@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+echo "Running pre-commit checks..."
+
+# Run linter
+ruff check .
+
+# Run formatter check
+ruff format --check .
+
+echo "All pre-commit checks passed!"

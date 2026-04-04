@@ -1,0 +1,7 @@
+version: "3"
+services:
+  seedream-cli:
+    platform: linux/amd64
+    container_name: "seedream-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/seedream-cli:${BUILD_NUMBER}"

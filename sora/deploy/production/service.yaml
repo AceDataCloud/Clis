@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sora-cli
+  name: sora-cli
+  namespace: acedatacloud
+spec:
+  selector:
+    app: sora-cli

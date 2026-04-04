@@ -1,0 +1,7 @@
+version: "3"
+services:
+  seedance-cli:
+    platform: linux/amd64
+    container_name: "seedance-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/seedance-cli:${BUILD_NUMBER}"

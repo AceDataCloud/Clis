@@ -1,0 +1,7 @@
+version: "3"
+services:
+  sora-cli:
+    platform: linux/amd64
+    container_name: "sora-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/sora-cli:${BUILD_NUMBER}"

@@ -1,0 +1,7 @@
+version: "3"
+services:
+  luma-cli:
+    platform: linux/amd64
+    container_name: "luma-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/luma-cli:${BUILD_NUMBER}"

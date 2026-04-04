@@ -1,0 +1,36 @@
+mappings:
+  luma:
+    repo: AceDataCloud/LumaCli
+    exclude:
+      - .github
+      - .gitbooks
+  suno:
+    repo: AceDataCloud/SunoCli
+    exclude:
+      - .github
+      - .gitbooks
+  sora:
+    repo: AceDataCloud/SoraCli
+    exclude:
+      - .github
+      - .gitbooks
+  veo:
+    repo: AceDataCloud/VeoCli
+    exclude:
+      - .github
+      - .gitbooks
+  nanobanana:
+    repo: AceDataCloud/NanoBananaCli
+    exclude:
+      - .github
+      - .gitbooks
+  seedance:
+    repo: AceDataCloud/SeedanceCli
+    exclude:
+      - .github
+      - .gitbooks
+  seedream:
+    repo: AceDataCloud/SeedreamCli
+    exclude:
+      - .github
+      - .gitbooks

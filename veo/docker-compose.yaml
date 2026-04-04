@@ -1,0 +1,7 @@
+version: "3"
+services:
+  veo-cli:
+    platform: linux/amd64
+    container_name: "veo-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/veo-cli:${BUILD_NUMBER}"
