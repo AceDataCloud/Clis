@@ -28,6 +28,12 @@ from luma_cli.core.output import (
     default=True,
     help="Enable prompt text enhancement (default: enabled).",
 )
+@click.option(
+    "--quality",
+    type=click.Choice(["standard", "high", "ultra"]),
+    default="standard",
+    help="Video generation quality level (default: standard).",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
@@ -40,6 +46,7 @@ def generate(
     aspect_ratio: str,
     loop: bool,
     enhancement: bool,
+    quality: str,
     callback_url: str | None,
     timeout: int | None,
     output_json: bool,
@@ -62,6 +69,7 @@ def generate(
             "aspect_ratio": aspect_ratio,
             "loop": loop,
             "enhancement": enhancement,
+            "quality": quality,
             "callback_url": callback_url,
             "timeout": timeout,
         }
@@ -101,6 +109,12 @@ def generate(
     default=True,
     help="Enable prompt text enhancement (default: enabled).",
 )
+@click.option(
+    "--quality",
+    type=click.Choice(["standard", "high", "ultra"]),
+    default="standard",
+    help="Video generation quality level (default: standard).",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
@@ -115,6 +129,7 @@ def image_to_video(
     aspect_ratio: str,
     loop: bool,
     enhancement: bool,
+    quality: str,
     callback_url: str | None,
     timeout: int | None,
     output_json: bool,
@@ -139,6 +154,7 @@ def image_to_video(
             aspect_ratio=aspect_ratio,
             loop=loop,
             enhancement=enhancement,
+            quality=quality,
             callback_url=callback_url,
             timeout=timeout,
         )
@@ -162,6 +178,12 @@ def image_to_video(
     default=DEFAULT_ASPECT_RATIO,
     help="Aspect ratio.",
 )
+@click.option(
+    "--quality",
+    type=click.Choice(["standard", "high", "ultra"]),
+    default="standard",
+    help="Video generation quality level (default: standard).",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
@@ -174,6 +196,7 @@ def extend(
     video_url: str | None,
     prompt: str | None,
     aspect_ratio: str,
+    quality: str,
     callback_url: str | None,
     timeout: int | None,
     output_json: bool,
@@ -200,6 +223,7 @@ def extend(
             video_url=video_url,
             prompt=prompt,
             aspect_ratio=aspect_ratio,
+            quality=quality,
             callback_url=callback_url,
             timeout=timeout,
         )
