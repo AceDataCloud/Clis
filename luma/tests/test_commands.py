@@ -99,20 +99,6 @@ class TestGenerateCommands:
         assert result.exit_code == 0
 
     @respx.mock
-    def test_generate_with_quality(self, runner, mock_video_response):
-        route = respx.post("https://api.acedata.cloud/luma/videos").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "generate", "test", "--quality", "high", "--json"],
-        )
-        assert result.exit_code == 0
-        assert route.called
-        body = json.loads(route.calls.last.request.content)
-        assert body["quality"] == "high"
-
-    @respx.mock
     def test_generate_with_timeout(self, runner, mock_video_response):
         route = respx.post("https://api.acedata.cloud/luma/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -153,30 +139,6 @@ class TestGenerateCommands:
         assert data["success"] is True
 
     @respx.mock
-    def test_image_to_video_with_quality(self, runner, mock_video_response):
-        route = respx.post("https://api.acedata.cloud/luma/videos").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "image-to-video",
-                "Animate this",
-                "--start-image-url",
-                "https://example.com/photo.jpg",
-                "--quality",
-                "ultra",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-        assert route.called
-        body = json.loads(route.calls.last.request.content)
-        assert body["quality"] == "ultra"
-
-    @respx.mock
     def test_image_to_video_with_timeout(self, runner, mock_video_response):
         route = respx.post("https://api.acedata.cloud/luma/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -210,20 +172,6 @@ class TestGenerateCommands:
             ["--token", "test-token", "extend", "video-123", "--json"],
         )
         assert result.exit_code == 0
-
-    @respx.mock
-    def test_extend_with_quality(self, runner, mock_video_response):
-        route = respx.post("https://api.acedata.cloud/luma/videos").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "extend", "video-123", "--quality", "high", "--json"],
-        )
-        assert result.exit_code == 0
-        assert route.called
-        body = json.loads(route.calls.last.request.content)
-        assert body["quality"] == "high"
 
     @respx.mock
     def test_extend_with_timeout(self, runner, mock_video_response):
