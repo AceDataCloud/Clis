@@ -218,7 +218,9 @@ class TestGenerateCommands:
         # Verify the content array contains text + image_url items
         sent = json.loads(route.calls[0].request.content)
         assert {"type": "text", "text": "Animate this"} in sent["content"]
-        assert {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"}} in sent["content"]
+        assert {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"}} in sent[
+            "content"
+        ]
         assert "image_urls" not in sent
 
     @respx.mock
@@ -245,8 +247,14 @@ class TestGenerateCommands:
         content = sent["content"]
         assert len(content) == 3  # 1 text + 2 image_url
         assert content[0] == {"type": "text", "text": "Bring to life"}
-        assert content[1] == {"type": "image_url", "image_url": {"url": "https://example.com/img1.jpg"}}
-        assert content[2] == {"type": "image_url", "image_url": {"url": "https://example.com/img2.jpg"}}
+        assert content[1] == {
+            "type": "image_url",
+            "image_url": {"url": "https://example.com/img1.jpg"},
+        }
+        assert content[2] == {
+            "type": "image_url",
+            "image_url": {"url": "https://example.com/img2.jpg"},
+        }
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────

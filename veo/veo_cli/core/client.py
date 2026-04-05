@@ -86,7 +86,7 @@ class VeoClient:
                 ) from e
 
             except Exception as e:
-                if isinstance(e, (VeoAPIError, VeoTimeoutError)):
+                if isinstance(e, VeoAPIError | VeoTimeoutError):
                     raise
                 raise VeoAPIError(message=str(e)) from e
 

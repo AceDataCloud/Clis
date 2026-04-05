@@ -86,7 +86,7 @@ class LumaClient:
                 ) from e
 
             except Exception as e:
-                if isinstance(e, (LumaAPIError, LumaTimeoutError)):
+                if isinstance(e, LumaAPIError | LumaTimeoutError):
                     raise
                 raise LumaAPIError(message=str(e)) from e
 

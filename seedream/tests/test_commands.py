@@ -156,7 +156,15 @@ class TestGenerateCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate", "test", "--response-format", "b64_json", "--json"],
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--response-format",
+                "b64_json",
+                "--json",
+            ],
         )
         assert result.exit_code == 0
         assert route.called
@@ -169,7 +177,15 @@ class TestGenerateCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate", "test", "--sequential-image-generation", "auto", "--json"],
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--sequential-image-generation",
+                "auto",
+                "--json",
+            ],
         )
         assert result.exit_code == 0
         assert route.called

@@ -93,4 +93,3 @@ class TestPrintTaskResult:
         print_task_result(data)
         captured = capsys.readouterr()
         assert "task-123" in captured.out
-
