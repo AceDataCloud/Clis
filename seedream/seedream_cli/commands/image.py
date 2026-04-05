@@ -30,7 +30,12 @@ from seedream_cli.core.output import (
     default=None,
     help="Output resolution.",
 )
-@click.option("--seed", type=int, default=None, help="Seed for reproducible generation (range: -1 to 2147483647).")
+@click.option(
+    "--seed",
+    type=int,
+    default=None,
+    help="Seed for reproducible generation (range: -1 to 2147483647).",
+)
 @click.option(
     "--sequential-image-generation",
     type=click.Choice(["auto", "disabled"]),
@@ -45,7 +50,9 @@ from seedream_cli.core.output import (
     default=None,
     help="Response format: url (default) or b64_json.",
 )
-@click.option("--watermark/--no-watermark", default=None, help="Add AI-generated watermark (default: true).")
+@click.option(
+    "--watermark/--no-watermark", default=None, help="Add AI-generated watermark (default: true)."
+)
 @click.option(
     "--output-format",
     type=click.Choice(["jpeg", "png"]),
@@ -132,7 +139,12 @@ def generate(
     default=DEFAULT_MODEL,
     help="Seedream model version.",
 )
-@click.option("--seed", type=int, default=None, help="Seed for reproducible generation (range: -1 to 2147483647).")
+@click.option(
+    "--seed",
+    type=int,
+    default=None,
+    help="Seed for reproducible generation (range: -1 to 2147483647).",
+)
 @click.option("--guidance-scale", type=float, default=None, help="Prompt weight (range: 1-10).")
 @click.option(
     "--response-format",
@@ -140,7 +152,9 @@ def generate(
     default=None,
     help="Response format: url (default) or b64_json.",
 )
-@click.option("--watermark/--no-watermark", default=None, help="Add AI-generated watermark (default: true).")
+@click.option(
+    "--watermark/--no-watermark", default=None, help="Add AI-generated watermark (default: true)."
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context

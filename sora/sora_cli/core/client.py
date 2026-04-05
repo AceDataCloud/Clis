@@ -86,7 +86,7 @@ class SoraClient:
                 ) from e
 
             except Exception as e:
-                if isinstance(e, (SoraAPIError, SoraTimeoutError)):
+                if isinstance(e, SoraAPIError | SoraTimeoutError):
                     raise
                 raise SoraAPIError(message=str(e)) from e
 

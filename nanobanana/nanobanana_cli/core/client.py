@@ -86,7 +86,7 @@ class NanoBananaClient:
                 ) from e
 
             except Exception as e:
-                if isinstance(e, (NanoBananaAPIError, NanoBananaTimeoutError)):
+                if isinstance(e, NanoBananaAPIError | NanoBananaTimeoutError):
                     raise
                 raise NanoBananaAPIError(message=str(e)) from e
 

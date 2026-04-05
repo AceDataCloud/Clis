@@ -86,7 +86,7 @@ class SeedanceClient:
                 ) from e
 
             except Exception as e:
-                if isinstance(e, (SeedanceAPIError, SeedanceTimeoutError)):
+                if isinstance(e, SeedanceAPIError | SeedanceTimeoutError):
                     raise
                 raise SeedanceAPIError(message=str(e)) from e
 

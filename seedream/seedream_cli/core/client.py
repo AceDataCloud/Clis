@@ -86,7 +86,7 @@ class SeedreamClient:
                 ) from e
 
             except Exception as e:
-                if isinstance(e, (SeedreamAPIError, SeedreamTimeoutError)):
+                if isinstance(e, SeedreamAPIError | SeedreamTimeoutError):
                     raise
                 raise SeedreamAPIError(message=str(e)) from e
 
