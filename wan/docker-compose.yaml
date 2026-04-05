@@ -1,0 +1,7 @@
+version: "3"
+services:
+  wan-cli:
+    platform: linux/amd64
+    container_name: "wan-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/wan-cli:${BUILD_NUMBER}"
