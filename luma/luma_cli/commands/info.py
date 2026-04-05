@@ -3,7 +3,13 @@
 import click
 
 from luma_cli.core.config import settings
-from luma_cli.core.output import ASPECT_RATIOS, console
+from luma_cli.core.output import ASPECT_RATIOS, console, print_models
+
+
+@click.command()
+def models() -> None:
+    """List available Luma models."""
+    print_models()
 
 
 @click.command("aspect-ratios")

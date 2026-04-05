@@ -9,6 +9,13 @@ from rich.table import Table
 
 console = Console()
 
+# Available models
+LUMA_MODELS = [
+    "luma",
+]
+
+DEFAULT_MODEL = "luma"
+
 # Available aspect ratios
 ASPECT_RATIOS = [
     "16:9",
@@ -102,3 +109,18 @@ def print_task_result(data: dict[str, Any]) -> None:
         console.print(table)
 
 
+def print_models() -> None:
+    """Print available Luma models."""
+    table = Table(title="Available Luma Models")
+    table.add_column("Model", style="bold cyan")
+    table.add_column("Version", style="bold")
+    table.add_column("Notes")
+
+    table.add_row(
+        "luma",
+        "Standard",
+        "Standard quality video generation (default)",
+    )
+
+    console.print(table)
+    console.print(f"\n[dim]Default model: {DEFAULT_MODEL}[/dim]")

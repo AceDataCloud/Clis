@@ -11,7 +11,7 @@ from importlib import metadata
 import click
 from dotenv import load_dotenv
 
-from luma_cli.commands.info import aspect_ratios, config
+from luma_cli.commands.info import aspect_ratios, config, models
 from luma_cli.commands.task import task, tasks_batch, wait
 from luma_cli.commands.video import extend, generate, image_to_video
 
@@ -63,6 +63,7 @@ cli.add_command(tasks_batch)
 cli.add_command(wait)
 cli.add_command(config)
 cli.add_command(aspect_ratios)
+cli.add_command(models)
 
 
 if __name__ == "__main__":
