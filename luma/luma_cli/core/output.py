@@ -9,6 +9,11 @@ from rich.table import Table
 
 console = Console()
 
+# Available models
+LUMA_MODELS = [
+    ("luma", "Standard", "Standard quality video generation (default)"),
+]
+
 # Available aspect ratios
 ASPECT_RATIOS = [
     "16:9",
@@ -26,6 +31,19 @@ DEFAULT_ASPECT_RATIO = "16:9"
 def print_json(data: Any) -> None:
     """Print data as formatted JSON."""
     console.print(json.dumps(data, indent=2, ensure_ascii=False))
+
+
+def print_models() -> None:
+    """Print available Luma models."""
+    table = Table(title="Available Luma Models")
+    table.add_column("Model", style="bold cyan")
+    table.add_column("Version")
+    table.add_column("Notes")
+
+    for model, version, notes in LUMA_MODELS:
+        table.add_row(model, version, notes)
+
+    console.print(table)
 
 
 def print_error(message: str) -> None:

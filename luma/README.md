@@ -62,7 +62,7 @@ cp .env.example .env
 luma generate "A test video"
 
 # Generate from reference image
-luma image-to-video "Animate this scene" -i https://example.com/photo.jpg
+luma image-to-video "Animate this scene" --start-image-url https://example.com/photo.jpg
 
 # Extend a video
 luma extend <video-id>
@@ -104,7 +104,6 @@ Most commands support:
 
 ```
 --json          Output raw JSON (for piping/scripting)
---model TEXT    Luma model version (default: luma)
 --timeout INT   Timeout in seconds for the API to return data
 ```
 
@@ -123,7 +122,6 @@ Most commands support:
 |----------|-------------|---------|
 | `ACEDATACLOUD_API_TOKEN` | API token from AceDataCloud | *Required* |
 | `ACEDATACLOUD_API_BASE_URL` | API base URL | `https://api.acedata.cloud` |
-| `LUMA_DEFAULT_MODEL` | Default model | `luma` |
 | `LUMA_REQUEST_TIMEOUT` | Timeout in seconds | `1800` |
 
 ## Development
