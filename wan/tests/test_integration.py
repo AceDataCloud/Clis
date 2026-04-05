@@ -1,5 +1,7 @@
 """Integration tests (require real API token)."""
 
+import contextlib
+
 import pytest
 
 from wan_cli.core.client import WanClient
@@ -22,7 +24,5 @@ def test_query_task_integration(api_token):
     """Test querying a task via real API."""
     client = WanClient(api_token=api_token)
     # Use a dummy task ID - it will return an error but we verify auth works
-    try:
+    with contextlib.suppress(Exception):
         client.query_task(id="test-task-id", action="retrieve")
-    except Exception:
-        pass  # Expected for non-existent task
