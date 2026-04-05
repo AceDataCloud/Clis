@@ -1,0 +1,7 @@
+services:
+  adc-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["adc"]
+    command: ["--help"]

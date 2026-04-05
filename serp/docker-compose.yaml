@@ -1,0 +1,6 @@
+services:
+  serp-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["serp-cli"]

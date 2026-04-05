@@ -1,4 +1,9 @@
 mappings:
+  midjourney:
+    repo: AceDataCloud/MidjourneyCli
+    exclude:
+      - .github
+      - .gitbooks
   luma:
     repo: AceDataCloud/LumaCli
     exclude:
@@ -31,6 +36,21 @@ mappings:
       - .gitbooks
   seedream:
     repo: AceDataCloud/SeedreamCli
+    exclude:
+      - .github
+      - .gitbooks
+  flux:
+    repo: AceDataCloud/FluxCli
+    exclude:
+      - .github
+      - .gitbooks
+  serp:
+    repo: AceDataCloud/SerpCli
+    exclude:
+      - .github
+      - .gitbooks
+  adc:
+    repo: AceDataCloud/AdcCli
     exclude:
       - .github
       - .gitbooks
