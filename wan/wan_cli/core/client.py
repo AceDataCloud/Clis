@@ -86,7 +86,7 @@ class WanClient:
                 ) from e
 
             except Exception as e:
-                if isinstance(e, (WanAPIError, WanTimeoutError)):
+                if isinstance(e, WanAPIError | WanTimeoutError):
                     raise
                 raise WanAPIError(message=str(e)) from e
 

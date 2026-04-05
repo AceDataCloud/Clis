@@ -1,7 +1,5 @@
 """Tests for output formatting."""
 
-import json
-
 from wan_cli.core.output import (
     DEFAULT_MODEL,
     DURATIONS,
@@ -45,7 +43,7 @@ def test_durations():
     assert 15 in DURATIONS
 
 
-def test_print_json(capsys):
+def test_print_json():
     data = {"key": "value", "number": 42}
     print_json(data)
     # Output goes to console, not capsys - just verify no exception
