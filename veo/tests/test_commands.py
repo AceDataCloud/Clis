@@ -86,7 +86,7 @@ class TestGenerateCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate", "test", "-m", "veo31-fast-ingredient", "--json"],
+            ["--token", "test-token", "generate", "test", "-m", "veo31-fast-ingredients", "--json"],
         )
         assert result.exit_code == 0
 
@@ -243,7 +243,7 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         assert "veo3" in result.output
-        assert "veo31-fast-ingredient" in result.output
+        assert "veo31-fast-ingredients" in result.output
 
     def test_aspect_ratios(self, runner):
         result = runner.invoke(cli, ["aspect-ratios"])
