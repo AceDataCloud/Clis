@@ -15,7 +15,7 @@ VEO_MODELS = [
     "veo3-fast",
     "veo31",
     "veo31-fast",
-    "veo31-fast-ingredient",
+    "veo31-fast-ingredients",
     "veo2",
     "veo2-fast",
 ]
@@ -148,7 +148,7 @@ def print_models() -> None:
         "Fast next-gen model",
     )
     table.add_row(
-        "veo31-fast-ingredient",
+        "veo31-fast-ingredients",
         "V3.1 Fast Ingredient",
         "Ingredient-based fast next-gen model",
     )

@@ -29,7 +29,7 @@ class TestConstants:
             "veo3-fast",
             "veo31",
             "veo31-fast",
-            "veo31-fast-ingredient",
+            "veo31-fast-ingredients",
             "veo2",
             "veo2-fast",
         ]:

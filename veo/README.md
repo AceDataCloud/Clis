@@ -14,7 +14,7 @@ Generate AI videos directly from your terminal — no MCP client required.
 
 - **Video Generation** — Generate videos from text prompts with multiple models
 - **Image-to-Video** — Create videos from reference images- **Video Upscale** — Get 1080p versions of generated videos
-- **Multiple Models** — veo3, veo3-fast, veo31, veo31-fast, veo31-fast-ingredient, veo2, veo2-fast
+- **Multiple Models** — veo3, veo3-fast, veo31, veo31-fast, veo31-fast-ingredients, veo2, veo2-fast
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -117,7 +117,7 @@ Most commands support:
 | `veo3-fast` | V3 Fast | Fast generation |
 | `veo31` | V3.1 | Next generation model |
 | `veo31-fast` | V3.1 Fast | Fast next-gen model |
-| `veo31-fast-ingredient` | V3.1 Fast Ingredient | Ingredient-based fast next-gen model |
+| `veo31-fast-ingredients` | V3.1 Fast Ingredient | Ingredient-based fast next-gen model |
 | `veo2` | V2 | Previous generation, stable |
 | `veo2-fast` | V2 Fast | Fast previous-gen model |
 
