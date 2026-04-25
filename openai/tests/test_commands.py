@@ -244,7 +244,7 @@ class TestImagineCommands:
         )
         result = runner.invoke(cli, ["--token", "test-token", "imagine", "A cat at sunset"])
         assert result.exit_code == 0
-        assert "example.com" in result.output
+        assert "https://example.com/generated-image.png" in result.output
 
     @respx.mock
     def test_imagine_with_model(self, runner, mock_image_response):
