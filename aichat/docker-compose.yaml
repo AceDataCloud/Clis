@@ -1,0 +1,6 @@
+services:
+  aichat-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["aichat-cli"]
