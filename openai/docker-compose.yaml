@@ -1,0 +1,6 @@
+services:
+  openai-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["openai-cli"]
