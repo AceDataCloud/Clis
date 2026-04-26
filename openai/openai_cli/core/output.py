@@ -48,8 +48,9 @@ EMBEDDING_MODELS = [
     "text-embedding-ada-002",
 ]
 
-# Image generation/editing models
-IMAGE_MODELS = [
+# Image generation models
+IMAGE_GENERATION_MODELS = [
+    "dall-e-2",
     "dall-e-3",
     "gpt-image-1",
     "gpt-image-1.5",
@@ -58,6 +59,20 @@ IMAGE_MODELS = [
     "nano-banana-2",
     "nano-banana-pro",
 ]
+
+# Image editing models (dall-e-2 not supported for editing)
+IMAGE_EDIT_MODELS = [
+    "dall-e-3",
+    "gpt-image-1",
+    "gpt-image-1.5",
+    "gpt-image-2",
+    "nano-banana",
+    "nano-banana-2",
+    "nano-banana-pro",
+]
+
+# Backward-compatible alias
+IMAGE_MODELS = IMAGE_GENERATION_MODELS
 
 # Response API models
 RESPONSE_MODELS = [
@@ -132,6 +147,7 @@ RESPONSE_MODELS = [
 DEFAULT_CHAT_MODEL = "gpt-4o-mini"
 DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"
 DEFAULT_IMAGE_MODEL = "dall-e-3"
+DEFAULT_IMAGE_EDIT_MODEL = "dall-e-3"
 DEFAULT_RESPONSE_MODEL = "gpt-4o-mini"
 
 
