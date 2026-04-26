@@ -371,3 +371,175 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["config"])
         assert result.exit_code == 0
         assert "api.acedata.cloud" in result.output
+
+
+# ─── Task Commands ─────────────────────────────────────────────────────────
+
+
+class TestTaskCommands:
+    """Tests for task retrieval commands."""
+
+    def test_task_help(self, runner):
+        result = runner.invoke(cli, ["task", "--help"])
+        assert result.exit_code == 0
+        assert "--id" in result.output
+        assert "--trace-id" in result.output
+
+    def test_tasks_help(self, runner):
+        result = runner.invoke(cli, ["tasks", "--help"])
+        assert result.exit_code == 0
+        assert "--ids" in result.output
+        assert "--trace-ids" in result.output
+
+    def test_task_requires_id_or_trace_id(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "task"])
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_task_by_id_json(self, runner, mock_task_response):
+        respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "--id",
+                "7489df4c-ef03-4de0-b598-e9a590793434",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["id"] == "7489df4c-ef03-4de0-b598-e9a590793434"
+
+    @respx.mock
+    def test_task_by_id_sends_correct_payload(self, runner, mock_task_response):
+        route = respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "--id",
+                "7489df4c-ef03-4de0-b598-e9a590793434",
+                "--json",
+            ],
+        )
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == "retrieve"
+        assert body["id"] == "7489df4c-ef03-4de0-b598-e9a590793434"
+
+    @respx.mock
+    def test_task_by_trace_id(self, runner, mock_task_response):
+        route = respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "--trace-id",
+                "my-custom-trace-001",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == "retrieve"
+        assert body["trace_id"] == "my-custom-trace-001"
+
+    @respx.mock
+    def test_task_rich_output(self, runner, mock_task_response):
+        respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "--id",
+                "7489df4c-ef03-4de0-b598-e9a590793434",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "7489df4c" in result.output
+
+    @respx.mock
+    def test_tasks_batch_by_ids_json(self, runner, mock_tasks_batch_response):
+        respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_tasks_batch_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "--ids",
+                "7489df4c-ef03-4de0-b598-e9a590793434",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "items" in data
+        assert data["count"] == 1
+
+    @respx.mock
+    def test_tasks_batch_sends_correct_payload(self, runner, mock_tasks_batch_response):
+        route = respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_tasks_batch_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "--trace-ids",
+                "my-trace-001",
+                "--trace-ids",
+                "my-trace-002",
+                "--json",
+            ],
+        )
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == "retrieve_batch"
+        assert "my-trace-001" in body["trace_ids"]
+        assert "my-trace-002" in body["trace_ids"]
+
+    @respx.mock
+    def test_tasks_batch_with_filters(self, runner, mock_tasks_batch_response):
+        route = respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_tasks_batch_response)
+        )
+        runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "--application-id",
+                "app-123",
+                "--limit",
+                "5",
+                "--offset",
+                "10",
+                "--json",
+            ],
+        )
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == "retrieve_batch"
+        assert body["application_id"] == "app-123"
+        assert body["limit"] == 5
+        assert body["offset"] == 10

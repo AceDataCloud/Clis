@@ -303,6 +303,45 @@ def print_response_result(data: dict[str, Any]) -> None:
         console.print(table)
 
 
+def print_task_result(data: dict[str, Any]) -> None:
+    """Print a task query result."""
+    items = data.get("items")
+    if items is not None:
+        # retrieve_batch response
+        count = data.get("count", len(items))
+        console.print(f"[bold]Tasks found:[/bold] {count}")
+        for item in items:
+            _print_single_task(item)
+    elif data:
+        # retrieve response (single task object or empty dict)
+        _print_single_task(data)
+    else:
+        console.print("[yellow]No task found.[/yellow]")
+
+
+def _print_single_task(task: dict[str, Any]) -> None:
+    """Print a single task object."""
+    if not task:
+        console.print("[yellow]No task found.[/yellow]")
+        return
+    table = Table(show_header=False, box=None, padding=(0, 2))
+    table.add_column("Field", style="bold cyan", width=18)
+    table.add_column("Value")
+    for key in ["id", "trace_id", "type", "application_id", "user_id", "created_at", "finished_at", "duration"]:
+        if task.get(key) is not None:
+            table.add_row(key.replace("_", " ").title(), str(task[key]))
+    response = task.get("response")
+    if response:
+        resp_data = response.get("data", [])
+        if resp_data and isinstance(resp_data, list):
+            for i, item in enumerate(resp_data, 1):
+                url = item.get("url", "")
+                if url:
+                    table.add_row(f"Result URL #{i}", url)
+    console.print(table)
+    console.print()
+
+
 def print_models() -> None:
     """Print available models for all endpoints."""
     table = Table(title="Available Chat Completion Models")

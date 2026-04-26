@@ -64,6 +64,8 @@ openai-cli config
 | `image` | Image generation (`/openai/images/generations`) |
 | `edit` | Image editing (`/openai/images/edits`) |
 | `response` | Responses API (`/openai/responses`) |
+| `task` | Retrieve a single async image task (`/openai/tasks`) |
+| `tasks` | Retrieve multiple async image tasks (`/openai/tasks`) |
 | `models` | List available models |
 | `config` | Show current configuration |
 
