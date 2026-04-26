@@ -117,6 +117,46 @@ class TestImagineCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["translation"] is True
 
+    @respx.mock
+    def test_imagine_with_style_reference(self, runner, mock_imagine_response):
+        route = respx.post("https://api.acedata.cloud/midjourney/imagine").mock(
+            return_value=Response(200, json=mock_imagine_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "imagine", "test", "--style-reference", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["style_reference"] is True
+
+    @respx.mock
+    def test_imagine_with_moodboard(self, runner, mock_imagine_response):
+        route = respx.post("https://api.acedata.cloud/midjourney/imagine").mock(
+            return_value=Response(200, json=mock_imagine_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "imagine", "test", "--moodboard", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["moodboard"] is True
+
+    @respx.mock
+    def test_imagine_no_style_reference_by_default(self, runner, mock_imagine_response):
+        route = respx.post("https://api.acedata.cloud/midjourney/imagine").mock(
+            return_value=Response(200, json=mock_imagine_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "imagine", "test", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert "style_reference" not in body
+        assert "moodboard" not in body
+
     def test_imagine_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "imagine", "test"])
         assert result.exit_code != 0
@@ -282,6 +322,75 @@ class TestTaskCommands:
         )
         result = runner.invoke(cli, ["--token", "test-token", "tasks", "t-1", "t-2", "--json"])
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_task_with_trace_id(self, runner, mock_task_response):
+        route = respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "task", "--trace-id", "trace-xyz", "--json"]
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["trace_id"] == "trace-xyz"
+        assert body["action"] == "retrieve"
+
+    @respx.mock
+    def test_tasks_batch_with_trace_ids(self, runner, mock_task_response):
+        route = respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "--trace-ids",
+                "trace-1",
+                "--trace-ids",
+                "trace-2",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == "retrieve_batch"
+        assert body["trace_ids"] == ["trace-1", "trace-2"]
+
+    @respx.mock
+    def test_tasks_batch_with_pagination(self, runner, mock_task_response):
+        route = respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "t-1",
+                "t-2",
+                "--offset",
+                "0",
+                "--limit",
+                "10",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["offset"] == 0
+        assert body["limit"] == 10
+
+    def test_task_no_id_no_trace_id(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "task"])
+        assert result.exit_code != 0
+
+    def test_tasks_no_ids_no_trace_ids(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "tasks"])
+        assert result.exit_code != 0
 
     @respx.mock
     def test_seed_json(self, runner, mock_seed_response):

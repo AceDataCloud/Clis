@@ -41,6 +41,17 @@ from midjourney_cli.core.output import (
     default=None,
     help="Quality level. V8: '1' or '4' (ultra). Older: '.25', '.5', '1'.",
 )
+@click.option(
+    "--style-reference/--no-style-reference",
+    "style_reference",
+    default=False,
+    help="Prompt uses style references (--sref). V8 only, costs 4x GPU time.",
+)
+@click.option(
+    "--moodboard/--no-moodboard",
+    default=False,
+    help="Prompt uses moodboard references. V8 only, costs 4x GPU time.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
@@ -56,6 +67,8 @@ def imagine(
     split_images: bool,
     hd: bool,
     quality: str | None,
+    style_reference: bool,
+    moodboard: bool,
     callback_url: str | None,
     timeout: int | None,
     output_json: bool,
@@ -87,6 +100,10 @@ def imagine(
             payload["hd"] = hd
         if quality is not None:
             payload["quality"] = quality
+        if style_reference:
+            payload["style_reference"] = style_reference
+        if moodboard:
+            payload["moodboard"] = moodboard
 
         result = client.imagine(**payload)  # type: ignore[arg-type]
         if output_json:

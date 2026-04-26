@@ -16,25 +16,36 @@ from midjourney_cli.core.output import (
 
 
 @click.command()
-@click.argument("task_id")
+@click.argument("task_id", required=False, default=None)
+@click.option("--trace-id", default=None, help="Retrieve task by trace ID instead of task ID.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def task(
     ctx: click.Context,
-    task_id: str,
+    task_id: str | None,
+    trace_id: str | None,
     output_json: bool,
 ) -> None:
     """Query a single task status.
 
     TASK_ID is the task ID returned from generate/imagine commands.
+    Alternatively, use --trace-id to retrieve by trace ID.
 
     \b
     Examples:
       midjourney task abc123-def456
+      midjourney task --trace-id trace-xyz789
     """
+    if task_id is None and trace_id is None:
+        raise click.UsageError("Provide TASK_ID argument or --trace-id option.")
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.query_task(id=task_id, action="retrieve")
+        kwargs: dict[str, object] = {"action": "retrieve"}
+        if task_id is not None:
+            kwargs["id"] = task_id
+        if trace_id is not None:
+            kwargs["trace_id"] = trace_id
+        result = client.query_task(**kwargs)
         if output_json:
             print_json(result)
         else:
@@ -45,25 +56,49 @@ def task(
 
 
 @click.command("tasks")
-@click.argument("task_ids", nargs=-1, required=True)
+@click.argument("task_ids", nargs=-1, required=False)
+@click.option(
+    "--trace-ids",
+    multiple=True,
+    help="Retrieve tasks by trace IDs (can be specified multiple times).",
+)
+@click.option("--offset", type=int, default=None, help="Offset for pagination.")
+@click.option("--limit", type=int, default=None, help="Maximum number of tasks to return.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def tasks_batch(
     ctx: click.Context,
     task_ids: tuple[str, ...],
+    trace_ids: tuple[str, ...],
+    offset: int | None,
+    limit: int | None,
     output_json: bool,
 ) -> None:
     """Query multiple tasks at once.
 
     TASK_IDS are space-separated task IDs.
+    Alternatively, use --trace-ids to retrieve by trace IDs.
 
     \b
     Examples:
       midjourney tasks abc123 def456 ghi789
+      midjourney tasks --trace-ids trace-1 --trace-ids trace-2
+      midjourney tasks abc123 def456 --offset 0 --limit 10
     """
+    if not task_ids and not trace_ids:
+        raise click.UsageError("Provide TASK_IDS arguments or --trace-ids options.")
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.query_task(ids=list(task_ids), action="retrieve_batch")
+        kwargs: dict[str, object] = {"action": "retrieve_batch"}
+        if task_ids:
+            kwargs["ids"] = list(task_ids)
+        if trace_ids:
+            kwargs["trace_ids"] = list(trace_ids)
+        if offset is not None:
+            kwargs["offset"] = offset
+        if limit is not None:
+            kwargs["limit"] = limit
+        result = client.query_task(**kwargs)
         if output_json:
             print_json(result)
         else:
