@@ -1,0 +1,6 @@
+services:
+  claude-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["claude-cli"]

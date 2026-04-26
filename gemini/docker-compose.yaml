@@ -1,0 +1,6 @@
+services:
+  gemini-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["gemini-cli"]
