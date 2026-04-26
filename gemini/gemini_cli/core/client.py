@@ -61,7 +61,7 @@ class GeminiClient:
                     raise GeminiAuthError("Access denied. Check your API permissions.")
 
                 response.raise_for_status()
-                return response.json()
+                return response.json()  # type: ignore[no-any-return]
 
             except httpx.TimeoutException as e:
                 raise GeminiTimeoutError(
@@ -105,7 +105,7 @@ class GeminiClient:
                 if response.status_code == 403:
                     raise GeminiAuthError("Access denied. Check your API permissions.")
                 response.raise_for_status()
-                return response.json()
+                return response.json()  # type: ignore[no-any-return]
             except httpx.TimeoutException as e:
                 raise GeminiTimeoutError(f"Request timed out after {self.timeout}s") from e
             except GeminiAuthError:

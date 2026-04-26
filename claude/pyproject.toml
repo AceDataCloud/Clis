@@ -38,10 +38,10 @@ all = ["claude-cli[dev,test,release]"]
 claude-cli = "claude_cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/AceDataCloud/ClaudeCli"
-Repository = "https://github.com/AceDataCloud/ClaudeCli"
-Issues = "https://github.com/AceDataCloud/ClaudeCli/issues"
-Changelog = "https://github.com/AceDataCloud/ClaudeCli/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/AceDataCloud/Clis"
+Repository = "https://github.com/AceDataCloud/Clis"
+Issues = "https://github.com/AceDataCloud/Clis/issues"
+Changelog = "https://github.com/AceDataCloud/Clis/blob/main/claude/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling>=1.21.0,<1.22.0"]

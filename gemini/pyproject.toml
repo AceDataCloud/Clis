@@ -38,10 +38,10 @@ all = ["gemini-cli[dev,test,release]"]
 gemini-cli = "gemini_cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/AceDataCloud/GeminiCli"
-Repository = "https://github.com/AceDataCloud/GeminiCli"
-Issues = "https://github.com/AceDataCloud/GeminiCli/issues"
-Changelog = "https://github.com/AceDataCloud/GeminiCli/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/AceDataCloud/Clis"
+Repository = "https://github.com/AceDataCloud/Clis"
+Issues = "https://github.com/AceDataCloud/Clis/issues"
+Changelog = "https://github.com/AceDataCloud/Clis/blob/main/gemini/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling>=1.21.0,<1.22.0"]
