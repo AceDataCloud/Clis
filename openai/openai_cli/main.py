@@ -16,6 +16,7 @@ from openai_cli.commands.embed import embed
 from openai_cli.commands.image import edit, image
 from openai_cli.commands.info import config, models
 from openai_cli.commands.response import response
+from openai_cli.commands.tasks import tasks
 
 load_dotenv()
 
@@ -51,6 +52,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
       openai-cli image "A sunset over mountains"
       openai-cli edit "Add clouds" --image-url https://example.com/photo.jpg
       openai-cli response "Summarize this topic" -m gpt-4o
+      openai-cli tasks retrieve --id <task-id>
 
     Set your token:
       export ACEDATACLOUD_API_TOKEN=your_token
@@ -65,6 +67,7 @@ cli.add_command(embed)
 cli.add_command(image)
 cli.add_command(edit)
 cli.add_command(response)
+cli.add_command(tasks)
 cli.add_command(models)
 cli.add_command(config)
 

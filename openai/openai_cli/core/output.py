@@ -303,6 +303,89 @@ def print_response_result(data: dict[str, Any]) -> None:
         console.print(table)
 
 
+def print_task_result(data: dict[str, Any]) -> None:
+    """Print a single task result."""
+    if not data:
+        console.print("[yellow]No task found.[/yellow]")
+        return
+
+    task_id = data.get("id", "")
+    trace_id = data.get("trace_id", "")
+    task_type = data.get("type", "")
+    created_at = data.get("created_at", "")
+    finished_at = data.get("finished_at", "")
+    duration = data.get("duration", "")
+
+    lines = []
+    if task_id:
+        lines.append(f"[bold]Task ID:[/bold] {task_id}")
+    if trace_id:
+        lines.append(f"[bold]Trace ID:[/bold] {trace_id}")
+    if task_type:
+        lines.append(f"[bold]Type:[/bold] {task_type}")
+    if created_at:
+        lines.append(f"[bold]Created:[/bold] {created_at}")
+    if finished_at:
+        lines.append(f"[bold]Finished:[/bold] {finished_at}")
+    if duration:
+        lines.append(f"[bold]Duration:[/bold] {duration}s")
+
+    response = data.get("response", {})
+    if response:
+        success = response.get("success", "")
+        image_data = response.get("data", [])
+        if success is not None:
+            lines.append(f"[bold]Success:[/bold] {success}")
+        if image_data:
+            for i, item in enumerate(image_data, 1):
+                url = item.get("url", "") or item.get("image_url", "")
+                if url:
+                    lines.append(f"[bold]Image {i}:[/bold] {url}")
+
+    console.print(
+        Panel(
+            "\n".join(lines) or "[dim](empty)[/dim]",
+            title="[bold green]Task[/bold green]",
+            border_style="green",
+        )
+    )
+
+
+def print_task_batch_result(data: dict[str, Any]) -> None:
+    """Print a batch of task results."""
+    items = data.get("items", [])
+    count = data.get("count", len(items))
+
+    if not items:
+        console.print("[yellow]No tasks found.[/yellow]")
+        return
+
+    console.print(f"[bold]Found {count} task(s):[/bold]")
+    for i, item in enumerate(items, 1):
+        task_id = item.get("id", "")
+        trace_id = item.get("trace_id", "")
+        task_type = item.get("type", "")
+        created_at = item.get("created_at", "")
+
+        lines = []
+        if task_id:
+            lines.append(f"[bold]Task ID:[/bold] {task_id}")
+        if trace_id:
+            lines.append(f"[bold]Trace ID:[/bold] {trace_id}")
+        if task_type:
+            lines.append(f"[bold]Type:[/bold] {task_type}")
+        if created_at:
+            lines.append(f"[bold]Created:[/bold] {created_at}")
+
+        console.print(
+            Panel(
+                "\n".join(lines) or "[dim](empty)[/dim]",
+                title=f"[bold green]Task #{i}[/bold green]",
+                border_style="green",
+            )
+        )
+
+
 def print_models() -> None:
     """Print available models for all endpoints."""
     table = Table(title="Available Chat Completion Models")

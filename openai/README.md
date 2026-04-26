@@ -48,6 +48,13 @@ openai-cli edit "Add a rainbow" --image-url https://example.com/photo.jpg
 # Use the Responses API
 openai-cli response "Summarize this article" -m gpt-4o
 
+# Retrieve an async task result
+openai-cli tasks retrieve --id 7489df4c-ef03-4de0-b598-e9a590793434
+openai-cli tasks retrieve --trace-id my-custom-trace-001
+
+# Retrieve a batch of task results
+openai-cli tasks batch --trace-ids trace-001 trace-002
+
 # List available models
 openai-cli models
 
@@ -64,6 +71,8 @@ openai-cli config
 | `image` | Image generation (`/openai/images/generations`) |
 | `edit` | Image editing (`/openai/images/edits`) |
 | `response` | Responses API (`/openai/responses`) |
+| `tasks retrieve` | Retrieve a single async task result (`/openai/tasks`) |
+| `tasks batch` | Retrieve multiple async task results (`/openai/tasks`) |
 | `models` | List available models |
 | `config` | Show current configuration |
 
