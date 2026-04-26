@@ -1,0 +1,6 @@
+services:
+  deepseek-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["deepseek-cli"]

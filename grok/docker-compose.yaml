@@ -1,0 +1,6 @@
+services:
+  grok-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["grok-cli"]

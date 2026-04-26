@@ -1,0 +1,6 @@
+services:
+  kimi-cli:
+    build: .
+    env_file:
+      - .env
+    entrypoint: ["kimi-cli"]

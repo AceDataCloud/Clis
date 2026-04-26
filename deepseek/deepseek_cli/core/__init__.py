@@ -1,0 +1,1 @@
+"""DeepSeek CLI core package."""
