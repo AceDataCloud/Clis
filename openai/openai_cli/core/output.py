@@ -48,8 +48,20 @@ EMBEDDING_MODELS = [
     "text-embedding-ada-002",
 ]
 
-# Image generation/editing models
+# Image editing models
 IMAGE_MODELS = [
+    "dall-e-3",
+    "gpt-image-1",
+    "gpt-image-1.5",
+    "gpt-image-2",
+    "nano-banana",
+    "nano-banana-2",
+    "nano-banana-pro",
+]
+
+# Image generation models (superset of editing models, includes dall-e-2)
+IMAGE_GEN_MODELS = [
+    "dall-e-2",
     "dall-e-3",
     "gpt-image-1",
     "gpt-image-1.5",
@@ -400,8 +412,8 @@ def print_models() -> None:
         table2.add_row(model)
     console.print(table2)
 
-    table3 = Table(title="Available Image Models")
+    table3 = Table(title="Available Image Generation Models")
     table3.add_column("Model", style="bold cyan")
-    for model in IMAGE_MODELS:
+    for model in IMAGE_GEN_MODELS:
         table3.add_row(model)
     console.print(table3)
