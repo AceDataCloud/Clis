@@ -104,6 +104,10 @@ class OpenAIClient:
         """Send a Responses API request."""
         return self.request("/openai/responses", kwargs)
 
+    def tasks(self, **kwargs: Any) -> dict[str, Any]:
+        """Query OpenAI async task results."""
+        return self.request("/openai/tasks", kwargs)
+
 
 def get_client(token: str | None = None) -> OpenAIClient:
     """Get an OpenAIClient instance, optionally overriding the token."""
