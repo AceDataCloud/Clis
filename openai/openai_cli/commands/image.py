@@ -61,6 +61,35 @@ from openai_cli.core.output import (
     default=None,
     help="Background transparency for GPT image models.",
 )
+@click.option(
+    "--moderation",
+    type=click.Choice(["low", "auto"]),
+    default=None,
+    help="Content-moderation level for GPT image models.",
+)
+@click.option(
+    "--output-compression",
+    default=None,
+    type=click.IntRange(0, 100),
+    help="Compression level (0-100) for webp/jpeg output.",
+)
+@click.option(
+    "--partial-images",
+    default=None,
+    type=click.IntRange(0, 3),
+    help="Number of partial images to emit during streaming (0-3).",
+)
+@click.option(
+    "--response-format",
+    type=click.Choice(["url", "b64_json"]),
+    default=None,
+    help="Format for dall-e image responses.",
+)
+@click.option(
+    "--callback-url",
+    default=None,
+    help="Optional callback URL for async image generation.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image(
@@ -73,6 +102,11 @@ def image(
     style: str | None,
     output_format: str | None,
     background: str | None,
+    moderation: str | None,
+    output_compression: int | None,
+    partial_images: int | None,
+    response_format: str | None,
+    callback_url: str | None,
     output_json: bool,
 ) -> None:
     """Generate an image from a text prompt.
@@ -95,6 +129,11 @@ def image(
         "style": style,
         "output_format": output_format,
         "background": background,
+        "moderation": moderation,
+        "output_compression": output_compression,
+        "partial_images": partial_images,
+        "response_format": response_format,
+        "callback_url": callback_url,
     }
 
     try:
@@ -155,6 +194,29 @@ def image(
     default=None,
     help="Background transparency for GPT image models.",
 )
+@click.option(
+    "--input-fidelity",
+    type=click.Choice(["high", "low"]),
+    default=None,
+    help="How strongly to match input style/features (GPT image models only).",
+)
+@click.option(
+    "--output-compression",
+    default=None,
+    type=click.IntRange(0, 100),
+    help="Compression level (0-100) for webp/jpeg output.",
+)
+@click.option(
+    "--response-format",
+    type=click.Choice(["url", "b64_json"]),
+    default=None,
+    help="Response format: url or b64_json.",
+)
+@click.option(
+    "--callback-url",
+    default=None,
+    help="Optional callback URL for async image editing.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def edit(
@@ -167,6 +229,10 @@ def edit(
     quality: str | None,
     output_format: str | None,
     background: str | None,
+    input_fidelity: str | None,
+    output_compression: int | None,
+    response_format: str | None,
+    callback_url: str | None,
     output_json: bool,
 ) -> None:
     """Edit an image using a text prompt.
@@ -188,6 +254,10 @@ def edit(
         "quality": quality,
         "output_format": output_format,
         "background": background,
+        "input_fidelity": input_fidelity,
+        "output_compression": output_compression,
+        "response_format": response_format,
+        "callback_url": callback_url,
     }
 
     try:
