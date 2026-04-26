@@ -1,0 +1,7 @@
+version: "3"
+services:
+  hailuo-cli:
+    platform: linux/amd64
+    container_name: "hailuo-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/hailuo-cli:${BUILD_NUMBER}"
