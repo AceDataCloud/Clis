@@ -5,7 +5,9 @@ import click
 from openai_cli.core.client import get_client
 from openai_cli.core.exceptions import OpenAIError
 from openai_cli.core.output import (
+    DEFAULT_GENERATION_MODEL,
     DEFAULT_IMAGE_MODEL,
+    GENERATION_MODELS,
     IMAGE_MODELS,
     print_error,
     print_image_result,
@@ -18,8 +20,8 @@ from openai_cli.core.output import (
 @click.option(
     "-m",
     "--model",
-    type=click.Choice(IMAGE_MODELS),
-    default=DEFAULT_IMAGE_MODEL,
+    type=click.Choice(GENERATION_MODELS),
+    default=DEFAULT_GENERATION_MODEL,
     show_default=True,
     help="Image generation model to use.",
 )

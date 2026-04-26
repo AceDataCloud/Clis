@@ -48,7 +48,19 @@ EMBEDDING_MODELS = [
     "text-embedding-ada-002",
 ]
 
-# Image generation/editing models
+# Image generation models (includes dall-e-2 for generations only)
+GENERATION_MODELS = [
+    "dall-e-2",
+    "dall-e-3",
+    "gpt-image-1",
+    "gpt-image-1.5",
+    "gpt-image-2",
+    "nano-banana",
+    "nano-banana-2",
+    "nano-banana-pro",
+]
+
+# Image editing models (dall-e-2 not supported for edits)
 IMAGE_MODELS = [
     "dall-e-3",
     "gpt-image-1",
@@ -131,6 +143,7 @@ RESPONSE_MODELS = [
 
 DEFAULT_CHAT_MODEL = "gpt-4o-mini"
 DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"
+DEFAULT_GENERATION_MODEL = "dall-e-3"
 DEFAULT_IMAGE_MODEL = "dall-e-3"
 DEFAULT_RESPONSE_MODEL = "gpt-4o-mini"
 
@@ -400,8 +413,14 @@ def print_models() -> None:
         table2.add_row(model)
     console.print(table2)
 
-    table3 = Table(title="Available Image Models")
+    table3 = Table(title="Available Image Generation Models")
     table3.add_column("Model", style="bold cyan")
-    for model in IMAGE_MODELS:
+    for model in GENERATION_MODELS:
         table3.add_row(model)
     console.print(table3)
+
+    table4 = Table(title="Available Image Editing Models")
+    table4.add_column("Model", style="bold cyan")
+    for model in IMAGE_MODELS:
+        table4.add_row(model)
+    console.print(table4)
