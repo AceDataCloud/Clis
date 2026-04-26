@@ -42,6 +42,9 @@ openai-cli embed "Hello, world!" -m text-embedding-3-small
 # Generate an image
 openai-cli image "A futuristic city skyline at night"
 
+# Generate an image with dall-e-2
+openai-cli image "A sunset over mountains" -m dall-e-2 --size 512x512
+
 # Edit an image
 openai-cli edit "Add a rainbow" --image-url https://example.com/photo.jpg
 

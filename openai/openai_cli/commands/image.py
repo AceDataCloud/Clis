@@ -6,7 +6,8 @@ from openai_cli.core.client import get_client
 from openai_cli.core.exceptions import OpenAIError
 from openai_cli.core.output import (
     DEFAULT_IMAGE_MODEL,
-    IMAGE_MODELS,
+    IMAGE_EDIT_MODELS,
+    IMAGE_GEN_MODELS,
     print_error,
     print_image_result,
     print_json,
@@ -18,7 +19,7 @@ from openai_cli.core.output import (
 @click.option(
     "-m",
     "--model",
-    type=click.Choice(IMAGE_MODELS),
+    type=click.Choice(IMAGE_GEN_MODELS),
     default=DEFAULT_IMAGE_MODEL,
     show_default=True,
     help="Image generation model to use.",
@@ -118,6 +119,7 @@ def image(
       openai-cli image "A futuristic city skyline at night"
       openai-cli image "Portrait of a cat" -m gpt-image-1 --quality high
       openai-cli image "Abstract art" --size 1792x1024 --style vivid
+      openai-cli image "A sunset" -m dall-e-2 --size 512x512
     """
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
@@ -157,7 +159,7 @@ def image(
 @click.option(
     "-m",
     "--model",
-    type=click.Choice(IMAGE_MODELS),
+    type=click.Choice(IMAGE_EDIT_MODELS),
     default=DEFAULT_IMAGE_MODEL,
     show_default=True,
     help="Image editing model to use.",
