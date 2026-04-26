@@ -36,6 +36,13 @@ from openai_cli.core.output import (
     help="Maximum number of tokens to generate.",
 )
 @click.option(
+    "-n",
+    "--count",
+    default=None,
+    type=int,
+    help="Number of response choices to generate.",
+)
+@click.option(
     "--background",
     is_flag=True,
     default=False,
@@ -49,6 +56,7 @@ def response(
     model: str,
     temperature: float | None,
     max_tokens: int | None,
+    count: int | None,
     background: bool,
     output_json: bool,
 ) -> None:
@@ -68,6 +76,7 @@ def response(
         "input": [{"role": "user", "content": prompt}],
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "n": count,
         "background": background if background else None,
     }
 
