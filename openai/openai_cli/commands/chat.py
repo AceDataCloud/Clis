@@ -48,6 +48,47 @@ from openai_cli.core.output import (
     type=int,
     help="Number of completion choices to generate.",
 )
+@click.option(
+    "--top-p",
+    default=None,
+    type=float,
+    help="Nucleus sampling probability mass (0-1). Alternative to temperature.",
+)
+@click.option(
+    "--frequency-penalty",
+    default=None,
+    type=float,
+    help="Penalize tokens based on frequency in the text so far (-2.0 to 2.0).",
+)
+@click.option(
+    "--presence-penalty",
+    default=None,
+    type=float,
+    help="Penalize tokens that have appeared in the text so far (-2.0 to 2.0).",
+)
+@click.option(
+    "--seed",
+    default=None,
+    type=int,
+    help="Random seed for deterministic sampling.",
+)
+@click.option(
+    "--stop",
+    default=None,
+    help="Stop sequence — generation halts when this string is produced.",
+)
+@click.option(
+    "--max-completion-tokens",
+    default=None,
+    type=int,
+    help="Upper bound on tokens generated (use instead of --max-tokens for o1/o3/o4 models).",
+)
+@click.option(
+    "--reasoning-effort",
+    type=click.Choice(["minimal", "low", "medium", "high"]),
+    default=None,
+    help="Reasoning effort for o1/o3/o4/gpt-5 series models.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -58,6 +99,13 @@ def chat(
     temperature: float | None,
     max_tokens: int | None,
     count: int | None,
+    top_p: float | None,
+    frequency_penalty: float | None,
+    presence_penalty: float | None,
+    seed: int | None,
+    stop: str | None,
+    max_completion_tokens: int | None,
+    reasoning_effort: str | None,
     output_json: bool,
 ) -> None:
     """Chat with an OpenAI-compatible model.
@@ -70,6 +118,7 @@ def chat(
       openai-cli chat "Explain quantum computing" -m gpt-5.4
       openai-cli chat "Write a poem" -m gpt-4o --temperature 0.9
       openai-cli chat "Summarize this" -s "You are a concise summarizer"
+      openai-cli chat "Solve this math problem" -m o4-mini --reasoning-effort high
     """
     client = get_client(ctx.obj.get("token"))
     messages = []
@@ -83,6 +132,13 @@ def chat(
         "temperature": temperature,
         "max_tokens": max_tokens,
         "n": count,
+        "top_p": top_p,
+        "frequency_penalty": frequency_penalty,
+        "presence_penalty": presence_penalty,
+        "seed": seed,
+        "stop": stop,
+        "max_completion_tokens": max_completion_tokens,
+        "reasoning_effort": reasoning_effort,
     }
 
     try:

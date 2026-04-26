@@ -50,6 +50,7 @@ EMBEDDING_MODELS = [
 
 # Image generation/editing models
 IMAGE_MODELS = [
+    "dall-e-2",
     "dall-e-3",
     "gpt-image-1",
     "gpt-image-1.5",
