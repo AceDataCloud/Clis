@@ -863,3 +863,171 @@ class TestUpdatedPersonaCommand:
             ],
         )
         assert result.exit_code == 0
+
+
+# ─── Persona List / Delete & Voices Commands ─────────────────────────────
+
+
+class TestPersonaListDeleteVoicesCommands:
+    """Tests for persona-list, persona-delete, and voices commands."""
+
+    @respx.mock
+    def test_persona_list_json(self, runner, mock_persona_list_response):
+        respx.get("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_list_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "persona-list", "user-123", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["success"] is True
+        assert len(data["data"]) == 2
+
+    @respx.mock
+    def test_persona_list_rich(self, runner, mock_persona_list_response):
+        respx.get("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_list_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "persona-list", "user-123"])
+        assert result.exit_code == 0
+        assert "persona-id-1" in result.output
+        assert "Voice One" in result.output
+
+    @respx.mock
+    def test_persona_list_with_pagination(self, runner, mock_persona_list_response):
+        respx.get("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_list_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "persona-list",
+                "user-123",
+                "--limit",
+                "10",
+                "--offset",
+                "0",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_persona_delete_json(self, runner, mock_persona_delete_response):
+        respx.delete("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_delete_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "persona-delete", "persona-456", "--json"]
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["success"] is True
+
+    @respx.mock
+    def test_persona_delete_rich(self, runner, mock_persona_delete_response):
+        respx.delete("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_delete_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "persona-delete", "persona-456"])
+        assert result.exit_code == 0
+        assert "persona-456" in result.output
+
+    @respx.mock
+    def test_persona_delete_with_user_id(self, runner, mock_persona_delete_response):
+        respx.delete("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_delete_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "persona-delete",
+                "persona-456",
+                "--user-id",
+                "user-123",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_voices_json(self, runner, mock_voices_response):
+        respx.post("https://api.acedata.cloud/suno/voices").mock(
+            return_value=Response(200, json=mock_voices_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "voices",
+                "https://example.com/voice.mp3",
+                "--name",
+                "My Custom Voice",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["success"] is True
+        assert data["data"]["id"] == "voice-id-101"
+
+    @respx.mock
+    def test_voices_rich(self, runner, mock_voices_response):
+        respx.post("https://api.acedata.cloud/suno/voices").mock(
+            return_value=Response(200, json=mock_voices_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "voices",
+                "https://example.com/voice.mp3",
+                "--name",
+                "My Custom Voice",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "voice-id-101" in result.output
+
+    @respx.mock
+    def test_voices_with_description(self, runner, mock_voices_response):
+        respx.post("https://api.acedata.cloud/suno/voices").mock(
+            return_value=Response(200, json=mock_voices_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "voices",
+                "https://example.com/voice.mp3",
+                "--name",
+                "My Custom Voice",
+                "--description",
+                "Smooth jazz vocalist",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_voices_no_name(self, runner, mock_voices_response):
+        respx.post("https://api.acedata.cloud/suno/voices").mock(
+            return_value=Response(200, json=mock_voices_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "voices",
+                "https://example.com/voice.mp3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0

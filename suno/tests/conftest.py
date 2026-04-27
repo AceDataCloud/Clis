@@ -143,3 +143,35 @@ def mock_upload_response():
             "id": "upload-id-789",
         },
     }
+
+
+@pytest.fixture
+def mock_persona_list_response():
+    """Mock persona list response."""
+    return {
+        "success": True,
+        "data": [
+            {"id": "persona-id-1", "name": "Voice One"},
+            {"id": "persona-id-2", "name": "Voice Two"},
+        ],
+    }
+
+
+@pytest.fixture
+def mock_persona_delete_response():
+    """Mock persona delete response."""
+    return {
+        "success": True,
+    }
+
+
+@pytest.fixture
+def mock_voices_response():
+    """Mock voices creation response."""
+    return {
+        "success": True,
+        "data": {
+            "id": "voice-id-101",
+            "name": "My Custom Voice",
+        },
+    }
