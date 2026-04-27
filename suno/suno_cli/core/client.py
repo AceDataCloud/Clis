@@ -31,13 +31,16 @@ class SunoClient:
         endpoint: str,
         payload: dict[str, Any],
         timeout: float | None = None,
+        method: str = "POST",
     ) -> dict[str, Any]:
-        """Make a POST request to the Suno API.
+        """Make a request to the Suno API.
 
         Args:
             endpoint: API endpoint path (e.g., "/suno/audios")
-            payload: Request body as dictionary
+            payload: For POST requests, sent as JSON request body. For GET/DELETE
+                requests, sent as URL query parameters.
             timeout: Optional timeout override
+            method: HTTP method (POST, GET, DELETE)
 
         Returns:
             API response as dictionary
@@ -50,12 +53,28 @@ class SunoClient:
 
         with httpx.Client() as http_client:
             try:
-                response = http_client.post(
-                    url,
-                    json=payload,
-                    headers=self._get_headers(),
-                    timeout=request_timeout,
-                )
+                http_method = method.upper()
+                if http_method == "GET":
+                    response = http_client.get(
+                        url,
+                        params=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
+                elif http_method == "DELETE":
+                    response = http_client.delete(
+                        url,
+                        params=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
+                else:
+                    response = http_client.post(
+                        url,
+                        json=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
 
                 if response.status_code == 401:
                     raise SunoAuthError("Invalid API token")
@@ -134,6 +153,18 @@ class SunoClient:
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""
         return self.request("/suno/tasks", kwargs)
+
+    def list_personas(self, **kwargs: Any) -> dict[str, Any]:
+        """List personas using the persona endpoint."""
+        return self.request("/suno/persona", kwargs, method="GET")
+
+    def delete_persona(self, **kwargs: Any) -> dict[str, Any]:
+        """Delete a persona using the persona endpoint."""
+        return self.request("/suno/persona", kwargs, method="DELETE")
+
+    def create_voice(self, **kwargs: Any) -> dict[str, Any]:
+        """Create a custom voice from an audio URL."""
+        return self.request("/suno/voices", kwargs)
 
 
 def get_client(token: str | None = None) -> SunoClient:
