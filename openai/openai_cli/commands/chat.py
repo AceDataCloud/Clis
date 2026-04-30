@@ -101,6 +101,30 @@ from openai_cli.core.output import (
     default=None,
     help="Processing type for serving the request (auto, default, flex, scale, priority).",
 )
+@click.option(
+    "--store",
+    is_flag=True,
+    default=False,
+    help="Store the output for use in OpenAI's model distillation or evals products.",
+)
+@click.option(
+    "--logprobs",
+    is_flag=True,
+    default=False,
+    help="Return log probabilities of the output tokens.",
+)
+@click.option(
+    "--top-logprobs",
+    default=None,
+    type=click.IntRange(0, 20),
+    help="Number of most likely tokens (0-20) to return at each token position with log probabilities.",
+)
+@click.option(
+    "--parallel-tool-calls",
+    is_flag=True,
+    default=False,
+    help="Enable parallel function calling during tool use.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -120,6 +144,10 @@ def chat(
     reasoning_effort: str | None,
     user: str | None,
     service_tier: str | None,
+    store: bool,
+    logprobs: bool,
+    top_logprobs: int | None,
+    parallel_tool_calls: bool,
     output_json: bool,
 ) -> None:
     """Chat with an OpenAI-compatible model.
@@ -155,6 +183,10 @@ def chat(
         "reasoning_effort": reasoning_effort,
         "user": user,
         "service_tier": service_tier,
+        "store": store if store else None,
+        "logprobs": logprobs if logprobs else None,
+        "top_logprobs": top_logprobs,
+        "parallel_tool_calls": parallel_tool_calls if parallel_tool_calls else None,
     }
 
     try:
