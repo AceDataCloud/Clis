@@ -42,11 +42,64 @@ from openai_cli.core.output import (
     help="Maximum number of tokens to generate.",
 )
 @click.option(
+    "--max-completion-tokens",
+    default=None,
+    type=int,
+    help="Upper bound for tokens generated in a completion (including reasoning tokens).",
+)
+@click.option(
     "-n",
     "--count",
     default=None,
     type=int,
     help="Number of completion choices to generate.",
+)
+@click.option(
+    "--top-p",
+    default=None,
+    type=float,
+    help="Nucleus sampling probability mass (0-1). Alternative to temperature.",
+)
+@click.option(
+    "--frequency-penalty",
+    default=None,
+    type=float,
+    help="Penalize tokens by their frequency in the text so far (-2.0 to 2.0).",
+)
+@click.option(
+    "--presence-penalty",
+    default=None,
+    type=float,
+    help="Penalize tokens that have already appeared in the text (-2.0 to 2.0).",
+)
+@click.option(
+    "--seed",
+    default=None,
+    type=int,
+    help="Seed for deterministic sampling.",
+)
+@click.option(
+    "--stop",
+    default=None,
+    multiple=True,
+    help="Stop sequence(s) where the API will stop generating (repeatable, up to 4).",
+)
+@click.option(
+    "--reasoning-effort",
+    type=click.Choice(["low", "medium", "high"]),
+    default=None,
+    help="Reasoning effort for o1/o3/o4/gpt-5 series models.",
+)
+@click.option(
+    "--user",
+    default=None,
+    help="Unique end-user identifier for monitoring and abuse detection.",
+)
+@click.option(
+    "--service-tier",
+    type=click.Choice(["auto", "default", "flex"]),
+    default=None,
+    help="Processing type for serving the request.",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -57,7 +110,16 @@ def chat(
     system: str | None,
     temperature: float | None,
     max_tokens: int | None,
+    max_completion_tokens: int | None,
     count: int | None,
+    top_p: float | None,
+    frequency_penalty: float | None,
+    presence_penalty: float | None,
+    seed: int | None,
+    stop: tuple[str, ...],
+    reasoning_effort: str | None,
+    user: str | None,
+    service_tier: str | None,
     output_json: bool,
 ) -> None:
     """Chat with an OpenAI-compatible model.
@@ -70,6 +132,7 @@ def chat(
       openai-cli chat "Explain quantum computing" -m gpt-5.4
       openai-cli chat "Write a poem" -m gpt-4o --temperature 0.9
       openai-cli chat "Summarize this" -s "You are a concise summarizer"
+      openai-cli chat "Reason about this" -m o3 --reasoning-effort high
     """
     client = get_client(ctx.obj.get("token"))
     messages = []
@@ -82,7 +145,16 @@ def chat(
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "max_completion_tokens": max_completion_tokens,
         "n": count,
+        "top_p": top_p,
+        "frequency_penalty": frequency_penalty,
+        "presence_penalty": presence_penalty,
+        "seed": seed,
+        "stop": list(stop) if stop else None,
+        "reasoning_effort": reasoning_effort,
+        "user": user,
+        "service_tier": service_tier,
     }
 
     try:

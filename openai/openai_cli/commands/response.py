@@ -1,5 +1,7 @@
 """Responses API command."""
 
+import json as json_module
+
 import click
 
 from openai_cli.core.client import get_client
@@ -36,6 +38,18 @@ from openai_cli.core.output import (
     help="Maximum number of tokens to generate.",
 )
 @click.option(
+    "-n",
+    "--count",
+    default=None,
+    type=int,
+    help="Number of completion choices to generate.",
+)
+@click.option(
+    "--response-format",
+    default=None,
+    help="Response format as JSON string (e.g. '{\"type\": \"json_object\"}').",
+)
+@click.option(
     "--background",
     is_flag=True,
     default=False,
@@ -49,6 +63,8 @@ def response(
     model: str,
     temperature: float | None,
     max_tokens: int | None,
+    count: int | None,
+    response_format: str | None,
     background: bool,
     output_json: bool,
 ) -> None:
@@ -63,11 +79,20 @@ def response(
       openai-cli response "Write a haiku" --temperature 1.2
     """
     client = get_client(ctx.obj.get("token"))
+    parsed_response_format = None
+    if response_format:
+        try:
+            parsed_response_format = json_module.loads(response_format)
+        except json_module.JSONDecodeError:
+            print_error(f"Invalid JSON for --response-format: {response_format}")
+            raise SystemExit(1)
     payload: dict[str, object] = {
         "model": model,
         "input": [{"role": "user", "content": prompt}],
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "n": count,
+        "response_format": parsed_response_format,
         "background": background if background else None,
     }
 

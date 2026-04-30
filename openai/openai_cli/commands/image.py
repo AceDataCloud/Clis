@@ -201,10 +201,21 @@ def image(
     help="How strongly to match input style/features (GPT image models only).",
 )
 @click.option(
+    "--mask-url",
+    default=None,
+    help="Optional mask image URL (PNG <4MB). Transparent areas indicate where to edit.",
+)
+@click.option(
     "--output-compression",
     default=None,
     type=click.IntRange(0, 100),
     help="Compression level (0-100) for webp/jpeg output.",
+)
+@click.option(
+    "--partial-images",
+    default=None,
+    type=click.IntRange(0, 3),
+    help="Number of partial images in streaming responses (0-3).",
 )
 @click.option(
     "--response-format",
@@ -230,7 +241,9 @@ def edit(
     output_format: str | None,
     background: str | None,
     input_fidelity: str | None,
+    mask_url: str | None,
     output_compression: int | None,
+    partial_images: int | None,
     response_format: str | None,
     callback_url: str | None,
     output_json: bool,
@@ -255,7 +268,9 @@ def edit(
         "output_format": output_format,
         "background": background,
         "input_fidelity": input_fidelity,
+        "mask": mask_url,
         "output_compression": output_compression,
+        "partial_images": partial_images,
         "response_format": response_format,
         "callback_url": callback_url,
     }
