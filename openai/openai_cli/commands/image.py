@@ -33,7 +33,7 @@ from openai_cli.core.output import (
 @click.option(
     "-s",
     "--size",
-    type=click.Choice(["1024x1024", "1792x1024", "1024x1792", "1536x1024", "1024x1536", "256x256", "512x512", "auto"]),
+    type=click.Choice(["1024x1024", "1792x1024", "1024x1792", "1536x1024", "1024x1536", "2048x2048", "2048x1536", "1536x2048", "2048x1152", "1152x2048", "2880x2880", "3264x2448", "2448x3264", "3840x2160", "2160x3840", "256x256", "512x512", "auto"]),
     default=None,
     help="Size of the generated image.",
 )
@@ -172,7 +172,7 @@ def image(
 @click.option(
     "-s",
     "--size",
-    type=click.Choice(["1024x1024", "1536x1024", "1024x1536", "256x256", "512x512", "auto"]),
+    type=click.Choice(["1024x1024", "1792x1024", "1024x1792", "1536x1024", "1024x1536", "2048x2048", "2048x1536", "1536x2048", "2048x1152", "1152x2048", "2880x2880", "3264x2448", "2448x3264", "3840x2160", "2160x3840", "256x256", "512x512", "auto"]),
     default=None,
     help="Size of the output image.",
 )
