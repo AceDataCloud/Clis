@@ -33,7 +33,12 @@ from openai_cli.core.output import (
 @click.option(
     "-s",
     "--size",
-    type=click.Choice(["1024x1024", "1792x1024", "1024x1792", "1536x1024", "1024x1536", "256x256", "512x512", "auto"]),
+    type=click.Choice([
+        "1024x1024", "1536x1024", "1024x1536", "1792x1024", "1024x1792",
+        "2048x2048", "2048x1536", "1536x2048", "2048x1152", "1152x2048",
+        "2880x2880", "3264x2448", "2448x3264", "3840x2160", "2160x3840",
+        "256x256", "512x512", "auto",
+    ]),
     default=None,
     help="Size of the generated image.",
 )
@@ -172,7 +177,12 @@ def image(
 @click.option(
     "-s",
     "--size",
-    type=click.Choice(["1024x1024", "1536x1024", "1024x1536", "256x256", "512x512", "auto"]),
+    type=click.Choice([
+        "1024x1024", "1536x1024", "1024x1536", "1792x1024", "1024x1792",
+        "2048x2048", "2048x1536", "1536x2048", "2048x1152", "1152x2048",
+        "2880x2880", "3264x2448", "2448x3264", "3840x2160", "2160x3840",
+        "256x256", "512x512", "auto",
+    ]),
     default=None,
     help="Size of the output image.",
 )
@@ -207,6 +217,17 @@ def image(
     help="Compression level (0-100) for webp/jpeg output.",
 )
 @click.option(
+    "--partial-images",
+    default=None,
+    type=click.IntRange(0, 3),
+    help="Number of partial images to emit during streaming (0-3).",
+)
+@click.option(
+    "--mask",
+    default=None,
+    help="URL of an optional mask image. Transparent areas indicate where to edit.",
+)
+@click.option(
     "--response-format",
     type=click.Choice(["url", "b64_json"]),
     default=None,
@@ -231,6 +252,8 @@ def edit(
     background: str | None,
     input_fidelity: str | None,
     output_compression: int | None,
+    partial_images: int | None,
+    mask: str | None,
     response_format: str | None,
     callback_url: str | None,
     output_json: bool,
@@ -256,6 +279,8 @@ def edit(
         "background": background,
         "input_fidelity": input_fidelity,
         "output_compression": output_compression,
+        "partial_images": partial_images,
+        "mask": mask,
         "response_format": response_format,
         "callback_url": callback_url,
     }

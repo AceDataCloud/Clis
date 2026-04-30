@@ -48,6 +48,12 @@ from openai_cli.core.output import (
     type=int,
     help="Number of completion choices to generate.",
 )
+@click.option(
+    "--reasoning-effort",
+    type=click.Choice(["minimal", "low", "medium", "high"]),
+    default=None,
+    help="Reasoning effort for o1/o3/o4/gpt-5 series models.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -58,6 +64,7 @@ def chat(
     temperature: float | None,
     max_tokens: int | None,
     count: int | None,
+    reasoning_effort: str | None,
     output_json: bool,
 ) -> None:
     """Chat with an OpenAI-compatible model.
@@ -83,6 +90,7 @@ def chat(
         "temperature": temperature,
         "max_tokens": max_tokens,
         "n": count,
+        "reasoning_effort": reasoning_effort,
     }
 
     try:
