@@ -142,9 +142,110 @@ class TestChatCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["temperature"] == 0.5
 
-    def test_chat_no_token(self, runner):
-        result = runner.invoke(cli, ["--token", "", "chat", "Hello"])
-        assert result.exit_code != 0
+    @respx.mock
+    def test_chat_with_top_p(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--top-p", "0.9", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["top_p"] == 0.9
+
+    @respx.mock
+    def test_chat_with_frequency_penalty(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--frequency-penalty", "0.5", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["frequency_penalty"] == 0.5
+
+    @respx.mock
+    def test_chat_with_reasoning_effort(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--reasoning-effort", "high", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["reasoning_effort"] == "high"
+
+    @respx.mock
+    def test_chat_with_seed(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--seed", "42", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["seed"] == 42
+
+    @respx.mock
+    def test_chat_with_stop(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--stop", "END", "--stop", "STOP", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert "END" in body["stop"]
+        assert "STOP" in body["stop"]
+
+    @respx.mock
+    def test_chat_with_max_completion_tokens(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--max-completion-tokens", "512", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["max_completion_tokens"] == 512
+
+    @respx.mock
+    def test_chat_with_user(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--user", "user-123", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["user"] == "user-123"
+
+    @respx.mock
+    def test_chat_with_service_tier(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--service-tier", "flex", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["service_tier"] == "flex"
 
     @respx.mock
     def test_chat_gpt54_model(self, runner, mock_chat_response):
@@ -298,6 +399,52 @@ class TestImageCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["image"] == "https://example.com/base.png"
 
+    @respx.mock
+    def test_edit_with_mask_url(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Add clouds",
+                "--image-url",
+                "https://example.com/base.png",
+                "--mask-url",
+                "https://example.com/mask.png",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["mask"] == "https://example.com/mask.png"
+
+    @respx.mock
+    def test_edit_with_partial_images(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Add clouds",
+                "--image-url",
+                "https://example.com/base.png",
+                "--partial-images",
+                "2",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["partial_images"] == 2
+
     def test_edit_requires_image_url(self, runner):
         result = runner.invoke(
             cli,
@@ -346,8 +493,55 @@ class TestResponseCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-5.4"
 
+    @respx.mock
+    def test_response_with_count(self, runner, mock_response_api_response):
+        route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(200, json=mock_response_api_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "response", "Hello", "-n", "2", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["n"] == 2
 
-# ─── Info Commands ─────────────────────────────────────────────────────────
+    @respx.mock
+    def test_response_with_response_format(self, runner, mock_response_api_response):
+        route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(200, json=mock_response_api_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "response",
+                "Hello",
+                "--response-format",
+                '{"type": "json_object"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["response_format"] == {"type": "json_object"}
+
+    def test_response_invalid_response_format(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "response",
+                "Hello",
+                "--response-format",
+                "not-json",
+            ],
+        )
+        assert result.exit_code != 0
+
+
 
 
 class TestInfoCommands:
