@@ -99,7 +99,7 @@ from openai_cli.core.output import (
     "--service-tier",
     type=click.Choice(["auto", "default", "flex", "scale", "priority"]),
     default=None,
-    help="Processing type for serving the request.",
+    help="Processing type for serving the request (auto, default, flex, scale, priority).",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
