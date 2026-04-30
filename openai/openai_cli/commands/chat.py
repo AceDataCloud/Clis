@@ -86,7 +86,7 @@ from openai_cli.core.output import (
 )
 @click.option(
     "--reasoning-effort",
-    type=click.Choice(["low", "medium", "high"]),
+    type=click.Choice(["minimal", "low", "medium", "high"]),
     default=None,
     help="Reasoning effort for o1/o3/o4/gpt-5 series models.",
 )
@@ -97,9 +97,9 @@ from openai_cli.core.output import (
 )
 @click.option(
     "--service-tier",
-    type=click.Choice(["auto", "default", "flex"]),
+    type=click.Choice(["auto", "default", "flex", "scale", "priority"]),
     default=None,
-    help="Processing type for serving the request.",
+    help="Processing type for serving the request (auto, default, flex, scale, priority).",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
