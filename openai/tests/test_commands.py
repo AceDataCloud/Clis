@@ -275,6 +275,94 @@ class TestChatCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-5.4-pro"
 
+    @respx.mock
+    def test_chat_with_response_format(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--response-format",
+                '{"type": "json_object"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["response_format"] == {"type": "json_object"}
+
+    @respx.mock
+    def test_chat_with_invalid_response_format(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--response-format",
+                "not-json",
+            ],
+        )
+        assert result.exit_code == 1
+
+    @respx.mock
+    def test_chat_with_logprobs(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--logprobs", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["logprobs"] is True
+
+    @respx.mock
+    def test_chat_with_top_logprobs(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--logprobs", "--top-logprobs", "5", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["top_logprobs"] == 5
+
+    @respx.mock
+    def test_chat_with_parallel_tool_calls(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--no-parallel-tool-calls", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["parallel_tool_calls"] is False
+
+    @respx.mock
+    def test_chat_with_store(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--store", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["store"] is True
+
 
 # ─── Embed Commands ────────────────────────────────────────────────────────
 

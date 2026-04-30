@@ -1,5 +1,7 @@
 """Chat completion command."""
 
+import json as json_module
+
 import click
 
 from openai_cli.core.client import get_client
@@ -101,6 +103,34 @@ from openai_cli.core.output import (
     default=None,
     help="Processing type for serving the request (auto, default, flex, scale, priority).",
 )
+@click.option(
+    "--response-format",
+    default=None,
+    help="Response format as JSON string (e.g. '{\"type\": \"json_object\"}').",
+)
+@click.option(
+    "--logprobs",
+    is_flag=True,
+    default=False,
+    help="Return log probabilities of output tokens.",
+)
+@click.option(
+    "--top-logprobs",
+    default=None,
+    type=click.IntRange(0, 20),
+    help="Number of most likely tokens to return log probs for (0-20, requires --logprobs).",
+)
+@click.option(
+    "--parallel-tool-calls/--no-parallel-tool-calls",
+    default=None,
+    help="Enable or disable parallel function calling during tool use.",
+)
+@click.option(
+    "--store",
+    is_flag=True,
+    default=False,
+    help="Store the output of this chat completion.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -120,6 +150,11 @@ def chat(
     reasoning_effort: str | None,
     user: str | None,
     service_tier: str | None,
+    response_format: str | None,
+    logprobs: bool,
+    top_logprobs: int | None,
+    parallel_tool_calls: bool | None,
+    store: bool,
     output_json: bool,
 ) -> None:
     """Chat with an OpenAI-compatible model.
@@ -140,6 +175,14 @@ def chat(
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
 
+    parsed_response_format = None
+    if response_format:
+        try:
+            parsed_response_format = json_module.loads(response_format)
+        except json_module.JSONDecodeError:
+            print_error(f"Invalid JSON for --response-format: {response_format}")
+            raise SystemExit(1)
+
     payload: dict[str, object] = {
         "model": model,
         "messages": messages,
@@ -155,6 +198,11 @@ def chat(
         "reasoning_effort": reasoning_effort,
         "user": user,
         "service_tier": service_tier,
+        "response_format": parsed_response_format,
+        "logprobs": logprobs or None,
+        "top_logprobs": top_logprobs,
+        "parallel_tool_calls": parallel_tool_calls,
+        "store": store or None,
     }
 
     try:
