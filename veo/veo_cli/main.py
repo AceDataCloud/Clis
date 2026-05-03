@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 from veo_cli.commands.info import aspect_ratios, config, models
 from veo_cli.commands.task import task, tasks_batch, wait
-from veo_cli.commands.video import generate, image_to_video, upscale
+from veo_cli.commands.video import generate, image_to_video, ingredients_to_video, upscale
 
 load_dotenv()
 
@@ -57,6 +57,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
 # Register commands
 cli.add_command(generate)
 cli.add_command(image_to_video)
+cli.add_command(ingredients_to_video)
 cli.add_command(upscale)
 cli.add_command(task)
 cli.add_command(tasks_batch)
