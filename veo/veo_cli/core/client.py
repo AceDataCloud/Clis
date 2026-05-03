@@ -96,8 +96,28 @@ class VeoClient:
         return self.request("/veo/videos", kwargs)
 
     def upscale_video(self, **kwargs: Any) -> dict[str, Any]:
-        """Upscale a video to 1080p."""
+        """Upscale a video to 1080p (legacy alias for /veo/videos action=get1080p)."""
         return self.request("/veo/videos", kwargs)
+
+    def upsample_video(self, **kwargs: Any) -> dict[str, Any]:
+        """Upsample a video using the dedicated /veo/upsample endpoint.
+
+        Accepts action: 1080p / 4k / gif. Successor to upscale_video; the
+        legacy upscale_video method is preserved for backward compatibility.
+        """
+        return self.request("/veo/upsample", kwargs)
+
+    def extend_video(self, **kwargs: Any) -> dict[str, Any]:
+        """Extend the duration of a previously generated video (veo31 series only)."""
+        return self.request("/veo/extend", kwargs)
+
+    def reshoot_video(self, **kwargs: Any) -> dict[str, Any]:
+        """Re-render a video with a different camera motion."""
+        return self.request("/veo/reshoot", kwargs)
+
+    def manipulate_object(self, **kwargs: Any) -> dict[str, Any]:
+        """Insert or remove an object in a previously generated video."""
+        return self.request("/veo/objects", kwargs)
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""

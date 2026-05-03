@@ -8,7 +8,10 @@ from veo_cli.core.output import (
     ASPECT_RATIOS,
     DEFAULT_ASPECT_RATIO,
     DEFAULT_MODEL,
+    EXTEND_MODELS,
+    MOTION_TYPES,
     RESOLUTIONS,
+    UPSAMPLE_ACTIONS,
     VEO_MODELS,
     print_error,
     print_json,
@@ -248,6 +251,247 @@ def upscale(
             action="get1080p",
             video_id=video_id,
         )
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("video_id")
+@click.option(
+    "-a",
+    "--action",
+    type=click.Choice(UPSAMPLE_ACTIONS),
+    default="1080p",
+    help="What to produce: 1080p / 4k upscale, or animated gif preview.",
+)
+@click.option("--callback-url", help="Optional callback URL for async completion notification.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def upsample(
+    ctx: click.Context,
+    video_id: str,
+    action: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Upsample a generated video to 1080p / 4K, or render a GIF preview.
+
+    VIDEO_ID is the id of the source video. Successor to `upscale` —
+    use `upsample` whenever you want anything other than just 1080p.
+
+    Examples:
+
+      veo upsample abc123-def456 --action 4k
+      veo upsample abc123-def456 --action gif
+    """
+    payload: dict = {"video_id": video_id, "action": action}
+    if callback_url:
+        payload["callback_url"] = callback_url
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.upsample_video(**payload)
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("video_id")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(EXTEND_MODELS),
+    default="veo31-fast",
+    help="Model to extend with. Only the veo31 series is supported upstream.",
+)
+@click.option("-p", "--prompt", help="Optional prompt that guides the extended section.")
+@click.option("--callback-url", help="Optional callback URL for async completion notification.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def extend(
+    ctx: click.Context,
+    video_id: str,
+    model: str,
+    prompt: str | None,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Extend the duration of a previously generated video.
+
+    Adds extra seconds to the end of an existing video. The model
+    continues the scene; an optional --prompt steers what happens next.
+
+    Outputs of `extend` can be extended further but cannot be reshot
+    or object-edited (upstream limitation, returns 400 if attempted).
+
+    Examples:
+
+      veo extend abc123-def456
+      veo extend abc123-def456 -m veo31 -p "the camera zooms out"
+    """
+    payload: dict = {"video_id": video_id, "model": model}
+    if prompt:
+        payload["prompt"] = prompt
+    if callback_url:
+        payload["callback_url"] = callback_url
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.extend_video(**payload)
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("video_id")
+@click.option(
+    "-t",
+    "--motion-type",
+    type=click.Choice(MOTION_TYPES, case_sensitive=False),
+    required=True,
+    help="Camera motion to apply (e.g. LEFT_TO_RIGHT, FORWARD, DOLLY_IN_ZOOM_OUT).",
+)
+@click.option("--callback-url", help="Optional callback URL for async completion notification.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def reshoot(
+    ctx: click.Context,
+    video_id: str,
+    motion_type: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Re-render an existing video with a different camera motion.
+
+    Keeps the same scene content but changes how the camera moves
+    through it. Useful for trying alternative shot framings cheaply.
+
+    Not supported on outputs of `extend`.
+
+    Available motion types:
+      STATIONARY, STATIONARY_UP, STATIONARY_DOWN, STATIONARY_LEFT,
+      STATIONARY_RIGHT, STATIONARY_DOLLY_IN_ZOOM_OUT,
+      STATIONARY_DOLLY_OUT_ZOOM_IN, UP, DOWN, LEFT_TO_RIGHT,
+      RIGHT_TO_LEFT, FORWARD, BACKWARD, DOLLY_IN_ZOOM_OUT,
+      DOLLY_OUT_ZOOM_IN.
+
+    Examples:
+
+      veo reshoot abc123-def456 --motion-type LEFT_TO_RIGHT
+      veo reshoot abc123-def456 -t DOLLY_IN_ZOOM_OUT
+    """
+    payload: dict = {"video_id": video_id, "motion_type": motion_type.upper()}
+    if callback_url:
+        payload["callback_url"] = callback_url
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.reshoot_video(**payload)
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("object-insert")
+@click.argument("video_id")
+@click.argument("prompt")
+@click.option(
+    "--mask",
+    "image_mask",
+    help="Optional mask: HTTP(S) URL or base64-encoded JPEG. White pixels mark insertion zone. If omitted, AI auto-determines placement.",
+)
+@click.option("--callback-url", help="Optional callback URL for async completion notification.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def object_insert(
+    ctx: click.Context,
+    video_id: str,
+    prompt: str,
+    image_mask: str | None,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Insert an object into a previously generated video.
+
+    Adds a new element to an existing scene. Provide a PROMPT describing
+    what to add. Optionally provide --mask to control placement.
+
+    Not supported on outputs of `extend`.
+
+    Examples:
+
+      veo object-insert abc123 "add a flying pig with black wings"
+      veo object-insert abc123 "add fireworks" --mask https://example.com/mask.jpg
+    """
+    payload: dict = {"video_id": video_id, "action": "insert", "prompt": prompt}
+    if image_mask:
+        payload["image_mask"] = image_mask
+    if callback_url:
+        payload["callback_url"] = callback_url
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.manipulate_object(**payload)
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("object-remove")
+@click.argument("video_id")
+@click.argument("image_mask")
+@click.option("-p", "--prompt", help="Optional description of what is being removed (logs only).")
+@click.option("--callback-url", help="Optional callback URL for async completion notification.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def object_remove(
+    ctx: click.Context,
+    video_id: str,
+    image_mask: str,
+    prompt: str | None,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Remove an object from a previously generated video.
+
+    IMAGE_MASK is required: HTTP(S) URL or base64-encoded JPEG. White
+    pixels mark the region to erase; the AI inpaints the gap with
+    contextually appropriate content.
+
+    Not supported on outputs of `extend`.
+
+    Examples:
+
+      veo object-remove abc123 https://example.com/mask.jpg
+      veo object-remove abc123 https://example.com/mask.jpg -p "remove the cloud"
+    """
+    payload: dict = {"video_id": video_id, "action": "remove", "image_mask": image_mask}
+    if prompt:
+        payload["prompt"] = prompt
+    if callback_url:
+        payload["callback_url"] = callback_url
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.manipulate_object(**payload)
         if output_json:
             print_json(result)
         else:
