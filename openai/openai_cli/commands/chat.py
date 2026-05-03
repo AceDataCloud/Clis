@@ -1,5 +1,7 @@
 """Chat completion command."""
 
+import json as json_module
+
 import click
 
 from openai_cli.core.client import get_client
@@ -125,6 +127,32 @@ from openai_cli.core.output import (
     default=False,
     help="Enable parallel function calling during tool use.",
 )
+@click.option(
+    "--response-format",
+    default=None,
+    help="Response format as JSON string (e.g. '{\"type\": \"json_object\"}').",
+)
+@click.option(
+    "--metadata",
+    default=None,
+    help="Metadata as JSON string (up to 16 key-value pairs, e.g. '{\"key\": \"value\"}').",
+)
+@click.option(
+    "--logit-bias",
+    default=None,
+    help="Logit bias as JSON string mapping token IDs to bias values (-100 to 100).",
+)
+@click.option(
+    "--modalities",
+    multiple=True,
+    type=click.Choice(["text", "audio"]),
+    help="Output modalities to generate (repeatable: --modalities text --modalities audio).",
+)
+@click.option(
+    "--web-search-options",
+    default=None,
+    help="Web search options as JSON string (e.g. '{\"search_context_size\": \"medium\"}').",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -148,6 +176,11 @@ def chat(
     logprobs: bool,
     top_logprobs: int | None,
     parallel_tool_calls: bool,
+    response_format: str | None,
+    metadata: str | None,
+    logit_bias: str | None,
+    modalities: tuple[str, ...],
+    web_search_options: str | None,
     output_json: bool,
 ) -> None:
     """Chat with an OpenAI-compatible model.
@@ -168,6 +201,38 @@ def chat(
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
 
+    parsed_response_format = None
+    if response_format:
+        try:
+            parsed_response_format = json_module.loads(response_format)
+        except json_module.JSONDecodeError:
+            print_error(f"Invalid JSON for --response-format: {response_format}")
+            raise SystemExit(1)
+
+    parsed_metadata = None
+    if metadata:
+        try:
+            parsed_metadata = json_module.loads(metadata)
+        except json_module.JSONDecodeError:
+            print_error(f"Invalid JSON for --metadata: {metadata}")
+            raise SystemExit(1)
+
+    parsed_logit_bias = None
+    if logit_bias:
+        try:
+            parsed_logit_bias = json_module.loads(logit_bias)
+        except json_module.JSONDecodeError:
+            print_error(f"Invalid JSON for --logit-bias: {logit_bias}")
+            raise SystemExit(1)
+
+    parsed_web_search_options = None
+    if web_search_options:
+        try:
+            parsed_web_search_options = json_module.loads(web_search_options)
+        except json_module.JSONDecodeError:
+            print_error(f"Invalid JSON for --web-search-options: {web_search_options}")
+            raise SystemExit(1)
+
     payload: dict[str, object] = {
         "model": model,
         "messages": messages,
@@ -187,6 +252,11 @@ def chat(
         "logprobs": logprobs if logprobs else None,
         "top_logprobs": top_logprobs,
         "parallel_tool_calls": parallel_tool_calls if parallel_tool_calls else None,
+        "response_format": parsed_response_format,
+        "metadata": parsed_metadata,
+        "logit_bias": parsed_logit_bias,
+        "modalities": list(modalities) if modalities else None,
+        "web_search_options": parsed_web_search_options,
     }
 
     try:

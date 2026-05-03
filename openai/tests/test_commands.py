@@ -275,6 +275,155 @@ class TestChatCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-5.4-pro"
 
+    @respx.mock
+    def test_chat_with_response_format(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--response-format",
+                '{"type": "json_object"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["response_format"] == {"type": "json_object"}
+
+    def test_chat_invalid_response_format(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--response-format",
+                "not-json",
+            ],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_chat_with_metadata(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--metadata",
+                '{"session": "abc"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["metadata"] == {"session": "abc"}
+
+    def test_chat_invalid_metadata(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--metadata", "not-json"],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_chat_with_logit_bias(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--logit-bias",
+                '{"1234": 10}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["logit_bias"] == {"1234": 10}
+
+    def test_chat_invalid_logit_bias(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--logit-bias", "not-json"],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_chat_with_modalities(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--modalities",
+                "text",
+                "--modalities",
+                "audio",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["modalities"] == ["text", "audio"]
+
+    @respx.mock
+    def test_chat_with_web_search_options(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--web-search-options",
+                '{"search_context_size": "high"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["web_search_options"] == {"search_context_size": "high"}
+
+    def test_chat_invalid_web_search_options(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--web-search-options",
+                "not-json",
+            ],
+        )
+        assert result.exit_code != 0
+
 
 # ─── Embed Commands ────────────────────────────────────────────────────────
 
