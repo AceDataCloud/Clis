@@ -189,6 +189,77 @@ class TestGenerateCommands:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_ingredients_to_video_json(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "ingredients-to-video",
+                "Product showcase",
+                "-i",
+                "https://example.com/product.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["success"] is True
+
+    @respx.mock
+    def test_ingredients_to_video_multiple_images(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "ingredients-to-video",
+                "Scene",
+                "-i",
+                "https://example.com/img1.jpg",
+                "-i",
+                "https://example.com/img2.jpg",
+                "-i",
+                "https://example.com/img3.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_ingredients_to_video_with_translation(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "ingredients-to-video",
+                "产品展示",
+                "-i",
+                "https://example.com/product.jpg",
+                "--translation",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    def test_ingredients_to_video_requires_image(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "ingredients-to-video", "Scene"],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
     def test_upscale_json(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/veo/videos").mock(
             return_value=Response(200, json=mock_video_response)

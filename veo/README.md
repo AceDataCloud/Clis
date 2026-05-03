@@ -64,6 +64,9 @@ veo generate "A test video"
 # Generate from reference image
 veo image-to-video "Animate this scene" -i https://example.com/photo.jpg
 
+# Generate from ingredient images (uses veo31-fast-ingredients model)
+veo ingredients-to-video "Product showcase" -i https://example.com/product.jpg
+
 # Upscale to 1080p
 veo upscale <video-id>
 
@@ -83,6 +86,7 @@ veo models
 |---------|-------------|
 | `veo generate <prompt>` | Generate a video from a text prompt |
 | `veo image-to-video <prompt> -i <url>` | Generate a video from reference image(s) |
+| `veo ingredients-to-video <prompt> -i <url>` | Generate a video from 1-3 ingredient images |
 | `veo upscale <video_id>` | Get 1080p version of a generated video |
 | `veo task <task_id>` | Query a single task status |
 | `veo tasks <id1> <id2>...` | Query multiple tasks at once |
