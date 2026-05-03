@@ -199,6 +199,90 @@ class TestGenerateCommands:
         )
         assert result.exit_code == 0
 
+    @respx.mock
+    def test_ingredients_to_video_json(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "ingredients-to-video",
+                "-i",
+                "https://example.com/img1.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["success"] is True
+
+    @respx.mock
+    def test_ingredients_to_video_with_prompt(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "ingredients-to-video",
+                "A cozy scene",
+                "-i",
+                "https://example.com/img1.jpg",
+                "-i",
+                "https://example.com/img2.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["success"] is True
+
+    @respx.mock
+    def test_ingredients_to_video_multiple_images(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "ingredients-to-video",
+                "-i",
+                "https://example.com/img1.jpg",
+                "-i",
+                "https://example.com/img2.jpg",
+                "-i",
+                "https://example.com/img3.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    def test_ingredients_to_video_too_many_images(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "ingredients-to-video",
+                "-i",
+                "https://example.com/img1.jpg",
+                "-i",
+                "https://example.com/img2.jpg",
+                "-i",
+                "https://example.com/img3.jpg",
+                "-i",
+                "https://example.com/img4.jpg",
+            ],
+        )
+        assert result.exit_code != 0
+
 
 # ─── Task Commands ─────────────────────────────────────────────────────────
 

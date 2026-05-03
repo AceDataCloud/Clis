@@ -170,6 +170,60 @@ def image_to_video(
         raise SystemExit(1) from e
 
 
+@click.command("ingredients-to-video")
+@click.argument("prompt", required=False, default=None)
+@click.option(
+    "-i",
+    "--image-url",
+    "image_urls",
+    required=True,
+    multiple=True,
+    help="Ingredient image URL(s). Can be specified up to 3 times.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def ingredients_to_video(
+    ctx: click.Context,
+    prompt: str | None,
+    image_urls: tuple[str, ...],
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Generate a video from ingredient image(s) using veo31-fast-ingredients.
+
+    Provide 1-3 reference images as ingredients. The model is fixed to
+    veo31-fast-ingredients and is set internally by the API.
+
+    Examples:
+
+      veo ingredients-to-video -i https://example.com/img1.jpg
+
+      veo ingredients-to-video "A cozy scene" -i img1.jpg -i img2.jpg
+    """
+    client = get_client(ctx.obj.get("token"))
+    if not 1 <= len(image_urls) <= 3:
+        print_error("ingredients-to-video requires between 1 and 3 image URLs.")
+        raise SystemExit(1)
+    try:
+        payload: dict[str, object] = {
+            "action": "ingredients2video",
+            "image_urls": list(image_urls),
+            "callback_url": callback_url,
+        }
+        if prompt is not None:
+            payload["prompt"] = prompt
+
+        result = client.generate_video(**payload)  # type: ignore[arg-type]
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
 @click.command()
 @click.argument("video_id")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")

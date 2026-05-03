@@ -13,7 +13,9 @@ Generate AI videos directly from your terminal — no MCP client required.
 ## Features
 
 - **Video Generation** — Generate videos from text prompts with multiple models
-- **Image-to-Video** — Create videos from reference images- **Video Upscale** — Get 1080p versions of generated videos
+- **Image-to-Video** — Create videos from reference images
+- **Ingredients-to-Video** — Generate videos from 1-3 ingredient images using veo31-fast-ingredients
+- **Video Upscale** — Get 1080p versions of generated videos
 - **Multiple Models** — veo3, veo3-fast, veo31, veo31-fast, veo31-fast-ingredients, veo2, veo2-fast
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
@@ -64,6 +66,9 @@ veo generate "A test video"
 # Generate from reference image
 veo image-to-video "Animate this scene" -i https://example.com/photo.jpg
 
+# Generate from ingredient images
+veo ingredients-to-video -i https://example.com/img1.jpg -i https://example.com/img2.jpg
+
 # Upscale to 1080p
 veo upscale <video-id>
 
@@ -83,6 +88,7 @@ veo models
 |---------|-------------|
 | `veo generate <prompt>` | Generate a video from a text prompt |
 | `veo image-to-video <prompt> -i <url>` | Generate a video from reference image(s) |
+| `veo ingredients-to-video -i <url>` | Generate a video from 1-3 ingredient images |
 | `veo upscale <video_id>` | Get 1080p version of a generated video |
 | `veo task <task_id>` | Query a single task status |
 | `veo tasks <id1> <id2>...` | Query multiple tasks at once |
