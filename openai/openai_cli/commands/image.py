@@ -1,5 +1,7 @@
 """Image generation and editing commands."""
 
+import re
+
 import click
 
 from openai_cli.core.client import get_client
@@ -11,6 +13,19 @@ from openai_cli.core.output import (
     print_image_result,
     print_json,
 )
+
+_SIZE_PATTERN = re.compile(r"^(auto|\d+x\d+)$")
+
+
+def _validate_size_format(ctx: click.Context, param: click.Parameter, value: str | None) -> str | None:
+    """Validate that size matches 'auto' or 'WIDTHxHEIGHT' pattern."""
+    if value is not None and not _SIZE_PATTERN.match(value):
+        raise click.BadParameter(
+            f"'{value}' is not a valid size. Use 'auto' or 'WIDTHxHEIGHT' format (e.g. 1024x1024).",
+            ctx=ctx,
+            param=param,
+        )
+    return value
 
 
 @click.command()
@@ -33,9 +48,15 @@ from openai_cli.core.output import (
 @click.option(
     "-s",
     "--size",
-    type=click.Choice(["1024x1024", "1792x1024", "1024x1792", "1536x1024", "1024x1536", "2048x2048", "2048x1536", "1536x2048", "2048x1152", "1152x2048", "2880x2880", "3264x2448", "2448x3264", "3840x2160", "2160x3840", "256x256", "512x512", "auto"]),
     default=None,
-    help="Size of the generated image.",
+    callback=_validate_size_format,
+    is_eager=False,
+    help=(
+        "Size of the generated image as WIDTHxHEIGHT or 'auto'. "
+        "gpt-image-2 accepts any WIDTHxHEIGHT (multiples of 16, max 3840 on each side). "
+        "dall-e-3: 1024x1024, 1792x1024, 1024x1792. "
+        "dall-e-2: 256x256, 512x512, 1024x1024."
+    ),
 )
 @click.option(
     "--quality",
@@ -172,9 +193,15 @@ def image(
 @click.option(
     "-s",
     "--size",
-    type=click.Choice(["1024x1024", "1792x1024", "1024x1792", "1536x1024", "1024x1536", "2048x2048", "2048x1536", "1536x2048", "2048x1152", "1152x2048", "2880x2880", "3264x2448", "2448x3264", "3840x2160", "2160x3840", "256x256", "512x512", "auto"]),
     default=None,
-    help="Size of the output image.",
+    callback=_validate_size_format,
+    is_eager=False,
+    help=(
+        "Size of the output image as WIDTHxHEIGHT or 'auto'. "
+        "gpt-image-2 accepts any WIDTHxHEIGHT (multiples of 16, max 3840 on each side). "
+        "dall-e-3: 1024x1024, 1792x1024, 1024x1792. "
+        "dall-e-2: 256x256, 512x512, 1024x1024."
+    ),
 )
 @click.option(
     "--quality",
