@@ -1,0 +1,7 @@
+version: "3"
+services:
+  kling-cli:
+    platform: linux/amd64
+    container_name: "kling-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/kling-cli:${BUILD_NUMBER}"
