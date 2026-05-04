@@ -8,6 +8,8 @@ from veo_cli.core.output import (
     ASPECT_RATIOS,
     DEFAULT_ASPECT_RATIO,
     DEFAULT_MODEL,
+    EXTEND_MODELS,
+    MOTION_TYPES,
     RESOLUTIONS,
     VEO_MODELS,
     print_error,
@@ -227,26 +229,203 @@ def ingredients_to_video(
 
 @click.command()
 @click.argument("video_id")
+@click.option(
+    "-a",
+    "--action",
+    type=click.Choice(["1080p", "4k", "gif"]),
+    default="1080p",
+    show_default=True,
+    help="Upsample action: 1080p, 4k, or gif.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upscale(
     ctx: click.Context,
     video_id: str,
+    action: str,
+    callback_url: str | None,
     output_json: bool,
 ) -> None:
-    """Get 1080p version of a generated video.
+    """Upsample a generated video to higher resolution or GIF.
 
-    VIDEO_ID is the ID of the video to upscale.
+    VIDEO_ID is the ID of the video to upsample.
 
     Examples:
 
       veo upscale abc123-def456
+
+      veo upscale abc123-def456 --action 4k
+
+      veo upscale abc123-def456 --action gif
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.upscale_video(
-            action="get1080p",
+        result = client.upsample_video(
+            action=action,
             video_id=video_id,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("video_id")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(EXTEND_MODELS),
+    required=True,
+    help="Model to use for extending (veo31 or veo31-fast).",
+)
+@click.option("--prompt", default=None, help="Optional prompt guiding the extended section.")
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def extend(
+    ctx: click.Context,
+    video_id: str,
+    model: str,
+    prompt: str | None,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Extend a previously generated video.
+
+    VIDEO_ID is the ID of the video to extend.
+
+    Only Veo 3.1 series models are supported (veo31, veo31-fast).
+
+    Examples:
+
+      veo extend abc123-def456 -m veo31-fast
+
+      veo extend abc123-def456 -m veo31 --prompt "Continue the scene"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.extend_video(
+            video_id=video_id,
+            model=model,
+            prompt=prompt,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("video_id")
+@click.option(
+    "--motion-type",
+    type=click.Choice(MOTION_TYPES),
+    required=True,
+    help="Camera motion to apply when re-rendering the video.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def reshoot(
+    ctx: click.Context,
+    video_id: str,
+    motion_type: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Re-render a video with a different camera motion.
+
+    VIDEO_ID is the ID of the video to reshoot. Videos from `extend` cannot be used.
+
+    Examples:
+
+      veo reshoot abc123-def456 --motion-type FORWARD
+
+      veo reshoot abc123-def456 --motion-type LEFT_TO_RIGHT
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.reshoot_video(
+            video_id=video_id,
+            motion_type=motion_type,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("video_id")
+@click.option(
+    "-a",
+    "--action",
+    type=click.Choice(["insert", "remove"]),
+    required=True,
+    help="Object action: insert or remove.",
+)
+@click.option(
+    "--prompt",
+    default=None,
+    help="Required for insert: describes what to add. Optional for remove.",
+)
+@click.option(
+    "--image-mask",
+    default=None,
+    help=(
+        "Mask image (URL or base64 JPEG). White pixels indicate the region to operate on. "
+        "Required for remove; optional for insert."
+    ),
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def objects(
+    ctx: click.Context,
+    video_id: str,
+    action: str,
+    prompt: str | None,
+    image_mask: str | None,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Insert or remove objects in a generated video.
+
+    VIDEO_ID is the ID of the video to edit. Videos from `extend` cannot be used.
+
+    Examples:
+
+      veo objects abc123 --action insert --prompt "Add a red balloon"
+
+      veo objects abc123 --action remove --image-mask https://example.com/mask.jpg
+    """
+    if action == "insert" and not prompt:
+        raise click.UsageError("--prompt is required when action is 'insert'.")
+    if action == "remove" and not image_mask:
+        raise click.UsageError("--image-mask is required when action is 'remove'.")
+
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.edit_objects(
+            video_id=video_id,
+            action=action,
+            prompt=prompt,
+            image_mask=image_mask,
+            callback_url=callback_url,
         )
         if output_json:
             print_json(result)

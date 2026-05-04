@@ -31,11 +31,36 @@ ASPECT_RATIOS = [
     "1:1",
 ]
 
+# Models supported by the extend endpoint
+EXTEND_MODELS = [
+    "veo31-fast",
+    "veo31",
+]
+
 # Available resolutions
 RESOLUTIONS = [
     "4k",
     "1080p",
     "gif",
+]
+
+# Camera motion types for reshoot
+MOTION_TYPES = [
+    "STATIONARY",
+    "STATIONARY_PAN_LEFT",
+    "STATIONARY_PAN_RIGHT",
+    "STATIONARY_TILT_UP",
+    "STATIONARY_TILT_DOWN",
+    "STATIONARY_DOLLY_ZOOM_IN",
+    "STATIONARY_DOLLY_ZOOM_OUT",
+    "UP",
+    "DOWN",
+    "LEFT_TO_RIGHT",
+    "RIGHT_TO_LEFT",
+    "FORWARD",
+    "BACKWARD",
+    "DOLLY_IN_ZOOM_OUT",
+    "DOLLY_OUT_ZOOM_IN",
 ]
 
 DEFAULT_ASPECT_RATIO = "16:9"
