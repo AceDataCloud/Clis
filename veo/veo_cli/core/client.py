@@ -95,9 +95,21 @@ class VeoClient:
         """Generate video using the main endpoint."""
         return self.request("/veo/videos", kwargs)
 
-    def upscale_video(self, **kwargs: Any) -> dict[str, Any]:
-        """Upscale a video to 1080p."""
-        return self.request("/veo/videos", kwargs)
+    def upsample_video(self, **kwargs: Any) -> dict[str, Any]:
+        """Upsample a video to a higher resolution."""
+        return self.request("/veo/upsample", kwargs)
+
+    def extend_video(self, **kwargs: Any) -> dict[str, Any]:
+        """Extend a previously generated video."""
+        return self.request("/veo/extend", kwargs)
+
+    def reshoot_video(self, **kwargs: Any) -> dict[str, Any]:
+        """Re-render a video with a different camera motion."""
+        return self.request("/veo/reshoot", kwargs)
+
+    def edit_objects(self, **kwargs: Any) -> dict[str, Any]:
+        """Insert or remove objects in a video."""
+        return self.request("/veo/objects", kwargs)
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""

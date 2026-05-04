@@ -261,7 +261,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_upscale_json(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/videos").mock(
+        respx.post("https://api.acedata.cloud/veo/upsample").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -269,6 +269,147 @@ class TestGenerateCommands:
             ["--token", "test-token", "upscale", "video-123", "--json"],
         )
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_upscale_4k(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/upsample").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "upscale", "video-123", "--action", "4k", "--json"],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_upscale_gif(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/upsample").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "upscale", "video-123", "--action", "gif", "--json"],
+        )
+        assert result.exit_code == 0
+
+
+# ─── Extend / Reshoot / Objects Commands ──────────────────────────────────
+
+
+class TestExtendReshootObjectsCommands:
+    """Tests for extend, reshoot, and objects commands."""
+
+    @respx.mock
+    def test_extend_json(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/extend").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "extend", "video-123", "--json"],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_extend_with_prompt(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/extend").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extend",
+                "video-123",
+                "-m",
+                "veo31",
+                "-p",
+                "slowly zoom out",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_reshoot_json(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/reshoot").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "reshoot",
+                "video-123",
+                "--motion-type",
+                "LEFT_TO_RIGHT",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    def test_reshoot_requires_motion_type(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "reshoot", "video-123"],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_objects_insert_json(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/objects").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "objects",
+                "insert",
+                "video-123",
+                "--prompt",
+                "add a flying pig",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_objects_remove_json(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/veo/objects").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "objects",
+                "remove",
+                "video-123",
+                "--image-mask",
+                "https://example.com/mask.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    def test_objects_insert_requires_prompt(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "objects", "insert", "video-123"],
+        )
+        assert result.exit_code != 0
+
+    def test_objects_remove_requires_mask(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "objects", "remove", "video-123"],
+        )
+        assert result.exit_code != 0
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────

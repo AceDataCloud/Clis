@@ -20,6 +20,38 @@ VEO_MODELS = [
     "veo2-fast",
 ]
 
+# Models supported for the extend endpoint
+EXTEND_MODELS = [
+    "veo31-fast",
+    "veo31",
+]
+
+# Upsample action choices
+UPSAMPLE_ACTIONS = [
+    "1080p",
+    "4k",
+    "gif",
+]
+
+# Camera motion types for reshoot
+MOTION_TYPES = [
+    "STATIONARY",
+    "STATIONARY_UP",
+    "STATIONARY_DOWN",
+    "STATIONARY_LEFT",
+    "STATIONARY_RIGHT",
+    "STATIONARY_DOLLY_IN_ZOOM_OUT",
+    "STATIONARY_DOLLY_OUT_ZOOM_IN",
+    "UP",
+    "DOWN",
+    "LEFT_TO_RIGHT",
+    "RIGHT_TO_LEFT",
+    "FORWARD",
+    "BACKWARD",
+    "DOLLY_IN_ZOOM_OUT",
+    "DOLLY_OUT_ZOOM_IN",
+]
+
 DEFAULT_MODEL = "veo3"
 
 # Available aspect ratios

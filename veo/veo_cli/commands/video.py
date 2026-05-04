@@ -8,7 +8,10 @@ from veo_cli.core.output import (
     ASPECT_RATIOS,
     DEFAULT_ASPECT_RATIO,
     DEFAULT_MODEL,
+    EXTEND_MODELS,
+    MOTION_TYPES,
     RESOLUTIONS,
+    UPSAMPLE_ACTIONS,
     VEO_MODELS,
     print_error,
     print_json,
@@ -227,26 +230,249 @@ def ingredients_to_video(
 
 @click.command()
 @click.argument("video_id")
+@click.option(
+    "-a",
+    "--action",
+    type=click.Choice(UPSAMPLE_ACTIONS),
+    default="1080p",
+    show_default=True,
+    help="Upsample action: 1080p, 4k, or gif.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upscale(
     ctx: click.Context,
     video_id: str,
+    action: str,
+    callback_url: str | None,
     output_json: bool,
 ) -> None:
-    """Get 1080p version of a generated video.
+    """Upsample a generated video to a higher resolution.
 
-    VIDEO_ID is the ID of the video to upscale.
+    VIDEO_ID is the ID of the video to upsample.
 
     Examples:
 
       veo upscale abc123-def456
+
+      veo upscale abc123-def456 --action 4k
+
+      veo upscale abc123-def456 --action gif
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.upscale_video(
-            action="get1080p",
+        result = client.upsample_video(
+            action=action,
             video_id=video_id,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("video_id")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(EXTEND_MODELS),
+    default="veo31-fast",
+    show_default=True,
+    help="Model for extending the video (veo31 series only).",
+)
+@click.option(
+    "-p",
+    "--prompt",
+    default=None,
+    help="Optional prompt guiding the extended section.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def extend(
+    ctx: click.Context,
+    video_id: str,
+    model: str,
+    prompt: str | None,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Extend a previously generated video.
+
+    VIDEO_ID is the ID of the video to extend. Only veo31 series models are supported.
+
+    Examples:
+
+      veo extend abc123-def456
+
+      veo extend abc123-def456 -m veo31 -p "slowly zoom out to reveal the landscape"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.extend_video(
+            video_id=video_id,
+            model=model,
+            prompt=prompt,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("video_id")
+@click.option(
+    "--motion-type",
+    type=click.Choice(MOTION_TYPES),
+    required=True,
+    help="Camera motion to apply when re-rendering the video.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def reshoot(
+    ctx: click.Context,
+    video_id: str,
+    motion_type: str,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Re-render a video with a different camera motion.
+
+    VIDEO_ID is the ID of the video to reshoot.
+
+    Examples:
+
+      veo reshoot abc123-def456 --motion-type LEFT_TO_RIGHT
+
+      veo reshoot abc123-def456 --motion-type FORWARD
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.reshoot_video(
+            video_id=video_id,
+            motion_type=motion_type,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.group()
+def objects() -> None:
+    """Insert or remove objects in a video.
+
+    \b
+    Examples:
+      veo objects insert abc123-def456 --prompt "add a flying pig with black wings"
+      veo objects remove abc123-def456 --image-mask https://example.com/mask.jpg
+    """
+
+
+@objects.command()
+@click.argument("video_id")
+@click.option(
+    "--prompt",
+    required=True,
+    help="Describes the object to add to the video.",
+)
+@click.option(
+    "--image-mask",
+    default=None,
+    help="Optional mask image URL or base64 JPEG. White pixels indicate placement region.",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def insert(
+    ctx: click.Context,
+    video_id: str,
+    prompt: str,
+    image_mask: str | None,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Insert an object into a video.
+
+    VIDEO_ID is the ID of the video to edit.
+
+    Examples:
+
+      veo objects insert abc123-def456 --prompt "add a flying pig with black wings"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.edit_objects(
+            action="insert",
+            video_id=video_id,
+            prompt=prompt,
+            image_mask=image_mask,
+            callback_url=callback_url,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_video_result(result)
+    except VeoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@objects.command()
+@click.argument("video_id")
+@click.option(
+    "--image-mask",
+    required=True,
+    help="Mask image (URL or base64 JPEG). White pixels define the region to remove.",
+)
+@click.option(
+    "--prompt",
+    default=None,
+    help="Optional description of what to remove (for logging).",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def remove(
+    ctx: click.Context,
+    video_id: str,
+    image_mask: str,
+    prompt: str | None,
+    callback_url: str | None,
+    output_json: bool,
+) -> None:
+    """Remove an object from a video using a mask.
+
+    VIDEO_ID is the ID of the video to edit.
+
+    Examples:
+
+      veo objects remove abc123-def456 --image-mask https://example.com/mask.jpg
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.edit_objects(
+            action="remove",
+            video_id=video_id,
+            image_mask=image_mask,
+            prompt=prompt,
+            callback_url=callback_url,
         )
         if output_json:
             print_json(result)

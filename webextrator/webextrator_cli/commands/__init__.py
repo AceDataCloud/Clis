@@ -1,0 +1,1 @@
+"""WebExtrator CLI commands package."""

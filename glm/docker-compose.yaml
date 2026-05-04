@@ -1,0 +1,7 @@
+services:
+  glm:
+    build: .
+    environment:
+      - ACEDATACLOUD_API_TOKEN=${ACEDATACLOUD_API_TOKEN}
+    stdin_open: true
+    tty: true
