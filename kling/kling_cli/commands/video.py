@@ -1,5 +1,8 @@
 """Video generation commands."""
 
+import json
+from typing import Any
+
 import click
 
 from kling_cli.core.client import get_client
@@ -15,6 +18,21 @@ from kling_cli.core.output import (
     print_json,
     print_video_result,
 )
+
+
+def _parse_json_option(value: str | None, param_hint: str) -> Any:
+    """Parse a JSON string option, raising BadParameter on invalid JSON."""
+    if value is None:
+        return None
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise click.BadParameter("Must be a valid JSON string.", param_hint=param_hint) from exc
+
+
+def _build_element_list(element_ids: tuple[str, ...]) -> list[dict[str, str]] | None:
+    """Build an element_list payload from a tuple of element IDs."""
+    return [{"element_id": eid} for eid in element_ids] if element_ids else None
 
 
 @click.command()
@@ -63,6 +81,34 @@ from kling_cli.core.output import (
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--camera-control",
+    default=None,
+    help=(
+        "Camera movement control as a JSON string. "
+        "Keys: type (one of simple/down_back/forward_up/left_turn_forward/right_turn_forward) "
+        "and optional config object with fields horizontal/vertical/pan/tilt/roll/zoom [-1,1]. "
+        'Example: \'{"type": "simple", "config": {"horizontal": 0.5}}\''
+    ),
+)
+@click.option(
+    "--element-id",
+    "element_ids",
+    multiple=True,
+    help=(
+        "Reference subject ID from the subject library. "
+        "Can be specified multiple times (max 7 without reference video, 4 with)."
+    ),
+)
+@click.option(
+    "--video-list",
+    default=None,
+    help=(
+        "Reference video(s) as a JSON array string. Each item must have video_url and may "
+        "include refer_type (feature or base) and keep_original_sound (yes/no). "
+        'Example: \'[{"video_url": "https://...", "refer_type": "base"}]\''
+    ),
+)
+@click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
@@ -78,6 +124,9 @@ def generate(
     negative_prompt: str | None,
     generate_audio: bool | None,
     callback_url: str | None,
+    camera_control: str | None,
+    element_ids: tuple[str, ...],
+    video_list: str | None,
     timeout: int | None,
     output_json: bool,
 ) -> None:
@@ -104,6 +153,9 @@ def generate(
             "negative_prompt": negative_prompt,
             "generate_audio": generate_audio,
             "callback_url": callback_url,
+            "camera_control": _parse_json_option(camera_control, "--camera-control"),
+            "element_list": _build_element_list(element_ids),
+            "video_list": _parse_json_option(video_list, "--video-list"),
             "timeout": timeout,
         }
 
@@ -168,6 +220,34 @@ def generate(
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--camera-control",
+    default=None,
+    help=(
+        "Camera movement control as a JSON string. "
+        "Keys: type (one of simple/down_back/forward_up/left_turn_forward/right_turn_forward) "
+        "and optional config object with fields horizontal/vertical/pan/tilt/roll/zoom [-1,1]. "
+        'Example: \'{"type": "simple", "config": {"horizontal": 0.5}}\''
+    ),
+)
+@click.option(
+    "--element-id",
+    "element_ids",
+    multiple=True,
+    help=(
+        "Reference subject ID from the subject library. "
+        "Can be specified multiple times (max 7 without reference video, 4 with)."
+    ),
+)
+@click.option(
+    "--video-list",
+    default=None,
+    help=(
+        "Reference video(s) as a JSON array string. Each item must have video_url and may "
+        "include refer_type (feature or base) and keep_original_sound (yes/no). "
+        'Example: \'[{"video_url": "https://...", "refer_type": "base"}]\''
+    ),
+)
+@click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
@@ -184,6 +264,9 @@ def image_to_video(
     cfg_scale: float | None,
     negative_prompt: str | None,
     callback_url: str | None,
+    camera_control: str | None,
+    element_ids: tuple[str, ...],
+    video_list: str | None,
     timeout: int | None,
     output_json: bool,
 ) -> None:
@@ -211,6 +294,9 @@ def image_to_video(
             cfg_scale=cfg_scale,
             negative_prompt=negative_prompt,
             callback_url=callback_url,
+            camera_control=_parse_json_option(camera_control, "--camera-control"),
+            element_list=_build_element_list(element_ids),
+            video_list=_parse_json_option(video_list, "--video-list"),
             timeout=timeout,
         )
         if output_json:

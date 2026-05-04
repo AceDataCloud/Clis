@@ -205,6 +205,172 @@ class TestGenerateCommands:
         assert body["action"] == "extend"
         assert body["video_id"] == "video-123"
 
+    @respx.mock
+    def test_generate_with_camera_control(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--camera-control",
+                '{"type": "simple", "config": {"horizontal": 0.5}}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["camera_control"] == {"type": "simple", "config": {"horizontal": 0.5}}
+
+    def test_generate_with_invalid_camera_control(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--camera-control",
+                "not-valid-json",
+            ],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_generate_with_element_ids(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--element-id",
+                "elem-001",
+                "--element-id",
+                "elem-002",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["element_list"] == [{"element_id": "elem-001"}, {"element_id": "elem-002"}]
+
+    @respx.mock
+    def test_generate_with_video_list(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--video-list",
+                '[{"video_url": "https://example.com/ref.mp4", "refer_type": "base"}]',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["video_list"] == [
+            {"video_url": "https://example.com/ref.mp4", "refer_type": "base"}
+        ]
+
+    def test_generate_with_invalid_video_list(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--video-list",
+                "not-valid-json",
+            ],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_image_to_video_with_camera_control(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this",
+                "--start-image-url",
+                "https://example.com/photo.jpg",
+                "--camera-control",
+                '{"type": "down_back"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["camera_control"] == {"type": "down_back"}
+
+    @respx.mock
+    def test_image_to_video_with_element_ids(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this",
+                "--start-image-url",
+                "https://example.com/photo.jpg",
+                "--element-id",
+                "elem-abc",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["element_list"] == [{"element_id": "elem-abc"}]
+
+    @respx.mock
+    def test_image_to_video_with_video_list(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this",
+                "--start-image-url",
+                "https://example.com/photo.jpg",
+                "--video-list",
+                '[{"video_url": "https://example.com/ref.mp4", "refer_type": "feature"}]',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["video_list"] == [
+            {"video_url": "https://example.com/ref.mp4", "refer_type": "feature"}
+        ]
+
     def test_extend_no_video_id(self, runner):
         result = runner.invoke(cli, ["--token", "test-token", "extend"])
         assert result.exit_code != 0
@@ -307,6 +473,71 @@ class TestMotionCommands:
                 "motion",
                 "--image-url",
                 "https://example.com/img.jpg",
+            ],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_motion_character_orientation_image(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/motion").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--character-orientation",
+                "image",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["character_orientation"] == "image"
+
+    @respx.mock
+    def test_motion_character_orientation_video(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/motion").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--character-orientation",
+                "video",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["character_orientation"] == "video"
+
+    def test_motion_invalid_character_orientation(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--character-orientation",
+                "invalid-value",
             ],
         )
         assert result.exit_code != 0
