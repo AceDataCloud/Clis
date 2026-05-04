@@ -3,7 +3,7 @@
 import click
 
 from webextrator_cli.core.client import get_client
-from webextrator_cli.core.exceptions import WebExtraterError
+from webextrator_cli.core.exceptions import WebExtratorError
 from webextrator_cli.core.output import (
     BLOCK_RESOURCE_TYPES,
     EXPECTED_TYPES,
@@ -114,6 +114,6 @@ def extract(
             print_json(result)
         else:
             print_extract_result(result)
-    except WebExtraterError as e:
+    except WebExtratorError as e:
         print_error(e.message)
         raise SystemExit(1) from e
