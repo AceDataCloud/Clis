@@ -6,13 +6,13 @@ import httpx
 
 from webextrator_cli.core.config import settings
 from webextrator_cli.core.exceptions import (
-    WebExtraterAPIError,
-    WebExtraterAuthError,
-    WebExtraterTimeoutError,
+    WebExtratorAPIError,
+    WebExtratorAuthError,
+    WebExtratorTimeoutError,
 )
 
 
-class WebExtraterClient:
+class WebExtratorClient:
     """HTTP client for AceDataCloud WebExtrator API."""
 
     def __init__(self, api_token: str | None = None, base_url: str | None = None):
@@ -23,7 +23,7 @@ class WebExtraterClient:
     def _get_headers(self) -> dict[str, str]:
         """Get request headers with authentication."""
         if not self.api_token:
-            raise WebExtraterAuthError(
+            raise WebExtratorAuthError(
                 "API token not configured. "
                 "Set ACEDATACLOUD_API_TOKEN or use --token option."
             )
@@ -56,33 +56,33 @@ class WebExtraterClient:
                 )
 
                 if response.status_code == 401:
-                    raise WebExtraterAuthError("Invalid API token")
+                    raise WebExtratorAuthError("Invalid API token")
 
                 if response.status_code == 403:
-                    raise WebExtraterAuthError("Access denied. Check your API permissions.")
+                    raise WebExtratorAuthError("Access denied. Check your API permissions.")
 
                 response.raise_for_status()
                 return response.json()  # type: ignore[no-any-return]
 
             except httpx.TimeoutException as e:
-                raise WebExtraterTimeoutError(
+                raise WebExtratorTimeoutError(
                     f"Request to {endpoint} timed out after {request_timeout}s"
                 ) from e
 
-            except WebExtraterAuthError:
+            except WebExtratorAuthError:
                 raise
 
             except httpx.HTTPStatusError as e:
-                raise WebExtraterAPIError(
+                raise WebExtratorAPIError(
                     message=e.response.text,
                     code=f"http_{e.response.status_code}",
                     status_code=e.response.status_code,
                 ) from e
 
             except Exception as e:
-                if isinstance(e, WebExtraterAPIError | WebExtraterTimeoutError):
+                if isinstance(e, WebExtratorAPIError | WebExtratorTimeoutError):
                     raise
-                raise WebExtraterAPIError(message=str(e)) from e
+                raise WebExtratorAPIError(message=str(e)) from e
 
     def extract(self, **kwargs: Any) -> dict[str, Any]:
         """Extract structured content from a web page."""
@@ -97,8 +97,8 @@ class WebExtraterClient:
         return self.request("/webextrator/tasks", kwargs)
 
 
-def get_client(token: str | None = None) -> WebExtraterClient:
-    """Get a WebExtraterClient instance, optionally overriding the token."""
+def get_client(token: str | None = None) -> WebExtratorClient:
+    """Get a WebExtratorClient instance, optionally overriding the token."""
     if token:
-        return WebExtraterClient(api_token=token)
-    return WebExtraterClient()
+        return WebExtratorClient(api_token=token)
+    return WebExtratorClient()

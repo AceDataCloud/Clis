@@ -1,7 +1,7 @@
 """Custom exceptions for WebExtrator CLI."""
 
 
-class WebExtraterError(Exception):
+class WebExtratorError(Exception):
     """Base exception for WebExtrator CLI."""
 
     def __init__(self, message: str, code: str = "unknown"):
@@ -10,14 +10,14 @@ class WebExtraterError(Exception):
         super().__init__(message)
 
 
-class WebExtraterAuthError(WebExtraterError):
+class WebExtratorAuthError(WebExtratorError):
     """Authentication error."""
 
     def __init__(self, message: str = "Authentication failed"):
         super().__init__(message, code="auth_error")
 
 
-class WebExtraterAPIError(WebExtraterError):
+class WebExtratorAPIError(WebExtratorError):
     """API error with HTTP status code."""
 
     def __init__(
@@ -30,7 +30,7 @@ class WebExtraterAPIError(WebExtraterError):
         super().__init__(message, code)
 
 
-class WebExtraterTimeoutError(WebExtraterError):
+class WebExtratorTimeoutError(WebExtratorError):
     """Request timeout error."""
 
     def __init__(self, message: str = "Request timed out"):
