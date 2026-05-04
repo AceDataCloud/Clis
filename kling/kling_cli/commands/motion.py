@@ -29,6 +29,7 @@ from kling_cli.core.output import (
 @click.option(
     "--character-orientation",
     default=None,
+    type=click.Choice(["image", "video"]),
     help="Orientation of characters in the generated video: consistent with the image or video.",
 )
 @click.option(
