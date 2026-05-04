@@ -16,7 +16,11 @@ from midjourney_cli.core.output import (
 
 @click.command()
 @click.argument("prompt")
-@click.option("--image-url", required=True, help="URL of the first frame reference image.")
+@click.option(
+    "--image-url",
+    required=True,
+    help="URL of the first-frame reference image. Required for video generation (Midjourney video is image-to-video only).",
+)
 @click.option(
     "-m",
     "--mode",
@@ -46,9 +50,10 @@ def video(
     callback_url: str | None,
     output_json: bool,
 ) -> None:
-    """Generate a video from text prompt and reference image.
+    """Generate a video from text prompt and first-frame reference image.
 
-    PROMPT describes the desired video content.
+    PROMPT describes the desired video content. Midjourney video is
+    image-to-video only — an image URL is always required.
 
     \b
     Examples:
@@ -108,7 +113,7 @@ def extend_video(
     callback_url: str | None,
     output_json: bool,
 ) -> None:
-    """Extend an existing video to make it longer.
+    """Extend an existing generated video to make it longer.
 
     VIDEO_ID is the video_id from a previous video generation.
     PROMPT describes how the video should continue.
