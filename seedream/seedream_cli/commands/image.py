@@ -60,6 +60,18 @@ from seedream_cli.core.output import (
     help="Output image file format: jpeg (default) or png. Only supported for doubao-seedream-5-0-260128.",
 )
 @click.option(
+    "--sequential-max-images",
+    type=click.IntRange(1, 15),
+    default=None,
+    help="Max images for sequential generation (1-15). Only used when --sequential-image-generation=auto.",
+)
+@click.option(
+    "--optimize-prompt-mode",
+    type=click.Choice(["standard", "fast"]),
+    default=None,
+    help="Prompt optimization mode. Only supported on doubao-seedream-5.0-lite, doubao-seedream-4.5, and doubao-seedream-4.0.",
+)
+@click.option(
     "--web-search",
     is_flag=True,
     default=False,
@@ -75,6 +87,8 @@ def generate(
     resolution: str | None,
     seed: int | None,
     sequential_image_generation: str | None,
+    sequential_max_images: int | None,
+    optimize_prompt_mode: str | None,
     stream: bool,
     guidance_scale: float | None,
     response_format: str | None,
@@ -101,6 +115,12 @@ def generate(
             "model": model,
             "seed": seed,
             "sequential_image_generation": sequential_image_generation,
+            "sequential_image_generation_options": {"max_images": sequential_max_images}
+            if sequential_max_images is not None
+            else None,
+            "optimize_prompt_options": {"mode": optimize_prompt_mode}
+            if optimize_prompt_mode is not None
+            else None,
             "stream": stream if stream else None,
             "guidance_scale": guidance_scale,
             "response_format": response_format,
