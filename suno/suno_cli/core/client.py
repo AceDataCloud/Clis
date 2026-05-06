@@ -102,49 +102,7 @@ class SunoClient:
         Returns:
             API response as dictionary
         """
-        url = f"{self.base_url}{endpoint}"
-        request_timeout = timeout or self.timeout
-
-        # Remove None values from params
-        params = {k: v for k, v in params.items() if v is not None}
-
-        with httpx.Client() as http_client:
-            try:
-                response = http_client.get(
-                    url,
-                    params=params,
-                    headers=self._get_headers(),
-                    timeout=request_timeout,
-                )
-
-                if response.status_code == 401:
-                    raise SunoAuthError("Invalid API token")
-
-                if response.status_code == 403:
-                    raise SunoAuthError("Access denied. Check your API permissions.")
-
-                response.raise_for_status()
-                return response.json()  # type: ignore[no-any-return]
-
-            except httpx.TimeoutException as e:
-                raise SunoTimeoutError(
-                    f"Request to {endpoint} timed out after {request_timeout}s"
-                ) from e
-
-            except SunoAuthError:
-                raise
-
-            except httpx.HTTPStatusError as e:
-                raise SunoAPIError(
-                    message=e.response.text,
-                    code=f"http_{e.response.status_code}",
-                    status_code=e.response.status_code,
-                ) from e
-
-            except Exception as e:
-                if isinstance(e, SunoAPIError | SunoTimeoutError):
-                    raise
-                raise SunoAPIError(message=str(e)) from e
+        return self._non_post_request("get", endpoint, params, timeout)
 
     def delete_request(
         self,
@@ -162,6 +120,26 @@ class SunoClient:
         Returns:
             API response as dictionary
         """
+        return self._non_post_request("delete", endpoint, params, timeout)
+
+    def _non_post_request(
+        self,
+        method: str,
+        endpoint: str,
+        params: dict[str, Any],
+        timeout: float | None = None,
+    ) -> dict[str, Any]:
+        """Make a GET or DELETE request to the Suno API.
+
+        Args:
+            method: HTTP method, either "get" or "delete"
+            endpoint: API endpoint path
+            params: Query parameters as dictionary
+            timeout: Optional timeout override
+
+        Returns:
+            API response as dictionary
+        """
         url = f"{self.base_url}{endpoint}"
         request_timeout = timeout or self.timeout
 
@@ -170,7 +148,8 @@ class SunoClient:
 
         with httpx.Client() as http_client:
             try:
-                response = http_client.delete(
+                http_method = getattr(http_client, method)
+                response = http_method(
                     url,
                     params=params,
                     headers=self._get_headers(),

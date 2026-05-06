@@ -155,7 +155,8 @@ def delete_persona(
             if result.get("success"):
                 print_success(f"Persona deleted: {persona_id}")
             else:
-                print_json(result)
+                print_error(result.get("error", {}).get("message", "Delete failed"))
+                raise SystemExit(1)
     except SunoError as e:
         print_error(e.message)
         raise SystemExit(1) from e
