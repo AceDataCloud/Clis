@@ -50,6 +50,7 @@ class TestSunoClient:
             ("/suno/style", "get_style"),
             ("/suno/mashup-lyrics", "mashup_lyrics"),
             ("/suno/upload", "upload_audio"),
+            ("/suno/voices", "create_voice"),
             ("/suno/tasks", "query_task"),
         ],
     )
@@ -70,6 +71,40 @@ class TestSunoClient:
             assert result == {"success": True}
             call_args = mock_instance.post.call_args
             assert endpoint in call_args[0][0]
+
+    def test_list_personas_uses_get(self, client):
+        """Test list_personas calls GET /suno/persona."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"success": True, "data": []}
+
+        with patch("httpx.Client") as mock_http:
+            mock_instance = MagicMock()
+            mock_instance.get.return_value = mock_response
+            mock_http.return_value.__enter__.return_value = mock_instance
+
+            result = client.list_personas(limit=10)
+
+            assert result == {"success": True, "data": []}
+            call_args = mock_instance.get.call_args
+            assert "/suno/persona" in call_args[0][0]
+
+    def test_delete_persona_uses_delete(self, client):
+        """Test delete_persona calls DELETE /suno/persona."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"success": True}
+
+        with patch("httpx.Client") as mock_http:
+            mock_instance = MagicMock()
+            mock_instance.delete.return_value = mock_response
+            mock_http.return_value.__enter__.return_value = mock_instance
+
+            result = client.delete_persona(persona_id="per-123")
+
+            assert result == {"success": True}
+            call_args = mock_instance.delete.call_args
+            assert "/suno/persona" in call_args[0][0]
 
 
 class TestRequestErrors:
