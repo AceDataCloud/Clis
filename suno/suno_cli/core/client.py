@@ -86,6 +86,126 @@ class SunoClient:
                     raise
                 raise SunoAPIError(message=str(e)) from e
 
+    def get_request(
+        self,
+        endpoint: str,
+        params: dict[str, Any],
+        timeout: float | None = None,
+    ) -> dict[str, Any]:
+        """Make a GET request to the Suno API.
+
+        Args:
+            endpoint: API endpoint path (e.g., "/suno/persona")
+            params: Query parameters as dictionary
+            timeout: Optional timeout override
+
+        Returns:
+            API response as dictionary
+        """
+        url = f"{self.base_url}{endpoint}"
+        request_timeout = timeout or self.timeout
+
+        # Remove None values from params
+        params = {k: v for k, v in params.items() if v is not None}
+
+        with httpx.Client() as http_client:
+            try:
+                response = http_client.get(
+                    url,
+                    params=params,
+                    headers=self._get_headers(),
+                    timeout=request_timeout,
+                )
+
+                if response.status_code == 401:
+                    raise SunoAuthError("Invalid API token")
+
+                if response.status_code == 403:
+                    raise SunoAuthError("Access denied. Check your API permissions.")
+
+                response.raise_for_status()
+                return response.json()  # type: ignore[no-any-return]
+
+            except httpx.TimeoutException as e:
+                raise SunoTimeoutError(
+                    f"Request to {endpoint} timed out after {request_timeout}s"
+                ) from e
+
+            except SunoAuthError:
+                raise
+
+            except httpx.HTTPStatusError as e:
+                raise SunoAPIError(
+                    message=e.response.text,
+                    code=f"http_{e.response.status_code}",
+                    status_code=e.response.status_code,
+                ) from e
+
+            except Exception as e:
+                if isinstance(e, SunoAPIError | SunoTimeoutError):
+                    raise
+                raise SunoAPIError(message=str(e)) from e
+
+    def delete_request(
+        self,
+        endpoint: str,
+        params: dict[str, Any],
+        timeout: float | None = None,
+    ) -> dict[str, Any]:
+        """Make a DELETE request to the Suno API.
+
+        Args:
+            endpoint: API endpoint path (e.g., "/suno/persona")
+            params: Query parameters as dictionary
+            timeout: Optional timeout override
+
+        Returns:
+            API response as dictionary
+        """
+        url = f"{self.base_url}{endpoint}"
+        request_timeout = timeout or self.timeout
+
+        # Remove None values from params
+        params = {k: v for k, v in params.items() if v is not None}
+
+        with httpx.Client() as http_client:
+            try:
+                response = http_client.delete(
+                    url,
+                    params=params,
+                    headers=self._get_headers(),
+                    timeout=request_timeout,
+                )
+
+                if response.status_code == 401:
+                    raise SunoAuthError("Invalid API token")
+
+                if response.status_code == 403:
+                    raise SunoAuthError("Access denied. Check your API permissions.")
+
+                response.raise_for_status()
+                return response.json()  # type: ignore[no-any-return]
+
+            except httpx.TimeoutException as e:
+                raise SunoTimeoutError(
+                    f"Request to {endpoint} timed out after {request_timeout}s"
+                ) from e
+
+            except SunoAuthError:
+                raise
+
+            except httpx.HTTPStatusError as e:
+                raise SunoAPIError(
+                    message=e.response.text,
+                    code=f"http_{e.response.status_code}",
+                    status_code=e.response.status_code,
+                ) from e
+
+            except Exception as e:
+                if isinstance(e, SunoAPIError | SunoTimeoutError):
+                    raise
+                raise SunoAPIError(message=str(e)) from e
+
     # Convenience methods
     def generate_audio(self, **kwargs: Any) -> dict[str, Any]:
         """Generate audio using the audios endpoint."""
@@ -131,9 +251,21 @@ class SunoClient:
         """Upload audio from a URL."""
         return self.request("/suno/upload", kwargs)
 
+    def create_voice(self, **kwargs: Any) -> dict[str, Any]:
+        """Create a custom voice persona from an audio URL."""
+        return self.request("/suno/voices", kwargs)
+
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""
         return self.request("/suno/tasks", kwargs)
+
+    def list_personas(self, **kwargs: Any) -> dict[str, Any]:
+        """List saved personas."""
+        return self.get_request("/suno/persona", kwargs)
+
+    def delete_persona(self, **kwargs: Any) -> dict[str, Any]:
+        """Delete a saved persona."""
+        return self.delete_request("/suno/persona", kwargs)
 
 
 def get_client(token: str | None = None) -> SunoClient:
