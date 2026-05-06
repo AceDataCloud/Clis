@@ -127,6 +127,10 @@ class SunoClient:
         """Generate mashup lyrics from two sets of lyrics."""
         return self.request("/suno/mashup-lyrics", kwargs)
 
+    def create_voice(self, **kwargs: Any) -> dict[str, Any]:
+        """Create a custom voice persona from an audio URL."""
+        return self.request("/suno/voices", kwargs)
+
     def upload_audio(self, **kwargs: Any) -> dict[str, Any]:
         """Upload audio from a URL."""
         return self.request("/suno/upload", kwargs)

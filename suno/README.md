@@ -138,7 +138,8 @@ suno models
 
 | Command | Description |
 |---------|-------------|
-| `suno persona <audio_id>` | Create a saved voice style |
+| `suno persona <audio_id>` | Create a saved voice style from a generated song |
+| `suno voices <audio_url>` | Create a custom voice persona from an audio URL |
 | `suno upload <audio_url>` | Upload external audio for processing |
 | `suno models` | List available Suno models |
 | `suno actions` | List available API actions |

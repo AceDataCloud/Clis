@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `voices` command: create a custom voice persona from a publicly accessible audio URL (`/suno/voices`)
+
 ## [2026.3.17.0] - 2026-03-17
 
 ### Added
