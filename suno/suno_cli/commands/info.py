@@ -41,6 +41,9 @@ def actions() -> None:
         ("underpainting", "Add AI accompaniment to uploaded audio"),
         ("overpainting", "Add AI vocals to uploaded audio"),
         ("samples", "Add AI samples to uploaded audio"),
+        ("persona-list", "List personas for a user (CLI: persona-list)"),
+        ("persona-delete", "Delete a persona by ID (CLI: persona-delete)"),
+        ("voices", "Create a custom voice persona from an audio URL (CLI: voices)"),
     ]
     for action, desc in action_list:
         table.add_row(action, desc)
