@@ -67,6 +67,137 @@ def persona(
         raise SystemExit(1) from e
 
 
+@click.command("persona-list")
+@click.option("--user-id", default=None, help="User ID to list personas for.")
+@click.option("--limit", type=int, default=None, help="Maximum number of personas to return.")
+@click.option("--offset", type=int, default=None, help="Number of personas to skip.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def persona_list(
+    ctx: click.Context,
+    user_id: str | None,
+    limit: int | None,
+    offset: int | None,
+    output_json: bool,
+) -> None:
+    """List saved voice personas.
+
+    Examples:
+
+      suno persona-list
+
+      suno persona-list --limit 10 --offset 0
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.list_personas(user_id=user_id, limit=limit, offset=offset)
+        if output_json:
+            print_json(result)
+        else:
+            items = result.get("items", [])
+            total_count = result.get("count", len(items))
+            if not items:
+                print_success("No personas found.")
+            else:
+                from rich.table import Table
+
+                from suno_cli.core.output import console
+
+                table = Table(title=f"Personas ({total_count} total)")
+                table.add_column("ID", style="cyan")
+                table.add_column("Name")
+                table.add_column("Description")
+                for item in items:
+                    table.add_row(
+                        item.get("id", ""),
+                        item.get("name", ""),
+                        item.get("description", ""),
+                    )
+                console.print(table)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("persona-delete")
+@click.argument("persona_id")
+@click.option("--user-id", default=None, help="User ID for ownership verification.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def persona_delete(
+    ctx: click.Context,
+    persona_id: str,
+    user_id: str | None,
+    output_json: bool,
+) -> None:
+    """Delete a saved voice persona.
+
+    PERSONA_ID is the ID of the persona to delete.
+
+    Examples:
+
+      suno persona-delete abc123
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.delete_persona(persona_id=persona_id, user_id=user_id)
+        if output_json:
+            print_json(result)
+        else:
+            if result.get("success"):
+                print_success(f"Persona {persona_id} deleted successfully.")
+            else:
+                print_json(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("voices")
+@click.argument("audio_url")
+@click.option("-n", "--name", default=None, help="Name for the custom voice persona.")
+@click.option("--description", default=None, help="Description of the custom voice persona.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def voices(
+    ctx: click.Context,
+    audio_url: str,
+    name: str | None,
+    description: str | None,
+    output_json: bool,
+) -> None:
+    """Create a custom voice persona from an audio URL.
+
+    AUDIO_URL is the publicly accessible URL of the audio file (MP3 or WAV,
+    at least 10 seconds long, with clear vocals from a single speaker).
+
+    Examples:
+
+      suno voices "https://example.com/my-voice.mp3" --name "My Voice"
+
+      suno voices "https://example.com/vocal.wav" --name "Singer" --description "Soprano voice"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.create_voice(audio_url=audio_url, name=name, description=description)
+        if output_json:
+            print_json(result)
+        else:
+            data = result.get("data", {})
+            if isinstance(data, dict):
+                persona_id = data.get("persona_id", "")
+                voice_name = data.get("name", name or "")
+                if persona_id:
+                    print_success(f"Voice created: {voice_name} (persona_id: {persona_id})")
+                else:
+                    print_json(result)
+            else:
+                print_json(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
 @click.command("upload")
 @click.argument("audio_url")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
