@@ -112,13 +112,56 @@ def mock_error_response():
 
 @pytest.fixture
 def mock_media_response():
-    """Mock media conversion response."""
+    """Mock media conversion response (MP4/timing)."""
     return {
         "success": True,
         "data": {
             "video_url": "https://cdn1.suno.ai/test-video.mp4",
-            "audio_url": "https://cdn1.suno.ai/test-audio.wav",
-            "midi_url": "https://cdn1.suno.ai/test.midi",
+        },
+    }
+
+
+@pytest.fixture
+def mock_wav_response():
+    """Mock WAV conversion response matching current API spec."""
+    return {
+        "success": True,
+        "task_id": "wav-task-123",
+        "trace_id": "wav-trace-456",
+        "data": [
+            {
+                "file_url": "https://platform.cdn.acedata.cloud/suno/test-audio.wav",
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def mock_midi_response():
+    """Mock MIDI conversion response matching current API spec."""
+    return {
+        "success": True,
+        "task_id": "midi-task-123",
+        "trace_id": "midi-trace-456",
+        "data": [
+            {
+                "file_url": "https://cdn1.suno.ai/test-audio.midi",
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def mock_vox_response():
+    """Mock vocal extraction response matching current API spec."""
+    return {
+        "success": True,
+        "task_id": "vox-task-123",
+        "trace_id": "vox-trace-456",
+        "data": {
+            "id": "vox-id-789",
+            "status": "complete",
+            "vocal_audio_url": "https://cdn1.suno.ai/processed_test_vocals.m4a",
         },
     }
 

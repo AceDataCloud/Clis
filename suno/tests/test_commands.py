@@ -426,20 +426,22 @@ class TestMediaCommands:
         assert "video_url" in result.output or "mp4" in result.output.lower()
 
     @respx.mock
-    def test_wav(self, runner, mock_media_response):
+    def test_wav(self, runner, mock_wav_response):
         respx.post("https://api.acedata.cloud/suno/wav").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_wav_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "wav", "audio-123"])
         assert result.exit_code == 0
+        assert "test-audio.wav" in result.output
 
     @respx.mock
-    def test_midi(self, runner, mock_media_response):
+    def test_midi(self, runner, mock_midi_response):
         respx.post("https://api.acedata.cloud/suno/midi").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_midi_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "midi", "audio-123"])
         assert result.exit_code == 0
+        assert "test-audio.midi" in result.output
 
     @respx.mock
     def test_timing(self, runner, mock_media_response):
@@ -450,12 +452,13 @@ class TestMediaCommands:
         assert result.exit_code == 0
 
     @respx.mock
-    def test_vocals(self, runner, mock_media_response):
+    def test_vocals(self, runner, mock_vox_response):
         respx.post("https://api.acedata.cloud/suno/vox").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_vox_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "vocals", "audio-123"])
         assert result.exit_code == 0
+        assert "processed_test_vocals.m4a" in result.output
 
 
 # ─── Task Commands ────────────────────────────────────────────────────────
@@ -737,9 +740,9 @@ class TestUpdatedMediaCommands:
     """Tests for updated media commands with new parameters."""
 
     @respx.mock
-    def test_wav_with_callback(self, runner, mock_media_response):
+    def test_wav_with_callback(self, runner, mock_wav_response):
         respx.post("https://api.acedata.cloud/suno/wav").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_wav_response)
         )
         result = runner.invoke(
             cli,
@@ -756,9 +759,9 @@ class TestUpdatedMediaCommands:
         assert result.exit_code == 0
 
     @respx.mock
-    def test_midi_with_callback(self, runner, mock_media_response):
+    def test_midi_with_callback(self, runner, mock_midi_response):
         respx.post("https://api.acedata.cloud/suno/midi").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_midi_response)
         )
         result = runner.invoke(
             cli,
@@ -775,9 +778,9 @@ class TestUpdatedMediaCommands:
         assert result.exit_code == 0
 
     @respx.mock
-    def test_vocals_with_time_range(self, runner, mock_media_response):
+    def test_vocals_with_time_range(self, runner, mock_vox_response):
         respx.post("https://api.acedata.cloud/suno/vox").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_vox_response)
         )
         result = runner.invoke(
             cli,
@@ -796,9 +799,9 @@ class TestUpdatedMediaCommands:
         assert result.exit_code == 0
 
     @respx.mock
-    def test_vocals_with_callback(self, runner, mock_media_response):
+    def test_vocals_with_callback(self, runner, mock_vox_response):
         respx.post("https://api.acedata.cloud/suno/vox").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_vox_response)
         )
         result = runner.invoke(
             cli,
