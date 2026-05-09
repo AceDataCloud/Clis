@@ -114,7 +114,7 @@ def response(
         "n": count,
         "response_format": parsed_response_format,
         "tools": parsed_tools,
-        "stream": stream if stream else None,
+        "stream": stream or None,
         "background": background if background else None,
     }
 
