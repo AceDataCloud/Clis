@@ -114,9 +114,11 @@ def response(
         "n": count,
         "response_format": parsed_response_format,
         "tools": parsed_tools,
-        "stream": stream or None,
-        "background": background if background else None,
     }
+    if stream:
+        payload["stream"] = True
+    if background:
+        payload["background"] = True
 
     try:
         result = client.responses(**payload)  # type: ignore[arg-type]
