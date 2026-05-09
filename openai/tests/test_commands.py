@@ -49,12 +49,14 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["image", "--help"])
         assert result.exit_code == 0
         assert "PROMPT" in result.output
+        assert "effective for dall-e-2" in result.output
 
     def test_edit_help(self, runner):
         result = runner.invoke(cli, ["edit", "--help"])
         assert result.exit_code == 0
         assert "PROMPT" in result.output
         assert "--image-url" in result.output
+        assert "effective for dall-e-2" in result.output
 
     def test_response_help(self, runner):
         result = runner.invoke(cli, ["response", "--help"])
