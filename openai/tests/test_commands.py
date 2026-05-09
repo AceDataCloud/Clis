@@ -541,6 +541,54 @@ class TestResponseCommands:
         )
         assert result.exit_code != 0
 
+    @respx.mock
+    def test_response_with_tools(self, runner, mock_response_api_response):
+        route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(200, json=mock_response_api_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "response",
+                "Hello",
+                "--tools",
+                '[{"type":"function","function":{"name":"lookup","description":"Lookup data","parameters":{"type":"object","properties":{}}}}]',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["tools"][0]["type"] == "function"
+
+    @respx.mock
+    def test_response_with_stream(self, runner, mock_response_api_response):
+        route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(200, json=mock_response_api_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "response", "Hello", "--stream", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["stream"] is True
+
+    def test_response_invalid_tools(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "response",
+                "Hello",
+                "--tools",
+                "not-json",
+            ],
+        )
+        assert result.exit_code != 0
+
 
 
 

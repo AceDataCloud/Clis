@@ -50,6 +50,17 @@ from openai_cli.core.output import (
     help="Response format as JSON string (e.g. '{\"type\": \"json_object\"}').",
 )
 @click.option(
+    "--tools",
+    default=None,
+    help="Tools as JSON array string for tool-calling.",
+)
+@click.option(
+    "--stream",
+    is_flag=True,
+    default=False,
+    help="Stream response tokens as they are generated.",
+)
+@click.option(
     "--background",
     is_flag=True,
     default=False,
@@ -65,6 +76,8 @@ def response(
     max_tokens: int | None,
     count: int | None,
     response_format: str | None,
+    tools: str | None,
+    stream: bool,
     background: bool,
     output_json: bool,
 ) -> None:
@@ -80,12 +93,19 @@ def response(
     """
     client = get_client(ctx.obj.get("token"))
     parsed_response_format = None
+    parsed_tools = None
     if response_format:
         try:
             parsed_response_format = json_module.loads(response_format)
-        except json_module.JSONDecodeError:
+        except json_module.JSONDecodeError as exc:
             print_error(f"Invalid JSON for --response-format: {response_format}")
-            raise SystemExit(1)
+            raise SystemExit(1) from exc
+    if tools:
+        try:
+            parsed_tools = json_module.loads(tools)
+        except json_module.JSONDecodeError as exc:
+            print_error(f"Invalid JSON for --tools: {tools}")
+            raise SystemExit(1) from exc
     payload: dict[str, object] = {
         "model": model,
         "input": [{"role": "user", "content": prompt}],
@@ -93,6 +113,8 @@ def response(
         "max_tokens": max_tokens,
         "n": count,
         "response_format": parsed_response_format,
+        "tools": parsed_tools,
+        "stream": stream if stream else None,
         "background": background if background else None,
     }
 
