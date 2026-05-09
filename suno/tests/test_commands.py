@@ -36,6 +36,9 @@ class TestGlobalCommands:
         assert "lyrics" in result.output
         assert "task" in result.output
         assert "wait" in result.output
+        assert "persona-list" in result.output
+        assert "persona-delete" in result.output
+        assert "voices" in result.output
 
     def test_help_generate(self, runner):
         result = runner.invoke(cli, ["generate", "--help"])
@@ -521,6 +524,75 @@ class TestPersonaCommands:
         )
         assert result.exit_code == 0
         assert "upload-id-789" in result.output
+
+    @respx.mock
+    def test_persona_list(self, runner):
+        respx.get("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(
+                200,
+                json={
+                    "items": [
+                        {
+                            "persona_id": "persona-id-456",
+                            "name": "My Voice",
+                            "source_type": "persona",
+                            "description": "Warm vocal style",
+                        }
+                    ],
+                    "count": 1,
+                },
+            )
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "persona-list", "--user-id", "user-123"],
+        )
+        assert result.exit_code == 0
+        assert "persona-id-456" in result.output
+
+    @respx.mock
+    def test_persona_delete(self, runner):
+        respx.delete("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json={"success": True})
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "persona-delete", "persona-id-456"],
+        )
+        assert result.exit_code == 0
+        assert "persona-id-456" in result.output
+
+    @respx.mock
+    def test_voices(self, runner):
+        respx.post("https://api.acedata.cloud/suno/voices").mock(
+            return_value=Response(
+                200,
+                json={
+                    "success": True,
+                    "task_id": "voice-task-123",
+                    "data": {
+                        "persona_id": "persona-id-789",
+                        "name": "My Voice",
+                        "is_public": False,
+                    },
+                },
+            )
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "voices",
+                "https://example.com/voice.mp3",
+                "--name",
+                "My Voice",
+                "--description",
+                "Warm vocal style",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "persona-id-789" in result.output
 
 
 # ─── Info Commands ────────────────────────────────────────────────────────

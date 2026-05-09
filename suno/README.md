@@ -139,6 +139,9 @@ suno models
 | Command | Description |
 |---------|-------------|
 | `suno persona <audio_id>` | Create a saved voice style |
+| `suno persona-list --user-id <user_id>` | List saved personas for a user |
+| `suno persona-delete <persona_id>` | Delete a saved persona |
+| `suno voices <audio_url>` | Create a custom voice persona from audio |
 | `suno upload <audio_url>` | Upload external audio for processing |
 | `suno models` | List available Suno models |
 | `suno actions` | List available API actions |

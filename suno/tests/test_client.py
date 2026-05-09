@@ -37,23 +37,26 @@ class TestSunoClient:
             client._get_headers()
 
     @pytest.mark.parametrize(
-        "endpoint,method",
+        "endpoint,method,http_method",
         [
-            ("/suno/audios", "generate_audio"),
-            ("/suno/lyrics", "generate_lyrics"),
-            ("/suno/persona", "create_persona"),
-            ("/suno/mp4", "get_mp4"),
-            ("/suno/wav", "get_wav"),
-            ("/suno/midi", "get_midi"),
-            ("/suno/timing", "get_timing"),
-            ("/suno/vox", "get_vox"),
-            ("/suno/style", "get_style"),
-            ("/suno/mashup-lyrics", "mashup_lyrics"),
-            ("/suno/upload", "upload_audio"),
-            ("/suno/tasks", "query_task"),
+            ("/suno/audios", "generate_audio", "post"),
+            ("/suno/lyrics", "generate_lyrics", "post"),
+            ("/suno/persona", "create_persona", "post"),
+            ("/suno/persona", "list_personas", "get"),
+            ("/suno/persona", "delete_persona", "delete"),
+            ("/suno/mp4", "get_mp4", "post"),
+            ("/suno/wav", "get_wav", "post"),
+            ("/suno/midi", "get_midi", "post"),
+            ("/suno/timing", "get_timing", "post"),
+            ("/suno/vox", "get_vox", "post"),
+            ("/suno/style", "get_style", "post"),
+            ("/suno/mashup-lyrics", "mashup_lyrics", "post"),
+            ("/suno/upload", "upload_audio", "post"),
+            ("/suno/voices", "create_voice", "post"),
+            ("/suno/tasks", "query_task", "post"),
         ],
     )
-    def test_convenience_methods(self, client, endpoint, method):
+    def test_convenience_methods(self, client, endpoint, method, http_method):
         """Test all convenience methods call the correct endpoints."""
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -61,14 +64,14 @@ class TestSunoClient:
 
         with patch("httpx.Client") as mock_http:
             mock_instance = MagicMock()
-            mock_instance.post.return_value = mock_response
+            getattr(mock_instance, http_method).return_value = mock_response
             mock_http.return_value.__enter__.return_value = mock_instance
 
             fn = getattr(client, method)
             result = fn(test_param="value")
 
             assert result == {"success": True}
-            call_args = mock_instance.post.call_args
+            call_args = getattr(mock_instance, http_method).call_args
             assert endpoint in call_args[0][0]
 
 
@@ -146,6 +149,22 @@ class TestRequestErrors:
             sent_json = call_kwargs[1]["json"]
             assert "c" not in sent_json
             assert sent_json == {"a": "b", "d": "e"}
+
+    def test_request_uses_query_params_for_get(self, client):
+        """Test GET requests send params instead of JSON."""
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"success": True}
+
+        with patch("httpx.Client") as mock_http:
+            mock_instance = MagicMock()
+            mock_instance.get.return_value = mock_response
+            mock_http.return_value.__enter__.return_value = mock_instance
+
+            client.request("/suno/persona", {"user_id": "user-123"}, method="GET")
+            call_kwargs = mock_instance.get.call_args[1]
+            assert call_kwargs["params"] == {"user_id": "user-123"}
+            assert "json" not in call_kwargs
 
 
 class TestGetClient:
