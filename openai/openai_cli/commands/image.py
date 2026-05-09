@@ -43,7 +43,12 @@ def _validate_size_format(ctx: click.Context, param: click.Parameter, value: str
     "--count",
     default=None,
     type=int,
-    help="Number of images to generate (1-10).",
+    help=(
+        "Number of images to generate (1-10). "
+        "Only effective for dall-e-2. "
+        "For gpt-image-1/1.5/2 and nano-banana models, n>1 is silently downgraded to 1; "
+        "send multiple parallel requests to get multiple images."
+    ),
 )
 @click.option(
     "-s",
@@ -188,7 +193,12 @@ def image(
     "--count",
     default=None,
     type=int,
-    help="Number of images to generate (1-10).",
+    help=(
+        "Number of images to generate (1-10). "
+        "Only effective for dall-e-2. "
+        "For gpt-image-1/1.5/2 and nano-banana models, n>1 is silently downgraded to 1; "
+        "send multiple parallel requests to get multiple images."
+    ),
 )
 @click.option(
     "-s",
