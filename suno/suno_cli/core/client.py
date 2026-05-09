@@ -99,6 +99,10 @@ class SunoClient:
         """Create a persona using the persona endpoint."""
         return self.request("/suno/persona", kwargs)
 
+    def create_voice(self, **kwargs: Any) -> dict[str, Any]:
+        """Create a custom voice from an audio URL."""
+        return self.request("/suno/voices", kwargs)
+
     def get_mp4(self, **kwargs: Any) -> dict[str, Any]:
         """Get MP4 video for a song."""
         return self.request("/suno/mp4", kwargs)

@@ -99,3 +99,47 @@ def upload(
     except SunoError as e:
         print_error(e.message)
         raise SystemExit(1) from e
+
+
+@click.command("voices")
+@click.argument("audio_url")
+@click.option("-n", "--name", required=True, help="Name for the custom voice.")
+@click.option("--description", default=None, help="Description of the custom voice.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def voices(
+    ctx: click.Context,
+    audio_url: str,
+    name: str,
+    description: str | None,
+    output_json: bool,
+) -> None:
+    """Create a custom voice persona from an audio file URL.
+
+    AUDIO_URL is a publicly accessible URL to an MP3 or WAV audio file.
+
+    Examples:
+
+      suno voices "https://example.com/my-voice.mp3" --name "My Voice"
+
+      suno voices "https://example.com/recording.wav" --name "Singer" --description "Soulful alto"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.create_voice(
+            audio_url=audio_url,
+            name=name,
+            description=description,
+        )
+        if output_json:
+            print_json(result)
+        else:
+            data = result.get("data", {})
+            voice_id = data.get("id", "")
+            if voice_id:
+                print_success(f"Voice created: {name} (ID: {voice_id})")
+            else:
+                print_json(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
