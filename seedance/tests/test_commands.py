@@ -76,7 +76,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_generate_with_model(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/seedance/videos").mock(
+        route = respx.post("https://api.acedata.cloud/seedance/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -92,6 +92,29 @@ class TestGenerateCommands:
             ],
         )
         assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["model"] == "doubao-seedance-1-5-pro-251215"
+
+    @respx.mock
+    def test_generate_with_new_v2_model(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/seedance/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "-m",
+                "doubao-seedance-2-0-260128",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["model"] == "doubao-seedance-2-0-260128"
 
     @respx.mock
     def test_generate_with_callback(self, runner, mock_video_response):
@@ -300,6 +323,7 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         assert "seedance-1-5-pro" in result.output
+        assert "doubao-seedance-2-0-260128" in result.output
 
     def test_aspect_ratios(self, runner):
         result = runner.invoke(cli, ["aspect-ratios"])

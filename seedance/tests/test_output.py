@@ -18,7 +18,7 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(SEEDANCE_MODELS) == 5
+        assert len(SEEDANCE_MODELS) == 7
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in SEEDANCE_MODELS
@@ -30,6 +30,8 @@ class TestConstants:
             "doubao-seedance-1-0-pro-fast-251015",
             "doubao-seedance-1-0-lite-t2v-250428",
             "doubao-seedance-1-0-lite-i2v-250428",
+            "doubao-seedance-2-0-260128",
+            "doubao-seedance-2-0-fast-260128",
         ]:
             assert model in SEEDANCE_MODELS
 
@@ -126,3 +128,4 @@ class TestPrintModels:
         print_models()
         captured = capsys.readouterr()
         assert "seedance-1-5-pro" in captured.out
+        assert "doubao-seedance-2-0-260128" in captured.out
