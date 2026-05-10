@@ -68,7 +68,7 @@ class TestTTSCommands:
         )
         result = runner.invoke(cli, ["--token", "test-token", "tts", "Hello"])
         assert result.exit_code == 0
-        assert "cdn.example.com" in result.output
+        assert "test-audio.mp3" in result.output
 
     @respx.mock
     def test_tts_with_model(self, runner, mock_tts_response):

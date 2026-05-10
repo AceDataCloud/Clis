@@ -3,7 +3,7 @@
 import click
 
 from fish_cli.core.config import settings
-from fish_cli.core.output import FISH_AUDIO_FORMATS, FISH_TTS_MODELS, console
+from fish_cli.core.output import DEFAULT_TTS_MODEL, FISH_AUDIO_FORMATS, console
 
 
 @click.command()
@@ -19,7 +19,7 @@ def models() -> None:
     table.add_row("s1", "Standard TTS model")
 
     console.print(table)
-    console.print(f"\n[dim]Default model: {FISH_TTS_MODELS[1]}[/dim]")
+    console.print(f"\n[dim]Default model: {DEFAULT_TTS_MODEL}[/dim]")
 
 
 @click.command()
