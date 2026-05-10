@@ -14,7 +14,7 @@ Generate AI videos directly from your terminal — no MCP client required.
 
 - **Video Generation** — Generate videos from text prompts with multiple models
 - **Image-to-Video** — Create videos from reference images
-- **Multiple Models** — doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-0-lite-t2v-250428, doubao-seedance-1-0-lite-i2v-250428
+- **Multiple Models** — doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-0-lite-t2v-250428, doubao-seedance-1-0-lite-i2v-250428, doubao-seedance-2-0-260128, doubao-seedance-2-0-fast-260128
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -125,6 +125,8 @@ Most commands support:
 | `doubao-seedance-1-0-pro-fast-251015` | V1.0 Fast | Faster generation |
 | `doubao-seedance-1-0-lite-t2v-250428` | V1.0 Lite T2V | Lightweight text-to-video |
 | `doubao-seedance-1-0-lite-i2v-250428` | V1.0 Lite I2V | Lightweight image-to-video |
+| `doubao-seedance-2-0-260128` | V2.0 | Next generation quality |
+| `doubao-seedance-2-0-fast-260128` | V2.0 Fast | Faster V2.0 generation |
 
 
 ## Configuration
