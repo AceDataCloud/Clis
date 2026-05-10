@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2026-05-10
+
+### Added
+
+- Added `deepseek-v4-flash` model to the supported models list
+
 ## [0.1.0] - 2025-04-25
 
 ### Added
