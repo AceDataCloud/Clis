@@ -1,0 +1,7 @@
+version: "3"
+services:
+  fish-cli:
+    platform: linux/amd64
+    container_name: "fish-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/fish-cli:${BUILD_NUMBER}"

@@ -59,3 +59,8 @@ mappings:
     exclude:
       - .github
       - .gitbooks
+  fish:
+    repo: AceDataCloud/FishCli
+    exclude:
+      - .github
+      - .gitbooks

@@ -1,0 +1,1 @@
+"""Fish CLI core package."""
