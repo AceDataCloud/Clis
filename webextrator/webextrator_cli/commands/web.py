@@ -5,12 +5,39 @@ import click
 from webextrator_cli.core.client import get_client
 from webextrator_cli.core.exceptions import WebExtratorError
 from webextrator_cli.core.output import (
+    BLOCK_RESOURCE_TYPES,
     WAIT_UNTIL_OPTIONS,
     print_error,
     print_extract_result,
     print_json,
     print_render_result,
 )
+
+
+def _parse_headers(headers: tuple[str, ...]) -> dict[str, str] | None:
+    """Parse repeatable --header options into a dictionary."""
+    if not headers:
+        return None
+
+    parsed: dict[str, str] = {}
+    for header in headers:
+        if ":" in header:
+            key, value = header.split(":", 1)
+        elif "=" in header:
+            key, value = header.split("=", 1)
+        else:
+            raise click.UsageError(
+                f"Invalid header format: '{header}'. Use 'Key: Value' or 'Key=Value'."
+            )
+
+        key = key.strip()
+        value = value.strip()
+        if not key:
+            raise click.UsageError(f"Invalid header format: '{header}'. Header key cannot be empty.")
+
+        parsed[key] = value
+
+    return parsed
 
 
 @click.command()
@@ -51,6 +78,19 @@ from webextrator_cli.core.output import (
     help="CSS selector to wait for before starting extraction.",
 )
 @click.option(
+    "--block-resource",
+    "block_resources",
+    multiple=True,
+    type=click.Choice(BLOCK_RESOURCE_TYPES),
+    help="Resource type to block during page load (repeatable).",
+)
+@click.option(
+    "--header",
+    "headers",
+    multiple=True,
+    help="Extra HTTP header in 'Key: Value' or 'Key=Value' format (repeatable).",
+)
+@click.option(
     "--user-agent",
     default=None,
     help="Override the User-Agent header.",
@@ -71,6 +111,8 @@ def extract(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
+    block_resources: tuple[str, ...],
+    headers: tuple[str, ...],
     user_agent: str | None,
     callback_url: str | None,
     output_json: bool,
@@ -94,6 +136,8 @@ def extract(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
+        "block_resources": list(block_resources) if block_resources else None,
+        "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
     }
@@ -135,6 +179,19 @@ def extract(
     help="CSS selector to wait for before capturing HTML.",
 )
 @click.option(
+    "--block-resource",
+    "block_resources",
+    multiple=True,
+    type=click.Choice(BLOCK_RESOURCE_TYPES),
+    help="Resource type to block during page load (repeatable).",
+)
+@click.option(
+    "--header",
+    "headers",
+    multiple=True,
+    help="Extra HTTP header in 'Key: Value' or 'Key=Value' format (repeatable).",
+)
+@click.option(
     "--user-agent",
     default=None,
     help="Override the User-Agent header.",
@@ -153,6 +210,8 @@ def render(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
+    block_resources: tuple[str, ...],
+    headers: tuple[str, ...],
     user_agent: str | None,
     callback_url: str | None,
     output_json: bool,
@@ -174,6 +233,8 @@ def render(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
+        "block_resources": list(block_resources) if block_resources else None,
+        "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
     }
