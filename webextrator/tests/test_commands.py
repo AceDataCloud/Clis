@@ -103,6 +103,49 @@ class TestExtractCommand:
         )
         assert result.exit_code == 0
 
+    @respx.mock
+    def test_extract_with_block_resources_and_headers(self, runner, mock_extract_response):
+        route = respx.post("https://api.acedata.cloud/webextrator/extract").mock(
+            return_value=Response(200, json=mock_extract_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extract",
+                "https://example.com",
+                "--block-resource",
+                "image",
+                "--block-resource",
+                "font",
+                "--header",
+                "X-Test: abc",
+                "--header",
+                "X-Trace: 123",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls.last.request.content.decode())
+        assert payload["block_resources"] == ["image", "font"]
+        assert payload["headers"] == {"X-Test": "abc", "X-Trace": "123"}
+
+    def test_extract_with_invalid_header(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extract",
+                "https://example.com",
+                "--header",
+                "InvalidHeader",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "must be in 'Name: Value' format" in result.output
+
     def test_extract_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "extract", "https://example.com"])
         assert result.exit_code != 0
@@ -165,6 +208,30 @@ class TestRenderCommand:
             ],
         )
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_render_with_block_resources_and_headers(self, runner, mock_render_response):
+        route = respx.post("https://api.acedata.cloud/webextrator/render").mock(
+            return_value=Response(200, json=mock_render_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "render",
+                "https://example.com",
+                "--block-resource",
+                "stylesheet",
+                "--header",
+                "X-Test: abc",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        payload = json.loads(route.calls.last.request.content.decode())
+        assert payload["block_resources"] == ["stylesheet"]
+        assert payload["headers"] == {"X-Test": "abc"}
 
     def test_render_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "render", "https://example.com"])

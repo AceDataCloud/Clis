@@ -13,6 +13,23 @@ from webextrator_cli.core.output import (
 )
 
 
+def _parse_headers(headers: tuple[str, ...]) -> dict[str, str] | None:
+    """Parse repeatable --header options into a JSON object."""
+    if not headers:
+        return None
+
+    parsed: dict[str, str] = {}
+    for header in headers:
+        key, sep, value = header.partition(":")
+        if not sep or not key.strip():
+            raise click.BadParameter(
+                "must be in 'Name: Value' format", param_hint="--header"
+            )
+        parsed[key.strip()] = value.strip()
+
+    return parsed
+
+
 @click.command()
 @click.argument("url")
 @click.option(
@@ -51,6 +68,19 @@ from webextrator_cli.core.output import (
     help="CSS selector to wait for before starting extraction.",
 )
 @click.option(
+    "--block-resource",
+    "block_resources",
+    multiple=True,
+    type=click.Choice(["image", "font", "media", "stylesheet", "xhr", "fetch"]),
+    help="Resource type to block during page load (repeatable).",
+)
+@click.option(
+    "--header",
+    "headers",
+    multiple=True,
+    help="Extra HTTP header as 'Name: Value' (repeatable).",
+)
+@click.option(
     "--user-agent",
     default=None,
     help="Override the User-Agent header.",
@@ -71,6 +101,8 @@ def extract(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
+    block_resources: tuple[str, ...],
+    headers: tuple[str, ...],
     user_agent: str | None,
     callback_url: str | None,
     output_json: bool,
@@ -94,6 +126,8 @@ def extract(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
+        "block_resources": list(block_resources) if block_resources else None,
+        "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
     }
@@ -135,6 +169,19 @@ def extract(
     help="CSS selector to wait for before capturing HTML.",
 )
 @click.option(
+    "--block-resource",
+    "block_resources",
+    multiple=True,
+    type=click.Choice(["image", "font", "media", "stylesheet", "xhr", "fetch"]),
+    help="Resource type to block during page load (repeatable).",
+)
+@click.option(
+    "--header",
+    "headers",
+    multiple=True,
+    help="Extra HTTP header as 'Name: Value' (repeatable).",
+)
+@click.option(
     "--user-agent",
     default=None,
     help="Override the User-Agent header.",
@@ -153,6 +200,8 @@ def render(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
+    block_resources: tuple[str, ...],
+    headers: tuple[str, ...],
     user_agent: str | None,
     callback_url: str | None,
     output_json: bool,
@@ -174,6 +223,8 @@ def render(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
+        "block_resources": list(block_resources) if block_resources else None,
+        "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
     }
