@@ -156,6 +156,15 @@ class TestMidjourneyClient:
         assert result["translated_content"] == "hello"
 
     @respx.mock
+    def test_shorten(self):
+        respx.post("https://api.acedata.cloud/midjourney/shorten").mock(
+            return_value=Response(200, json={"prompts": ["short prompt"]})
+        )
+        client = MidjourneyClient(api_token="test-token")
+        result = client.shorten(prompt="a long prompt")
+        assert result["prompts"] == ["short prompt"]
+
+    @respx.mock
     def test_get_seed(self):
         respx.post("https://api.acedata.cloud/midjourney/seed").mock(
             return_value=Response(200, json={"success": True, "seed": 12345})

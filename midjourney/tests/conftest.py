@@ -80,6 +80,17 @@ def mock_translate_response():
 
 
 @pytest.fixture
+def mock_shorten_response():
+    """Mock successful shorten response."""
+    return {
+        "prompts": [
+            "mountain lake sunrise with mist, golden light --ar 16:9 --v 6",
+            "misty alpine lake at dawn, cinematic golden hour --ar 16:9",
+        ]
+    }
+
+
+@pytest.fixture
 def mock_video_response():
     """Mock successful video generation response."""
     return {

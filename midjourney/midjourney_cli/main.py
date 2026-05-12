@@ -11,7 +11,7 @@ from importlib import metadata
 import click
 from dotenv import load_dotenv
 
-from midjourney_cli.commands.edit import describe, edit, translate
+from midjourney_cli.commands.edit import describe, edit, shorten, translate
 from midjourney_cli.commands.imagine import blend, imagine, transform
 from midjourney_cli.commands.info import actions, config, modes, versions
 from midjourney_cli.commands.task import seed, task, tasks_batch, wait
@@ -68,6 +68,7 @@ cli.add_command(blend)
 cli.add_command(edit)
 cli.add_command(describe)
 cli.add_command(translate)
+cli.add_command(shorten)
 
 # Video
 cli.add_command(video)
