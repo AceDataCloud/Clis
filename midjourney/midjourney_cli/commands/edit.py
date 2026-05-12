@@ -10,6 +10,7 @@ from midjourney_cli.core.output import (
     print_edit_result,
     print_error,
     print_json,
+    print_shorten_result,
 )
 
 
@@ -131,6 +132,35 @@ def translate(
             print_json(result)
         else:
             print_translate_result(result)
+    except MidjourneyError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("prompt")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def shorten(
+    ctx: click.Context,
+    prompt: str,
+    output_json: bool,
+) -> None:
+    """Analyze a prompt and generate shortened Midjourney prompt candidates.
+
+    PROMPT is the text prompt to shorten.
+
+    \b
+    Examples:
+      midjourney shorten "A serene mountain lake at sunrise with mist"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.shorten(prompt=prompt)
+        if output_json:
+            print_json(result)
+        else:
+            print_shorten_result(result)
     except MidjourneyError as e:
         print_error(e.message)
         raise SystemExit(1) from e

@@ -160,6 +160,21 @@ def print_translate_result(data: dict[str, Any]) -> None:
         console.print("[yellow]No translation returned.[/yellow]")
 
 
+def print_shorten_result(data: dict[str, Any]) -> None:
+    """Print shortened prompts in a rich format."""
+    prompts = data.get("prompts", [])
+    if prompts:
+        console.print(
+            Panel(
+                "\n".join(f"[bold]{i}.[/bold] {prompt}" for i, prompt in enumerate(prompts, 1)),
+                title="[bold green]Shortened Prompts[/bold green]",
+                border_style="green",
+            )
+        )
+    else:
+        console.print("[yellow]No shortened prompts returned.[/yellow]")
+
+
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
     # Handle single-task response
