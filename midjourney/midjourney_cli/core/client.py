@@ -117,6 +117,10 @@ class MidjourneyClient:
         """Generate video using the videos endpoint."""
         return self.request("/midjourney/videos", self._with_async_callback(kwargs))
 
+    def shorten(self, **kwargs: Any) -> dict[str, Any]:
+        """Analyze and shorten a prompt using the shorten endpoint."""
+        return self.request("/midjourney/shorten", kwargs)
+
     def translate(self, **kwargs: Any) -> dict[str, Any]:
         """Translate content using the translate endpoint."""
         return self.request("/midjourney/translate", kwargs)

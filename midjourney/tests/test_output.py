@@ -11,6 +11,7 @@ from midjourney_cli.core.output import (
     print_imagine_result,
     print_json,
     print_seed_result,
+    print_shorten_result,
     print_success,
     print_task_result,
     print_translate_result,
@@ -135,6 +136,16 @@ class TestPrintTranslateResult:
         print_translate_result(data)
         captured = capsys.readouterr()
         assert "cat" in captured.out
+
+
+class TestPrintShortenResult:
+    """Tests for shorten result formatting."""
+
+    def test_print_shorten_result(self, capsys):
+        data = {"prompts": ["prompt one", "prompt two"]}
+        print_shorten_result(data)
+        captured = capsys.readouterr()
+        assert "prompt one" in captured.out
 
 
 class TestPrintSeedResult:

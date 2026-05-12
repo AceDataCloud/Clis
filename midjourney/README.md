@@ -102,6 +102,7 @@ midjourney wait <task_id> --interval 5
 | `midjourney edit <image_url> <prompt>` | Edit an image with a text prompt |
 | `midjourney describe <image_url>` | Get 4 AI descriptions of an image |
 | `midjourney translate <content>` | Translate Chinese text to English prompts |
+| `midjourney shorten <prompt>` | Generate up to 5 shortened prompt candidates |
 
 ### Video Generation
 
