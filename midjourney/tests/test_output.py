@@ -27,6 +27,7 @@ class TestConstants:
 
     def test_versions(self):
         assert "8" in MIDJOURNEY_VERSIONS
+        assert "8.1" in MIDJOURNEY_VERSIONS
 
     def test_actions(self):
         assert "generate" in IMAGINE_ACTIONS

@@ -14,7 +14,7 @@ MIDJOURNEY_MODES = ["fast", "relax", "turbo"]
 DEFAULT_MODE = "fast"
 
 # Available versions
-MIDJOURNEY_VERSIONS = ["5.2", "6", "6.1", "7", "8"]
+MIDJOURNEY_VERSIONS = ["5.2", "6", "6.1", "7", "8", "8.1"]
 
 # Available imagine actions
 IMAGINE_ACTIONS = [
