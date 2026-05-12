@@ -13,7 +13,7 @@ Generate AI images, edit photos, create videos, and manage tasks directly from y
 ## Features
 
 - **Image Generation** — Generate from prompts, transform (upscale/variation/zoom/pan), blend images
-- **Image Editing** — Edit with prompts and masks, describe images (reverse prompt), translate prompts
+- **Image Editing** — Edit with prompts and masks, describe images (reverse prompt), shorten and translate prompts
 - **Video Generation** — Generate video from text + reference image, extend existing videos
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
@@ -101,6 +101,7 @@ midjourney wait <task_id> --interval 5
 |---------|-------------|
 | `midjourney edit <image_url> <prompt>` | Edit an image with a text prompt |
 | `midjourney describe <image_url>` | Get 4 AI descriptions of an image |
+| `midjourney shorten <prompt>` | Analyze and shorten a prompt into up to 5 candidates |
 | `midjourney translate <content>` | Translate Chinese text to English prompts |
 
 ### Video Generation
@@ -280,7 +281,7 @@ MidjourneyCli/
 │   │   └── output.py      # Rich terminal formatting
 │   └── commands/          # CLI command groups
 │       ├── imagine.py     # Image generation (imagine, transform, blend)
-│       ├── edit.py        # Edit, describe, translate commands
+│       ├── edit.py        # Edit, describe, shorten, translate commands
 │       ├── video.py       # Video generation commands
 │       ├── task.py        # Task management commands
 │       └── info.py        # Info & utility commands

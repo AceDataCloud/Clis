@@ -71,6 +71,21 @@ def mock_describe_response():
 
 
 @pytest.fixture
+def mock_shorten_response():
+    """Mock successful shorten response."""
+    return {
+        "success": True,
+        "prompts": [
+            "serene mountain lake at sunrise, mist, golden hour --ar 16:9",
+            "mountain lake sunrise with mist, golden light --ar 16:9",
+            "tranquil alpine lake, dawn mist, warm golden tones --ar 16:9",
+            "sunrise over misty mountain lake, golden hour photography --ar 16:9",
+            "misty lake at dawn, mountains in background, golden sunrise --ar 16:9",
+        ],
+    }
+
+
+@pytest.fixture
 def mock_translate_response():
     """Mock successful translate response."""
     return {

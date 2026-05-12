@@ -106,6 +106,39 @@ def describe(
 
 
 @click.command()
+@click.argument("prompt")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def shorten(
+    ctx: click.Context,
+    prompt: str,
+    output_json: bool,
+) -> None:
+    """Analyze and shorten a prompt into up to 5 concise candidates.
+
+    PROMPT is the text to analyze and shorten. Midjourney's prompt analyzer
+    highlights the highest-weighted tokens and produces up to 5 shortened
+    candidate prompts that preserve the dominant ideas.
+
+    \b
+    Examples:
+      midjourney shorten "A serene mountain lake at sunrise with mist rising from the water and golden hour lighting"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        from midjourney_cli.core.output import print_shorten_result
+
+        result = client.shorten(prompt=prompt)
+        if output_json:
+            print_json(result)
+        else:
+            print_shorten_result(result)
+    except MidjourneyError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
 @click.argument("content")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context

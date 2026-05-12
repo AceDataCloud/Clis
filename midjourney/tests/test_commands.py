@@ -243,6 +243,19 @@ class TestEditCommands:
         data = json.loads(result.output)
         assert data["translated_content"] == "A cat sitting on a table"
 
+    @respx.mock
+    def test_shorten_json(self, runner, mock_shorten_response):
+        respx.post("https://api.acedata.cloud/midjourney/shorten").mock(
+            return_value=Response(200, json=mock_shorten_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "shorten", "A very long and detailed prompt", "--json"],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert len(data["prompts"]) == 5
+
 
 # ─── Video Commands ───────────────────────────────────────────────────────
 
