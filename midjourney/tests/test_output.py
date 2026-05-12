@@ -146,6 +146,7 @@ class TestPrintShortenResult:
         print_shorten_result(data)
         captured = capsys.readouterr()
         assert "prompt one" in captured.out
+        assert "prompt two" in captured.out
 
 
 class TestPrintSeedResult:

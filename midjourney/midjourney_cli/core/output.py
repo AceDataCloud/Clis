@@ -164,9 +164,12 @@ def print_shorten_result(data: dict[str, Any]) -> None:
     """Print prompt shorten result in a rich format."""
     prompts = data.get("prompts", [])
     if prompts:
+        formatted_prompts = [
+            f"[bold]{index}.[/bold] {prompt}" for index, prompt in enumerate(prompts, 1)
+        ]
         console.print(
             Panel(
-                "\n".join(f"[bold]{i}.[/bold] {prompt}" for i, prompt in enumerate(prompts, 1)),
+                "\n".join(formatted_prompts),
                 title="[bold green]Shortened Prompts[/bold green]",
                 border_style="green",
             )
