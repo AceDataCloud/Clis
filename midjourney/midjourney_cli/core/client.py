@@ -121,6 +121,10 @@ class MidjourneyClient:
         """Translate content using the translate endpoint."""
         return self.request("/midjourney/translate", kwargs)
 
+    def shorten(self, **kwargs: Any) -> dict[str, Any]:
+        """Analyze and shorten prompt using the shorten endpoint."""
+        return self.request("/midjourney/shorten", kwargs)
+
     def get_seed(self, **kwargs: Any) -> dict[str, Any]:
         """Get seed value for a generated image."""
         return self.request("/midjourney/seed", kwargs)

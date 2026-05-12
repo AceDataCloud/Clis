@@ -80,6 +80,15 @@ def mock_translate_response():
 
 
 @pytest.fixture
+def mock_shorten_response():
+    """Mock successful shorten response."""
+    return {
+        "success": True,
+        "content": "sunset mountain lake, cinematic lighting",
+    }
+
+
+@pytest.fixture
 def mock_video_response():
     """Mock successful video generation response."""
     return {
