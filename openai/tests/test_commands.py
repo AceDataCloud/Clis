@@ -593,8 +593,9 @@ class TestTasksCommands:
         assert "images_generations" in result.output
         assert "images_edits" in result.output
 
+    @pytest.mark.parametrize("task_type", ["images", "images_generations", "images_edits"])
     @respx.mock
-    def test_tasks_batch_with_type(self, runner, mock_task_batch_response):
+    def test_tasks_batch_with_type(self, runner, mock_task_batch_response, task_type):
         route = respx.post("https://api.acedata.cloud/openai/tasks").mock(
             return_value=Response(200, json=mock_task_batch_response)
         )
@@ -606,13 +607,13 @@ class TestTasksCommands:
                 "tasks",
                 "batch",
                 "--type",
-                "images",
+                task_type,
                 "--json",
             ],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["type"] == "images"
+        assert body["type"] == task_type
 
     def test_tasks_retrieve_requires_id_or_trace_id(self, runner):
         result = runner.invoke(cli, ["--token", "test-token", "tasks", "retrieve"])
