@@ -49,10 +49,12 @@ openai-cli edit "Add a rainbow" --image-url https://example.com/photo.jpg
 openai-cli response "Summarize this article" -m gpt-4o
 
 # Retrieve an async task result
+# The image endpoint returns a task ID immediately when callback_url is used
 openai-cli tasks retrieve --id 7489df4c-ef03-4de0-b598-e9a590793434
 openai-cli tasks retrieve --trace-id my-custom-trace-001
 
 # Retrieve a batch of task results
+openai-cli tasks batch --type images --application-id 9dec7b2a-1cad-41ff-8536-d4ddaf2525d4
 openai-cli tasks batch --trace-ids trace-001 trace-002
 
 # List available models

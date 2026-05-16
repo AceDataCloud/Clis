@@ -17,20 +17,31 @@ def tasks() -> None:
     """Query OpenAI async task results (`/openai/tasks`).
 
     Use these commands to retrieve results of image generation or editing
-    tasks that were submitted with a callback_url.
+    tasks that were submitted with a callback_url. The normal flow is to poll
+    with the task ID returned immediately when the original request is accepted.
 
     \b
     Examples:
       openai-cli tasks retrieve --id 7489df4c-ef03-4de0-b598-e9a590793434
       openai-cli tasks retrieve --trace-id my-custom-trace-001
+      openai-cli tasks batch --type images --application-id 9dec7b2a-1cad-41ff-8536-d4ddaf2525d4
       openai-cli tasks batch --trace-ids trace-001 trace-002
       openai-cli tasks batch --application-id 9dec7b2a-1cad-41ff-8536-d4ddaf2525d4
     """
 
 
 @tasks.command()
-@click.option("--id", "task_id", default=None, help="Task ID returned when the job was submitted.")
-@click.option("--trace-id", default=None, help="Custom trace ID passed in the original request.")
+@click.option(
+    "--id",
+    "task_id",
+    default=None,
+    help="Task ID returned immediately when the original request was accepted (recommended).",
+)
+@click.option(
+    "--trace-id",
+    default=None,
+    help="Optional custom trace ID from the original request.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def retrieve(
@@ -41,7 +52,8 @@ def retrieve(
 ) -> None:
     """Retrieve a single task by ID or trace ID.
 
-    Either --id or --trace-id must be provided. When both are given,
+    Either --id or --trace-id must be provided. In the typical callback flow,
+    use --id from the original submit response. When both are given,
     --trace-id takes precedence.
 
     \b
@@ -75,7 +87,13 @@ def retrieve(
 @click.option("--trace-ids", multiple=True, help="Trace IDs to retrieve (repeatable).")
 @click.option("--application-id", default=None, help="Filter by application ID.")
 @click.option("--user-id", default=None, help="Filter by end-user ID.")
-@click.option("--type", "task_type", default=None, help="Filter by task type (e.g. images_generations).")
+@click.option(
+    "--type",
+    "task_type",
+    type=click.Choice(["images", "images_generations", "images_edits"]),
+    default=None,
+    help="Filter by task type: images, images_generations, or images_edits.",
+)
 @click.option("--offset", default=None, type=int, help="Pagination offset (default 0).")
 @click.option("--limit", default=None, type=int, help="Page size (default 12).")
 @click.option("--created-at-min", default=None, type=float, help="Start timestamp (Unix seconds).")

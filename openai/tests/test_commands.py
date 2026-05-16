@@ -590,6 +590,9 @@ class TestTasksCommands:
         assert result.exit_code == 0
         assert "--ids" in result.output
         assert "--trace-ids" in result.output
+        assert "images_generations" in result.output
+        assert "images_edits" in result.output
+        assert "images" in result.output
 
     def test_tasks_retrieve_requires_id_or_trace_id(self, runner):
         result = runner.invoke(cli, ["--token", "test-token", "tasks", "retrieve"])
@@ -722,6 +725,27 @@ class TestTasksCommands:
         assert body["action"] == "retrieve_batch"
         assert "id-1" in body["ids"]
         assert "id-2" in body["ids"]
+
+    @respx.mock
+    def test_tasks_batch_with_images_type(self, runner, mock_task_batch_response):
+        route = respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_task_batch_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "batch",
+                "--type",
+                "images",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["type"] == "images"
 
     @respx.mock
     def test_tasks_batch_rich_output(self, runner, mock_task_batch_response):
