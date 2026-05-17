@@ -32,6 +32,7 @@ class TestGlobalCommands:
         assert "imagine" in result.output
         assert "transform" in result.output
         assert "edit" in result.output
+        assert "shorten" in result.output
         assert "task" in result.output
 
     def test_help_imagine(self, runner):
@@ -242,6 +243,25 @@ class TestEditCommands:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["translated_content"] == "A cat sitting on a table"
+
+    @respx.mock
+    def test_shorten_json(self, runner, mock_shorten_response):
+        respx.post("https://api.acedata.cloud/midjourney/shorten").mock(
+            return_value=Response(200, json=mock_shorten_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "shorten",
+                "a very long cinematic prompt",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert len(data["prompts"]) == 2
 
 
 # ─── Video Commands ───────────────────────────────────────────────────────

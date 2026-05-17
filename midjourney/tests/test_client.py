@@ -129,6 +129,15 @@ class TestMidjourneyClient:
         assert result["descriptions"] == ["desc"]
 
     @respx.mock
+    def test_shorten(self):
+        respx.post("https://api.acedata.cloud/midjourney/shorten").mock(
+            return_value=Response(200, json={"success": True, "prompts": ["short prompt"]})
+        )
+        client = MidjourneyClient(api_token="test-token")
+        result = client.shorten(prompt="a very long prompt")
+        assert result["prompts"] == ["short prompt"]
+
+    @respx.mock
     def test_edit(self):
         respx.post("https://api.acedata.cloud/midjourney/edits").mock(
             return_value=Response(200, json={"success": True, "task_id": "edit-123"})

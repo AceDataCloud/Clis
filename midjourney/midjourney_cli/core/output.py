@@ -145,6 +145,21 @@ def print_describe_result(data: dict[str, Any]) -> None:
         console.print("[yellow]No descriptions returned.[/yellow]")
 
 
+def print_shorten_result(data: dict[str, Any]) -> None:
+    """Print prompt shorten result in a rich format."""
+    prompts = data.get("prompts", [])
+    if prompts:
+        console.print(
+            Panel(
+                "\n".join(f"[bold]{i}.[/bold] {prompt}" for i, prompt in enumerate(prompts, 1)),
+                title="[bold green]Shortened Prompts[/bold green]",
+                border_style="green",
+            )
+        )
+    else:
+        console.print("[yellow]No shortened prompts returned.[/yellow]")
+
+
 def print_translate_result(data: dict[str, Any]) -> None:
     """Print translation result in a rich format."""
     translated = data.get("translated_content", data.get("content", ""))
