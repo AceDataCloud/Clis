@@ -35,7 +35,9 @@ from midjourney_cli.core.output import (
 @click.option(
     "--split/--no-split", "split_images", default=False, help="Split 2x2 grid into 4 images."
 )
-@click.option("--hd", is_flag=True, default=False, help="Enable HD mode (V8/V8.1 only; default on V8.1).")
+@click.option(
+    "--hd", is_flag=True, default=False, help="Enable HD mode (V8/V8.1 only; default on V8.1)."
+)
 @click.option(
     "--quality",
     default=None,
