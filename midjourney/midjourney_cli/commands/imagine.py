@@ -29,13 +29,15 @@ from midjourney_cli.core.output import (
     "mj_version",
     type=click.Choice(MIDJOURNEY_VERSIONS),
     default=None,
-    help="Midjourney model version (5.2, 6, 6.1, 7, 8).",
+    help="Midjourney model version (5.2, 6, 6.1, 7, 8, 8.1). '8.1' is the latest and is recommended.",
 )
 @click.option("--translation/--no-translation", default=False, help="Auto-translate to English.")
 @click.option(
     "--split/--no-split", "split_images", default=False, help="Split 2x2 grid into 4 images."
 )
-@click.option("--hd", is_flag=True, default=False, help="Enable HD mode (V8 only, 4x cost).")
+@click.option(
+    "--hd", is_flag=True, default=False, help="Enable HD mode (V8/V8.1 only; default on V8.1)."
+)
 @click.option(
     "--quality",
     default=None,
