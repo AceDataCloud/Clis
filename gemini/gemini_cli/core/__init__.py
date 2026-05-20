@@ -1,0 +1,1 @@
+"""Gemini CLI core package."""
