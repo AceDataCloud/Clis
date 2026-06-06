@@ -13,10 +13,11 @@ console = Console()
 FLUX_MODELS = [
     "flux-dev",
     "flux-pro",
-    "flux-pro-1.1",
-    "flux-pro-1.1-ultra",
     "flux-kontext-pro",
     "flux-kontext-max",
+    "flux-2-flex",
+    "flux-2-pro",
+    "flux-2-max",
 ]
 DEFAULT_MODEL = "flux-dev"
 
@@ -132,10 +133,11 @@ def print_models() -> None:
 
     table.add_row("flux-dev", "Dev", "Pixels", "Fast, good balance (default)")
     table.add_row("flux-pro", "Pro", "Pixels", "Higher quality")
-    table.add_row("flux-pro-1.1", "Pro", "Pixels", "Better prompt following")
-    table.add_row("flux-pro-1.1-ultra", "Ultra", "Aspect ratio", "Highest quality")
     table.add_row("flux-kontext-pro", "Kontext", "Aspect ratio", "Best for editing/style transfer")
     table.add_row("flux-kontext-max", "Kontext", "Aspect ratio", "Max context for complex edits")
+    table.add_row("flux-2-flex", "Flux 2", "Pixels", "Fast Flux 2 generation")
+    table.add_row("flux-2-pro", "Flux 2", "Pixels", "Higher quality Flux 2 generation")
+    table.add_row("flux-2-max", "Flux 2", "Pixels", "Maximum quality Flux 2 generation")
 
     console.print(table)
     console.print(f"\n[dim]Default model: {DEFAULT_MODEL}[/dim]")

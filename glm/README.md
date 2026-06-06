@@ -41,7 +41,6 @@ glm models
 | `glm-5.1` | Latest GLM model |
 | `glm-4.7` | GLM-4 series (default) |
 | `glm-4.6` | GLM-4 series |
-| `glm-4.5-air` | GLM-4 Air variant |
 | `glm-3-turbo` | GLM-3 Turbo |
 
 ## Configuration

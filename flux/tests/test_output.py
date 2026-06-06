@@ -15,9 +15,15 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_flux_models(self):
-        assert len(FLUX_MODELS) == 6
-        assert "flux-dev" in FLUX_MODELS
-        assert "flux-kontext-pro" in FLUX_MODELS
+        assert FLUX_MODELS == [
+            "flux-dev",
+            "flux-pro",
+            "flux-kontext-pro",
+            "flux-kontext-max",
+            "flux-2-flex",
+            "flux-2-pro",
+            "flux-2-max",
+        ]
 
     def test_aspect_ratios(self):
         assert len(ASPECT_RATIOS) == 11

@@ -55,8 +55,8 @@ def generate(
     \b
     Examples:
       flux generate "A majestic mountain at golden hour, photorealistic"
-      flux generate "Cyberpunk city with neon lights" -m flux-pro-1.1
-      flux generate "Minimalist logo of a phoenix" -m flux-pro-1.1-ultra -s 16:9
+      flux generate "Cyberpunk city with neon lights" -m flux-2-pro
+      flux generate "Minimalist logo of a phoenix" -m flux-2-max -s 16:9
     """
     client = get_client(ctx.obj.get("token"))
     try:
