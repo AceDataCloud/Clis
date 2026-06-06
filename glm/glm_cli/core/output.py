@@ -15,7 +15,6 @@ GLM_MODELS = [
     "glm-5.1",
     "glm-4.7",
     "glm-4.6",
-    "glm-4.5-air",
     "glm-3-turbo",
 ]
 
@@ -89,7 +88,6 @@ def print_models() -> None:
     table.add_row("glm-5.1", "Latest GLM model")
     table.add_row("glm-4.7", "GLM-4 series (default)")
     table.add_row("glm-4.6", "GLM-4 series")
-    table.add_row("glm-4.5-air", "GLM-4 Air variant")
     table.add_row("glm-3-turbo", "GLM-3 Turbo")
 
     console.print(table)

@@ -7,7 +7,7 @@ A command-line tool for AI image generation and editing using [Flux](https://bla
 - **Text-to-Image Generation** — Generate images from text prompts with multiple Flux models
 - **Image Editing** — Edit existing images using text descriptions (kontext models)
 - **Task Management** — Query status, batch check, and poll for completion
-- **Multiple Models** — flux-dev, flux-pro, flux-pro-1.1, flux-pro-1.1-ultra, flux-kontext-pro, flux-kontext-max
+- **Multiple Models** — flux-dev, flux-pro, flux-kontext-pro, flux-kontext-max, flux-2-flex, flux-2-pro, flux-2-max
 - **Rich Output** — Beautiful terminal formatting with `--json` for scripting
 
 ## Installation
@@ -26,10 +26,10 @@ export ACEDATACLOUD_API_TOKEN=your_token_here
 flux generate "A majestic mountain landscape at golden hour, photorealistic"
 
 # Generate with a specific model
-flux generate "Cyberpunk city with neon lights" -m flux-pro-1.1
+flux generate "Cyberpunk city with neon lights" -m flux-2-pro
 
 # Generate with aspect ratio (ultra/kontext models)
-flux generate "Minimalist logo of a phoenix" -m flux-pro-1.1-ultra -s 16:9
+flux generate "Minimalist logo of a phoenix" -m flux-2-max -s 16:9
 
 # Edit an existing image
 flux edit "Add sunglasses to the person" --image-url https://example.com/photo.jpg
@@ -66,10 +66,11 @@ flux tasks task-1 task-2 task-3
 |-------|------|-----------|-------|
 | `flux-dev` | Dev | Pixels | Fast, good balance (default) |
 | `flux-pro` | Pro | Pixels | Higher quality |
-| `flux-pro-1.1` | Pro | Pixels | Better prompt following |
-| `flux-pro-1.1-ultra` | Ultra | Aspect ratio | Highest quality |
 | `flux-kontext-pro` | Kontext | Aspect ratio | Best for editing/style transfer |
 | `flux-kontext-max` | Kontext | Aspect ratio | Max context for complex edits |
+| `flux-2-flex` | Flux 2 | Pixels | Fast Flux 2 generation |
+| `flux-2-pro` | Flux 2 | Pixels | Higher quality Flux 2 generation |
+| `flux-2-max` | Flux 2 | Pixels | Maximum quality Flux 2 generation |
 
 ## JSON Output
 

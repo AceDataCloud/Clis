@@ -88,13 +88,13 @@ class TestGenerateCommands:
                 "generate",
                 "test",
                 "-m",
-                "flux-pro-1.1",
+                "flux-2-pro",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "flux-pro-1.1"
+        assert body["model"] == "flux-2-pro"
 
     @respx.mock
     def test_generate_with_size(self, runner, mock_image_response):
