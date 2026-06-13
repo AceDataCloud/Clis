@@ -45,9 +45,7 @@ class TestAichatClient:
             )
         )
         client = AichatClient(api_token="test-token")
-        result = client.request(
-            "/aichat/conversations", {"question": "Hi", "model": "gpt-4o"}
-        )
+        result = client.request("/aichat/conversations", {"question": "Hi", "model": "gpt-4o"})
         assert result["id"] == "abc123"
         assert result["answer"] == "Hello!"
 
