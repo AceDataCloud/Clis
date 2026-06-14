@@ -36,6 +36,17 @@ class TestSunoClient:
         with pytest.raises(SunoAuthError, match="not configured"):
             client._get_headers()
 
+    def test_with_async_callback_sets_async_without_callback(self, client):
+        payload = {"prompt": "test"}
+        result = client._with_async_callback(payload)
+        assert result["async"] is True
+
+    def test_with_async_callback_keeps_callback_without_forcing_async(self, client):
+        payload = {"prompt": "test", "callback_url": "https://example.com/callback"}
+        result = client._with_async_callback(payload)
+        assert result["callback_url"] == "https://example.com/callback"
+        assert "async" not in result
+
     @pytest.mark.parametrize(
         "endpoint,method",
         [

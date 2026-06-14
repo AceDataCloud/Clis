@@ -90,10 +90,17 @@ class WanClient:
                     raise
                 raise WanAPIError(message=str(e)) from e
 
+    def _with_async_callback(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Ensure long-running operations are submitted asynchronously."""
+        request_payload = dict(payload)
+        if "async" not in request_payload and not request_payload.get("callback_url"):
+            request_payload["async"] = True
+        return request_payload
+
     # Convenience methods
     def generate_video(self, **kwargs: Any) -> dict[str, Any]:
         """Generate video using the main endpoint."""
-        return self.request("/wan/videos", kwargs)
+        return self.request("/wan/videos", self._with_async_callback(kwargs))
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""

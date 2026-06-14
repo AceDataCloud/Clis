@@ -86,10 +86,17 @@ class SunoClient:
                     raise
                 raise SunoAPIError(message=str(e)) from e
 
+    def _with_async_callback(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Ensure long-running operations are submitted asynchronously."""
+        request_payload = dict(payload)
+        if "async" not in request_payload and not request_payload.get("callback_url"):
+            request_payload["async"] = True
+        return request_payload
+
     # Convenience methods
     def generate_audio(self, **kwargs: Any) -> dict[str, Any]:
         """Generate audio using the audios endpoint."""
-        return self.request("/suno/audios", kwargs)
+        return self.request("/suno/audios", self._with_async_callback(kwargs))
 
     def generate_lyrics(self, **kwargs: Any) -> dict[str, Any]:
         """Generate lyrics using the lyrics endpoint."""
@@ -109,15 +116,15 @@ class SunoClient:
 
     def get_vox(self, **kwargs: Any) -> dict[str, Any]:
         """Extract vocals from a song."""
-        return self.request("/suno/vox", kwargs)
+        return self.request("/suno/vox", self._with_async_callback(kwargs))
 
     def get_wav(self, **kwargs: Any) -> dict[str, Any]:
         """Get WAV format of a song."""
-        return self.request("/suno/wav", kwargs)
+        return self.request("/suno/wav", self._with_async_callback(kwargs))
 
     def get_midi(self, **kwargs: Any) -> dict[str, Any]:
         """Get MIDI data of a song."""
-        return self.request("/suno/midi", kwargs)
+        return self.request("/suno/midi", self._with_async_callback(kwargs))
 
     def get_style(self, **kwargs: Any) -> dict[str, Any]:
         """Optimize a style prompt."""

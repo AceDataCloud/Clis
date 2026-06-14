@@ -1,5 +1,7 @@
 """Tests for the HTTP client."""
 
+import json
+
 import pytest
 import respx
 from httpx import Response
@@ -52,6 +54,27 @@ class TestOpenAIClient:
         result = client.embeddings(model="text-embedding-3-small", input="Hello")
         assert route.called
         assert "data" in result
+
+    @respx.mock
+    def test_image_generations_sets_async_without_callback(self):
+        route = respx.post("https://api.acedata.cloud/openai/images/generations").mock(
+            return_value=Response(200, json={"success": True})
+        )
+        client = OpenAIClient(api_token="test-token")
+        client.image_generations(prompt="test")
+        body = json.loads(route.calls.last.request.content)
+        assert body["async"] is True
+
+    @respx.mock
+    def test_image_generations_keeps_callback_without_forcing_async(self):
+        route = respx.post("https://api.acedata.cloud/openai/images/generations").mock(
+            return_value=Response(200, json={"success": True})
+        )
+        client = OpenAIClient(api_token="test-token")
+        client.image_generations(prompt="test", callback_url="https://example.com/callback")
+        body = json.loads(route.calls.last.request.content)
+        assert body["callback_url"] == "https://example.com/callback"
+        assert "async" not in body
 
     @respx.mock
     def test_unauthorized_raises_auth_error(self):

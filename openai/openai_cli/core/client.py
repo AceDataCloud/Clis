@@ -84,6 +84,13 @@ class OpenAIClient:
                     raise
                 raise OpenAIAPIError(message=str(e)) from e
 
+    def _with_async_callback(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Ensure long-running operations are submitted asynchronously."""
+        request_payload = dict(payload)
+        if "async" not in request_payload and not request_payload.get("callback_url"):
+            request_payload["async"] = True
+        return request_payload
+
     def chat_completions(self, **kwargs: Any) -> dict[str, Any]:
         """Send a chat completion request."""
         return self.request("/openai/chat/completions", kwargs)
@@ -94,11 +101,11 @@ class OpenAIClient:
 
     def image_generations(self, **kwargs: Any) -> dict[str, Any]:
         """Generate images."""
-        return self.request("/openai/images/generations", kwargs)
+        return self.request("/openai/images/generations", self._with_async_callback(kwargs))
 
     def image_edits(self, **kwargs: Any) -> dict[str, Any]:
         """Edit images."""
-        return self.request("/openai/images/edits", kwargs)
+        return self.request("/openai/images/edits", self._with_async_callback(kwargs))
 
     def responses(self, **kwargs: Any) -> dict[str, Any]:
         """Send a Responses API request."""

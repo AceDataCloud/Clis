@@ -1,5 +1,7 @@
 """Tests for HTTP client."""
 
+import json
+
 import pytest
 import respx
 from httpx import Response
@@ -99,12 +101,25 @@ class TestSeedreamClient:
 
     @respx.mock
     def test_generate_image(self):
-        respx.post("https://api.acedata.cloud/seedream/images").mock(
+        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
             return_value=Response(200, json={"success": True, "task_id": "gen-123"})
         )
         client = SeedreamClient(api_token="test-token")
         result = client.generate_image(prompt="test")
         assert result["task_id"] == "gen-123"
+        body = json.loads(route.calls.last.request.content)
+        assert body["async"] is True
+
+    @respx.mock
+    def test_generate_image_keeps_callback_without_forcing_async(self):
+        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
+            return_value=Response(200, json={"success": True, "task_id": "gen-123"})
+        )
+        client = SeedreamClient(api_token="test-token")
+        client.generate_image(prompt="test", callback_url="https://example.com/callback")
+        body = json.loads(route.calls.last.request.content)
+        assert body["callback_url"] == "https://example.com/callback"
+        assert "async" not in body
 
     @respx.mock
     def test_query_task(self):

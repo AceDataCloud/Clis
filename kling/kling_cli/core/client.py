@@ -90,14 +90,21 @@ class KlingClient:
                     raise
                 raise KlingAPIError(message=str(e)) from e
 
+    def _with_async_callback(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Ensure long-running operations are submitted asynchronously."""
+        request_payload = dict(payload)
+        if "async" not in request_payload and not request_payload.get("callback_url"):
+            request_payload["async"] = True
+        return request_payload
+
     # Convenience methods
     def generate_video(self, **kwargs: Any) -> dict[str, Any]:
         """Generate video using the videos endpoint."""
-        return self.request("/kling/videos", kwargs)
+        return self.request("/kling/videos", self._with_async_callback(kwargs))
 
     def generate_motion(self, **kwargs: Any) -> dict[str, Any]:
         """Generate motion video using the motion endpoint."""
-        return self.request("/kling/motion", kwargs)
+        return self.request("/kling/motion", self._with_async_callback(kwargs))
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""

@@ -90,14 +90,21 @@ class SeedreamClient:
                     raise
                 raise SeedreamAPIError(message=str(e)) from e
 
+    def _with_async_callback(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Ensure long-running operations are submitted asynchronously."""
+        request_payload = dict(payload)
+        if "async" not in request_payload and not request_payload.get("callback_url"):
+            request_payload["async"] = True
+        return request_payload
+
     # Convenience methods
     def generate_image(self, **kwargs: Any) -> dict[str, Any]:
         """Generate image using the main endpoint."""
-        return self.request("/seedream/images", kwargs)
+        return self.request("/seedream/images", self._with_async_callback(kwargs))
 
     def edit_image(self, **kwargs: Any) -> dict[str, Any]:
         """Edit an image using the main endpoint."""
-        return self.request("/seedream/images", kwargs)
+        return self.request("/seedream/images", self._with_async_callback(kwargs))
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""

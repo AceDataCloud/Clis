@@ -90,26 +90,33 @@ class VeoClient:
                     raise
                 raise VeoAPIError(message=str(e)) from e
 
+    def _with_async_callback(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Ensure long-running operations are submitted asynchronously."""
+        request_payload = dict(payload)
+        if "async" not in request_payload and not request_payload.get("callback_url"):
+            request_payload["async"] = True
+        return request_payload
+
     # Convenience methods
     def generate_video(self, **kwargs: Any) -> dict[str, Any]:
         """Generate video using the main endpoint."""
-        return self.request("/veo/videos", kwargs)
+        return self.request("/veo/videos", self._with_async_callback(kwargs))
 
     def upsample_video(self, **kwargs: Any) -> dict[str, Any]:
         """Upsample a video to higher resolution or GIF."""
-        return self.request("/veo/upsample", kwargs)
+        return self.request("/veo/upsample", self._with_async_callback(kwargs))
 
     def extend_video(self, **kwargs: Any) -> dict[str, Any]:
         """Extend a previously generated video."""
-        return self.request("/veo/extend", kwargs)
+        return self.request("/veo/extend", self._with_async_callback(kwargs))
 
     def reshoot_video(self, **kwargs: Any) -> dict[str, Any]:
         """Re-render a video with a different camera motion."""
-        return self.request("/veo/reshoot", kwargs)
+        return self.request("/veo/reshoot", self._with_async_callback(kwargs))
 
     def edit_objects(self, **kwargs: Any) -> dict[str, Any]:
         """Insert or remove objects in a video."""
-        return self.request("/veo/objects", kwargs)
+        return self.request("/veo/objects", self._with_async_callback(kwargs))
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""
