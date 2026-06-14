@@ -26,13 +26,16 @@ def _parse_json_option(
 
     try:
         parsed = json.loads(value)
-    except json.JSONDecodeError:
-        print_error(f"Invalid JSON for --{option_name}.")
+    except json.JSONDecodeError as exc:
+        print_error(f"Invalid JSON for --{option_name}: {exc.msg}.")
         raise SystemExit(1) from None
 
     expected_type = dict if expected_kind == "object" else list
     if not isinstance(parsed, expected_type):
-        print_error(f"--{option_name} must be a JSON {expected_kind}.")
+        actual_kind = "object" if isinstance(parsed, dict) else "array" if isinstance(parsed, list) else type(parsed).__name__
+        print_error(
+            f"--{option_name} must be a JSON {expected_kind}, got {actual_kind}."
+        )
         raise SystemExit(1)
 
     return parsed
