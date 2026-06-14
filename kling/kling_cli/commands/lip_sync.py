@@ -111,7 +111,7 @@ def lip_sync(
             "voice_language": voice_language,
             "voice_speed": voice_speed,
             "callback_url": callback_url,
-            "async": async_mode if async_mode else None,
+            "async": async_mode or None,
             "timeout": timeout,
         }
         result = client.generate_lip_sync(**payload)  # type: ignore[arg-type]
