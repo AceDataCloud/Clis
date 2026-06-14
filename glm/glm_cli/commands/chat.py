@@ -1,7 +1,7 @@
 """Chat completion command."""
 
-import json as json_module
-from typing import Any
+import json
+from typing import Any, Literal
 
 import click
 
@@ -19,19 +19,20 @@ from glm_cli.core.output import (
 def _parse_json_option(
     option_name: str,
     value: str | None,
-    expected_type: type[Any],
+    expected_kind: Literal["object", "array"],
 ) -> Any | None:
     if value is None:
         return None
 
     try:
-        parsed = json_module.loads(value)
-    except json_module.JSONDecodeError:
-        print_error(f"Invalid JSON for --{option_name}: {value}")
+        parsed = json.loads(value)
+    except json.JSONDecodeError:
+        print_error(f"Invalid JSON for --{option_name}.")
         raise SystemExit(1) from None
 
+    expected_type = dict if expected_kind == "object" else list
     if not isinstance(parsed, expected_type):
-        print_error(f"--{option_name} must be a JSON {expected_type.__name__}.")
+        print_error(f"--{option_name} must be a JSON {expected_kind}.")
         raise SystemExit(1)
 
     return parsed
@@ -41,7 +42,7 @@ def _parse_tool_choice(value: str | None) -> str | dict[str, Any] | None:
     if value in {None, "none", "auto", "required"}:
         return value
 
-    return _parse_json_option("tool-choice", value, dict)
+    return _parse_json_option("tool-choice", value, "object")
 
 
 @click.command()
@@ -263,16 +264,16 @@ def chat(
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
 
-    parsed_response_format = _parse_json_option("response-format", response_format, dict)
-    parsed_stream_options = _parse_json_option("stream-options", stream_options, dict)
-    parsed_metadata = _parse_json_option("metadata", metadata, dict)
-    parsed_logit_bias = _parse_json_option("logit-bias", logit_bias, dict)
-    parsed_audio = _parse_json_option("audio", audio, dict)
-    parsed_prediction = _parse_json_option("prediction", prediction, dict)
+    parsed_response_format = _parse_json_option("response-format", response_format, "object")
+    parsed_stream_options = _parse_json_option("stream-options", stream_options, "object")
+    parsed_metadata = _parse_json_option("metadata", metadata, "object")
+    parsed_logit_bias = _parse_json_option("logit-bias", logit_bias, "object")
+    parsed_audio = _parse_json_option("audio", audio, "object")
+    parsed_prediction = _parse_json_option("prediction", prediction, "object")
     parsed_web_search_options = _parse_json_option(
-        "web-search-options", web_search_options, dict
+        "web-search-options", web_search_options, "object"
     )
-    parsed_tools = _parse_json_option("tools", tools, list)
+    parsed_tools = _parse_json_option("tools", tools, "array")
     parsed_tool_choice = _parse_tool_choice(tool_choice)
 
     payload: dict[str, object] = {
