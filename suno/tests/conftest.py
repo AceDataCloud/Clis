@@ -143,3 +143,16 @@ def mock_upload_response():
             "id": "upload-id-789",
         },
     }
+
+
+@pytest.fixture
+def mock_voices_response():
+    """Mock voices response."""
+    return {
+        "success": True,
+        "data": {
+            "persona_id": "voice-id-123",
+            "name": "My Voice",
+            "is_public": False,
+        },
+    }

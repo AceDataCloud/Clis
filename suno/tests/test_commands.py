@@ -522,6 +522,18 @@ class TestPersonaCommands:
         assert result.exit_code == 0
         assert "upload-id-789" in result.output
 
+    @respx.mock
+    def test_voices(self, runner, mock_voices_response):
+        respx.post("https://api.acedata.cloud/suno/voices").mock(
+            return_value=Response(200, json=mock_voices_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "voices", "https://example.com/audio.mp3", "-n", "My Voice"],
+        )
+        assert result.exit_code == 0
+        assert "voice-id-123" in result.output
+
 
 # ─── Info Commands ────────────────────────────────────────────────────────
 
