@@ -11,9 +11,6 @@ from midjourney_cli.core.exceptions import (
     MidjourneyTimeoutError,
 )
 
-# Dummy callback URL to force async mode — returns 200 OK immediately.
-_ASYNC_CALLBACK_URL = "https://api.acedata.cloud/health"
-
 
 class MidjourneyClient:
     """HTTP client for AceDataCloud Midjourney API."""
@@ -37,7 +34,7 @@ class MidjourneyClient:
         """Ensure long-running operations are submitted asynchronously."""
         request_payload = dict(payload)
         if not request_payload.get("callback_url"):
-            request_payload["callback_url"] = _ASYNC_CALLBACK_URL
+            request_payload["async"] = True
         return request_payload
 
     def request(
