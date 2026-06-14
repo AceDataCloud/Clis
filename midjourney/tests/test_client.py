@@ -40,7 +40,7 @@ class TestMidjourneyClient:
         client = MidjourneyClient(api_token="test-token")
         payload = {"prompt": "test"}
         result = client._with_async_callback(payload)
-        assert "callback_url" in result
+        assert result["async"] is True
         assert result["prompt"] == "test"
 
     def test_async_callback_preserves_existing(self):

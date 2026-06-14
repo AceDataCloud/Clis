@@ -137,7 +137,7 @@ class TestFluxClient:
         import json
 
         body = json.loads(route.calls.last.request.content)
-        assert "callback_url" in body
+        assert body["async"] is True
 
     @respx.mock
     def test_with_async_callback_preserves_custom(self):
