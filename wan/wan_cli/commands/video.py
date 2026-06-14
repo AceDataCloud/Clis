@@ -70,6 +70,13 @@ from wan_cli.core.output import (
     help="URL of an audio file to use in the generated video.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -85,6 +92,7 @@ def generate(
     prompt_extend: bool | None,
     audio_url: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from a text prompt.
@@ -112,6 +120,7 @@ def generate(
             "prompt_extend": prompt_extend,
             "audio_url": audio_url,
             "callback_url": callback_url,
+            "async": async_mode,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
@@ -189,6 +198,13 @@ def generate(
     help="Reference video file URL for character/timbre extraction.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(
@@ -206,6 +222,7 @@ def image_to_video(
     audio_url: str | None,
     reference_video_urls: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from a reference image.
@@ -235,6 +252,7 @@ def image_to_video(
             "audio_url": audio_url,
             "reference_video_urls": reference_video_urls,
             "callback_url": callback_url,
+            "async": async_mode,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]

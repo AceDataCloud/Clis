@@ -65,6 +65,13 @@ from sora_cli.core.output import (
     help="Ending second for the character appearance (v1.0, required when --character-url is set).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -79,6 +86,7 @@ def generate(
     character_start: int | None,
     character_end: int | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from a text prompt.
@@ -99,6 +107,7 @@ def generate(
             "prompt": prompt,
             "model": model,
             "callback_url": callback_url,
+            "async": async_mode,
             "orientation": orientation,
             "duration": int(duration),
             "size": size,
@@ -160,6 +169,13 @@ def generate(
     help="API version. 1.0 supports orientation/multiple images; 2.0 uses first image and pixel-based sizes.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(
@@ -172,6 +188,7 @@ def image_to_video(
     size: str,
     version: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from reference image(s).
@@ -197,6 +214,7 @@ def image_to_video(
             size=size,
             version=version,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)

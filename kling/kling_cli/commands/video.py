@@ -81,6 +81,13 @@ def _build_element_list(element_ids: tuple[str, ...]) -> list[dict[str, str]] | 
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
+@click.option(
     "--camera-control",
     default=None,
     help=(
@@ -124,6 +131,7 @@ def generate(
     negative_prompt: str | None,
     generate_audio: bool | None,
     callback_url: str | None,
+    async_mode: bool,
     camera_control: str | None,
     element_ids: tuple[str, ...],
     video_list: str | None,
@@ -153,6 +161,7 @@ def generate(
             "negative_prompt": negative_prompt,
             "generate_audio": generate_audio,
             "callback_url": callback_url,
+            "async": async_mode,
             "camera_control": _parse_json_option(camera_control, "--camera-control"),
             "element_list": _build_element_list(element_ids),
             "video_list": _parse_json_option(video_list, "--video-list"),
@@ -220,6 +229,13 @@ def generate(
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
+@click.option(
     "--camera-control",
     default=None,
     help=(
@@ -264,6 +280,7 @@ def image_to_video(
     cfg_scale: float | None,
     negative_prompt: str | None,
     callback_url: str | None,
+    async_mode: bool,
     camera_control: str | None,
     element_ids: tuple[str, ...],
     video_list: str | None,
@@ -294,6 +311,7 @@ def image_to_video(
             cfg_scale=cfg_scale,
             negative_prompt=negative_prompt,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
             camera_control=_parse_json_option(camera_control, "--camera-control"),
             element_list=_build_element_list(element_ids),
             video_list=_parse_json_option(video_list, "--video-list"),
@@ -339,6 +357,13 @@ def image_to_video(
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
+@click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
@@ -352,6 +377,7 @@ def extend(
     aspect_ratio: str,
     duration: int | None,
     callback_url: str | None,
+    async_mode: bool,
     timeout: int | None,
     output_json: bool,
 ) -> None:
@@ -378,6 +404,7 @@ def extend(
             aspect_ratio=aspect_ratio,
             duration=duration,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
             timeout=timeout,
         )
         if output_json:

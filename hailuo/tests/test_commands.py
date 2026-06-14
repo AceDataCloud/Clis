@@ -179,9 +179,7 @@ class TestTaskCommands:
         route = respx.post("https://api.acedata.cloud/hailuo/tasks").mock(
             return_value=Response(200, json=mock_tasks_batch_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "tasks", "t-1", "t-2", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "tasks", "t-1", "t-2", "--json"])
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["action"] == "retrieve_batch"

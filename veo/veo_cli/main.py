@@ -13,7 +13,15 @@ from dotenv import load_dotenv
 
 from veo_cli.commands.info import aspect_ratios, config, models
 from veo_cli.commands.task import task, tasks_batch, wait
-from veo_cli.commands.video import extend, generate, image_to_video, ingredients_to_video, objects, reshoot, upscale
+from veo_cli.commands.video import (
+    extend,
+    generate,
+    image_to_video,
+    ingredients_to_video,
+    objects,
+    reshoot,
+    upscale,
+)
 
 load_dotenv()
 

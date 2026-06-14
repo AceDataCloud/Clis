@@ -40,6 +40,13 @@ from nanobanana_cli.core.output import (
     help="Output resolution (nano-banana-pro only).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -49,6 +56,7 @@ def generate(
     aspect_ratio: str,
     resolution: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate an image from a text prompt.
@@ -72,6 +80,7 @@ def generate(
             "model": model,
             "aspect_ratio": aspect_ratio,
             "callback_url": callback_url,
+            "async": async_mode,
         }
         if resolution:
             payload["resolution"] = resolution
@@ -104,6 +113,13 @@ def generate(
     help="NanoBanana model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def edit(
@@ -112,6 +128,7 @@ def edit(
     image_urls: tuple[str, ...],
     model: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Edit or combine images using AI.
@@ -137,6 +154,7 @@ def edit(
             image_urls=list(image_urls),
             model=model,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)

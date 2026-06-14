@@ -51,8 +51,10 @@ class TestExtractCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "extract", "https://www.amazon.com/dp/B0C1234567",
+                "--token",
+                "test-token",
+                "extract",
+                "https://www.amazon.com/dp/B0C1234567",
                 "--json",
             ],
         )
@@ -81,9 +83,13 @@ class TestExtractCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "extract", "https://example.com",
-                "--expected-type", "product", "--json",
+                "--token",
+                "test-token",
+                "extract",
+                "https://example.com",
+                "--expected-type",
+                "product",
+                "--json",
             ],
         )
         assert result.exit_code == 0
@@ -96,9 +102,12 @@ class TestExtractCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "extract", "https://example.com",
-                "--enable-llm", "--json",
+                "--token",
+                "test-token",
+                "extract",
+                "https://example.com",
+                "--enable-llm",
+                "--json",
             ],
         )
         assert result.exit_code == 0
@@ -130,9 +139,7 @@ class TestRenderCommand:
         respx.post("https://api.acedata.cloud/webextrator/render").mock(
             return_value=Response(200, json=mock_render_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "render", "https://example.com"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "render", "https://example.com"])
         assert result.exit_code == 0
         assert "550e8400-e29b-41d4-a716-446655440002" in result.output
 
@@ -144,9 +151,13 @@ class TestRenderCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "render", "https://example.com",
-                "--wait-until", "load", "--json",
+                "--token",
+                "test-token",
+                "render",
+                "https://example.com",
+                "--wait-until",
+                "load",
+                "--json",
             ],
         )
         assert result.exit_code == 0
@@ -159,9 +170,13 @@ class TestRenderCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "render", "https://example.com",
-                "--callback-url", "https://my.server.com/webhook", "--json",
+                "--token",
+                "test-token",
+                "render",
+                "https://example.com",
+                "--callback-url",
+                "https://my.server.com/webhook",
+                "--json",
             ],
         )
         assert result.exit_code == 0
@@ -182,9 +197,12 @@ class TestTasksCommands:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "tasks", "retrieve",
-                "--id", "550e8400-e29b-41d4-a716-446655440000",
+                "--token",
+                "test-token",
+                "tasks",
+                "retrieve",
+                "--id",
+                "550e8400-e29b-41d4-a716-446655440000",
                 "--json",
             ],
         )
@@ -200,18 +218,19 @@ class TestTasksCommands:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "tasks", "retrieve",
-                "--trace-id", "550e8400-e29b-41d4-a716-446655440001",
+                "--token",
+                "test-token",
+                "tasks",
+                "retrieve",
+                "--trace-id",
+                "550e8400-e29b-41d4-a716-446655440001",
                 "--json",
             ],
         )
         assert result.exit_code == 0
 
     def test_tasks_retrieve_requires_id_or_trace_id(self, runner):
-        result = runner.invoke(
-            cli, ["--token", "test-token", "tasks", "retrieve"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "tasks", "retrieve"])
         assert result.exit_code != 0
 
     @respx.mock
@@ -223,9 +242,14 @@ class TestTasksCommands:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "tasks", "batch",
-                "--ids", "id1", "--ids", "id2",
+                "--token",
+                "test-token",
+                "tasks",
+                "batch",
+                "--ids",
+                "id1",
+                "--ids",
+                "id2",
                 "--json",
             ],
         )

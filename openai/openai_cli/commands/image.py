@@ -17,7 +17,9 @@ from openai_cli.core.output import (
 _SIZE_PATTERN = re.compile(r"^(auto|\d+x\d+)$")
 
 
-def _validate_size_format(ctx: click.Context, param: click.Parameter, value: str | None) -> str | None:
+def _validate_size_format(
+    ctx: click.Context, param: click.Parameter, value: str | None
+) -> str | None:
     """Validate that size matches 'auto' or 'WIDTHxHEIGHT' pattern."""
     if value is not None and not _SIZE_PATTERN.match(value):
         raise click.BadParameter(
@@ -111,6 +113,13 @@ def _validate_size_format(ctx: click.Context, param: click.Parameter, value: str
     default=None,
     help="Optional callback URL for async image generation.",
 )
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image(
@@ -128,6 +137,7 @@ def image(
     partial_images: int | None,
     response_format: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate an image from a text prompt.
@@ -155,6 +165,7 @@ def image(
         "partial_images": partial_images,
         "response_format": response_format,
         "callback_url": callback_url,
+        "async": async_mode,
     }
 
     try:
@@ -255,6 +266,13 @@ def image(
     default=None,
     help="Optional callback URL for async image editing.",
 )
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def edit(
@@ -273,6 +291,7 @@ def edit(
     partial_images: int | None,
     response_format: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Edit an image using a text prompt.
@@ -300,6 +319,7 @@ def edit(
         "partial_images": partial_images,
         "response_format": response_format,
         "callback_url": callback_url,
+        "async": async_mode,
     }
 
     try:
