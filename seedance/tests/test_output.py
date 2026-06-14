@@ -18,13 +18,15 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(SEEDANCE_MODELS) == 5
+        assert len(SEEDANCE_MODELS) == 7
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in SEEDANCE_MODELS
 
     def test_models_include_all(self):
         for model in [
+            "doubao-seedance-2-0-260128",
+            "doubao-seedance-2-0-fast-260128",
             "doubao-seedance-1-5-pro-251215",
             "doubao-seedance-1-0-pro-250528",
             "doubao-seedance-1-0-pro-fast-251015",

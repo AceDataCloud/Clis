@@ -4,7 +4,16 @@ import click
 
 from aichat_cli.core.client import get_client
 from aichat_cli.core.exceptions import AichatError
-from aichat_cli.core.output import DEFAULT_MODEL, MODELS, print_answer, print_error, print_json
+from aichat_cli.core.output import (
+    DEFAULT_MODEL,
+    DEFAULT_MODEL2,
+    MODEL_GROUPS,
+    MODELS,
+    MODELS2,
+    print_answer,
+    print_error,
+    print_json,
+)
 
 
 @click.command()
@@ -76,6 +85,92 @@ def chat(
         }
 
         result = client.converse(**payload)  # type: ignore[arg-type]
+        if output_json:
+            print_json(result)
+        else:
+            print_answer(result)
+    except AichatError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("chat2")
+@click.argument("question")
+@click.option(
+    "-m",
+    "--model",
+    default=DEFAULT_MODEL2,
+    type=click.Choice(MODELS2, case_sensitive=True),
+    help=f"Model to use (default: {DEFAULT_MODEL2}).",
+    show_default=True,
+)
+@click.option(
+    "-g",
+    "--model-group",
+    default=None,
+    type=click.Choice(MODEL_GROUPS, case_sensitive=True),
+    help="Filter by provider group (chatgpt, claude, gemini, grok, kimi, glm, deepseek).",
+)
+@click.option(
+    "--id",
+    "conversation_id",
+    default=None,
+    help="Conversation ID to continue an existing conversation.",
+)
+@click.option(
+    "--stateful",
+    is_flag=True,
+    default=False,
+    help="Enable stateful conversation (server remembers context).",
+)
+@click.option(
+    "--ref",
+    "references",
+    multiple=True,
+    help="Reference URL or text to include as context (can be repeated).",
+)
+@click.option("--max-turns", default=None, type=int, help="Maximum conversation turns.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def chat2(
+    ctx: click.Context,
+    question: str,
+    model: str,
+    model_group: str | None,
+    conversation_id: str | None,
+    stateful: bool,
+    references: tuple[str, ...],
+    max_turns: int | None,
+    output_json: bool,
+) -> None:
+    """Send a question to a multi-provider AI model (aichat2).
+
+    Supports OpenAI, Anthropic Claude, Google Gemini, xAI Grok, DeepSeek, Kimi, GLM and more.
+
+    QUESTION is the prompt or question to send to the model.
+
+    \b
+    Examples:
+      aichat chat2 "What is the capital of France?"
+      aichat chat2 "Write a poem" -m claude-opus-4-20250514
+      aichat chat2 "Explain AI" -m gemini-3.1-pro
+      aichat chat2 "Hello" --model-group claude
+      aichat chat2 "Tell me more" --id 64a67fff-61dc-4801-8339-2c69334c61d6
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        payload: dict[str, object] = {
+            "action": "chat",
+            "question": question,
+            "model": model,
+            "id": conversation_id,
+            "stateful": stateful if stateful else None,
+            "references": list(references) if references else None,
+            "max_turns": max_turns,
+            "model_group": model_group,
+        }
+
+        result = client.converse2(**payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:

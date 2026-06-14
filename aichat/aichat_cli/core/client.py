@@ -85,6 +85,10 @@ class AichatClient:
         """Send a conversation request to the AI."""
         return self.request("/aichat/conversations", kwargs)
 
+    def converse2(self, **kwargs: Any) -> dict[str, Any]:
+        """Send a multi-provider conversation request via aichat2."""
+        return self.request("/aichat2/conversations", kwargs)
+
 
 def get_client(token: str | None = None) -> AichatClient:
     """Get an AichatClient instance, optionally overriding the token."""

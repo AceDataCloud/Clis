@@ -93,6 +93,88 @@ MODELS = [
 
 DEFAULT_MODEL = "gpt-4o"
 
+# Available models for /aichat2/conversations endpoint (multi-provider)
+MODELS2 = [
+    "gpt-4",
+    "gpt-4.1",
+    "gpt-4.1-mini",
+    "gpt-4.1-nano",
+    "gpt-4o",
+    "gpt-4o-2024-05-13",
+    "gpt-4o-all",
+    "gpt-4o-image",
+    "gpt-4o-mini",
+    "gpt-5-all",
+    "gpt-5.1-all",
+    "gpt-5.2-pro",
+    "gpt-5.4-mini",
+    "gpt-5.4-nano",
+    "gpt-image-1",
+    "claude-3-5-haiku-20241022",
+    "claude-3-5-sonnet-20240620",
+    "claude-3-5-sonnet-20241022",
+    "claude-3-7-sonnet-20250219",
+    "claude-3-haiku-20240307",
+    "claude-3-opus-20240229",
+    "claude-3-sonnet-20240229",
+    "claude-haiku-4-5-20251001",
+    "claude-opus-4-1-20250805",
+    "claude-opus-4-20250514",
+    "claude-opus-4-5-20251101",
+    "claude-opus-4-6",
+    "claude-opus-4-7",
+    "claude-opus-4-8",
+    "claude-sonnet-4-20250514",
+    "claude-sonnet-4-5-20250929",
+    "claude-sonnet-4-6",
+    "gemini-2.0-flash-lite",
+    "gemini-2.5-flash-lite",
+    "gemini-3-pro-preview",
+    "gemini-3.1-flash-image-preview",
+    "gemini-3.1-flash-lite-preview",
+    "gemini-3.1-pro",
+    "gemini-3.1-pro-preview",
+    "grok-3",
+    "grok-3-fast",
+    "grok-4",
+    "grok-4-0709",
+    "deepseek-chat",
+    "deepseek-r1",
+    "deepseek-r1-0528",
+    "deepseek-reasoner",
+    "deepseek-v3",
+    "deepseek-v3-250324",
+    "deepseek-v3.2-exp",
+    "deepseek-v4-flash",
+    "kimi-k2-0711-preview",
+    "kimi-k2-0905-preview",
+    "kimi-k2-instruct-0905",
+    "kimi-k2-thinking",
+    "kimi-k2-thinking-turbo",
+    "kimi-k2-turbo-preview",
+    "kimi-k2.5",
+    "glm-3-turbo",
+    "glm-4.5",
+    "glm-4.5v",
+    "glm-4.6",
+    "glm-4.7",
+    "glm-5",
+    "glm-5-turbo",
+    "glm-5.1",
+    "o1",
+    "o1-mini",
+    "o1-pro",
+    "o3",
+    "o3-mini",
+    "o3-pro",
+    "o4-mini",
+]
+
+DEFAULT_MODEL2 = "gpt-4o"
+
+# Available model groups for /aichat2/conversations endpoint
+MODEL_GROUPS = ["chatgpt", "claude", "gemini", "grok", "kimi", "glm", "deepseek"]
+
 
 def print_json(data: Any) -> None:
     """Print data as formatted JSON."""
@@ -168,3 +250,33 @@ def print_models() -> None:
         table.add_row(model, family)
 
     console.print(table)
+
+
+def print_models2() -> None:
+    """Print available models for the multi-provider aichat2 endpoint."""
+    table = Table(title="Available Models (Multi-Provider)")
+    table.add_column("Model", style="bold cyan")
+    table.add_column("Provider")
+
+    for model in MODELS2:
+        if model.startswith("gpt") or model.startswith("o1") or model.startswith("o3") or model.startswith("o4"):
+            provider = "OpenAI"
+        elif model.startswith("claude"):
+            provider = "Anthropic"
+        elif model.startswith("gemini"):
+            provider = "Google"
+        elif model.startswith("grok"):
+            provider = "xAI"
+        elif model.startswith("deepseek"):
+            provider = "DeepSeek"
+        elif model.startswith("kimi"):
+            provider = "Moonshot"
+        elif model.startswith("glm"):
+            provider = "Zhipu"
+        else:
+            provider = "Other"
+
+        table.add_row(model, provider)
+
+    console.print(table)
+    console.print(f"\n[dim]Default model: {DEFAULT_MODEL2}[/dim]")

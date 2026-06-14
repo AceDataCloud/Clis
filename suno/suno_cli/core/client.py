@@ -131,6 +131,10 @@ class SunoClient:
         """Upload audio from a URL."""
         return self.request("/suno/upload", kwargs)
 
+    def create_voice(self, **kwargs: Any) -> dict[str, Any]:
+        """Create a voice from an audio URL."""
+        return self.request("/suno/voices", kwargs)
+
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""
         return self.request("/suno/tasks", kwargs)

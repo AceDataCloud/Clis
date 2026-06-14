@@ -160,6 +160,22 @@ def print_translate_result(data: dict[str, Any]) -> None:
         console.print("[yellow]No translation returned.[/yellow]")
 
 
+def print_shorten_result(data: dict[str, Any]) -> None:
+    """Print shorten result in a rich format."""
+    shortened = data.get("data", {})
+    prompts = shortened.get("prompts", []) if isinstance(shortened, dict) else []
+    if prompts:
+        table = Table(title="[bold green]Shortened Prompts[/bold green]")
+        table.add_column("#", style="bold cyan", width=4)
+        table.add_column("Prompt")
+        for i, prompt in enumerate(prompts, 1):
+            table.add_row(str(i), str(prompt))
+        console.print(table)
+    else:
+        console.print("[yellow]No shortened prompts returned.[/yellow]")
+        console.print_json(data if isinstance(data, str) else __import__("json").dumps(data))
+
+
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
     # Handle single-task response

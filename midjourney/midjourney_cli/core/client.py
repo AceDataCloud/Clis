@@ -109,6 +109,10 @@ class MidjourneyClient:
         """Describe image using the describe endpoint."""
         return self.request("/midjourney/describe", kwargs)
 
+    def shorten(self, **kwargs: Any) -> dict[str, Any]:
+        """Shorten a prompt using the shorten endpoint."""
+        return self.request("/midjourney/shorten", kwargs)
+
     def edit(self, **kwargs: Any) -> dict[str, Any]:
         """Edit image using the edits endpoint."""
         return self.request("/midjourney/edits", self._with_async_callback(kwargs))
