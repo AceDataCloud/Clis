@@ -126,11 +126,12 @@ def voice(
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.create_voice(
-            audio_url=audio_url,
-            name=name,
-            description=description,
-        )
+        payload: dict[str, object] = {"audio_url": audio_url}
+        if name is not None:
+            payload["name"] = name
+        if description is not None:
+            payload["description"] = description
+        result = client.create_voice(**payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:

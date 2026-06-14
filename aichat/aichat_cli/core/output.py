@@ -254,28 +254,26 @@ def print_models() -> None:
 
 def print_models2() -> None:
     """Print available models for the multi-provider aichat2 endpoint."""
+    _provider_prefixes: list[tuple[tuple[str, ...], str]] = [
+        (("gpt", "o1", "o3", "o4"), "OpenAI"),
+        (("claude",), "Anthropic"),
+        (("gemini",), "Google"),
+        (("grok",), "xAI"),
+        (("deepseek",), "DeepSeek"),
+        (("kimi",), "Moonshot"),
+        (("glm",), "Zhipu"),
+    ]
+
     table = Table(title="Available Models (Multi-Provider)")
     table.add_column("Model", style="bold cyan")
     table.add_column("Provider")
 
     for model in MODELS2:
-        if model.startswith("gpt") or model.startswith("o1") or model.startswith("o3") or model.startswith("o4"):
-            provider = "OpenAI"
-        elif model.startswith("claude"):
-            provider = "Anthropic"
-        elif model.startswith("gemini"):
-            provider = "Google"
-        elif model.startswith("grok"):
-            provider = "xAI"
-        elif model.startswith("deepseek"):
-            provider = "DeepSeek"
-        elif model.startswith("kimi"):
-            provider = "Moonshot"
-        elif model.startswith("glm"):
-            provider = "Zhipu"
-        else:
-            provider = "Other"
-
+        provider = "Other"
+        for prefixes, name in _provider_prefixes:
+            if any(model.startswith(p) for p in prefixes):
+                provider = name
+                break
         table.add_row(model, provider)
 
     console.print(table)
