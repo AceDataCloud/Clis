@@ -78,6 +78,7 @@ from seedream_cli.core.output import (
     help="Enable web search tool. Only supported for doubao-seedream-5-0-260128.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -96,6 +97,7 @@ def generate(
     output_format: str | None,
     web_search: bool,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate an image from a text prompt.
@@ -128,6 +130,7 @@ def generate(
             "output_format": output_format,
             "tools": [{"type": "web_search"}] if web_search else None,
             "callback_url": callback_url,
+            "async": async_mode,
         }
         if resolution:
             payload["size"] = resolution
@@ -176,6 +179,7 @@ def generate(
     "--watermark/--no-watermark", default=None, help="Add AI-generated watermark (default: true)."
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def edit(
@@ -188,6 +192,7 @@ def edit(
     response_format: str | None,
     watermark: bool | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Edit or combine images using AI.
@@ -211,6 +216,7 @@ def edit(
             response_format=response_format,
             watermark=watermark,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)

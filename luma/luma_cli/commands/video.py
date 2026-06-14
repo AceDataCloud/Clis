@@ -29,6 +29,7 @@ from luma_cli.core.output import (
     help="Enable prompt text enhancement (default: enabled).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
@@ -41,6 +42,7 @@ def generate(
     loop: bool,
     enhancement: bool,
     callback_url: str | None,
+    async_mode: bool,
     timeout: int | None,
     output_json: bool,
 ) -> None:
@@ -63,6 +65,7 @@ def generate(
             "loop": loop,
             "enhancement": enhancement,
             "callback_url": callback_url,
+            "async": async_mode,
             "timeout": timeout,
         }
 
@@ -102,6 +105,7 @@ def generate(
     help="Enable prompt text enhancement (default: enabled).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
@@ -116,6 +120,7 @@ def image_to_video(
     loop: bool,
     enhancement: bool,
     callback_url: str | None,
+    async_mode: bool,
     timeout: int | None,
     output_json: bool,
 ) -> None:
@@ -140,6 +145,7 @@ def image_to_video(
             loop=loop,
             enhancement=enhancement,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
             timeout=timeout,
         )
         if output_json:
@@ -163,6 +169,7 @@ def image_to_video(
     help="Aspect ratio.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
@@ -175,6 +182,7 @@ def extend(
     prompt: str | None,
     aspect_ratio: str,
     callback_url: str | None,
+    async_mode: bool,
     timeout: int | None,
     output_json: bool,
 ) -> None:
@@ -201,6 +209,7 @@ def extend(
             prompt=prompt,
             aspect_ratio=aspect_ratio,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
             timeout=timeout,
         )
         if output_json:

@@ -45,6 +45,7 @@ from kling_cli.core.output import (
 )
 @click.option("--prompt", default=None, help="Text prompt (positive and/or negative descriptions).")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
@@ -59,6 +60,7 @@ def motion(
     keep_original_sound: bool,
     prompt: str | None,
     callback_url: str | None,
+    async_mode: bool,
     timeout: int | None,
     output_json: bool,
 ) -> None:
@@ -83,6 +85,7 @@ def motion(
             keep_original_sound="yes" if keep_original_sound else "no",
             prompt=prompt,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
             timeout=timeout,
         )
         if output_json:

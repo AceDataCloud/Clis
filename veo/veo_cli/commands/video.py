@@ -47,6 +47,7 @@ from veo_cli.core.output import (
     help="Enable automatic prompt translation.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -57,6 +58,7 @@ def generate(
     resolution: str | None,
     translation: bool | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from a text prompt.
@@ -76,6 +78,7 @@ def generate(
             "prompt": prompt,
             "model": model,
             "callback_url": callback_url,
+            "async": async_mode,
             "aspect_ratio": aspect_ratio,
             "resolution": resolution,
             "translation": translation,
@@ -128,6 +131,7 @@ def generate(
     help="Enable automatic prompt translation.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(
@@ -139,6 +143,7 @@ def image_to_video(
     resolution: str | None,
     translation: bool | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from reference image(s).
@@ -162,6 +167,7 @@ def image_to_video(
             resolution=resolution,
             translation=translation,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -188,6 +194,7 @@ def image_to_video(
     help="Enable automatic prompt translation.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def ingredients_to_video(
@@ -196,6 +203,7 @@ def ingredients_to_video(
     image_urls: tuple[str, ...],
     translation: bool | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from 1-3 ingredient images.
@@ -217,6 +225,7 @@ def ingredients_to_video(
             image_urls=list(image_urls),
             translation=translation,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -238,6 +247,7 @@ def ingredients_to_video(
     help="Upsample action: 1080p, 4k, or gif.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upscale(
@@ -245,6 +255,7 @@ def upscale(
     video_id: str,
     action: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Upsample a generated video to higher resolution or GIF.
@@ -265,6 +276,7 @@ def upscale(
             action=action,
             video_id=video_id,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -286,6 +298,7 @@ def upscale(
 )
 @click.option("--prompt", default=None, help="Optional prompt guiding the extended section.")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def extend(
@@ -294,6 +307,7 @@ def extend(
     model: str,
     prompt: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Extend a previously generated video.
@@ -315,6 +329,7 @@ def extend(
             model=model,
             prompt=prompt,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -334,6 +349,7 @@ def extend(
     help="Camera motion to apply when re-rendering the video.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def reshoot(
@@ -341,6 +357,7 @@ def reshoot(
     video_id: str,
     motion_type: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Re-render a video with a different camera motion.
@@ -359,6 +376,7 @@ def reshoot(
             video_id=video_id,
             motion_type=motion_type,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
@@ -392,6 +410,7 @@ def reshoot(
     ),
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def objects(
@@ -401,6 +420,7 @@ def objects(
     prompt: str | None,
     image_mask: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Insert or remove objects in a generated video.
@@ -426,6 +446,7 @@ def objects(
             prompt=prompt,
             image_mask=image_mask,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         if output_json:
             print_json(result)
