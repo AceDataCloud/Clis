@@ -12,6 +12,7 @@ import click
 from dotenv import load_dotenv
 
 from kling_cli.commands.info import aspect_ratios, config, models
+from kling_cli.commands.lip_sync import lip_sync
 from kling_cli.commands.motion import motion
 from kling_cli.commands.task import task, tasks_batch, wait
 from kling_cli.commands.video import extend, generate, image_to_video
@@ -47,6 +48,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
       kling generate "A cinematic scene of a sunset over the ocean"
       kling image-to-video "Animate this" --start-image-url https://example.com/photo.jpg
       kling motion --image-url img.jpg --video-url ref.mp4
+      kling lip-sync --mode audio2video --video-id 895055164389466178 --audio-url https://example.com/voice.mp3
       kling task abc123-def456
       kling wait abc123 --interval 5
 
@@ -62,6 +64,7 @@ cli.add_command(generate)
 cli.add_command(image_to_video)
 cli.add_command(extend)
 cli.add_command(motion)
+cli.add_command(lip_sync)
 cli.add_command(task)
 cli.add_command(tasks_batch)
 cli.add_command(wait)

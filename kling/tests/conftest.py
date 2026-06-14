@@ -63,6 +63,20 @@ def mock_motion_response():
 
 
 @pytest.fixture
+def mock_lip_sync_response():
+    """Mock successful lip-sync response."""
+    return {
+        "success": True,
+        "task_id": "test-lip-sync-task-123",
+        "trace_id": "test-trace-789",
+        "video_id": "895055968777281546",
+        "video_url": "https://cdn.example.com/test-lip-sync-video.mp4",
+        "duration": "4.966",
+        "state": "succeed",
+    }
+
+
+@pytest.fixture
 def mock_task_response():
     """Mock task query response."""
     return {

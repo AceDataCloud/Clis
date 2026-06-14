@@ -54,6 +54,15 @@ def print_video_result(data: dict[str, Any]) -> None:
     trace_id = data.get("trace_id", "N/A")
     items = data.get("data", [])
 
+    # Some Kling endpoints return the generated video fields at the top level.
+    if not items and any(data.get(key) for key in ("video_id", "video_url", "state", "duration")):
+        items = {
+            "video_id": data.get("video_id"),
+            "video_url": data.get("video_url"),
+            "state": data.get("state"),
+            "duration": data.get("duration"),
+        }
+
     console.print(
         Panel(
             f"[bold]Task ID:[/bold] {task_id}\n[bold]Trace ID:[/bold] {trace_id}",
@@ -88,8 +97,12 @@ def print_video_result(data: dict[str, Any]) -> None:
         table.add_column("Value")
         if items.get("video_url"):
             table.add_row("URL", items["video_url"])
+        if items.get("video_id"):
+            table.add_row("Video ID", items["video_id"])
         if items.get("state"):
             table.add_row("State", items["state"])
+        if items.get("duration"):
+            table.add_row("Duration", str(items["duration"]))
         if items.get("model_name"):
             table.add_row("Model", items["model_name"])
         if items.get("created_at"):

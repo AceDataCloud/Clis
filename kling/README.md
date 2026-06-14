@@ -26,6 +26,9 @@ kling extend --video-id abc123
 # Generate a motion video from image + reference video
 kling motion --image-url https://example.com/img.jpg --video-url https://example.com/ref.mp4
 
+# Drive an existing video with audio
+kling lip-sync --mode audio2video --video-id 895055164389466178 --audio-url https://example.com/voice.mp3
+
 # Check task status
 kling task abc123-def456
 

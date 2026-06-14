@@ -45,6 +45,12 @@ class TestGlobalCommands:
         assert "--image-url" in result.output
         assert "--video-url" in result.output
 
+    def test_help_lip_sync(self, runner):
+        result = runner.invoke(cli, ["lip-sync", "--help"])
+        assert result.exit_code == 0
+        assert "--mode" in result.output
+        assert "--video-id" in result.output
+
 
 # ─── Generate Commands ─────────────────────────────────────────────────────
 
@@ -538,6 +544,133 @@ class TestMotionCommands:
                 "https://example.com/ref.mp4",
                 "--character-orientation",
                 "invalid-value",
+            ],
+        )
+        assert result.exit_code != 0
+
+
+# ─── Lip Sync Commands ───────────────────────────────────────────────────────
+
+
+class TestLipSyncCommands:
+    """Tests for lip-sync commands."""
+
+    @respx.mock
+    def test_lip_sync_audio_to_video_json(self, runner, mock_lip_sync_response):
+        route = respx.post("https://api.acedata.cloud/kling/lip-sync").mock(
+            return_value=Response(200, json=mock_lip_sync_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "audio2video",
+                "--video-id",
+                "895055164389466178",
+                "--audio-url",
+                "https://example.com/voice.mp3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["mode"] == "audio2video"
+        assert body["video_id"] == "895055164389466178"
+        assert body["audio_url"] == "https://example.com/voice.mp3"
+        assert body["audio_type"] == "url"
+
+    @respx.mock
+    def test_lip_sync_text_to_video_payload(self, runner, mock_lip_sync_response):
+        route = respx.post("https://api.acedata.cloud/kling/lip-sync").mock(
+            return_value=Response(200, json=mock_lip_sync_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "text2video",
+                "--video-url",
+                "https://example.com/input.mp4",
+                "--text",
+                "Hello there",
+                "--voice-id",
+                "genshin_vindi2",
+                "--voice-language",
+                "en",
+                "--voice-speed",
+                "1.2",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["mode"] == "text2video"
+        assert body["video_url"] == "https://example.com/input.mp4"
+        assert body["text"] == "Hello there"
+        assert body["voice_id"] == "genshin_vindi2"
+        assert body["voice_language"] == "en"
+        assert body["voice_speed"] == 1.2
+        assert "audio_url" not in body
+
+    @respx.mock
+    def test_lip_sync_rich_output(self, runner, mock_lip_sync_response):
+        respx.post("https://api.acedata.cloud/kling/lip-sync").mock(
+            return_value=Response(200, json=mock_lip_sync_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "audio2video",
+                "--video-id",
+                "895055164389466178",
+                "--audio-url",
+                "https://example.com/voice.mp3",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "test-lip-sync-task-123" in result.output
+        assert "https://cdn.example.com/test-lip-sync-video.mp4" in result.output
+
+    def test_lip_sync_requires_single_video_source(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "audio2video",
+                "--video-id",
+                "895055164389466178",
+                "--video-url",
+                "https://example.com/input.mp4",
+                "--audio-url",
+                "https://example.com/voice.mp3",
+            ],
+        )
+        assert result.exit_code != 0
+
+    def test_lip_sync_requires_text_fields_for_text_mode(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "text2video",
+                "--video-id",
+                "895055164389466178",
             ],
         )
         assert result.exit_code != 0
