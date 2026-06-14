@@ -297,24 +297,25 @@ def image_to_video(
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.generate_video(
-            action="image2video",
-            prompt=prompt,
-            start_image_url=start_image_url,
-            end_image_url=end_image_url,
-            model=model,
-            mode=mode,
-            aspect_ratio=aspect_ratio,
-            duration=duration,
-            cfg_scale=cfg_scale,
-            negative_prompt=negative_prompt,
-            callback_url=callback_url,
-            **{"async": async_mode},
-            camera_control=_parse_json_option(camera_control, "--camera-control"),
-            element_list=_build_element_list(element_ids),
-            video_list=_parse_json_option(video_list, "--video-list"),
-            timeout=timeout,
-        )
+        payload: dict[str, object] = {
+            "action": "image2video",
+            "prompt": prompt,
+            "start_image_url": start_image_url,
+            "end_image_url": end_image_url,
+            "model": model,
+            "mode": mode,
+            "aspect_ratio": aspect_ratio,
+            "duration": duration,
+            "cfg_scale": cfg_scale,
+            "negative_prompt": negative_prompt,
+            "callback_url": callback_url,
+            "async": async_mode,
+            "camera_control": _parse_json_option(camera_control, "--camera-control"),
+            "element_list": _build_element_list(element_ids),
+            "video_list": _parse_json_option(video_list, "--video-list"),
+            "timeout": timeout,
+        }
+        result = client.generate_video(**payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:
@@ -392,18 +393,19 @@ def extend(
         raise click.UsageError("Provide --video-id.")
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.generate_video(
-            action="extend",
-            video_id=video_id,
-            prompt=prompt,
-            model=model,
-            mode=mode,
-            aspect_ratio=aspect_ratio,
-            duration=duration,
-            callback_url=callback_url,
-            **{"async": async_mode},
-            timeout=timeout,
-        )
+        payload: dict[str, object] = {
+            "action": "extend",
+            "video_id": video_id,
+            "prompt": prompt,
+            "model": model,
+            "mode": mode,
+            "aspect_ratio": aspect_ratio,
+            "duration": duration,
+            "callback_url": callback_url,
+            "async": async_mode,
+            "timeout": timeout,
+        }
+        result = client.generate_video(**payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:

@@ -1,5 +1,7 @@
 """Motion generation command."""
 
+from typing import Any
+
 import click
 
 from kling_cli.core.client import get_client
@@ -82,7 +84,7 @@ def motion(
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        payload: dict[str, object] = {
+        payload: dict[str, Any] = {
             "image_url": image_url,
             "video_url": video_url,
             "character_orientation": character_orientation,

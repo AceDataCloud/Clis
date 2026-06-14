@@ -53,9 +53,15 @@ def print_video_result(data: dict[str, Any]) -> None:
     """Print video generation result in a rich format."""
     task_id = data.get("task_id", "N/A")
     trace_id = data.get("trace_id", "N/A")
-    items = data.get("data", [])
-    if not items and any(key in data for key in ("video_id", "video_url", "state", "duration")):
-        items = data
+    raw_items = data.get("data")
+    if isinstance(raw_items, list):
+        items: list[dict[str, Any]] | dict[str, Any] = raw_items
+    elif isinstance(raw_items, dict):
+        items = raw_items
+    elif any(data.get(key) is not None for key in ("video_id", "video_url", "state", "duration")):
+        items = [data]
+    else:
+        items = []
 
     console.print(
         Panel(

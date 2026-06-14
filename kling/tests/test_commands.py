@@ -702,6 +702,25 @@ class TestLipSyncCommands:
         )
         assert result.exit_code != 0
 
+    def test_lip_sync_rejects_text_over_120_characters(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "text2video",
+                "--video-id",
+                "video-123",
+                "--text",
+                "x" * 121,
+                "--voice-id",
+                "voice-123",
+            ],
+        )
+        assert result.exit_code != 0
+
 
 # ─── Task Commands ─────────────────────────────────────────────────────────
 

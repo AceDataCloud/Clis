@@ -1,5 +1,7 @@
 """Lip-sync generation command."""
 
+from typing import Any
+
 import click
 
 from kling_cli.core.client import get_client
@@ -30,7 +32,11 @@ LIP_SYNC_AUDIO_TYPES = ["url", "file"]
     default=None,
     help="How the audio is supplied for audio2video.",
 )
-@click.option("--text", default=None, help="Text to speak (required for text2video; max 120 chars).")
+@click.option(
+    "--text",
+    default=None,
+    help="Text to speak (required for text2video; max 120 characters).",
+)
 @click.option("--voice-id", default=None, help="Voice ID to use for text2video.")
 @click.option(
     "--voice-language",
@@ -65,12 +71,14 @@ def lip_sync(
     if mode == "text2video":
         if not text:
             raise click.UsageError("Provide --text when --mode text2video is used.")
+        if len(text) > 120:
+            raise click.UsageError("--text must be 120 characters or fewer.")
         if not voice_id:
             raise click.UsageError("Provide --voice-id when --mode text2video is used.")
 
     client = get_client(ctx.obj.get("token"))
     try:
-        payload: dict[str, object] = {
+        payload: dict[str, Any] = {
             "mode": mode,
             "video_id": video_id,
             "video_url": video_url,
