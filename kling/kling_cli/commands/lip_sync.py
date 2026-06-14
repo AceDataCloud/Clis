@@ -130,18 +130,16 @@ def lip_sync(
 
     client = get_client(ctx.obj.get("token"))
     try:
+        audio_type = None
+        if mode == "audio2video":
+            audio_type = "file" if audio_file else "url"
+
         payload = {
             "mode": mode,
             "video_id": video_id,
             "video_url": video_url,
             "audio_url": audio_url if mode == "audio2video" else None,
-            "audio_type": (
-                "file"
-                if mode == "audio2video" and audio_file
-                else "url"
-                if mode == "audio2video"
-                else None
-            ),
+            "audio_type": audio_type,
             "audio_file": audio_file if mode == "audio2video" else None,
             "text": text if mode == "text2video" else None,
             "voice_id": voice_id if mode == "text2video" else None,

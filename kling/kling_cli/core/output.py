@@ -52,11 +52,11 @@ def print_video_result(data: dict[str, Any]) -> None:
     """Print video generation result in a rich format."""
     task_id = data.get("task_id", "N/A")
     trace_id = data.get("trace_id", "N/A")
-    items = data.get("data", [])
+    video_items = data.get("data", [])
 
     # Some Kling endpoints return the generated video fields at the top level.
-    if not items and any(data.get(key) for key in ("video_id", "video_url", "state", "duration")):
-        items = {
+    if not video_items and any(data.get(key) for key in ("video_id", "video_url", "state", "duration")):
+        video_items = {
             "video_id": data.get("video_id"),
             "video_url": data.get("video_url"),
             "state": data.get("state"),
@@ -71,12 +71,12 @@ def print_video_result(data: dict[str, Any]) -> None:
         )
     )
 
-    if not items:
+    if not video_items:
         console.print("[yellow]No data available yet. Use 'task' to check status.[/yellow]")
         return
 
-    if isinstance(items, list):
-        for i, item in enumerate(items, 1):
+    if isinstance(video_items, list):
+        for i, item in enumerate(video_items, 1):
             table = Table(show_header=False, box=None, padding=(0, 2))
             table.add_column("Field", style="bold cyan", width=15)
             table.add_column("Value")
@@ -91,22 +91,22 @@ def print_video_result(data: dict[str, Any]) -> None:
                 table.add_row("Created", item["created_at"])
             console.print(table)
             console.print()
-    elif isinstance(items, dict):
+    elif isinstance(video_items, dict):
         table = Table(show_header=False, box=None, padding=(0, 2))
         table.add_column("Field", style="bold cyan", width=15)
         table.add_column("Value")
-        if items.get("video_url"):
-            table.add_row("URL", items["video_url"])
-        if items.get("video_id"):
-            table.add_row("Video ID", items["video_id"])
-        if items.get("state"):
-            table.add_row("State", items["state"])
-        if items.get("duration"):
-            table.add_row("Duration", str(items["duration"]))
-        if items.get("model_name"):
-            table.add_row("Model", items["model_name"])
-        if items.get("created_at"):
-            table.add_row("Created", items["created_at"])
+        if video_items.get("video_url"):
+            table.add_row("URL", video_items["video_url"])
+        if video_items.get("video_id"):
+            table.add_row("Video ID", video_items["video_id"])
+        if video_items.get("state"):
+            table.add_row("State", video_items["state"])
+        if video_items.get("duration"):
+            table.add_row("Duration", str(video_items["duration"]))
+        if video_items.get("model_name"):
+            table.add_row("Model", video_items["model_name"])
+        if video_items.get("created_at"):
+            table.add_row("Created", video_items["created_at"])
         console.print(table)
 
 
