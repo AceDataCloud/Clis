@@ -139,6 +139,7 @@ suno models
 | Command | Description |
 |---------|-------------|
 | `suno persona <audio_id>` | Create a saved voice style |
+| `suno voices <audio_url>` | Create a reusable voice from uploaded audio |
 | `suno upload <audio_url>` | Upload external audio for processing |
 | `suno models` | List available Suno models |
 | `suno actions` | List available API actions |

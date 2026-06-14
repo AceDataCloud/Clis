@@ -103,6 +103,10 @@ class SunoClient:
         """Get MP4 video for a song."""
         return self.request("/suno/mp4", kwargs)
 
+    def create_voice(self, **kwargs: Any) -> dict[str, Any]:
+        """Create a voice from uploaded audio."""
+        return self.request("/suno/voices", kwargs)
+
     def get_timing(self, **kwargs: Any) -> dict[str, Any]:
         """Get timing/subtitle data for a song."""
         return self.request("/suno/timing", kwargs)
