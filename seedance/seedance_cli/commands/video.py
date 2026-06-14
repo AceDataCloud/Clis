@@ -97,6 +97,7 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             help="Task timeout threshold in seconds (3600-259200).",
         ),
         click.option("--callback-url", default=None, help="Webhook callback URL."),
+        click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting."),
         click.option("--json", "output_json", is_flag=True, help="Output raw JSON."),
     ]
     for decorator in reversed(decorators):
@@ -118,6 +119,7 @@ def _build_common_payload(
     service_tier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
+    async_mode: bool,
 ) -> dict[str, object]:
     """Build the common parts of a video generation payload."""
     payload: dict[str, object] = {
@@ -146,6 +148,8 @@ def _build_common_payload(
         payload["execution_expires_after"] = execution_expires_after
     if callback_url is not None:
         payload["callback_url"] = callback_url
+        if async_mode:
+            payload["async"] = True
     return payload
 
 
@@ -169,6 +173,7 @@ def generate(
     service_tier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from a text prompt.
@@ -200,6 +205,7 @@ def generate(
             service_tier=service_tier,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         payload["content"] = [{"type": "text", "text": prompt}]
 
@@ -242,6 +248,7 @@ def image_to_video(
     service_tier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from reference image(s).
@@ -273,6 +280,7 @@ def image_to_video(
             service_tier=service_tier,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
         )
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
         for url in image_urls:

@@ -60,6 +60,7 @@ from webextrator_cli.core.output import (
     default=None,
     help="Callback URL for async processing.",
 )
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def extract(
@@ -73,6 +74,7 @@ def extract(
     wait_for_selector: str | None,
     user_agent: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Extract structured content from a web page.
@@ -96,6 +98,7 @@ def extract(
         "wait_for_selector": wait_for_selector,
         "user_agent": user_agent,
         "callback_url": callback_url,
+        "async": async_mode,
     }
 
     try:
@@ -144,6 +147,7 @@ def extract(
     default=None,
     help="Callback URL for async processing.",
 )
+@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def render(
@@ -155,6 +159,7 @@ def render(
     wait_for_selector: str | None,
     user_agent: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Render a web page and return the rendered HTML.
@@ -176,6 +181,7 @@ def render(
         "wait_for_selector": wait_for_selector,
         "user_agent": user_agent,
         "callback_url": callback_url,
+        "async": async_mode,
     }
 
     try:
