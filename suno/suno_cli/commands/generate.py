@@ -36,7 +36,13 @@ from suno_cli.core.output import (
 )
 @click.option("--weirdness", type=float, default=None, help="Weirdness level (custom mode only).")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -123,7 +129,13 @@ def generate(
     help="Style influence strength (advanced custom mode).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def custom(
@@ -306,7 +318,13 @@ def cover(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def remaster(
@@ -348,7 +366,13 @@ def remaster(
 @click.command()
 @click.argument("audio_id")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def concat(
@@ -396,7 +420,13 @@ def concat(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate_persona(
@@ -440,7 +470,13 @@ def generate_persona(
 @click.command()
 @click.argument("audio_id")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def stems(
@@ -489,7 +525,13 @@ def stems(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def replace_section(
@@ -557,7 +599,13 @@ def replace_section(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upload_extend(
@@ -618,7 +666,13 @@ def upload_extend(
     "--audio-weight", type=float, default=None, help="Audio weight for the cover (advanced)."
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upload_cover(
@@ -673,7 +727,13 @@ def upload_cover(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def mashup(
@@ -724,7 +784,13 @@ def mashup(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate_persona_vox(
@@ -768,7 +834,13 @@ def generate_persona_vox(
 @click.command("all-stems")
 @click.argument("audio_id")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def all_stems(
@@ -821,7 +893,13 @@ def all_stems(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def underpainting(
@@ -880,7 +958,13 @@ def underpainting(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def overpainting(
@@ -935,7 +1019,13 @@ def overpainting(
     help="Suno model version.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def samples(

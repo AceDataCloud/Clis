@@ -160,12 +160,18 @@ def print_chat_result(data: dict[str, Any]) -> None:
             content = message.get("content", "")
             role = message.get("role", "assistant")
             finish_reason = choice.get("finish_reason", "")
-            title = f"[bold green]Response #{i}[/bold green]" if len(choices) > 1 else "[bold green]Response[/bold green]"
+            title = (
+                f"[bold green]Response #{i}[/bold green]"
+                if len(choices) > 1
+                else "[bold green]Response[/bold green]"
+            )
             console.print(
                 Panel(
                     content or "[dim](empty)[/dim]",
                     title=title,
-                    subtitle=f"[dim]{role} · {finish_reason}[/dim]" if finish_reason else f"[dim]{role}[/dim]",
+                    subtitle=f"[dim]{role} · {finish_reason}[/dim]"
+                    if finish_reason
+                    else f"[dim]{role}[/dim]",
                     border_style="green",
                 )
             )
@@ -244,7 +250,11 @@ def print_image_result(data: dict[str, Any]) -> None:
                 parts.append(f"[bold]Base64:[/bold] {b64[:40]}...")
             if revised_prompt:
                 parts.append(f"[bold]Revised Prompt:[/bold] {revised_prompt}")
-            title = f"[bold green]Image #{i}[/bold green]" if len(image_data) > 1 else "[bold green]Image[/bold green]"
+            title = (
+                f"[bold green]Image #{i}[/bold green]"
+                if len(image_data) > 1
+                else "[bold green]Image[/bold green]"
+            )
             console.print(
                 Panel("\n".join(parts) or "[dim](no URL)[/dim]", title=title, border_style="green")
             )

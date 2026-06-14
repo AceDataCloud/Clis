@@ -91,7 +91,7 @@ def print_render_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
-    items = data.get("items", None)
+    items = data.get("items")
     if items is not None:
         # Batch result
         count = data.get("count", len(items))

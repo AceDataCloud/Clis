@@ -80,7 +80,13 @@ def _build_element_list(element_ids: tuple[str, ...]) -> list[dict[str, str]] | 
     help="Generate audio along with the video (supported by kling-v3, kling-v3-omni, kling-v2-6 pro).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option(
     "--camera-control",
     default=None,
@@ -222,7 +228,13 @@ def generate(
     help="Negative prompt (max 200 characters).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option(
     "--camera-control",
     default=None,
@@ -344,7 +356,13 @@ def image_to_video(
     help="Video duration in seconds.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )

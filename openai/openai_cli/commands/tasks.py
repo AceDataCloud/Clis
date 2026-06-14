@@ -75,7 +75,9 @@ def retrieve(
 @click.option("--trace-ids", multiple=True, help="Trace IDs to retrieve (repeatable).")
 @click.option("--application-id", default=None, help="Filter by application ID.")
 @click.option("--user-id", default=None, help="Filter by end-user ID.")
-@click.option("--type", "task_type", default=None, help="Filter by task type (e.g. images_generations).")
+@click.option(
+    "--type", "task_type", default=None, help="Filter by task type (e.g. images_generations)."
+)
 @click.option("--offset", default=None, type=int, help="Pagination offset (default 0).")
 @click.option("--limit", default=None, type=int, help="Page size (default 12).")
 @click.option("--created-at-min", default=None, type=float, help="Start timestamp (Unix seconds).")

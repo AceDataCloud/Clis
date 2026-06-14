@@ -97,7 +97,13 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             help="Task timeout threshold in seconds (3600-259200).",
         ),
         click.option("--callback-url", default=None, help="Webhook callback URL."),
-        click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting."),
+        click.option(
+            "--async",
+            "async_mode",
+            is_flag=True,
+            default=False,
+            help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+        ),
         click.option("--json", "output_json", is_flag=True, help="Output raw JSON."),
     ]
     for decorator in reversed(decorators):
@@ -205,7 +211,7 @@ def generate(
             service_tier=service_tier,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
-            **({"async": True} if async_mode else {}),
+            async_mode=async_mode,
         )
         payload["content"] = [{"type": "text", "text": prompt}]
 
@@ -280,7 +286,7 @@ def image_to_video(
             service_tier=service_tier,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
-            **({"async": True} if async_mode else {}),
+            async_mode=async_mode,
         )
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
         for url in image_urls:

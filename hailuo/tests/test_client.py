@@ -5,7 +5,7 @@ import respx
 from httpx import Response
 
 from hailuo_cli.core.client import HailuoClient, get_client
-from hailuo_cli.core.exceptions import HailuoAPIError, HailuoAuthError, HailuoTimeoutError
+from hailuo_cli.core.exceptions import HailuoAuthError
 
 
 class TestHailuoClient:

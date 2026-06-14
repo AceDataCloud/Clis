@@ -65,7 +65,13 @@ from sora_cli.core.output import (
     help="Ending second for the character appearance (v1.0, required when --character-url is set).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -163,7 +169,13 @@ def generate(
     help="API version. 1.0 supports orientation/multiple images; 2.0 uses first image and pixel-based sizes.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(

@@ -287,9 +287,7 @@ class TestEmbedCommands:
         respx.post("https://api.acedata.cloud/openai/embeddings").mock(
             return_value=Response(200, json=mock_embedding_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "embed", "Hello world", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "embed", "Hello world", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert "data" in data
@@ -328,9 +326,7 @@ class TestImageCommands:
         respx.post("https://api.acedata.cloud/openai/images/generations").mock(
             return_value=Response(200, json=mock_image_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "image", "A sunset", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "image", "A sunset", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert "data" in data
@@ -464,9 +460,7 @@ class TestResponseCommands:
         respx.post("https://api.acedata.cloud/openai/responses").mock(
             return_value=Response(200, json=mock_response_api_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "response", "What is 2+2?", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "response", "What is 2+2?", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert "output" in data
@@ -540,8 +534,6 @@ class TestResponseCommands:
             ],
         )
         assert result.exit_code != 0
-
-
 
 
 class TestInfoCommands:

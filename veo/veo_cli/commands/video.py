@@ -47,7 +47,13 @@ from veo_cli.core.output import (
     help="Enable automatic prompt translation.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -131,7 +137,13 @@ def generate(
     help="Enable automatic prompt translation.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(
@@ -194,7 +206,13 @@ def image_to_video(
     help="Enable automatic prompt translation.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def ingredients_to_video(
@@ -247,7 +265,13 @@ def ingredients_to_video(
     help="Upsample action: 1080p, 4k, or gif.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def upscale(
@@ -298,7 +322,13 @@ def upscale(
 )
 @click.option("--prompt", default=None, help="Optional prompt guiding the extended section.")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def extend(
@@ -349,7 +379,13 @@ def extend(
     help="Camera motion to apply when re-rendering the video.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def reshoot(
@@ -410,7 +446,13 @@ def reshoot(
     ),
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def objects(

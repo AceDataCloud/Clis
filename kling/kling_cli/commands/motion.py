@@ -45,7 +45,13 @@ from kling_cli.core.output import (
 )
 @click.option("--prompt", default=None, help="Text prompt (positive and/or negative descriptions).")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )

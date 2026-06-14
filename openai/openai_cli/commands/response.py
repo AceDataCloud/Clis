@@ -47,7 +47,7 @@ from openai_cli.core.output import (
 @click.option(
     "--response-format",
     default=None,
-    help="Response format as JSON string (e.g. '{\"type\": \"json_object\"}').",
+    help='Response format as JSON string (e.g. \'{"type": "json_object"}\').',
 )
 @click.option(
     "--background",
@@ -85,7 +85,7 @@ def response(
             parsed_response_format = json_module.loads(response_format)
         except json_module.JSONDecodeError:
             print_error(f"Invalid JSON for --response-format: {response_format}")
-            raise SystemExit(1)
+            raise SystemExit(1) from None
     payload: dict[str, object] = {
         "model": model,
         "input": [{"role": "user", "content": prompt}],

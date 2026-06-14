@@ -1,7 +1,5 @@
 """Tests for Hailuo CLI configuration."""
 
-import os
-
 import pytest
 
 from hailuo_cli.core.config import Settings

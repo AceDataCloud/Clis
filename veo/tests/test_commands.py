@@ -300,8 +300,15 @@ class TestGenerateCommands:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token", "extend", "video-123",
-                "-m", "veo31", "--prompt", "Continue the scene", "--json",
+                "--token",
+                "test-token",
+                "extend",
+                "video-123",
+                "-m",
+                "veo31",
+                "--prompt",
+                "Continue the scene",
+                "--json",
             ],
         )
         assert result.exit_code == 0
@@ -314,8 +321,13 @@ class TestGenerateCommands:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token", "reshoot", "video-123",
-                "--motion-type", "FORWARD", "--json",
+                "--token",
+                "test-token",
+                "reshoot",
+                "video-123",
+                "--motion-type",
+                "FORWARD",
+                "--json",
             ],
         )
         assert result.exit_code == 0
@@ -328,8 +340,15 @@ class TestGenerateCommands:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token", "objects", "video-123",
-                "--action", "insert", "--prompt", "Add a red balloon", "--json",
+                "--token",
+                "test-token",
+                "objects",
+                "video-123",
+                "--action",
+                "insert",
+                "--prompt",
+                "Add a red balloon",
+                "--json",
             ],
         )
         assert result.exit_code == 0
@@ -342,8 +361,15 @@ class TestGenerateCommands:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token", "objects", "video-123",
-                "--action", "remove", "--image-mask", "https://example.com/mask.jpg", "--json",
+                "--token",
+                "test-token",
+                "objects",
+                "video-123",
+                "--action",
+                "remove",
+                "--image-mask",
+                "https://example.com/mask.jpg",
+                "--json",
             ],
         )
         assert result.exit_code == 0

@@ -23,7 +23,13 @@ from hailuo_cli.core.output import (
     help="Hailuo model to use (default: minimax-t2v).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -65,9 +71,7 @@ def generate(
 
 @click.command("image-to-video")
 @click.argument("prompt")
-@click.option(
-    "--image-url", required=True, help="URL of the first frame reference image."
-)
+@click.option("--image-url", required=True, help="URL of the first frame reference image.")
 @click.option(
     "-m",
     "--model",
@@ -76,7 +80,13 @@ def generate(
     help="Hailuo image-to-video model (default: minimax-i2v).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(

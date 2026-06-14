@@ -24,8 +24,7 @@ class WebExtratorClient:
         """Get request headers with authentication."""
         if not self.api_token:
             raise WebExtratorAuthError(
-                "API token not configured. "
-                "Set ACEDATACLOUD_API_TOKEN or use --token option."
+                "API token not configured. Set ACEDATACLOUD_API_TOKEN or use --token option."
             )
         return {
             "accept": "application/json",

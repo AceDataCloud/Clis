@@ -29,7 +29,13 @@ from luma_cli.core.output import (
     help="Enable prompt text enhancement (default: enabled).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
@@ -105,7 +111,13 @@ def generate(
     help="Enable prompt text enhancement (default: enabled).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
@@ -169,7 +181,13 @@ def image_to_video(
     help="Aspect ratio.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option("--async", "async_mode", is_flag=True, default=False, help="Submit asynchronously; returns a task_id to poll instead of waiting.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
