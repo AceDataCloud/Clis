@@ -136,8 +136,9 @@ def generate(
             "output_format": output_format,
             "tools": [{"type": "web_search"}] if web_search else None,
             "callback_url": callback_url,
-            "async": async_mode if async_mode else None,
         }
+        if async_mode:
+            payload["async"] = True
         if resolution:
             payload["size"] = resolution
 
@@ -219,17 +220,19 @@ def edit(
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.edit_image(
-            prompt=prompt,
-            image=list(image_urls),
-            model=model,
-            seed=seed,
-            guidance_scale=guidance_scale,
-            response_format=response_format,
-            watermark=watermark,
-            callback_url=callback_url,
-            **{"async": async_mode} if async_mode else {},
-        )
+        payload: dict[str, object] = {
+            "prompt": prompt,
+            "image": list(image_urls),
+            "model": model,
+            "seed": seed,
+            "guidance_scale": guidance_scale,
+            "response_format": response_format,
+            "watermark": watermark,
+            "callback_url": callback_url,
+        }
+        if async_mode:
+            payload["async"] = True
+        result = client.edit_image(**payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:
