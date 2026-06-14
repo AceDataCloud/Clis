@@ -11,9 +11,6 @@ from flux_cli.core.exceptions import (
     FluxTimeoutError,
 )
 
-# Dummy callback URL to force async mode.
-_ASYNC_CALLBACK_URL = "https://api.acedata.cloud/health"
-
 
 class FluxClient:
     """HTTP client for AceDataCloud Flux API."""
@@ -37,7 +34,7 @@ class FluxClient:
         """Ensure long-running operations are submitted asynchronously."""
         request_payload = dict(payload)
         if not request_payload.get("callback_url"):
-            request_payload["callback_url"] = _ASYNC_CALLBACK_URL
+            request_payload["async"] = True
         return request_payload
 
     def request(

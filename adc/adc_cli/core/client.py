@@ -11,9 +11,6 @@ from adc_cli.core.exceptions import (
     AdcTimeoutError,
 )
 
-# Dummy callback URL to force async mode for long-running operations.
-_ASYNC_CALLBACK_URL = "https://api.acedata.cloud/health"
-
 
 class AdcClient:
     """HTTP client for AceDataCloud API."""
@@ -39,7 +36,7 @@ class AdcClient:
         """Ensure long-running operations are submitted asynchronously."""
         request_payload = dict(payload)
         if not request_payload.get("callback_url"):
-            request_payload["callback_url"] = _ASYNC_CALLBACK_URL
+            request_payload["async"] = True
         return request_payload
 
     def request(

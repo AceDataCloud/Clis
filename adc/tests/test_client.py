@@ -42,7 +42,7 @@ class TestAdcClient:
         client = AdcClient(api_token="test-token")
         payload = {"prompt": "test"}
         result = client._with_async_callback(payload)
-        assert result["callback_url"] == "https://api.acedata.cloud/health"
+        assert result["async"] is True
         assert result["prompt"] == "test"
         # Original should not be modified
         assert "callback_url" not in payload
@@ -126,7 +126,7 @@ class TestConvenienceMethods:
         result = client.flux_image(prompt="sunset", model="flux-dev")
         assert result["task_id"] == "flux-1"
         body = json.loads(route.calls.last.request.content)
-        assert body["callback_url"] == "https://api.acedata.cloud/health"
+        assert body["async"] is True
 
     @respx.mock
     def test_midjourney_imagine(self):
@@ -137,7 +137,7 @@ class TestConvenienceMethods:
         result = client.midjourney_imagine(prompt="city")
         assert result["task_id"] == "mj-1"
         body = json.loads(route.calls.last.request.content)
-        assert "callback_url" in body
+        assert body["async"] is True
 
     @respx.mock
     def test_suno_music(self):
@@ -148,7 +148,7 @@ class TestConvenienceMethods:
         result = client.suno_music(action="generate", prompt="jazz")
         assert result["task_id"] == "suno-1"
         body = json.loads(route.calls.last.request.content)
-        assert "callback_url" in body
+        assert body["async"] is True
 
     @respx.mock
     def test_luma_video(self):
