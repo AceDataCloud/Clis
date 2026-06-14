@@ -26,6 +26,7 @@ DEFAULT_MODEL = "kling-v1"
 
 # Available modes
 KLING_MODES = ["std", "pro", "4k"]
+KLING_MOTION_MODES = ["std", "pro"]
 DEFAULT_MODE = "std"
 
 # Available aspect ratios
@@ -53,6 +54,8 @@ def print_video_result(data: dict[str, Any]) -> None:
     task_id = data.get("task_id", "N/A")
     trace_id = data.get("trace_id", "N/A")
     items = data.get("data", [])
+    if not items and any(key in data for key in ("video_id", "video_url", "state", "duration")):
+        items = data
 
     console.print(
         Panel(
@@ -72,10 +75,14 @@ def print_video_result(data: dict[str, Any]) -> None:
             table.add_column("Field", style="bold cyan", width=15)
             table.add_column("Value")
             table.add_row("Video", f"#{i}")
+            if item.get("video_id"):
+                table.add_row("Video ID", item["video_id"])
             if item.get("video_url"):
                 table.add_row("URL", item["video_url"])
             if item.get("state"):
                 table.add_row("State", item["state"])
+            if item.get("duration"):
+                table.add_row("Duration", str(item["duration"]))
             if item.get("model_name"):
                 table.add_row("Model", item["model_name"])
             if item.get("created_at"):
@@ -86,10 +93,14 @@ def print_video_result(data: dict[str, Any]) -> None:
         table = Table(show_header=False, box=None, padding=(0, 2))
         table.add_column("Field", style="bold cyan", width=15)
         table.add_column("Value")
+        if items.get("video_id"):
+            table.add_row("Video ID", items["video_id"])
         if items.get("video_url"):
             table.add_row("URL", items["video_url"])
         if items.get("state"):
             table.add_row("State", items["state"])
+        if items.get("duration"):
+            table.add_row("Duration", str(items["duration"]))
         if items.get("model_name"):
             table.add_row("Model", items["model_name"])
         if items.get("created_at"):

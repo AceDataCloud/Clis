@@ -26,6 +26,9 @@ kling extend --video-id abc123
 # Generate a motion video from image + reference video
 kling motion --image-url https://example.com/img.jpg --video-url https://example.com/ref.mp4
 
+# Lip-sync an existing Kling video with audio
+kling lip-sync --mode audio2video --video-id abc123 --audio-url https://example.com/voice.mp3
+
 # Check task status
 kling task abc123-def456
 
@@ -43,6 +46,7 @@ kling config
 
 - `--token` / `ACEDATACLOUD_API_TOKEN` — API token
 - `--json` — Output raw JSON
+- `--async` — Return a task ID immediately for supported generation endpoints
 
 ## Models
 

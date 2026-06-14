@@ -6,7 +6,7 @@ from kling_cli.core.client import get_client
 from kling_cli.core.exceptions import KlingError
 from kling_cli.core.output import (
     DEFAULT_MODE,
-    KLING_MODES,
+    KLING_MOTION_MODES,
     print_error,
     print_json,
     print_video_result,
@@ -34,7 +34,7 @@ from kling_cli.core.output import (
 )
 @click.option(
     "--mode",
-    type=click.Choice(KLING_MODES),
+    type=click.Choice(KLING_MOTION_MODES),
     default=DEFAULT_MODE,
     help="Generation mode: std (High performance) or pro (High quality).",
 )
@@ -45,6 +45,12 @@ from kling_cli.core.output import (
 )
 @click.option("--prompt", default=None, help="Text prompt (positive and/or negative descriptions).")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async/--no-async",
+    "async_mode",
+    default=None,
+    help="Process asynchronously and return a task ID immediately.",
+)
 @click.option(
     "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
 )
@@ -59,6 +65,7 @@ def motion(
     keep_original_sound: bool,
     prompt: str | None,
     callback_url: str | None,
+    async_mode: bool | None,
     timeout: int | None,
     output_json: bool,
 ) -> None:
@@ -75,16 +82,17 @@ def motion(
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.generate_motion(
-            image_url=image_url,
-            video_url=video_url,
-            character_orientation=character_orientation,
-            mode=mode,
-            keep_original_sound="yes" if keep_original_sound else "no",
-            prompt=prompt,
-            callback_url=callback_url,
-            timeout=timeout,
-        )
+        payload: dict[str, object] = {
+            "image_url": image_url,
+            "video_url": video_url,
+            "character_orientation": character_orientation,
+            "mode": mode,
+            "keep_original_sound": "yes" if keep_original_sound else "no",
+            "prompt": prompt,
+            "callback_url": callback_url,
+            "async": async_mode,
+        }
+        result = client.generate_motion(timeout=timeout, **payload)
         if output_json:
             print_json(result)
         else:

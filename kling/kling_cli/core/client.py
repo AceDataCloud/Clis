@@ -99,6 +99,10 @@ class KlingClient:
         """Generate motion video using the motion endpoint."""
         return self.request("/kling/motion", kwargs)
 
+    def generate_lip_sync(self, **kwargs: Any) -> dict[str, Any]:
+        """Generate lip-sync video using the lip-sync endpoint."""
+        return self.request("/kling/lip-sync", kwargs)
+
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""
         return self.request("/kling/tasks", kwargs)
