@@ -32,7 +32,7 @@ def _parse_json_option(
 
     expected_type = dict if expected_kind == "object" else list
     if not isinstance(parsed, expected_type):
-        actual_kind = "object" if isinstance(parsed, dict) else "array" if isinstance(parsed, list) else type(parsed).__name__
+        actual_kind = _get_json_kind(parsed)
         print_error(
             f"--{option_name} must be a JSON {expected_kind}, got {actual_kind}."
         )
@@ -46,6 +46,14 @@ def _parse_tool_choice(value: str | None) -> str | dict[str, Any] | None:
         return value
 
     return _parse_json_option("tool-choice", value, "object")
+
+
+def _get_json_kind(value: Any) -> str:
+    if isinstance(value, dict):
+        return "object"
+    if isinstance(value, list):
+        return "array"
+    return type(value).__name__
 
 
 @click.command()

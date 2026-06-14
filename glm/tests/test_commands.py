@@ -217,6 +217,36 @@ class TestChatCommand:
         assert result.exit_code != 0
         assert "Invalid JSON for --response-format" in result.output
 
+    def test_chat_with_invalid_stream_options_json(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--stream-options",
+                "{invalid",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "Invalid JSON for --stream-options" in result.output
+
+    def test_chat_with_wrong_response_format_type(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--response-format",
+                '["json_object"]',
+            ],
+        )
+        assert result.exit_code != 0
+        assert "--response-format must be a JSON object, got array." in result.output
+
     def test_chat_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "chat", "Hello"])
         assert result.exit_code != 0
