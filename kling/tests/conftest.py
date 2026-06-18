@@ -114,6 +114,10 @@ def mock_talking_photo_response():
             }
         ],
     }
+
+
+@pytest.fixture
+def mock_error_response():
     """Mock error response."""
     return {
         "success": False,
