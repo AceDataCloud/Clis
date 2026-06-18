@@ -180,7 +180,7 @@ def custom(
             style=style,
             model=model,
             vocal_gender=gender or None,
-            negative_style=negative_style,
+            style_negative=negative_style,
             variation_category=variation_category,
             weirdness=weirdness,
             style_influence=style_influence,
@@ -1054,6 +1054,82 @@ def samples(
             samples_start=samples_start,
             samples_end=samples_end,
             model=model,
+            callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_audio_result(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("audio_urls", nargs=-1, required=True)
+@click.option("-p", "--prompt", default=None, help="Optional lyrics or generation prompt.")
+@click.option("-s", "--style", default=None, help="Optional comma-separated style tags.")
+@click.option("-t", "--title", default=None, help="Optional song title.")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(SUNO_MODELS),
+    default=DEFAULT_MODEL,
+    help="Suno model version.",
+)
+@click.option(
+    "--audio-weight",
+    type=click.FloatRange(0.0, 1.0),
+    default=None,
+    help="How strongly the reference audio should influence the result (0-1).",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def inspo(
+    ctx: click.Context,
+    audio_urls: tuple[str, ...],
+    prompt: str | None,
+    style: str | None,
+    title: str | None,
+    model: str,
+    audio_weight: float | None,
+    callback_url: str | None,
+    async_mode: bool,
+    output_json: bool,
+) -> None:
+    """Generate music inspired by 1 to 4 reference audio URLs.
+
+    AUDIO_URLS are public audio URLs to use as inspiration sources.
+
+    Examples:
+
+      suno inspo https://example.com/ref1.mp3
+
+      suno inspo https://example.com/ref1.mp3 https://example.com/ref2.mp3 --style "acoustic, folk"
+    """
+    if len(audio_urls) > 4:
+        print_error("Inspo accepts at most 4 reference audio URLs.")
+        raise SystemExit(1)
+
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.generate_audio(
+            action="inspo",
+            audio_urls=list(audio_urls),
+            prompt=prompt,
+            style=style,
+            title=title,
+            model=model,
+            audio_weight=audio_weight,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )

@@ -92,7 +92,7 @@ def mock_persona_response():
         "success": True,
         "task_id": "persona-task-123",
         "data": {
-            "id": "persona-id-456",
+            "persona_id": "persona-id-456",
             "name": "My Voice",
         },
     }
@@ -140,6 +140,58 @@ def mock_upload_response():
     return {
         "success": True,
         "data": {
-            "id": "upload-id-789",
+            "audio_id": "upload-id-789",
         },
+    }
+
+
+@pytest.fixture
+def mock_persona_list_response():
+    """Mock persona list response."""
+    return {
+        "items": [
+            {
+                "persona_id": "persona-id-456",
+                "user_id": "user-123",
+                "name": "My Voice",
+                "description": "Warm vocal style",
+                "source_type": "persona",
+                "created_at": 1714200000,
+            }
+        ],
+        "count": 1,
+    }
+
+
+@pytest.fixture
+def mock_voice_response():
+    """Mock voices creation response."""
+    return {
+        "success": True,
+        "task_id": "voice-task-123",
+        "data": {
+            "persona_id": "persona-id-456",
+            "name": "My Voice",
+            "is_public": False,
+        },
+    }
+
+
+@pytest.fixture
+def mock_wav_file_response():
+    """Mock WAV response using the current OpenAPI schema."""
+    return {
+        "success": True,
+        "task_id": "wav-task-123",
+        "data": [{"file_url": "https://platform.cdn.acedata.cloud/suno/test.wav"}],
+    }
+
+
+@pytest.fixture
+def mock_midi_file_response():
+    """Mock MIDI response using the current OpenAPI schema."""
+    return {
+        "success": True,
+        "task_id": "midi-task-123",
+        "data": [{"file_url": "https://platform.cdn.acedata.cloud/suno/test.mid"}],
     }

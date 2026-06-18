@@ -51,6 +51,12 @@ class TestGlobalCommands:
         assert "--title" in result.output
         assert "--style" in result.output
 
+    def test_help_inspo(self, runner):
+        result = runner.invoke(cli, ["inspo", "--help"])
+        assert result.exit_code == 0
+        assert "AUDIO_URLS" in result.output
+        assert "--audio-weight" in result.output
+
 
 # ─── Generation Commands ───────────────────────────────────────────────────
 
@@ -125,6 +131,32 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["success"] is True
+
+    @respx.mock
+    def test_custom_uses_style_negative_payload(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "custom",
+                "-l",
+                "[Verse]\nHello world",
+                "-t",
+                "Hello",
+                "-s",
+                "pop",
+                "--negative-style",
+                "metal",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        request_data = json.loads(route.calls.last.request.content)
+        assert request_data["style_negative"] == "metal"
 
     @respx.mock
     def test_custom_lyrics_from_file(self, runner, mock_audio_response):
@@ -208,6 +240,50 @@ class TestGenerateCommands:
         )
         result = runner.invoke(cli, ["--token", "test-token", "concat", "audio-123", "--json"])
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_inspo(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "inspo",
+                "https://example.com/ref1.mp3",
+                "https://example.com/ref2.mp3",
+                "--style",
+                "acoustic, folk",
+                "--audio-weight",
+                "0.6",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        request_data = json.loads(route.calls.last.request.content)
+        assert request_data["action"] == "inspo"
+        assert request_data["audio_urls"] == [
+            "https://example.com/ref1.mp3",
+            "https://example.com/ref2.mp3",
+        ]
+
+    def test_inspo_rejects_more_than_four_urls(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "inspo",
+                "https://example.com/1.mp3",
+                "https://example.com/2.mp3",
+                "https://example.com/3.mp3",
+                "https://example.com/4.mp3",
+                "https://example.com/5.mp3",
+            ],
+        )
+        assert result.exit_code != 0
 
     @respx.mock
     def test_generate_persona(self, runner, mock_audio_response):
@@ -426,17 +502,17 @@ class TestMediaCommands:
         assert "video_url" in result.output or "mp4" in result.output.lower()
 
     @respx.mock
-    def test_wav(self, runner, mock_media_response):
+    def test_wav(self, runner, mock_wav_file_response):
         respx.post("https://api.acedata.cloud/suno/wav").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_wav_file_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "wav", "audio-123"])
         assert result.exit_code == 0
 
     @respx.mock
-    def test_midi(self, runner, mock_media_response):
+    def test_midi(self, runner, mock_midi_file_response):
         respx.post("https://api.acedata.cloud/suno/midi").mock(
-            return_value=Response(200, json=mock_media_response)
+            return_value=Response(200, json=mock_midi_file_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "midi", "audio-123"])
         assert result.exit_code == 0
@@ -522,6 +598,48 @@ class TestPersonaCommands:
         assert result.exit_code == 0
         assert "upload-id-789" in result.output
 
+    @respx.mock
+    def test_personas(self, runner, mock_persona_list_response):
+        respx.get("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json=mock_persona_list_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "personas"])
+        assert result.exit_code == 0
+        assert "persona-id-456" in result.output
+
+    @respx.mock
+    def test_delete_persona(self, runner):
+        route = respx.delete("https://api.acedata.cloud/suno/persona").mock(
+            return_value=Response(200, json={"success": True})
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "delete-persona", "persona-id-456"]
+        )
+        assert result.exit_code == 0
+        assert route.calls.last.request.url.params["persona_id"] == "persona-id-456"
+        assert "Deleted persona" in result.output
+
+    @respx.mock
+    def test_voices(self, runner, mock_voice_response):
+        route = respx.post("https://api.acedata.cloud/suno/voices").mock(
+            return_value=Response(200, json=mock_voice_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "voices",
+                "https://example.com/audio.mp3",
+                "--name",
+                "My Voice",
+            ],
+        )
+        assert result.exit_code == 0
+        request_data = json.loads(route.calls.last.request.content)
+        assert request_data["audio_url"] == "https://example.com/audio.mp3"
+        assert "voice-task-123" in result.output
+
 
 # ─── Info Commands ────────────────────────────────────────────────────────
 
@@ -544,6 +662,7 @@ class TestInfoCommands:
         assert "extend" in result.output
         assert "cover" in result.output
         assert "concat" in result.output
+        assert "inspo" in result.output
 
     def test_lyric_format(self, runner):
         result = runner.invoke(cli, ["lyric-format"])

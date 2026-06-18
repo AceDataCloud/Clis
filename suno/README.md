@@ -107,6 +107,7 @@ suno models
 | `suno underpainting <audio_id>` | Add AI accompaniment to uploaded audio |
 | `suno overpainting <audio_id>` | Add AI vocals to uploaded audio |
 | `suno samples <audio_id>` | Add AI samples to uploaded audio |
+| `suno inspo <audio_url>...` | Generate music inspired by 1 to 4 reference audio URLs |
 
 ### Lyrics
 
@@ -139,6 +140,9 @@ suno models
 | Command | Description |
 |---------|-------------|
 | `suno persona <audio_id>` | Create a saved voice style |
+| `suno personas` | List saved personas |
+| `suno delete-persona <persona_id>` | Delete a saved persona |
+| `suno voices <audio_url>` | Create a voice/persona from an external audio URL |
 | `suno upload <audio_url>` | Upload external audio for processing |
 | `suno models` | List available Suno models |
 | `suno actions` | List available API actions |

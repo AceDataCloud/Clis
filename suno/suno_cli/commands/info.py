@@ -41,6 +41,7 @@ def actions() -> None:
         ("underpainting", "Add AI accompaniment to uploaded audio"),
         ("overpainting", "Add AI vocals to uploaded audio"),
         ("samples", "Add AI samples to uploaded audio"),
+        ("inspo", "Generate music inspired by 1 to 4 reference audio URLs"),
     ]
     for action, desc in action_list:
         table.add_row(action, desc)

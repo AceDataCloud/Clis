@@ -20,6 +20,7 @@ from suno_cli.commands.generate import (
     generate,
     generate_persona,
     generate_persona_vox,
+    inspo,
     mashup,
     overpainting,
     remaster,
@@ -33,7 +34,7 @@ from suno_cli.commands.generate import (
 from suno_cli.commands.info import actions, config, lyric_format, models
 from suno_cli.commands.lyrics import lyrics, mashup_lyrics, optimize_style
 from suno_cli.commands.media import extract_vocals, midi, mp4, timing, wav
-from suno_cli.commands.persona import persona, upload
+from suno_cli.commands.persona import delete_persona, persona, personas, upload, voices
 from suno_cli.commands.task import task, tasks_batch, wait
 
 load_dotenv()
@@ -95,6 +96,7 @@ cli.add_command(mashup)
 cli.add_command(underpainting)
 cli.add_command(overpainting)
 cli.add_command(samples)
+cli.add_command(inspo)
 
 # Register commands — lyrics
 cli.add_command(lyrics)
@@ -115,6 +117,9 @@ cli.add_command(wait)
 
 # Register commands — persona & upload
 cli.add_command(persona)
+cli.add_command(personas)
+cli.add_command(delete_persona)
+cli.add_command(voices)
 cli.add_command(upload)
 
 # Register commands — info
