@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- `kling lip-sync` — Apply lip sync to a video using audio or text-to-speech
+- `kling talking-photo` — Animate a photo with synchronized audio
+
 ## [0.1.0] - 2025-05-04
 
 ### Added

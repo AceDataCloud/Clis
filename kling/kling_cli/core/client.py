@@ -103,6 +103,14 @@ class KlingClient:
         """Query task status using the tasks endpoint."""
         return self.request("/kling/tasks", kwargs)
 
+    def lip_sync(self, **kwargs: Any) -> dict[str, Any]:
+        """Apply lip sync to a video using the lip-sync endpoint."""
+        return self.request("/kling/lip-sync", kwargs)
+
+    def talking_photo(self, **kwargs: Any) -> dict[str, Any]:
+        """Animate a photo with synchronized audio using the talking-photo endpoint."""
+        return self.request("/kling/talking-photo", kwargs)
+
 
 def get_client(token: str | None = None) -> KlingClient:
     """Get a KlingClient instance, optionally overriding the token."""

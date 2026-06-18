@@ -81,7 +81,39 @@ def mock_task_response():
 
 
 @pytest.fixture
-def mock_error_response():
+def mock_lip_sync_response():
+    """Mock successful lip sync response."""
+    return {
+        "success": True,
+        "task_id": "test-lip-sync-task-123",
+        "trace_id": "test-trace-456",
+        "data": [
+            {
+                "id": "video-id-1",
+                "state": "succeeded",
+                "video_url": "https://cdn.example.com/test-lip-sync-video.mp4",
+                "created_at": "2025-01-21T00:00:00.000Z",
+            }
+        ],
+    }
+
+
+@pytest.fixture
+def mock_talking_photo_response():
+    """Mock successful talking photo response."""
+    return {
+        "success": True,
+        "task_id": "test-talking-photo-task-123",
+        "trace_id": "test-trace-456",
+        "data": [
+            {
+                "id": "video-id-1",
+                "state": "succeeded",
+                "video_url": "https://cdn.example.com/test-talking-photo-video.mp4",
+                "created_at": "2025-01-21T00:00:00.000Z",
+            }
+        ],
+    }
     """Mock error response."""
     return {
         "success": False,

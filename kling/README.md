@@ -26,6 +26,15 @@ kling extend --video-id abc123
 # Generate a motion video from image + reference video
 kling motion --image-url https://example.com/img.jpg --video-url https://example.com/ref.mp4
 
+# Apply lip sync to a video with audio
+kling lip-sync --mode audio2video --video-url https://example.com/video.mp4 --audio-url https://example.com/audio.mp3
+
+# Apply lip sync to a video using text-to-speech
+kling lip-sync --mode text2video --video-id abc123 --text "Hello world" --voice-language en
+
+# Animate a photo with synchronized audio
+kling talking-photo --image-url https://example.com/photo.jpg --audio-url https://example.com/speech.mp3
+
 # Check task status
 kling task abc123-def456
 
