@@ -1064,3 +1064,90 @@ def samples(
     except SunoError as e:
         print_error(e.message)
         raise SystemExit(1) from e
+
+
+@click.command()
+@click.option(
+    "--audio-url",
+    "audio_urls",
+    multiple=True,
+    required=True,
+    help=(
+        "Public URL of a reference audio file (.mp3/.wav/.m4a, ≤5MB). "
+        "Provide 1 to 4 URLs (specify the option multiple times)."
+    ),
+)
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(SUNO_MODELS),
+    default=DEFAULT_MODEL,
+    help="Suno model version.",
+)
+@click.option("-p", "--prompt", default=None, help="Lyrics or creative prompt (optional).")
+@click.option("-t", "--title", default=None, help="Song title (optional).")
+@click.option(
+    "-s",
+    "--tags",
+    default=None,
+    help="Music style tags, e.g. 'acoustic, folk, warm' (optional).",
+)
+@click.option(
+    "--audio-weight",
+    type=float,
+    default=None,
+    help="Influence weight of reference audio on the output [0, 1] (optional).",
+)
+@click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def inspo(
+    ctx: click.Context,
+    audio_urls: tuple[str, ...],
+    model: str,
+    prompt: str | None,
+    title: str | None,
+    tags: str | None,
+    audio_weight: float | None,
+    callback_url: str | None,
+    async_mode: bool,
+    output_json: bool,
+) -> None:
+    """Generate new music inspired by 1–4 reference audio files (Inspo mode).
+
+    Unlike a cover, Inspo extracts style from the reference audio(s) and
+    generates a brand-new composition.  Provide 1 to 4 public audio URLs.
+
+    Examples:
+
+      suno inspo --audio-url https://cdn1.suno.ai/abc.mp3
+
+      suno inspo --audio-url url1.mp3 --audio-url url2.mp3 --tags "folk, acoustic"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.generate_audio(
+            action="inspo",
+            audio_urls=list(audio_urls),
+            model=model,
+            prompt=prompt,
+            title=title,
+            tags=tags,
+            audio_weight=audio_weight,
+            callback_url=callback_url,
+            **({"async": True} if async_mode else {}),
+        )
+        if output_json:
+            print_json(result)
+        else:
+            print_audio_result(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e

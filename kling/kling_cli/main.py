@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 
 from kling_cli.commands.info import aspect_ratios, config, models
 from kling_cli.commands.motion import motion
+from kling_cli.commands.talking_photo import talking_photo
 from kling_cli.commands.task import task, tasks_batch, wait
 from kling_cli.commands.video import extend, generate, image_to_video
 
@@ -62,6 +63,7 @@ cli.add_command(generate)
 cli.add_command(image_to_video)
 cli.add_command(extend)
 cli.add_command(motion)
+cli.add_command(talking_photo)
 cli.add_command(task)
 cli.add_command(tasks_batch)
 cli.add_command(wait)
