@@ -10,6 +10,14 @@ permissions:
   issues: write
   pull-requests: write
 
+# Serialize runs. create-task closes ALL open copilot/* PRs + auto-sync issues, so an
+# overlapping run cannibalizes the in-flight run's still-working PR — that is exactly what
+# happened to PR #377 (closed by the next dispatch 22s before Copilot finished). With
+# cancel-in-progress:false a new Docs dispatch queues behind the current run instead.
+concurrency:
+  group: sync-from-docs
+  cancel-in-progress: false
+
 jobs:
   create-task:
     runs-on: ubuntu-latest
