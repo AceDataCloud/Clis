@@ -182,8 +182,21 @@ jobs:
                 echo "Tracking PR #$PR_NUMBER (draft=$IS_DRAFT, +$ADDITIONS/-$DELETIONS)"
               fi
 
-              # Reliable completion signal: Copilot marks the PR ready-for-review
-              # itself when its agent finishes successfully.
+              # Primary completion signal: Copilot emits a `copilot_work_finished`
+              # timeline event when its agent finishes. It now leaves the PR as a DRAFT
+              # (only fires copilot_work_finished + review_requested, never ready_for_review),
+              # so the old `isDraft == false` check below never fired and good PRs were
+              # discarded. The Merge step force-readies the draft before merging.
+              WORK_DONE=$(gh api "repos/$REPO/issues/$PR_NUMBER/timeline" --paginate \
+                --jq '[.[] | select(.event == "copilot_work_finished")] | length' 2>/dev/null || echo 0)
+              if [ "${WORK_DONE:-0}" -gt 0 ]; then
+                echo "PR #$PR_NUMBER: Copilot emitted copilot_work_finished — agent done (draft=$IS_DRAFT)."
+                echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+                echo "result=ready" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+
+              # Secondary signal: Copilot marked the PR ready-for-review itself.
               if [ "$IS_DRAFT" = "false" ]; then
                 echo "PR #$PR_NUMBER is ready for review — Copilot finished."
                 echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
@@ -191,16 +204,19 @@ jobs:
                 exit 0
               fi
 
-              # Zombie guard: if PR has been open >30 min with 0 commits, give up.
+              # Zombie guard: PR open >30 min with 0 commits and no finish signal means
+              # Copilot produced nothing (nothing to sync, or it stalled). Close it and
+              # treat as a no-op success — a missed sync is recovered by the next dispatch,
+              # so don't fail the build and create false-alarm red CI.
               if [ "$ADDITIONS" = "0" ] && [ "$DELETIONS" = "0" ]; then
                 created_epoch=$(date -d "$CREATED_AT" +%s 2>/dev/null || python3 -c "import datetime,sys; print(int(datetime.datetime.fromisoformat(sys.argv[1].replace('Z','+00:00')).timestamp()))" "$CREATED_AT")
                 age=$((now - created_epoch))
                 if [ "$age" -gt "$ZOMBIE_GRACE_SECONDS" ]; then
-                  echo "::warning::PR #$PR_NUMBER has 0 commits after ${age}s — closing as zombie."
+                  echo "::warning::PR #$PR_NUMBER has 0 commits after ${age}s — closing as no-op."
                   gh pr close "$PR_NUMBER" --repo "$REPO" --delete-branch \
-                    --comment "Auto-closed: Copilot opened this PR but produced no commits within ${ZOMBIE_GRACE_SECONDS}s. Triggering workflow can be re-dispatched if a sync is still needed." 2>/dev/null || true
+                    --comment "Auto-closed: Copilot opened this PR but produced no commits within ${ZOMBIE_GRACE_SECONDS}s. Re-dispatch the workflow if a sync is still needed." 2>/dev/null || true
                   echo "result=zombie-closed" >> "$GITHUB_OUTPUT"
-                  exit 1
+                  exit 0
                 fi
               fi
             fi

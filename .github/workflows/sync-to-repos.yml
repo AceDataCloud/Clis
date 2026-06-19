@@ -3,6 +3,12 @@ name: Sync to Sub-Repos
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      sync_all:
+        description: "Force-sync every mapped dir (full catch-up, ignores git diff)"
+        type: boolean
+        default: true
 
 jobs:
   detect-changes:
@@ -18,6 +24,13 @@ jobs:
       - name: Detect changed subdirectories
         id: changes
         run: |
+          # Full catch-up when manually dispatched with sync_all: mirror every mapped dir
+          # regardless of git diff. Used to recover after the sync was stalled (e.g. expired token).
+          FULL_SYNC="false"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.sync_all }}" = "true" ]; then
+            FULL_SYNC="true"
+          fi
+
           # Get list of changed files
           CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
 
@@ -28,7 +41,7 @@ jobs:
           HAS_CHANGES="false"
 
           for dir in $DIRS; do
-            if echo "$CHANGED" | grep -q "^${dir}/"; then
+            if [ "$FULL_SYNC" = "true" ] || echo "$CHANGED" | grep -q "^${dir}/"; then
               # Extract repo from sync.yaml
               REPO=$(awk "/^  ${dir}:/{found=1} found && /repo:/{print \$2; exit}" sync.yaml)
               if [ -n "$REPO" ]; then
@@ -54,7 +67,10 @@ jobs:
 
       - name: Sync ${{ matrix.dir }} to ${{ matrix.repo }}
         env:
-          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+          # Prefer the org-maintained admin/bot tokens (rotated centrally) and fall back to
+          # the repo SYNC_TOKEN. SYNC_TOKEN silently expired once (Apr 2026) and froze every
+          # mirror for months — don't depend on a single manually-maintained secret alone.
+          GH_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN || secrets.BOT_GITHUB_TOKEN || secrets.SYNC_TOKEN }}
         run: |
           set -e
 
