@@ -1094,7 +1094,7 @@ def samples(
 )
 @click.option(
     "--audio-weight",
-    type=float,
+    type=click.FloatRange(0.0, 1.0),
     default=None,
     help="Influence weight of reference audio on the output [0, 1] (optional).",
 )
@@ -1131,6 +1131,8 @@ def inspo(
 
       suno inspo --audio-url url1.mp3 --audio-url url2.mp3 --tags "folk, acoustic"
     """
+    if not 1 <= len(audio_urls) <= 4:
+        raise click.UsageError("Provide between 1 and 4 --audio-url values.")
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.generate_audio(
