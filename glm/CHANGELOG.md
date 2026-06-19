@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.1] - 2026-06-19
+
+### Changed
+- Added `glm-5.2` model support
+
 ## [0.1.0] - 2025-05-04
 
 ### Added

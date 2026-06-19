@@ -14,7 +14,7 @@ pip install glm-cli
 export ACEDATACLOUD_API_TOKEN=your_token
 
 glm chat "What is the capital of France?"
-glm chat "Explain AI" -m glm-5.1
+glm chat "Explain AI" -m glm-5.2
 glm models
 ```
 
@@ -38,7 +38,8 @@ glm models
 
 | Model | Notes |
 |-------|-------|
-| `glm-5.1` | Latest GLM model |
+| `glm-5.2` | Latest GLM model |
+| `glm-5.1` | GLM-5 series |
 | `glm-4.7` | GLM-4 series (default) |
 | `glm-4.6` | GLM-4 series |
 | `glm-3-turbo` | GLM-3 Turbo |
