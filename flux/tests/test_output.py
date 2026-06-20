@@ -23,6 +23,7 @@ class TestConstants:
             "flux-2-flex",
             "flux-2-pro",
             "flux-2-max",
+            "flux-2-klein",
         ]
 
     def test_aspect_ratios(self):

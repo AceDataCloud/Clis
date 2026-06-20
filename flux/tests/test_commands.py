@@ -280,6 +280,7 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "flux-dev" in result.output
         assert "flux-pro" in result.output
+        assert "flux-2-klein" in result.output
 
     def test_aspect_ratios(self, runner):
         result = runner.invoke(cli, ["aspect-ratios"])
