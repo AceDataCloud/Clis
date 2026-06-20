@@ -18,6 +18,7 @@ FLUX_MODELS = [
     "flux-2-flex",
     "flux-2-pro",
     "flux-2-max",
+    "flux-2-klein",
 ]
 DEFAULT_MODEL = "flux-dev"
 
@@ -138,6 +139,7 @@ def print_models() -> None:
     table.add_row("flux-2-flex", "Flux 2", "Pixels", "Fast Flux 2 generation")
     table.add_row("flux-2-pro", "Flux 2", "Pixels", "Higher quality Flux 2 generation")
     table.add_row("flux-2-max", "Flux 2", "Pixels", "Maximum quality Flux 2 generation")
+    table.add_row("flux-2-klein", "Flux 2", "Pixels", "Compact Flux 2 model")
 
     console.print(table)
     console.print(f"\n[dim]Default model: {DEFAULT_MODEL}[/dim]")
