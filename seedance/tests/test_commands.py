@@ -38,6 +38,8 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "PROMPT" in result.output
         assert "--model" in result.output
+        assert "--audio-url" in result.output
+        assert "--video-url" in result.output
 
 
 # ─── Generate Commands ─────────────────────────────────────────────────────
@@ -95,7 +97,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_generate_with_callback(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/seedance/videos").mock(
+        route = respx.post("https://api.acedata.cloud/seedance/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -111,6 +113,21 @@ class TestGenerateCommands:
             ],
         )
         assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["callback_url"] == "https://example.com/callback"
+
+    @respx.mock
+    def test_generate_with_async_without_callback(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/seedance/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "test", "--async", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["async"] is True
 
     @respx.mock
     def test_generate_with_new_params(self, runner, mock_video_response):
@@ -218,9 +235,11 @@ class TestGenerateCommands:
         # Verify the content array contains text + image_url items
         sent = json.loads(route.calls[0].request.content)
         assert {"type": "text", "text": "Animate this"} in sent["content"]
-        assert {"type": "image_url", "image_url": {"url": "https://example.com/photo.jpg"}} in sent[
-            "content"
-        ]
+        assert {
+            "type": "image_url",
+            "role": "reference_image",
+            "image_url": {"url": "https://example.com/photo.jpg"},
+        } in sent["content"]
         assert "image_urls" not in sent
 
     @respx.mock
@@ -249,12 +268,70 @@ class TestGenerateCommands:
         assert content[0] == {"type": "text", "text": "Bring to life"}
         assert content[1] == {
             "type": "image_url",
+            "role": "reference_image",
             "image_url": {"url": "https://example.com/img1.jpg"},
         }
         assert content[2] == {
             "type": "image_url",
             "image_url": {"url": "https://example.com/img2.jpg"},
+            "role": "reference_image",
         }
+
+    @respx.mock
+    def test_generate_with_reference_media(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/seedance/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--first-frame-url",
+                "https://example.com/first.jpg",
+                "--last-frame-url",
+                "https://example.com/last.jpg",
+                "--reference-image-url",
+                "https://example.com/ref.jpg",
+                "--audio-url",
+                "https://example.com/ref.mp3",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["content"] == [
+            {"type": "text", "text": "test"},
+            {
+                "type": "image_url",
+                "role": "first_frame",
+                "image_url": {"url": "https://example.com/first.jpg"},
+            },
+            {
+                "type": "image_url",
+                "role": "last_frame",
+                "image_url": {"url": "https://example.com/last.jpg"},
+            },
+            {
+                "type": "image_url",
+                "role": "reference_image",
+                "image_url": {"url": "https://example.com/ref.jpg"},
+            },
+            {
+                "type": "audio_url",
+                "role": "reference_audio",
+                "audio_url": {"url": "https://example.com/ref.mp3"},
+            },
+            {
+                "type": "video_url",
+                "role": "reference_video",
+                "video_url": {"url": "https://example.com/ref.mp4"},
+            },
+        ]
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────

@@ -16,6 +16,11 @@ from seedance_cli.core.output import (
 )
 
 _SERVICE_TIERS = ["default", "flex"]
+_IMAGE_ROLES = {
+    "first_frame": "first_frame",
+    "last_frame": "last_frame",
+    "reference_image": "reference_image",
+}
 
 
 def _shared_video_options(f):  # type: ignore[no-untyped-def]
@@ -46,13 +51,13 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             "--duration",
             type=float,
             default=None,
-            help="Duration in seconds (2-12). Mutually exclusive with --frames.",
+            help="Duration in seconds (2-15). Mutually exclusive with --frames.",
         ),
         click.option(
             "--frames",
             type=int,
             default=None,
-            help="Frame count (29-289, must satisfy 25+4n). Mutually exclusive with --duration.",
+            help="Frame count (29-361, must satisfy 25+4n). Mutually exclusive with --duration.",
         ),
         click.option(
             "--seed",
@@ -97,6 +102,32 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             help="Task timeout threshold in seconds (3600-259200).",
         ),
         click.option("--callback-url", default=None, help="Webhook callback URL."),
+        click.option(
+            "--first-frame-url",
+            default=None,
+            help="Reference image URL to use as the first frame.",
+        ),
+        click.option(
+            "--last-frame-url",
+            default=None,
+            help="Reference image URL to use as the last frame.",
+        ),
+        click.option(
+            "--reference-image-url",
+            "reference_image_urls",
+            multiple=True,
+            help="Additional reference image URL(s). Can be specified multiple times.",
+        ),
+        click.option(
+            "--audio-url",
+            default=None,
+            help="Reference audio URL.",
+        ),
+        click.option(
+            "--video-url",
+            default=None,
+            help="Reference video URL.",
+        ),
         click.option(
             "--async",
             "async_mode",
@@ -154,9 +185,46 @@ def _build_common_payload(
         payload["execution_expires_after"] = execution_expires_after
     if callback_url is not None:
         payload["callback_url"] = callback_url
-        if async_mode:
-            payload["async"] = True
+    if async_mode:
+        payload["async"] = True
     return payload
+
+
+def _build_content(
+    prompt: str,
+    first_frame_url: str | None,
+    last_frame_url: str | None,
+    reference_image_urls: tuple[str, ...],
+    audio_url: str | None,
+    video_url: str | None,
+) -> list[dict[str, object]]:
+    """Build request content items from the supported reference media inputs."""
+    content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
+    image_sources = [
+        (first_frame_url, _IMAGE_ROLES["first_frame"]),
+        (last_frame_url, _IMAGE_ROLES["last_frame"]),
+    ]
+    image_sources.extend((url, _IMAGE_ROLES["reference_image"]) for url in reference_image_urls)
+    for url, role in image_sources:
+        if url is not None:
+            content.append({"type": "image_url", "role": role, "image_url": {"url": url}})
+    if audio_url is not None:
+        content.append(
+            {
+                "type": "audio_url",
+                "role": "reference_audio",
+                "audio_url": {"url": audio_url},
+            }
+        )
+    if video_url is not None:
+        content.append(
+            {
+                "type": "video_url",
+                "role": "reference_video",
+                "video_url": {"url": video_url},
+            }
+        )
+    return content
 
 
 @click.command()
@@ -179,6 +247,11 @@ def generate(
     service_tier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
+    first_frame_url: str | None,
+    last_frame_url: str | None,
+    reference_image_urls: tuple[str, ...],
+    audio_url: str | None,
+    video_url: str | None,
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -213,7 +286,14 @@ def generate(
             callback_url=callback_url,
             async_mode=async_mode,
         )
-        payload["content"] = [{"type": "text", "text": prompt}]
+        payload["content"] = _build_content(
+            prompt=prompt,
+            first_frame_url=first_frame_url,
+            last_frame_url=last_frame_url,
+            reference_image_urls=reference_image_urls,
+            audio_url=audio_url,
+            video_url=video_url,
+        )
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
         if output_json:
@@ -254,6 +334,11 @@ def image_to_video(
     service_tier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
+    first_frame_url: str | None,
+    last_frame_url: str | None,
+    reference_image_urls: tuple[str, ...],
+    audio_url: str | None,
+    video_url: str | None,
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -288,10 +373,14 @@ def image_to_video(
             callback_url=callback_url,
             async_mode=async_mode,
         )
-        content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
-        for url in image_urls:
-            content.append({"type": "image_url", "image_url": {"url": url}})
-        payload["content"] = content
+        payload["content"] = _build_content(
+            prompt=prompt,
+            first_frame_url=first_frame_url,
+            last_frame_url=last_frame_url,
+            reference_image_urls=image_urls + reference_image_urls,
+            audio_url=audio_url,
+            video_url=video_url,
+        )
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
         if output_json:

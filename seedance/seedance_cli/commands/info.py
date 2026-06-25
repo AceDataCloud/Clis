@@ -50,9 +50,7 @@ def resolutions() -> None:
         "480p": "Standard",
         "720p": "HD",
         "1080p": "Full HD",
-        "1K": "Default",
-        "2K": "High resolution",
-        "4K": "Ultra-high resolution",
+        "4k": "Ultra-high resolution",
     }
     for r in RESOLUTIONS:
         table.add_row(r, desc_map.get(r, r))
