@@ -103,9 +103,9 @@ Most commands support:
 --json                       Output raw JSON (for piping/scripting)
 --model TEXT                 Seedance model version (default: doubao-seedance-1-0-pro-250528)
 --aspect-ratio TEXT          Aspect ratio (16:9, 9:16, 1:1, 4:3, 3:4, 21:9, adaptive)
---resolution TEXT            Output resolution (480p, 720p, 1080p)
---duration FLOAT             Duration in seconds (2–12). Mutually exclusive with --frames.
---frames INT                 Frame count (29–289, must satisfy 25+4n). Mutually exclusive with --duration.
+--resolution TEXT            Output resolution (480p, 720p, 1080p, 4k)
+--duration FLOAT             Duration in seconds (2–15). Mutually exclusive with --frames.
+--frames INT                 Frame count (29–361, must satisfy 25+4n). Mutually exclusive with --duration.
 --seed INT                   Random seed for reproducible generation (-1 for random).
 --camerafixed BOOL           Fix the camera position (true/false).
 --watermark BOOL             Add a watermark to the output (true/false).
@@ -114,6 +114,11 @@ Most commands support:
 --service-tier TEXT          Service level (default/flex).
 --execution-expires-after INT  Task timeout in seconds (3600–259200).
 --callback-url TEXT          Webhook callback URL.
+--first-frame-url TEXT       Reference image URL for the first frame.
+--last-frame-url TEXT        Reference image URL for the last frame.
+--reference-image-url TEXT   Additional reference image URL(s) (repeatable).
+--audio-url TEXT             Reference audio URL.
+--video-url TEXT             Reference video URL.
 ```
 
 ## Available Models
@@ -125,6 +130,9 @@ Most commands support:
 | `doubao-seedance-1-0-pro-fast-251015` | V1.0 Fast | Faster generation |
 | `doubao-seedance-1-0-lite-t2v-250428` | V1.0 Lite T2V | Lightweight text-to-video |
 | `doubao-seedance-1-0-lite-i2v-250428` | V1.0 Lite I2V | Lightweight image-to-video |
+| `doubao-seedance-2-0-260128` | V2.0 | Next-generation general model |
+| `doubao-seedance-2-0-fast-260128` | V2.0 Fast | Faster next-generation generation |
+| `doubao-seedance-2-0-mini-260615` | V2.0 Mini | Compact next-generation model |
 
 
 ## Configuration

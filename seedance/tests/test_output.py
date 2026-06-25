@@ -18,7 +18,7 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(SEEDANCE_MODELS) == 5
+        assert len(SEEDANCE_MODELS) == 8
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in SEEDANCE_MODELS
@@ -30,6 +30,9 @@ class TestConstants:
             "doubao-seedance-1-0-pro-fast-251015",
             "doubao-seedance-1-0-lite-t2v-250428",
             "doubao-seedance-1-0-lite-i2v-250428",
+            "doubao-seedance-2-0-260128",
+            "doubao-seedance-2-0-fast-260128",
+            "doubao-seedance-2-0-mini-260615",
         ]:
             assert model in SEEDANCE_MODELS
 
@@ -39,7 +42,8 @@ class TestConstants:
         assert "adaptive" in ASPECT_RATIOS
 
     def test_resolutions(self):
-        assert len(RESOLUTIONS) == 3
+        assert len(RESOLUTIONS) == 4
+        assert "4k" in RESOLUTIONS
 
 
 class TestPrintJson:
