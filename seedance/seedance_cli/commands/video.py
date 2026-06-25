@@ -16,13 +16,6 @@ from seedance_cli.core.output import (
 )
 
 _SERVICE_TIERS = ["default", "flex"]
-_IMAGE_ROLES = {
-    "first_frame": "first_frame",
-    "last_frame": "last_frame",
-    "reference_image": "reference_image",
-}
-
-
 def _shared_video_options(f):  # type: ignore[no-untyped-def]
     """Decorator that attaches options shared by generate and image-to-video."""
     decorators = [
@@ -201,10 +194,10 @@ def _build_content(
     """Build request content items from the supported reference media inputs."""
     content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
     image_sources = [
-        (first_frame_url, _IMAGE_ROLES["first_frame"]),
-        (last_frame_url, _IMAGE_ROLES["last_frame"]),
+        (first_frame_url, "first_frame"),
+        (last_frame_url, "last_frame"),
     ]
-    image_sources.extend((url, _IMAGE_ROLES["reference_image"]) for url in reference_image_urls)
+    image_sources.extend((url, "reference_image") for url in reference_image_urls)
     for url, role in image_sources:
         if url is not None:
             content.append({"type": "image_url", "role": role, "image_url": {"url": url}})
