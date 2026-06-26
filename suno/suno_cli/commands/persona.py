@@ -57,11 +57,60 @@ def persona(
             print_json(result)
         else:
             data = result.get("data", {})
-            persona_id = data.get("id", "")
+            persona_id = data.get("persona_id") or data.get("id", "")
             if persona_id:
                 print_success(f"Persona created: {name} (ID: {persona_id})")
             else:
                 print_json(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("personas")
+@click.option("--user-id", default=None, help="Filter personas by user ID.")
+@click.option("--limit", type=int, default=None, help="Maximum number of personas to return.")
+@click.option("--offset", type=int, default=None, help="Number of personas to skip.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def personas(
+    ctx: click.Context,
+    user_id: str | None,
+    limit: int | None,
+    offset: int | None,
+    output_json: bool,
+) -> None:
+    """List saved personas."""
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.list_personas(user_id=user_id, limit=limit, offset=offset)
+        print_json(result if output_json else result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("persona-delete")
+@click.argument("persona_id")
+@click.option("--user-id", default=None, help="User ID that owns the persona.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def persona_delete(
+    ctx: click.Context,
+    persona_id: str,
+    user_id: str | None,
+    output_json: bool,
+) -> None:
+    """Delete a saved persona."""
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.delete_persona(persona_id=persona_id, user_id=user_id)
+        if output_json:
+            print_json(result)
+        elif result.get("success"):
+            print_success(f"Persona deleted: {persona_id}")
+        else:
+            print_json(result)
     except SunoError as e:
         print_error(e.message)
         raise SystemExit(1) from e
@@ -94,6 +143,45 @@ def upload(
             upload_id = data.get("id", "")
             if upload_id:
                 print_success(f"Uploaded: {upload_id}")
+            else:
+                print_json(result)
+    except SunoError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command("voice")
+@click.argument("audio_url")
+@click.option("-n", "--name", default=None, help="Name for the voice persona.")
+@click.option("--description", default=None, help="Description of the voice persona.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def voice(
+    ctx: click.Context,
+    audio_url: str,
+    name: str | None,
+    description: str | None,
+    output_json: bool,
+) -> None:
+    """Create a voice persona from an external audio file URL.
+
+    AUDIO_URL is the URL of the voice recording to clone.
+
+    Examples:
+
+      suno voice "https://example.com/voice.mp3" --name "My Clone"
+    """
+    client = get_client(ctx.obj.get("token"))
+    try:
+        result = client.create_voice(audio_url=audio_url, name=name, description=description)
+        if output_json:
+            print_json(result)
+        else:
+            data = result.get("data", {})
+            persona_id = data.get("persona_id", "")
+            voice_name = data.get("name") or name or "Voice persona"
+            if persona_id:
+                print_success(f"{voice_name} created (ID: {persona_id})")
             else:
                 print_json(result)
     except SunoError as e:
