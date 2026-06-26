@@ -117,6 +117,72 @@ class TestChatCommand:
         sent = json.loads(route.calls[0].request.content)
         assert sent["reasoning_effort"] == "high"
 
+    @respx.mock
+    def test_chat_with_service_tier(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/grok/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--service-tier", "flex", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["service_tier"] == "flex"
+
+    @respx.mock
+    def test_chat_with_logprobs(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/grok/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--logprobs", "--top-logprobs", "5", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["logprobs"] is True
+        assert sent["top_logprobs"] == 5
+
+    @respx.mock
+    def test_chat_with_max_completion_tokens(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/grok/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--max-completion-tokens", "100", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["max_completion_tokens"] == 100
+
+    @respx.mock
+    def test_chat_with_parallel_tool_calls(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/grok/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--parallel-tool-calls", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["parallel_tool_calls"] is True
+
+    @respx.mock
+    def test_chat_with_store(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/grok/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--store", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["store"] is True
+
     def test_chat_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "chat", "Hello"])
         assert result.exit_code != 0
