@@ -1,10 +1,11 @@
 """Persona management commands."""
 
 import click
+from rich.table import Table
 
 from suno_cli.core.client import get_client
 from suno_cli.core.exceptions import SunoError
-from suno_cli.core.output import print_error, print_json, print_success
+from suno_cli.core.output import console, print_error, print_json, print_success
 
 
 @click.command()
@@ -84,7 +85,28 @@ def personas(
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.list_personas(user_id=user_id, limit=limit, offset=offset)
-        print_json(result if output_json else result)
+        if output_json:
+            print_json(result)
+        else:
+            items = result.get("items", [])
+            if isinstance(items, list):
+                table = Table(title="Saved Personas")
+                table.add_column("Persona ID", style="cyan")
+                table.add_column("Name")
+                table.add_column("Description")
+                table.add_column("Source")
+
+                for item in items:
+                    table.add_row(
+                        item.get("persona_id", "-"),
+                        item.get("name", "-"),
+                        item.get("description", "-"),
+                        item.get("source_type", "-"),
+                    )
+
+                console.print(table)
+            else:
+                print_json(result)
     except SunoError as e:
         print_error(e.message)
         raise SystemExit(1) from e
