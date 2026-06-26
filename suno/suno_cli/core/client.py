@@ -54,16 +54,27 @@ class SunoClient:
 
         with httpx.Client() as http_client:
             try:
-                request_kwargs: dict[str, Any] = {
-                    "headers": self._get_headers(),
-                    "timeout": request_timeout,
-                }
-                if method in {"GET", "DELETE"}:
-                    request_kwargs["params"] = payload
+                if method == "GET":
+                    response = http_client.get(
+                        url,
+                        params=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
+                elif method == "DELETE":
+                    response = http_client.delete(
+                        url,
+                        params=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
                 else:
-                    request_kwargs["json"] = payload
-
-                response = http_client.request(method, url, **request_kwargs)
+                    response = http_client.post(
+                        url,
+                        json=payload,
+                        headers=self._get_headers(),
+                        timeout=request_timeout,
+                    )
 
                 if response.status_code == 401:
                     raise SunoAuthError("Invalid API token")
