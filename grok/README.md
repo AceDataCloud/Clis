@@ -42,6 +42,7 @@ Options:
 - `-s, --system`: System prompt
 - `--temperature`: Sampling temperature (0-2)
 - `--max-tokens`: Maximum tokens to generate
+- `--max-completion-tokens`: Upper bound on tokens that can be generated for a completion
 - `-n, --count`: Number of completion choices
 - `--top-p`: Nucleus sampling probability
 - `--frequency-penalty`: Frequency penalty (-2.0 to 2.0)
@@ -50,6 +51,11 @@ Options:
 - `--stop`: Stop sequences (repeatable)
 - `--user`: End-user identifier
 - `--reasoning-effort`: Reasoning effort level (minimal/low/medium/high)
+- `--service-tier`: Service tier (auto/default/flex/scale/priority)
+- `--logprobs`: Return log probabilities of output tokens
+- `--top-logprobs`: Number of most likely tokens with log probabilities to return
+- `--parallel-tool-calls`: Enable parallel function calling during tool use
+- `--store`: Store the output of this completion request
 - `--json`: Output raw JSON
 
 ### `video`

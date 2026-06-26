@@ -7,6 +7,7 @@ from grok_cli.core.exceptions import GrokError
 from grok_cli.core.output import (
     DEFAULT_CHAT_MODEL,
     GROK_CHAT_MODELS,
+    SERVICE_TIERS,
     print_chat_result,
     print_error,
     print_json,
@@ -89,6 +90,43 @@ from grok_cli.core.output import (
     type=click.Choice(["minimal", "low", "medium", "high"]),
     help="Reasoning effort level (minimal/low/medium/high).",
 )
+@click.option(
+    "--service-tier",
+    default=None,
+    type=click.Choice(SERVICE_TIERS),
+    help="Service tier for the request (auto/default/flex/scale/priority).",
+)
+@click.option(
+    "--logprobs",
+    is_flag=True,
+    default=False,
+    help="Return log probabilities of the output tokens.",
+)
+@click.option(
+    "--top-logprobs",
+    default=None,
+    type=int,
+    help="Number of most likely tokens (with log probabilities) to return at each position.",
+)
+@click.option(
+    "--max-completion-tokens",
+    default=None,
+    type=int,
+    help="Upper bound on the number of tokens that can be generated for a completion.",
+)
+@click.option(
+    "--parallel-tool-calls",
+    "parallel_tool_calls",
+    is_flag=True,
+    default=False,
+    help="Enable parallel function calling during tool use.",
+)
+@click.option(
+    "--store",
+    is_flag=True,
+    default=False,
+    help="Whether to store the output of this completion request.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -106,6 +144,12 @@ def chat(
     stop: tuple[str, ...],
     user: str | None,
     reasoning_effort: str | None,
+    service_tier: str | None,
+    logprobs: bool,
+    top_logprobs: int | None,
+    max_completion_tokens: int | None,
+    parallel_tool_calls: bool,
+    store: bool,
     output_json: bool,
 ) -> None:
     """Chat with a Grok model.
@@ -138,6 +182,12 @@ def chat(
         "stop": list(stop) if stop else None,
         "user": user,
         "reasoning_effort": reasoning_effort,
+        "service_tier": service_tier,
+        "logprobs": logprobs or None,
+        "top_logprobs": top_logprobs,
+        "max_completion_tokens": max_completion_tokens,
+        "parallel_tool_calls": parallel_tool_calls or None,
+        "store": store or None,
     }
 
     try:
