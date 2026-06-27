@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - Initial release of AceDataCloud unified CLI
-- `adc image` — Generate images via Flux, Midjourney, Seedream, NanoBanana
+- `adc image` — Generate images via Flux, Seedream, NanoBanana
 - `adc video` — Generate videos via Luma, Sora, Veo, Seedance
 - `adc music` — Generate music via Suno
 - `adc search` — Google search via SERP API

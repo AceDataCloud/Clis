@@ -129,17 +129,6 @@ class TestConvenienceMethods:
         assert body["async"] is True
 
     @respx.mock
-    def test_midjourney_imagine(self):
-        route = respx.post("https://api.acedata.cloud/midjourney/imagine").mock(
-            return_value=Response(200, json={"task_id": "mj-1"})
-        )
-        client = AdcClient(api_token="test-token")
-        result = client.midjourney_imagine(prompt="city")
-        assert result["task_id"] == "mj-1"
-        body = json.loads(route.calls.last.request.content)
-        assert body["async"] is True
-
-    @respx.mock
     def test_suno_music(self):
         route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json={"task_id": "suno-1"})

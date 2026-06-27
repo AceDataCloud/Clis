@@ -73,18 +73,6 @@ class TestImageCommands:
         assert "test-task-123" in result.output
 
     @respx.mock
-    def test_image_midjourney(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/midjourney/imagine").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "image", "A city", "--service", "midjourney", "--json"],
-        )
-        assert result.exit_code == 0
-        assert route.called
-
-    @respx.mock
     def test_image_with_edit(self, runner, mock_image_response):
         route = respx.post("https://api.acedata.cloud/flux/images").mock(
             return_value=Response(200, json=mock_image_response)

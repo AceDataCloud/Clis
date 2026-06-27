@@ -95,10 +95,6 @@ class AdcClient:
         """Generate/edit image using Flux."""
         return self.request("/flux/images", self._with_async_callback(kwargs))
 
-    def midjourney_imagine(self, **kwargs: Any) -> dict[str, Any]:
-        """Generate image using Midjourney."""
-        return self.request("/midjourney/imagine", self._with_async_callback(kwargs))
-
     def suno_music(self, **kwargs: Any) -> dict[str, Any]:
         """Generate music using Suno."""
         return self.request("/suno/audios", self._with_async_callback(kwargs))

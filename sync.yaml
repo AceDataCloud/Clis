@@ -1,9 +1,4 @@
 mappings:
-  midjourney:
-    repo: AceDataCloud/MidjourneyCli
-    exclude:
-      - .github
-      - .gitbooks
   luma:
     repo: AceDataCloud/LumaCli
     exclude:

@@ -13,7 +13,6 @@ console = Console()
 # Service catalog
 SERVICES = {
     "flux": {"type": "Image", "description": "Flux AI image generation & editing"},
-    "midjourney": {"type": "Image", "description": "Midjourney image generation"},
     "seedream": {"type": "Image", "description": "Seedream image generation"},
     "nanobanana": {"type": "Image", "description": "NanoBanana image generation & editing"},
     "suno": {"type": "Music", "description": "Suno AI music generation"},

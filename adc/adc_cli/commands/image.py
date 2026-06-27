@@ -11,7 +11,7 @@ from adc_cli.core.output import print_error, print_json, print_result
 @click.argument("prompt")
 @click.option(
     "--service",
-    type=click.Choice(["flux", "midjourney", "seedream", "nanobanana"]),
+    type=click.Choice(["flux", "seedream", "nanobanana"]),
     default="flux",
     help="Image generation service to use.",
 )
@@ -38,7 +38,6 @@ def image(
     \b
     Examples:
       adc image "A sunset over mountains, photorealistic"
-      adc image "Cyberpunk city" --service midjourney
       adc image "Add sunglasses" --image-url https://example.com/photo.jpg
       adc image "Logo design" --service flux -m flux-pro-1.1-ultra -s 16:9
     """
@@ -55,13 +54,6 @@ def image(
                 "image_url": image_url,
             }
             result = client.flux_image(**payload)  # type: ignore[arg-type]
-        elif service == "midjourney":
-            payload = {
-                "prompt": prompt,
-                "size": size,
-                "version": model,
-            }
-            result = client.midjourney_imagine(**payload)  # type: ignore[arg-type]
         else:
             # seedream, nanobanana — generic image endpoint
             payload = {

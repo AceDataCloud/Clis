@@ -6,7 +6,6 @@ Monorepo for all AceDataCloud command-line interface tools.
 
 | Directory | Standalone Repo | Description |
 |---|---|---|
-| `midjourney/` | [MidjourneyCli](https://github.com/AceDataCloud/MidjourneyCli) | Midjourney image & video generation CLI |
 | `luma/` | [LumaCli](https://github.com/AceDataCloud/LumaCli) | Luma video generation CLI |
 | `suno/` | [SunoCli](https://github.com/AceDataCloud/SunoCli) | Suno music generation CLI |
 | `sora/` | [SoraCli](https://github.com/AceDataCloud/SoraCli) | Sora video generation CLI |
