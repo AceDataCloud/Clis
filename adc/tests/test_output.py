@@ -18,9 +18,8 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_services_catalog(self):
-        assert len(SERVICES) == 10
+        assert len(SERVICES) == 9
         assert "flux" in SERVICES
-        assert "midjourney" in SERVICES
         assert "suno" in SERVICES
         assert "luma" in SERVICES
         assert "sora" in SERVICES

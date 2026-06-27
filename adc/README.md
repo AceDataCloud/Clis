@@ -54,7 +54,6 @@ adc --token your_token image "A sunset"
 
 ```bash
 adc image "A sunset over mountains"                        # Flux (default)
-adc image "Cyberpunk city" --service midjourney             # Midjourney
 adc image "Logo design" --service seedream                  # Seedream
 adc image "Add sunglasses" --image-url https://...         # Edit with Flux
 adc image "A landscape" -m flux-pro-1.1-ultra -s 16:9     # Custom model & size
@@ -117,7 +116,6 @@ adc search "test query" --json | jq '.organic[].title'
 | Service      | Type   | Command                    |
 | ------------ | ------ | -------------------------- |
 | Flux         | Image  | `adc image --service flux` |
-| Midjourney   | Image  | `adc image --service midjourney` |
 | Seedream     | Image  | `adc image --service seedream` |
 | NanoBanana   | Image  | `adc image --service nanobanana` |
 | Suno         | Music  | `adc music`                |
