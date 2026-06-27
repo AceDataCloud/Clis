@@ -71,7 +71,7 @@ Options:
 - `--image-url`: Reference image URL for image-to-video
 - `--reference-image-url`: Additional reference image URLs (repeatable)
 - `-a, --aspect-ratio`: Aspect ratio (1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3)
-- `-r, --resolution`: Output resolution (480p, 720p)
+- `-r, --resolution`: Output resolution (480p, 720p, 1080p)
 - `--duration`: Duration in seconds
 - `--callback-url`: Webhook callback URL
 - `--async`: Submit asynchronously
