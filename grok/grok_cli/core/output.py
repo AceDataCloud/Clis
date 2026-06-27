@@ -41,6 +41,7 @@ ASPECT_RATIOS = [
 RESOLUTIONS = [
     "480p",
     "720p",
+    "1080p",
 ]
 
 DEFAULT_RESOLUTION = "480p"
