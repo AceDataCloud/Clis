@@ -11,17 +11,12 @@ console = Console()
 
 # Available models
 SEEDANCE_MODELS = [
-    "doubao-seedance-1-5-pro-251215",
-    "doubao-seedance-1-0-pro-250528",
-    "doubao-seedance-1-0-pro-fast-251015",
-    "doubao-seedance-1-0-lite-t2v-250428",
-    "doubao-seedance-1-0-lite-i2v-250428",
     "doubao-seedance-2-0-260128",
     "doubao-seedance-2-0-fast-260128",
     "doubao-seedance-2-0-mini-260615",
 ]
 
-DEFAULT_MODEL = "doubao-seedance-1-0-pro-250528"
+DEFAULT_MODEL = "doubao-seedance-2-0-260128"
 
 # Available aspect ratios
 ASPECT_RATIOS = [
@@ -134,34 +129,9 @@ def print_models() -> None:
     table.add_column("Notes")
 
     table.add_row(
-        "doubao-seedance-1-5-pro-251215",
-        "V1.5 Pro",
-        "Newest, supports audio generation",
-    )
-    table.add_row(
-        "doubao-seedance-1-0-pro-250528",
-        "V1.0 Pro",
-        "Standard quality (default)",
-    )
-    table.add_row(
-        "doubao-seedance-1-0-pro-fast-251015",
-        "V1.0 Fast",
-        "Faster generation",
-    )
-    table.add_row(
-        "doubao-seedance-1-0-lite-t2v-250428",
-        "V1.0 Lite T2V",
-        "Lightweight text-to-video",
-    )
-    table.add_row(
-        "doubao-seedance-1-0-lite-i2v-250428",
-        "V1.0 Lite I2V",
-        "Lightweight image-to-video",
-    )
-    table.add_row(
         "doubao-seedance-2-0-260128",
         "V2.0",
-        "Next-generation general model",
+        "Next-generation general model (default)",
     )
     table.add_row(
         "doubao-seedance-2-0-fast-260128",

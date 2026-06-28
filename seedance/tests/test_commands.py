@@ -89,7 +89,7 @@ class TestGenerateCommands:
                 "generate",
                 "test",
                 "-m",
-                "doubao-seedance-1-5-pro-251215",
+                "doubao-seedance-2-0-260128",
                 "--json",
             ],
         )
@@ -376,7 +376,7 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
-        assert "seedance-1-5-pro" in result.output
+        assert "seedance-2-0-260128" in result.output
 
     def test_aspect_ratios(self, runner):
         result = runner.invoke(cli, ["aspect-ratios"])

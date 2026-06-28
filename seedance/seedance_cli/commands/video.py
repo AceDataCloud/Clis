@@ -16,6 +16,8 @@ from seedance_cli.core.output import (
 )
 
 _SERVICE_TIERS = ["default", "flex"]
+
+
 def _shared_video_options(f):  # type: ignore[no-untyped-def]
     """Decorator that attaches options shared by generate and image-to-video."""
     decorators = [
@@ -74,7 +76,7 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             "--generate-audio",
             type=click.BOOL,
             default=None,
-            help="Generate audio for the video (true/false). Only doubao-seedance-1-5-pro-251215 supports this.",
+            help="Generate audio for the video (true/false). Supported by doubao-seedance-1-5-pro-251215 and the doubao-seedance-2-0 series.",
         ),
         click.option(
             "--return-last-frame",
