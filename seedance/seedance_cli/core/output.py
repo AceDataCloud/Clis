@@ -21,7 +21,7 @@ SEEDANCE_MODELS = [
     "doubao-seedance-2-0-mini-260615",
 ]
 
-DEFAULT_MODEL = "doubao-seedance-1-0-pro-250528"
+DEFAULT_MODEL = "doubao-seedance-2-0-260128"
 
 # Available aspect ratios
 ASPECT_RATIOS = [
@@ -136,12 +136,12 @@ def print_models() -> None:
     table.add_row(
         "doubao-seedance-1-5-pro-251215",
         "V1.5 Pro",
-        "Newest, supports audio generation",
+        "Newest 1.x, supports audio generation",
     )
     table.add_row(
         "doubao-seedance-1-0-pro-250528",
         "V1.0 Pro",
-        "Standard quality (default)",
+        "Standard quality",
     )
     table.add_row(
         "doubao-seedance-1-0-pro-fast-251015",
@@ -161,7 +161,7 @@ def print_models() -> None:
     table.add_row(
         "doubao-seedance-2-0-260128",
         "V2.0",
-        "Next-generation general model",
+        "Next-generation general model (default)",
     )
     table.add_row(
         "doubao-seedance-2-0-fast-260128",
