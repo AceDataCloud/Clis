@@ -332,6 +332,21 @@ class TestGenerateCommands:
         )
         assert result.exit_code == 0
 
+    def test_reshoot_rejects_legacy_motion_type(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "reshoot",
+                "video-123",
+                "--motion-type",
+                "STATIONARY_PAN_LEFT",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "Invalid value for '--motion-type'" in result.output
+
     @respx.mock
     def test_objects_insert_json(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/veo/objects").mock(
