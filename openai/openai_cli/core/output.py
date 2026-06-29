@@ -12,6 +12,7 @@ console = Console()
 
 # Chat completion models
 CHAT_MODELS = [
+    "gpt-oss:free",
     "gpt-5.5",
     "gpt-5.5-pro",
     "gpt-5.4",
