@@ -16,8 +16,6 @@ VEO_MODELS = [
     "veo31",
     "veo31-fast",
     "veo31-fast-ingredients",
-    "veo2",
-    "veo2-fast",
 ]
 
 DEFAULT_MODEL = "veo3"
@@ -26,9 +24,6 @@ DEFAULT_MODEL = "veo3"
 ASPECT_RATIOS = [
     "16:9",
     "9:16",
-    "3:4",
-    "4:3",
-    "1:1",
 ]
 
 # Models supported by the extend endpoint
@@ -47,12 +42,12 @@ RESOLUTIONS = [
 # Camera motion types for reshoot
 MOTION_TYPES = [
     "STATIONARY",
-    "STATIONARY_PAN_LEFT",
-    "STATIONARY_PAN_RIGHT",
-    "STATIONARY_TILT_UP",
-    "STATIONARY_TILT_DOWN",
-    "STATIONARY_DOLLY_ZOOM_IN",
-    "STATIONARY_DOLLY_ZOOM_OUT",
+    "STATIONARY_UP",
+    "STATIONARY_DOWN",
+    "STATIONARY_LEFT",
+    "STATIONARY_RIGHT",
+    "STATIONARY_DOLLY_IN_ZOOM_OUT",
+    "STATIONARY_DOLLY_OUT_ZOOM_IN",
     "UP",
     "DOWN",
     "LEFT_TO_RIGHT",
@@ -176,16 +171,6 @@ def print_models() -> None:
         "veo31-fast-ingredients",
         "V3.1 Fast Ingredient",
         "Ingredient-based fast next-gen model",
-    )
-    table.add_row(
-        "veo2",
-        "V2",
-        "Previous generation, stable",
-    )
-    table.add_row(
-        "veo2-fast",
-        "V2 Fast",
-        "Fast previous-gen model",
     )
 
     console.print(table)

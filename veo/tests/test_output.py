@@ -18,7 +18,7 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(VEO_MODELS) == 7
+        assert len(VEO_MODELS) == 5
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in VEO_MODELS
@@ -30,13 +30,11 @@ class TestConstants:
             "veo31",
             "veo31-fast",
             "veo31-fast-ingredients",
-            "veo2",
-            "veo2-fast",
         ]:
             assert model in VEO_MODELS
 
     def test_aspect_ratios(self):
-        assert len(ASPECT_RATIOS) == 5
+        assert len(ASPECT_RATIOS) == 2
         assert "16:9" in ASPECT_RATIOS
         assert "9:16" in ASPECT_RATIOS
 
