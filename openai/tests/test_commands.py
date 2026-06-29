@@ -275,6 +275,20 @@ class TestChatCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-5.4-pro"
 
+    @respx.mock
+    def test_chat_free_model(self, runner, mock_chat_response):
+        """Verify newly synced free chat models are accepted."""
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "-m", "gpt-4o-mini:free", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "gpt-4o-mini:free"
+
 
 # ─── Embed Commands ────────────────────────────────────────────────────────
 
@@ -544,6 +558,11 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "gpt-5.4" in result.output
         assert "gpt-4o" in result.output
+        assert "gpt-5.5:free" in result.output
+        assert "gpt-5:free" in result.output
+        assert "gpt-4.1:free" in result.output
+        assert "gpt-4o:free" in result.output
+        assert "gpt-4o-mini:free" in result.output
         assert "text-embedding-3-small" in result.output
         assert "dall-e-3" in result.output
 
