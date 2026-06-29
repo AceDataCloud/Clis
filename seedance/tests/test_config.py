@@ -9,7 +9,7 @@ def test_settings_default_values():
     settings = Settings()
     assert settings.api_base_url == "https://api.acedata.cloud"
     assert settings.request_timeout == 1800
-    assert settings.default_model == "doubao-seedance-1-0-pro-250528"
+    assert settings.default_model == "doubao-seedance-2-0-260128"
 
 
 def test_settings_from_environment():

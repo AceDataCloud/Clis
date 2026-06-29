@@ -14,7 +14,7 @@ Generate AI videos directly from your terminal — no MCP client required.
 
 - **Video Generation** — Generate videos from text prompts with multiple models
 - **Image-to-Video** — Create videos from reference images
-- **Multiple Models** — doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-0-lite-t2v-250428, doubao-seedance-1-0-lite-i2v-250428
+- **Multiple Models** — Seedance 2.0 series (doubao-seedance-2-0-260128, doubao-seedance-2-0-fast-260128, doubao-seedance-2-0-mini-260615) plus doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-0-lite-t2v-250428, doubao-seedance-1-0-lite-i2v-250428
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -101,7 +101,7 @@ Most commands support:
 
 ```
 --json                       Output raw JSON (for piping/scripting)
---model TEXT                 Seedance model version (default: doubao-seedance-1-0-pro-250528)
+--model TEXT                 Seedance model version (default: doubao-seedance-2-0-260128)
 --aspect-ratio TEXT          Aspect ratio (16:9, 9:16, 1:1, 4:3, 3:4, 21:9, adaptive)
 --resolution TEXT            Output resolution (480p, 720p, 1080p, 4k)
 --duration FLOAT             Duration in seconds (2–15). Mutually exclusive with --frames.
@@ -109,7 +109,7 @@ Most commands support:
 --seed INT                   Random seed for reproducible generation (-1 for random).
 --camerafixed BOOL           Fix the camera position (true/false).
 --watermark BOOL             Add a watermark to the output (true/false).
---generate-audio BOOL        Generate audio (true/false). Only doubao-seedance-1-5-pro-251215.
+--generate-audio BOOL        Generate audio (true/false). Supported by doubao-seedance-1-5-pro-251215 and the doubao-seedance-2-0 series.
 --return-last-frame BOOL     Return the last frame of the video (true/false).
 --service-tier TEXT          Service level (default/flex).
 --execution-expires-after INT  Task timeout in seconds (3600–259200).
@@ -125,12 +125,12 @@ Most commands support:
 
 | Model | Version | Notes |
 |-------|---------|-------|
-| `doubao-seedance-1-5-pro-251215` | V1.5 Pro | Newest, supports audio generation |
-| `doubao-seedance-1-0-pro-250528` | V1.0 Pro | Standard quality (default) |
+| `doubao-seedance-1-5-pro-251215` | V1.5 Pro | Newest 1.x, supports audio generation |
+| `doubao-seedance-1-0-pro-250528` | V1.0 Pro | Standard quality |
 | `doubao-seedance-1-0-pro-fast-251015` | V1.0 Fast | Faster generation |
 | `doubao-seedance-1-0-lite-t2v-250428` | V1.0 Lite T2V | Lightweight text-to-video |
 | `doubao-seedance-1-0-lite-i2v-250428` | V1.0 Lite I2V | Lightweight image-to-video |
-| `doubao-seedance-2-0-260128` | V2.0 | Next-generation general model |
+| `doubao-seedance-2-0-260128` | V2.0 | Next-generation general model (default) |
 | `doubao-seedance-2-0-fast-260128` | V2.0 Fast | Faster next-generation generation |
 | `doubao-seedance-2-0-mini-260615` | V2.0 Mini | Compact next-generation model |
 
@@ -143,7 +143,7 @@ Most commands support:
 |----------|-------------|---------|
 | `ACEDATACLOUD_API_TOKEN` | API token from AceDataCloud | *Required* |
 | `ACEDATACLOUD_API_BASE_URL` | API base URL | `https://api.acedata.cloud` |
-| `SEEDANCE_DEFAULT_MODEL` | Default model | `doubao-seedance-1-0-pro-250528` |
+| `SEEDANCE_DEFAULT_MODEL` | Default model | `doubao-seedance-2-0-260128` |
 | `SEEDANCE_REQUEST_TIMEOUT` | Timeout in seconds | `1800` |
 
 ## Development
