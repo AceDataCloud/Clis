@@ -3,6 +3,16 @@ name: Sync to Sub-Repos
 on:
   push:
     branches: [main]
+  schedule:
+    # Weekly full re-sync (Monday 03:00 UTC)
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+    inputs:
+      sync_all:
+        description: 'Sync all directories (bypass change detection)'
+        required: false
+        default: 'true'
+        type: boolean
   workflow_dispatch:
     inputs:
       sync_all:
@@ -30,6 +40,7 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.sync_all }}" = "true" ]; then
             FULL_SYNC="true"
           fi
+          if [ "${{ github.event_name }}" = "schedule" ]; then FULL_SYNC="true"; fi
 
           # Get list of changed files
           CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
