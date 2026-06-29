@@ -29,7 +29,7 @@ class TestInfoIntegration:
     def test_models_no_token(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
-        assert "seedance-1-5-pro" in result.output
+        assert "seedance-2-0-260128" in result.output
 
     def test_config_display(self, runner):
         result = runner.invoke(cli, ["config"])
