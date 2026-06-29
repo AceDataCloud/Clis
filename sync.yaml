@@ -50,7 +50,7 @@ mappings:
       - .github
       - .gitbooks
   adc:
-    repo: AceDataCloud/AdcCli
+    repo: AceDataCloud/AceDataCloudCli
     exclude:
       - .github
       - .gitbooks
