@@ -13,12 +13,6 @@ on:
         required: false
         default: 'true'
         type: boolean
-  workflow_dispatch:
-    inputs:
-      sync_all:
-        description: "Force-sync every mapped dir (full catch-up, ignores git diff)"
-        type: boolean
-        default: true
 
 jobs:
   detect-changes:
