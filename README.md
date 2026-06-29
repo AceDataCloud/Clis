@@ -16,7 +16,7 @@ Monorepo for all AceDataCloud command-line interface tools.
 | `flux/` | [FluxCli](https://github.com/AceDataCloud/FluxCli) | Flux image generation & editing CLI |
 | `serp/` | [SerpCli](https://github.com/AceDataCloud/SerpCli) | Google SERP (Search) CLI |
 | `wan/` | [WanCli](https://github.com/AceDataCloud/WanCli) | Tongyi Wansiang video generation CLI |
-| `adc/` | [AdcCli](https://github.com/AceDataCloud/AdcCli) | Unified AceDataCloud CLI (all services) |
+| `adc/` | [AceDataCloudCli](https://github.com/AceDataCloud/AceDataCloudCli) | Unified AceDataCloud CLI (all services) |
 
 ## How It Works
 
