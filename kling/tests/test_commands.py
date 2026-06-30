@@ -30,6 +30,8 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["--help"])
         assert result.exit_code == 0
         assert "generate" in result.output
+        assert "lip-sync" in result.output
+        assert "talking-photo" in result.output
         assert "task" in result.output
         assert "wait" in result.output
 
@@ -44,6 +46,17 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "--image-url" in result.output
         assert "--video-url" in result.output
+
+    def test_help_lip_sync(self, runner):
+        result = runner.invoke(cli, ["lip-sync", "--help"])
+        assert result.exit_code == 0
+        assert "--mode" in result.output
+
+    def test_help_talking_photo(self, runner):
+        result = runner.invoke(cli, ["talking-photo", "--help"])
+        assert result.exit_code == 0
+        assert "--image-url" in result.output
+        assert "--audio-url" in result.output
 
 
 # ─── Generate Commands ─────────────────────────────────────────────────────
@@ -540,6 +553,118 @@ class TestMotionCommands:
                 "invalid-value",
             ],
         )
+        assert result.exit_code != 0
+
+
+# ─── Lip Sync / Talking Photo Commands ───────────────────────────────────────
+
+
+class TestLipSyncCommands:
+    """Tests for lip-sync and talking-photo commands."""
+
+    @respx.mock
+    def test_lip_sync_json(self, runner, mock_motion_response):
+        respx.post("https://api.acedata.cloud/kling/lip-sync").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "audio2video",
+                "--video-url",
+                "https://example.com/video.mp4",
+                "--audio-url",
+                "https://example.com/audio.mp3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_lip_sync_payload(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/lip-sync").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "text2video",
+                "--video-id",
+                "video-123",
+                "--text",
+                "Hello world",
+                "--voice-language",
+                "en",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["mode"] == "text2video"
+        assert body["video_id"] == "video-123"
+        assert body["text"] == "Hello world"
+        assert body["voice_language"] == "en"
+
+    @respx.mock
+    def test_talking_photo_json(self, runner, mock_motion_response):
+        respx.post("https://api.acedata.cloud/kling/talking-photo").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "talking-photo",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--audio-url",
+                "https://example.com/audio.mp3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_talking_photo_payload(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/talking-photo").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "talking-photo",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--audio-url",
+                "https://example.com/audio.mp3",
+                "--model",
+                "kling-v2-6",
+                "--duration",
+                "10",
+                "--mode",
+                "pro",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "kling-v2-6"
+        assert body["duration"] == 10
+        assert body["mode"] == "pro"
+
+    def test_talking_photo_missing_required(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "talking-photo", "--image-url", "x"])
         assert result.exit_code != 0
 
 
