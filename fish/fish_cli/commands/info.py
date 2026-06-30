@@ -1,6 +1,7 @@
 """Info and utility commands."""
 
 import click
+from rich.table import Table
 
 from fish_cli.core.config import settings
 from fish_cli.core.output import console, print_tts_models
@@ -15,8 +16,6 @@ def tts_models() -> None:
 @click.command()
 def config() -> None:
     """Show current configuration."""
-    from rich.table import Table
-
     table = Table(title="Fish CLI Configuration")
     table.add_column("Setting", style="bold cyan")
     table.add_column("Value")
