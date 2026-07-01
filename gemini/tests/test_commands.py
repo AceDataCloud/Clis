@@ -85,6 +85,45 @@ class TestChatCommand:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_chat_with_new_models(self, runner, mock_chat_response):
+        for model in [
+            "gemini-2.5-flash-lite",
+            "gemini-3.1-flash-lite-preview",
+            "gemini-3.1-flash-image-preview",
+            "gemini-2.5-flash-image",
+            "gemini-3-pro-image-preview",
+        ]:
+            respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
+                return_value=Response(200, json=mock_chat_response)
+            )
+            result = runner.invoke(
+                cli, ["--token", "test-token", "chat", "Hello", "-m", model, "--json"]
+            )
+            assert result.exit_code == 0, f"Model {model} failed: {result.output}"
+
+    @respx.mock
+    def test_chat_with_max_completion_tokens(self, runner, mock_chat_response):
+        respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--max-completion-tokens", "512", "--json"],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_chat_with_service_tier(self, runner, mock_chat_response):
+        respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--service-tier", "flex", "--json"],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
     def test_chat_with_system_prompt(self, runner, mock_chat_response):
         respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)

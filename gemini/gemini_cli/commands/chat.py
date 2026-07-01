@@ -85,6 +85,18 @@ from gemini_cli.core.output import (
     help="Reasoning effort level.",
 )
 @click.option(
+    "--max-completion-tokens",
+    default=None,
+    type=int,
+    help="Maximum number of tokens to generate (alternative to --max-tokens).",
+)
+@click.option(
+    "--service-tier",
+    type=click.Choice(["auto", "default", "flex", "scale", "priority"]),
+    default=None,
+    help="Service tier for compute allocation.",
+)
+@click.option(
     "--user",
     default=None,
     help="Unique end-user identifier for monitoring and abuse detection.",
@@ -105,6 +117,8 @@ def chat(
     seed: int | None,
     stop: tuple[str, ...],
     reasoning_effort: str | None,
+    max_completion_tokens: int | None,
+    service_tier: str | None,
     user: str | None,
     output_json: bool,
 ) -> None:
@@ -130,6 +144,7 @@ def chat(
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "max_completion_tokens": max_completion_tokens,
         "n": count,
         "top_p": top_p,
         "frequency_penalty": frequency_penalty,
@@ -137,6 +152,7 @@ def chat(
         "seed": seed,
         "stop": list(stop) if stop else None,
         "reasoning_effort": reasoning_effort,
+        "service_tier": service_tier,
         "user": user,
     }
 
