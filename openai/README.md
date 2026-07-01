@@ -73,7 +73,7 @@ openai-cli config
 | `response` | Responses API (`/openai/responses`) |
 | `tasks retrieve` | Retrieve a single async task result (`/openai/tasks`) |
 | `tasks batch` | Retrieve multiple async task results (`/openai/tasks`) |
-| `models` | List available models |
+| `models` | List available models (`/openai/models`) |
 | `config` | Show current configuration |
 
 ## Environment Variables

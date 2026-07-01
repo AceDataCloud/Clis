@@ -428,3 +428,17 @@ def print_models() -> None:
     for model in IMAGE_MODELS:
         table3.add_row(model)
     console.print(table3)
+
+
+def print_api_models(data: dict[str, Any]) -> None:
+    """Print models returned by /openai/models."""
+    models = data.get("data", [])
+
+    table = Table(title="Available Models")
+    table.add_column("Model", style="bold cyan")
+    table.add_column("Owner", style="dim")
+
+    for model in models:
+        table.add_row(model.get("id", ""), model.get("owned_by", ""))
+
+    console.print(table)

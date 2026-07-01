@@ -2,14 +2,28 @@
 
 import click
 
+from openai_cli.core.client import get_client
 from openai_cli.core.config import settings
-from openai_cli.core.output import console, print_models
+from openai_cli.core.exceptions import OpenAIError
+from openai_cli.core.output import console, print_api_models, print_error, print_json
 
 
 @click.command()
-def models() -> None:
-    """List available models for all endpoints."""
-    print_models()
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def models(ctx: click.Context, output_json: bool) -> None:
+    """List available models from the OpenAI models endpoint."""
+    client = get_client(ctx.obj.get("token"))
+
+    try:
+        result = client.models()
+        if output_json:
+            print_json(result)
+        else:
+            print_api_models(result)
+    except OpenAIError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
 
 
 @click.command()

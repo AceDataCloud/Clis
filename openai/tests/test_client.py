@@ -77,6 +77,20 @@ class TestOpenAIClient:
                 messages=[{"role": "user", "content": "Hi"}],
             )
 
+
+    @respx.mock
+    def test_models_request(self):
+        route = respx.get("https://api.acedata.cloud/openai/models").mock(
+            return_value=Response(
+                200,
+                json={"object": "list", "data": [{"id": "gpt-4o", "object": "model", "created": 1714500000, "owned_by": "system"}]},
+            )
+        )
+        client = OpenAIClient(api_token="test-token")
+        result = client.models()
+        assert route.called
+        assert result["object"] == "list"
+
     def test_none_values_stripped_from_payload(self):
         payload = {"model": "gpt-4o-mini", "temperature": None, "n": None}
         stripped = {k: v for k, v in payload.items() if v is not None}

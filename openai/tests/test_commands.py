@@ -553,24 +553,42 @@ class TestResponseCommands:
 class TestInfoCommands:
     """Tests for info and utility commands."""
 
+    @respx.mock
     def test_models(self, runner):
-        result = runner.invoke(cli, ["models"])
+        respx.get("https://api.acedata.cloud/openai/models").mock(
+            return_value=Response(
+                200,
+                json={
+                    "object": "list",
+                    "data": [
+                        {"id": "gpt-5.4", "object": "model", "created": 1714500000, "owned_by": "system"},
+                        {"id": "gpt-4o", "object": "model", "created": 1714500000, "owned_by": "system"},
+                    ],
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "models"])
         assert result.exit_code == 0
         assert "gpt-5.4" in result.output
         assert "gpt-4o" in result.output
-        assert "gpt-5.5:free" in result.output
-        assert "gpt-5:free" in result.output
-        assert "gpt-4.1:free" in result.output
-        assert "gpt-4o:free" in result.output
-        assert "gpt-4o-mini:free" in result.output
-        assert "text-embedding-3-small" in result.output
-        assert "dall-e-3" in result.output
 
-    def test_models_includes_gpt54(self, runner):
-        """Verify gpt-5.4 is listed (restored by revert commit)."""
-        result = runner.invoke(cli, ["models"])
+    @respx.mock
+    def test_models_json(self, runner):
+        respx.get("https://api.acedata.cloud/openai/models").mock(
+            return_value=Response(
+                200,
+                json={
+                    "object": "list",
+                    "data": [
+                        {"id": "gpt-5.4", "object": "model", "created": 1714500000, "owned_by": "system"}
+                    ],
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "models", "--json"])
         assert result.exit_code == 0
-        assert "gpt-5.4" in result.output
+        data = json.loads(result.output)
+        assert data["data"][0]["id"] == "gpt-5.4"
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
