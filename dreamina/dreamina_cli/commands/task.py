@@ -35,7 +35,7 @@ def task(
     client = get_client(ctx.obj.get("token"))
     try:
         if not task_id and not trace_id:
-            raise click.UsageError("Provide TASK_ID or --trace-id.")
+            raise click.UsageError("Provide either a task ID or use --trace-id.")
 
         result = client.query_task(id=task_id, trace_id=trace_id, action="retrieve")
         if output_json:
