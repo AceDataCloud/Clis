@@ -35,21 +35,25 @@ class OpenAIClient:
     def request(
         self,
         endpoint: str,
-        payload: dict[str, Any],
+        payload: dict[str, Any] | None = None,
         timeout: float | None = None,
+        method: str = "POST",
     ) -> dict[str, Any]:
-        """Make a POST request to the AceDataCloud API."""
+        """Make a request to the AceDataCloud API."""
         url = f"{self.base_url}{endpoint}"
         request_timeout = timeout or self.timeout
+
+        payload = payload or {}
 
         # Remove None values from payload
         payload = {k: v for k, v in payload.items() if v is not None}
 
         with httpx.Client() as http_client:
             try:
-                response = http_client.post(
+                response = http_client.request(
+                    method,
                     url,
-                    json=payload,
+                    json=payload if method.upper() != "GET" else None,
                     headers=self._get_headers(),
                     timeout=request_timeout,
                 )
@@ -106,6 +110,10 @@ class OpenAIClient:
     def tasks(self, **kwargs: Any) -> dict[str, Any]:
         """Query OpenAI async task results."""
         return self.request("/openai/tasks", kwargs)
+
+    def models(self) -> dict[str, Any]:
+        """List available models from API."""
+        return self.request("/openai/models", payload=None, method="GET")
 
 
 def get_client(token: str | None = None) -> OpenAIClient:
