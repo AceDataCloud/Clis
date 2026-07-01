@@ -1,0 +1,199 @@
+"""Chat completion command (OpenAI-compatible endpoint)."""
+
+import click
+
+from claude_cli.core.client import get_client
+from claude_cli.core.exceptions import ClaudeError
+from claude_cli.core.output import (
+    CHAT_MODELS,
+    DEFAULT_CHAT_MODEL,
+    print_chat_result,
+    print_error,
+    print_json,
+)
+
+
+@click.command()
+@click.argument("prompt")
+@click.option(
+    "-m",
+    "--model",
+    type=click.Choice(CHAT_MODELS),
+    default=DEFAULT_CHAT_MODEL,
+    show_default=True,
+    help="Model to use for chat completion.",
+)
+@click.option(
+    "-s",
+    "--system",
+    default=None,
+    help="System prompt to set the assistant's behavior.",
+)
+@click.option(
+    "--temperature",
+    default=None,
+    type=float,
+    help="Sampling temperature (0-2). Higher values = more random.",
+)
+@click.option(
+    "--max-tokens",
+    default=None,
+    type=int,
+    help="Maximum number of tokens to generate.",
+)
+@click.option(
+    "--max-completion-tokens",
+    default=None,
+    type=int,
+    help="Upper bound for tokens generated in a completion (including reasoning tokens).",
+)
+@click.option(
+    "-n",
+    "--count",
+    default=None,
+    type=int,
+    help="Number of completion choices to generate.",
+)
+@click.option(
+    "--top-p",
+    default=None,
+    type=float,
+    help="Nucleus sampling probability mass (0-1). Alternative to temperature.",
+)
+@click.option(
+    "--frequency-penalty",
+    default=None,
+    type=float,
+    help="Penalize tokens by their frequency in the text so far (-2.0 to 2.0).",
+)
+@click.option(
+    "--presence-penalty",
+    default=None,
+    type=float,
+    help="Penalize tokens that have already appeared in the text (-2.0 to 2.0).",
+)
+@click.option(
+    "--seed",
+    default=None,
+    type=int,
+    help="Seed for deterministic sampling.",
+)
+@click.option(
+    "--stop",
+    default=None,
+    multiple=True,
+    help="Stop sequence(s) where the API will stop generating (repeatable).",
+)
+@click.option(
+    "--reasoning-effort",
+    type=click.Choice(["minimal", "low", "medium", "high"]),
+    default=None,
+    help="Reasoning effort for extended thinking models.",
+)
+@click.option(
+    "--user",
+    default=None,
+    help="Unique end-user identifier for monitoring and abuse detection.",
+)
+@click.option(
+    "--service-tier",
+    type=click.Choice(["auto", "default", "flex", "scale", "priority"]),
+    default=None,
+    help="Processing type for serving the request.",
+)
+@click.option(
+    "--store",
+    is_flag=True,
+    default=False,
+    help="Store the output for model distillation or evals.",
+)
+@click.option(
+    "--logprobs",
+    is_flag=True,
+    default=False,
+    help="Return log probabilities of the output tokens.",
+)
+@click.option(
+    "--top-logprobs",
+    default=None,
+    type=click.IntRange(0, 20),
+    help="Number of most likely tokens (0-20) to return at each token position.",
+)
+@click.option(
+    "--parallel-tool-calls",
+    is_flag=True,
+    default=False,
+    help="Enable parallel function calling during tool use.",
+)
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def chat(
+    ctx: click.Context,
+    prompt: str,
+    model: str,
+    system: str | None,
+    temperature: float | None,
+    max_tokens: int | None,
+    max_completion_tokens: int | None,
+    count: int | None,
+    top_p: float | None,
+    frequency_penalty: float | None,
+    presence_penalty: float | None,
+    seed: int | None,
+    stop: tuple[str, ...],
+    reasoning_effort: str | None,
+    user: str | None,
+    service_tier: str | None,
+    store: bool,
+    logprobs: bool,
+    top_logprobs: int | None,
+    parallel_tool_calls: bool,
+    output_json: bool,
+) -> None:
+    """Chat with a Claude model using the OpenAI-compatible endpoint.
+
+    PROMPT is the user message to send to the model.
+
+    \b
+    Examples:
+      claude chat "What is the capital of France?"
+      claude chat "Explain quantum computing" -m claude-3-5-sonnet-20241022
+      claude chat "Write a poem" --temperature 0.9
+      claude chat "Summarize this" -s "You are a concise summarizer"
+    """
+    client = get_client(ctx.obj.get("token"))
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": prompt})
+
+    payload: dict[str, object] = {
+        "model": model,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+        "max_completion_tokens": max_completion_tokens,
+        "n": count,
+        "top_p": top_p,
+        "frequency_penalty": frequency_penalty,
+        "presence_penalty": presence_penalty,
+        "seed": seed,
+        "stop": list(stop) if stop else None,
+        "reasoning_effort": reasoning_effort,
+        "user": user,
+        "service_tier": service_tier,
+        "store": store if store else None,
+        "logprobs": logprobs if logprobs else None,
+        "top_logprobs": top_logprobs,
+        "parallel_tool_calls": parallel_tool_calls if parallel_tool_calls else None,
+    }
+
+    try:
+        result = client.chat_completions(**payload)  # type: ignore[arg-type]
+        if output_json:
+            print_json(result)
+        else:
+            print_chat_result(result)
+    except ClaudeError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
