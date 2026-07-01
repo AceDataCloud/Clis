@@ -63,13 +63,15 @@ class TestChatCommand:
 
     @respx.mock
     def test_chat_with_model(self, runner, mock_chat_response):
-        respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
+        route = respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
-            cli, ["--token", "test-token", "chat", "Hello", "-m", "glm-5.1", "--json"]
+            cli, ["--token", "test-token", "chat", "Hello", "-m", "glm-5-turbo", "--json"]
         )
         assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "glm-5-turbo"
 
     @respx.mock
     def test_chat_with_system_prompt(self, runner, mock_chat_response):
@@ -106,6 +108,9 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
+        assert "glm-5.2" in result.output
+        assert "glm-5" in result.output
+        assert "glm-5-turbo" in result.output
         assert "glm-4.7" in result.output
         assert "glm-5.1" in result.output
 

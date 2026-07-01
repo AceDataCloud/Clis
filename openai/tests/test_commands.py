@@ -99,11 +99,11 @@ class TestChatCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "-m", "gpt-5.4", "--json"],
+            ["--token", "test-token", "chat", "Hello", "-m", "gpt-5.4-mini", "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "gpt-5.4"
+        assert body["model"] == "gpt-5.4-mini"
 
     @respx.mock
     def test_chat_with_system_prompt(self, runner, mock_chat_response):
@@ -495,11 +495,11 @@ class TestResponseCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "response", "Hello", "-m", "gpt-5.4", "--json"],
+            ["--token", "test-token", "response", "Hello", "-m", "gpt-5.4-nano", "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "gpt-5.4"
+        assert body["model"] == "gpt-5.4-nano"
 
     @respx.mock
     def test_response_with_count(self, runner, mock_response_api_response):
