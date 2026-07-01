@@ -163,7 +163,7 @@ class TestTaskCommands:
 
     @respx.mock
     def test_task_json(self, runner, mock_task_response):
-        respx.post("https://api.acedata.cloud/dreamina/tasks").mock(
+        route = respx.post("https://api.acedata.cloud/dreamina/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
         result = runner.invoke(
@@ -172,6 +172,28 @@ class TestTaskCommands:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["id"] == "362b4fed-67bd-11f1-ad11-00163e57d510"
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["id"] == "362b4fed-67bd-11f1-ad11-00163e57d510"
+
+    @respx.mock
+    def test_task_with_trace_id(self, runner, mock_task_response):
+        route = respx.post("https://api.acedata.cloud/dreamina/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "--trace-id",
+                "a9063166-26ed-4451-85b5-54e896817c69",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["trace_id"] == "a9063166-26ed-4451-85b5-54e896817c69"
 
     @respx.mock
     def test_task_rich_output(self, runner, mock_task_response):

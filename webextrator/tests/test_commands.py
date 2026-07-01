@@ -96,7 +96,7 @@ class TestExtractCommand:
 
     @respx.mock
     def test_extract_with_enable_llm(self, runner, mock_extract_response):
-        respx.post("https://api.acedata.cloud/webextrator/extract").mock(
+        route = respx.post("https://api.acedata.cloud/webextrator/extract").mock(
             return_value=Response(200, json=mock_extract_response)
         )
         result = runner.invoke(
@@ -111,6 +111,31 @@ class TestExtractCommand:
             ],
         )
         assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["enable_llm"] is True
+
+    @respx.mock
+    def test_extract_with_block_resources_and_headers(self, runner, mock_extract_response):
+        route = respx.post("https://api.acedata.cloud/webextrator/extract").mock(
+            return_value=Response(200, json=mock_extract_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extract",
+                "https://example.com",
+                "--block-resources",
+                "--headers",
+                '{"Accept-Language":"en-US"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["block_resources"] is True
+        assert sent["headers"] == {"Accept-Language": "en-US"}
 
     def test_extract_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "extract", "https://example.com"])
@@ -164,7 +189,7 @@ class TestRenderCommand:
 
     @respx.mock
     def test_render_with_callback(self, runner, mock_render_response):
-        respx.post("https://api.acedata.cloud/webextrator/render").mock(
+        route = respx.post("https://api.acedata.cloud/webextrator/render").mock(
             return_value=Response(200, json=mock_render_response)
         )
         result = runner.invoke(
@@ -180,6 +205,31 @@ class TestRenderCommand:
             ],
         )
         assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["callback_url"] == "https://my.server.com/webhook"
+
+    @respx.mock
+    def test_render_with_block_resources_and_headers(self, runner, mock_render_response):
+        route = respx.post("https://api.acedata.cloud/webextrator/render").mock(
+            return_value=Response(200, json=mock_render_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "render",
+                "https://example.com",
+                "--block-resources",
+                "--headers",
+                '{"X-Test":"1"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["block_resources"] is True
+        assert sent["headers"] == {"X-Test": "1"}
 
     def test_render_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "render", "https://example.com"])
