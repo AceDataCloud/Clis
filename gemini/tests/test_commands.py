@@ -89,9 +89,9 @@ class TestChatCommand:
         for model in [
             "gemini-2.5-flash-lite",
             "gemini-3.1-flash-lite-preview",
-            "gemini-3.1-flash-image-preview",
+            "gemini-3.1-flash-image",
             "gemini-2.5-flash-image",
-            "gemini-3-pro-image-preview",
+            "gemini-3-pro-image",
         ]:
             respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
                 return_value=Response(200, json=mock_chat_response)
