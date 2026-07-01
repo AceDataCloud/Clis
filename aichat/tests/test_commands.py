@@ -77,11 +77,11 @@ class TestChatCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "-m", "gpt-4o-mini", "--json"],
+            ["--token", "test-token", "chat", "Hello", "-m", "gpt-5.4-mini", "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "gpt-4o-mini"
+        assert body["model"] == "gpt-5.4-mini"
 
     @respx.mock
     def test_chat_with_conversation_id(self, runner, mock_chat_response):
@@ -169,6 +169,10 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
+        assert "gpt-5.4-mini" in result.output
+        assert "gpt-5.4-nano" in result.output
+        assert "glm-5" in result.output
+        assert "glm-5-turbo" in result.output
         assert "gpt-4o" in result.output
         assert "deepseek" in result.output.lower()
 
