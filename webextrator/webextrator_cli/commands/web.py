@@ -1,5 +1,7 @@
 """Web extraction and rendering commands."""
 
+import json
+
 import click
 
 from webextrator_cli.core.client import get_client
@@ -11,6 +13,21 @@ from webextrator_cli.core.output import (
     print_json,
     print_render_result,
 )
+
+
+def _parse_headers(headers: str | None) -> dict[str, str] | None:
+    """Parse --headers JSON option."""
+    if headers is None:
+        return None
+    try:
+        parsed = json.loads(headers)
+    except json.JSONDecodeError as exc:
+        raise click.BadParameter("--headers must be a valid JSON object.") from exc
+    if not isinstance(parsed, dict) or not all(
+        isinstance(k, str) and isinstance(v, str) for k, v in parsed.items()
+    ):
+        raise click.BadParameter("--headers must be a JSON object of string key/value pairs.")
+    return parsed
 
 
 @click.command()
@@ -51,6 +68,16 @@ from webextrator_cli.core.output import (
     help="CSS selector to wait for before starting extraction.",
 )
 @click.option(
+    "--block-resources/--no-block-resources",
+    default=None,
+    help="Block non-essential resources (images/fonts/media) during page load.",
+)
+@click.option(
+    "--headers",
+    default=None,
+    help='Custom request headers as JSON, e.g. \'{"Accept-Language":"en-US"}\'.',
+)
+@click.option(
     "--user-agent",
     default=None,
     help="Override the User-Agent header.",
@@ -78,6 +105,8 @@ def extract(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
+    block_resources: bool | None,
+    headers: str | None,
     user_agent: str | None,
     callback_url: str | None,
     async_mode: bool,
@@ -102,6 +131,8 @@ def extract(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
+        "block_resources": block_resources,
+        "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
         "async": async_mode,
@@ -144,6 +175,16 @@ def extract(
     help="CSS selector to wait for before capturing HTML.",
 )
 @click.option(
+    "--block-resources/--no-block-resources",
+    default=None,
+    help="Block non-essential resources (images/fonts/media) during page load.",
+)
+@click.option(
+    "--headers",
+    default=None,
+    help='Custom request headers as JSON, e.g. \'{"Accept-Language":"en-US"}\'.',
+)
+@click.option(
     "--user-agent",
     default=None,
     help="Override the User-Agent header.",
@@ -169,6 +210,8 @@ def render(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
+    block_resources: bool | None,
+    headers: str | None,
     user_agent: str | None,
     callback_url: str | None,
     async_mode: bool,
@@ -191,6 +234,8 @@ def render(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
+        "block_resources": block_resources,
+        "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
         "async": async_mode,

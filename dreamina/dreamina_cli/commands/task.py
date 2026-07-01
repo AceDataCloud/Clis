@@ -10,12 +10,18 @@ from dreamina_cli.core.output import print_error, print_json, print_success, pri
 
 
 @click.command()
-@click.argument("task_id")
+@click.argument("task_id", required=False)
+@click.option(
+    "--trace-id",
+    default=None,
+    help="Trace ID to query when task ID is not available.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def task(
     ctx: click.Context,
-    task_id: str,
+    task_id: str | None,
+    trace_id: str | None,
     output_json: bool,
 ) -> None:
     """Query a single task status.
@@ -28,7 +34,10 @@ def task(
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.query_task(id=task_id, action="retrieve")
+        if not task_id and not trace_id:
+            raise click.UsageError("Provide either a task ID or use --trace-id.")
+
+        result = client.query_task(id=task_id, trace_id=trace_id, action="retrieve")
         if output_json:
             print_json(result)
         else:
