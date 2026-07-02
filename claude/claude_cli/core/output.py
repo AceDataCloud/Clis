@@ -13,6 +13,7 @@ console = Console()
 # Claude chat completion models (OpenAI-compatible endpoint)
 CHAT_MODELS = [
     "claude-opus-4-8",
+    "claude-fable-5",
     "claude-sonnet-5",
     "claude-sonnet-4-6",
     "claude-opus-4-7",

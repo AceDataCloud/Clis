@@ -349,6 +349,7 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         assert "claude" in result.output.lower()
+        assert "claude-fable-5" in result.output
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
