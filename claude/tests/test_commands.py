@@ -351,8 +351,160 @@ class TestInfoCommands:
         assert "claude" in result.output.lower()
         assert "claude-fable-5" in result.output
 
+    def test_models_first_entry(self, runner):
+        result = runner.invoke(cli, ["models"])
+        assert result.exit_code == 0
+        lines = [line for line in result.output.splitlines() if "claude-" in line]
+        assert "claude-fable-5" in lines[0]
+
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
         assert result.exit_code == 0
         assert "API Token" in result.output
         assert "API Base URL" in result.output
+
+
+# ─── Messages Thinking ────────────────────────────────────────────────────
+
+
+class TestMessagesThinking:
+    """Tests for the --thinking-type and --thinking-budget-tokens options."""
+
+    @respx.mock
+    def test_messages_with_thinking_enabled(self, runner, mock_messages_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+            return_value=Response(200, json=mock_messages_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "messages",
+                "Think carefully",
+                "--thinking-type",
+                "enabled",
+                "--thinking-budget-tokens",
+                "2048",
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["thinking"] == {"type": "enabled", "budget_tokens": 2048}
+
+    @respx.mock
+    def test_messages_with_thinking_disabled(self, runner, mock_messages_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+            return_value=Response(200, json=mock_messages_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "messages",
+                "Hello",
+                "--thinking-type",
+                "disabled",
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["thinking"] == {"type": "disabled"}
+
+    @respx.mock
+    def test_messages_with_thinking_adaptive(self, runner, mock_messages_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+            return_value=Response(200, json=mock_messages_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "messages",
+                "Hello",
+                "--thinking-type",
+                "adaptive",
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["thinking"] == {"type": "adaptive"}
+
+    @respx.mock
+    def test_messages_without_thinking(self, runner, mock_messages_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+            return_value=Response(200, json=mock_messages_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "messages", "Hello"]
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body.get("thinking") is None
+
+    def test_messages_thinking_budget_below_minimum(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "messages",
+                "Hello",
+                "--thinking-type",
+                "enabled",
+                "--thinking-budget-tokens",
+                "512",
+            ],
+        )
+        assert result.exit_code != 0
+
+    def test_messages_thinking_enabled_requires_budget(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "messages",
+                "Hello",
+                "--thinking-type",
+                "enabled",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "thinking-budget-tokens" in result.output
+
+    @respx.mock
+    def test_count_tokens_with_thinking_enabled(self, runner, mock_count_tokens_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
+            return_value=Response(200, json=mock_count_tokens_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "count-tokens",
+                "Hello",
+                "--thinking-type",
+                "enabled",
+                "--thinking-budget-tokens",
+                "1024",
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["thinking"] == {"type": "enabled", "budget_tokens": 1024}
+
+    @respx.mock
+    def test_count_tokens_without_thinking(self, runner, mock_count_tokens_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
+            return_value=Response(200, json=mock_count_tokens_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "count-tokens", "Hello"]
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body.get("thinking") is None
