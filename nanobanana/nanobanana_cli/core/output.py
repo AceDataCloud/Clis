@@ -14,6 +14,9 @@ NANOBANANA_MODELS = [
     "nano-banana",
     "nano-banana-2",
     "nano-banana-pro",
+    "nano-banana:official",
+    "nano-banana-2:official",
+    "nano-banana-pro:official",
 ]
 
 DEFAULT_MODEL = "nano-banana"
@@ -138,6 +141,21 @@ def print_models() -> None:
     table.add_row(
         "nano-banana-pro",
         "Best quality (Gemini 3 Pro)",
+        "Highest quality, resolution control (1K/2K/4K)",
+    )
+    table.add_row(
+        "nano-banana:official",
+        "Fast generation, official variant",
+        "Quick, good quality",
+    )
+    table.add_row(
+        "nano-banana-2:official",
+        "Improved generation, official variant",
+        "Better quality, balanced speed",
+    )
+    table.add_row(
+        "nano-banana-pro:official",
+        "Best quality, official variant",
         "Highest quality, resolution control (1K/2K/4K)",
     )
 

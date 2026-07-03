@@ -89,6 +89,25 @@ class TestImageCommands:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_generate_with_official_model(self, runner, mock_image_response):
+        respx.post("https://api.acedata.cloud/nano-banana/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "-m",
+                "nano-banana-pro:official",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
     def test_generate_with_aspect_ratio(self, runner, mock_image_response):
         respx.post("https://api.acedata.cloud/nano-banana/images").mock(
             return_value=Response(200, json=mock_image_response)
@@ -270,6 +289,7 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "nano-banana" in result.output
         assert "nano-banana-pro" in result.output
+        assert ":official" in result.output
 
     def test_aspect_ratios(self, runner):
         result = runner.invoke(cli, ["aspect-ratios"])
