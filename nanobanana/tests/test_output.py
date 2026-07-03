@@ -19,7 +19,7 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(NANOBANANA_MODELS) == 3
+        assert len(NANOBANANA_MODELS) == 6
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in NANOBANANA_MODELS
@@ -28,6 +28,9 @@ class TestConstants:
         assert "nano-banana" in NANOBANANA_MODELS
         assert "nano-banana-2" in NANOBANANA_MODELS
         assert "nano-banana-pro" in NANOBANANA_MODELS
+        assert "nano-banana:official" in NANOBANANA_MODELS
+        assert "nano-banana-2:official" in NANOBANANA_MODELS
+        assert "nano-banana-pro:official" in NANOBANANA_MODELS
 
     def test_aspect_ratios(self):
         assert len(ASPECT_RATIOS) == 7
@@ -129,3 +132,4 @@ class TestPrintModels:
         captured = capsys.readouterr()
         assert "nano-banana" in captured.out
         assert "nano-banana-pro" in captured.out
+        assert ":official" in captured.out
