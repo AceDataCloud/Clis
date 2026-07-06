@@ -228,13 +228,13 @@ class TestVideoCommand:
             [
                 "--token", "test-token",
                 "video", "test",
-                "-m", "grok-imagine-video-1.5-preview",
+                "-m", "grok-imagine-video-1.5",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "grok-imagine-video-1.5-preview"
+        assert sent["model"] == "grok-imagine-video-1.5"
 
     @respx.mock
     def test_video_with_image_url(self, runner, mock_video_response):
