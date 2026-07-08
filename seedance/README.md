@@ -104,7 +104,7 @@ Most commands support:
 --model TEXT                 Seedance model version (default: doubao-seedance-2-0-260128)
 --aspect-ratio TEXT          Aspect ratio (16:9, 9:16, 1:1, 4:3, 3:4, 21:9, adaptive)
 --resolution TEXT            Output resolution (480p, 720p, 1080p, 4k)
---duration FLOAT             Duration in seconds (2–15). Mutually exclusive with --frames.
+--duration INT               Duration in seconds (-1 for default, or an integer up to 15). Mutually exclusive with --frames.
 --frames INT                 Frame count (29–361, must satisfy 25+4n). Mutually exclusive with --duration.
 --seed INT                   Random seed for reproducible generation (-1 for random).
 --camerafixed BOOL           Fix the camera position (true/false).
