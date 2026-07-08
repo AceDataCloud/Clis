@@ -66,6 +66,7 @@ IMAGE_MODELS = [
     "gpt-image-2:reverse",
     "gpt-image-2:official",
     "nano-banana",
+    "nano-banana-2-lite",
     "nano-banana-2",
     "nano-banana-pro",
 ]

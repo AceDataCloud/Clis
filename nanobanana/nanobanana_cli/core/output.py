@@ -12,9 +12,11 @@ console = Console()
 # Available models
 NANOBANANA_MODELS = [
     "nano-banana",
+    "nano-banana-2-lite",
     "nano-banana-2",
     "nano-banana-pro",
     "nano-banana:official",
+    "nano-banana-2-lite:official",
     "nano-banana-2:official",
     "nano-banana-pro:official",
 ]
@@ -134,6 +136,11 @@ def print_models() -> None:
         "Quick, good quality",
     )
     table.add_row(
+        "nano-banana-2-lite",
+        "Lite generation",
+        "Lightweight, fast speed",
+    )
+    table.add_row(
         "nano-banana-2",
         "Improved generation",
         "Better quality, balanced speed",
@@ -147,6 +154,11 @@ def print_models() -> None:
         "nano-banana:official",
         "Fast generation, official variant",
         "Quick, good quality",
+    )
+    table.add_row(
+        "nano-banana-2-lite:official",
+        "Lite generation, official variant",
+        "Lightweight, fast speed",
     )
     table.add_row(
         "nano-banana-2:official",
