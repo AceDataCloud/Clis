@@ -1,5 +1,7 @@
 """Motion generation command."""
 
+import json
+
 import click
 
 from kling_cli.core.client import get_client
@@ -11,6 +13,8 @@ from kling_cli.core.output import (
     print_json,
     print_video_result,
 )
+
+MOTION_MODELS = ["kling-v2-6", "kling-v3"]
 
 
 @click.command()
@@ -39,9 +43,21 @@ from kling_cli.core.output import (
     help="Generation mode: std (High performance) or pro (High quality).",
 )
 @click.option(
+    "-m",
+    "--model-name",
+    type=click.Choice(MOTION_MODELS),
+    default=None,
+    help="Model to use for motion generation.",
+)
+@click.option(
     "--keep-original-sound/--no-keep-original-sound",
     default=True,
     help="Whether to keep the original sound from the reference video (default: keep).",
+)
+@click.option(
+    "--watermark-info",
+    default=None,
+    help='Watermark configuration as a JSON string, e.g. \'{"enabled": true}\'.',
 )
 @click.option("--prompt", default=None, help="Text prompt (positive and/or negative descriptions).")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
@@ -63,7 +79,9 @@ def motion(
     video_url: str,
     character_orientation: str | None,
     mode: str,
+    model_name: str | None,
     keep_original_sound: bool,
+    watermark_info: str | None,
     prompt: str | None,
     callback_url: str | None,
     async_mode: bool,
@@ -81,6 +99,15 @@ def motion(
 
       kling motion --image-url img.jpg --video-url ref.mp4 --prompt "A dancer performing"
     """
+    parsed_watermark_info = None
+    if watermark_info is not None:
+        try:
+            parsed_watermark_info = json.loads(watermark_info)
+        except json.JSONDecodeError as exc:
+            raise click.BadParameter(
+                "Must be a valid JSON string.", param_hint="--watermark-info"
+            ) from exc
+
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.generate_motion(
@@ -88,7 +115,9 @@ def motion(
             video_url=video_url,
             character_orientation=character_orientation,
             mode=mode,
+            model_name=model_name,
             keep_original_sound="yes" if keep_original_sound else "no",
+            watermark_info=parsed_watermark_info,
             prompt=prompt,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
