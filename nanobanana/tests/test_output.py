@@ -19,13 +19,14 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(NANOBANANA_MODELS) == 6
+        assert len(NANOBANANA_MODELS) == 8
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in NANOBANANA_MODELS
 
     def test_models_include_all(self):
         assert "nano-banana" in NANOBANANA_MODELS
+        assert "nano-banana-2-lite" in NANOBANANA_MODELS
         assert "nano-banana-2" in NANOBANANA_MODELS
         assert "nano-banana-pro" in NANOBANANA_MODELS
         assert "nano-banana:official" in NANOBANANA_MODELS
