@@ -555,6 +555,88 @@ class TestMotionCommands:
         )
         assert result.exit_code != 0
 
+    @respx.mock
+    def test_motion_model_name(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/motion").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--model-name",
+                "kling-v3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model_name"] == "kling-v3"
+
+    def test_motion_invalid_model_name(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--model-name",
+                "invalid-model",
+            ],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_motion_watermark_info(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/motion").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--watermark-info",
+                '{"enabled": true}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["watermark_info"] == {"enabled": True}
+
+    def test_motion_watermark_info_invalid_json(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--watermark-info",
+                "not-valid-json",
+            ],
+        )
+        assert result.exit_code != 0
+
 
 # ─── Lip Sync / Talking Photo Commands ───────────────────────────────────────
 
