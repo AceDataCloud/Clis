@@ -11,6 +11,7 @@ console = Console()
 
 # Available models
 VEO_MODELS = [
+    "veo2-fast",
     "veo3",
     "veo3-fast",
     "veo31",
@@ -147,6 +148,11 @@ def print_models() -> None:
     table.add_column("Version", style="bold")
     table.add_column("Notes")
 
+    table.add_row(
+        "veo2-fast",
+        "V2 Fast",
+        "Fast V2 model",
+    )
     table.add_row(
         "veo3",
         "V3",
