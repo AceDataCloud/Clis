@@ -1,0 +1,7 @@
+version: "3"
+services:
+  happyhorse-cli:
+    platform: linux/amd64
+    container_name: "happyhorse-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/happyhorse-cli:${BUILD_NUMBER}"
