@@ -14,7 +14,7 @@ Generate AI images directly from your terminal — no MCP client required.
 
 - **Image Generation** — Generate images from text prompts with multiple models
 - **Image Editing** — Edit, combine, and transform images with AI
-- **Multiple Models** — doubao-seedream-5-0-260128, doubao-seedream-4-5-251128, doubao-seedream-4-0-250828, doubao-seedream-3-0-t2i-250415, doubao-seededit-3-0-i2i-250628
+- **Multiple Models** — doubao-seedream-5-0-pro-260628, doubao-seedream-5-0-260128, doubao-seedream-4-5-251128, doubao-seedream-4-0-250828, doubao-seedream-3-0-t2i-250415, doubao-seededit-3-0-i2i-250628
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -107,6 +107,7 @@ Most commands support:
 
 | Model | Version | Notes |
 |-------|---------|-------|
+| `doubao-seedream-5-0-pro-260628` | V5.0 Pro | Flagship single image (no image sets/streaming/web search) |
 | `doubao-seedream-5-0-260128` | V5.0 | Latest model (default) |
 | `doubao-seedream-4-5-251128` | V4.5 | Flagship model, best quality |
 | `doubao-seedream-4-0-250828` | V4.0 | Standard quality |
