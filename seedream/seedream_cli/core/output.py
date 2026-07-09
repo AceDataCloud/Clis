@@ -11,6 +11,7 @@ console = Console()
 
 # Available models
 SEEDREAM_MODELS = [
+    "doubao-seedream-5-0-pro-260628",
     "doubao-seedream-5-0-260128",
     "doubao-seedream-4-5-251128",
     "doubao-seedream-4-0-250828",

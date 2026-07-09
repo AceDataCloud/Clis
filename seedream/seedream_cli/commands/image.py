@@ -57,7 +57,7 @@ from seedream_cli.core.output import (
     "--output-format",
     type=click.Choice(["jpeg", "png"]),
     default=None,
-    help="Output image file format: jpeg (default) or png. Only supported for doubao-seedream-5-0-260128.",
+    help="Output image file format: jpeg (default) or png. Only supported for doubao-seedream-5-0-pro-260628 and doubao-seedream-5-0-260128.",
 )
 @click.option(
     "--sequential-max-images",
