@@ -273,7 +273,7 @@ def upscale(
 ) -> None:
     """Generate a 1080p variant from a generated video.
 
-    VIDEO_ID is the ID of the video to upsample.
+    VIDEO_ID is the ID of the video to generate a 1080p variant from.
 
     Examples:
 
