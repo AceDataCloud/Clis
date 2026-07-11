@@ -15,8 +15,6 @@ from seedance_cli.core.output import (
     print_video_result,
 )
 
-_SERVICE_TIERS = ["default", "flex"]
-
 
 def _shared_video_options(f):  # type: ignore[no-untyped-def]
     """Decorator that attaches options shared by generate and image-to-video."""
@@ -85,12 +83,6 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             help="Return the last frame of the generated video (true/false).",
         ),
         click.option(
-            "--service-tier",
-            type=click.Choice(_SERVICE_TIERS),
-            default=None,
-            help="Service level type (default/flex).",
-        ),
-        click.option(
             "--execution-expires-after",
             type=int,
             default=None,
@@ -148,7 +140,6 @@ def _build_common_payload(
     watermark: bool | None,
     generate_audio: bool | None,
     return_last_frame: bool | None,
-    service_tier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
     async_mode: bool,
@@ -174,8 +165,6 @@ def _build_common_payload(
         payload["generate_audio"] = generate_audio
     if return_last_frame is not None:
         payload["return_last_frame"] = return_last_frame
-    if service_tier is not None:
-        payload["service_tier"] = service_tier
     if execution_expires_after is not None:
         payload["execution_expires_after"] = execution_expires_after
     if callback_url is not None:
@@ -239,7 +228,6 @@ def generate(
     watermark: bool | None,
     generate_audio: bool | None,
     return_last_frame: bool | None,
-    service_tier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
     first_frame_url: str | None,
@@ -276,7 +264,6 @@ def generate(
             watermark=watermark,
             generate_audio=generate_audio,
             return_last_frame=return_last_frame,
-            service_tier=service_tier,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
             async_mode=async_mode,
@@ -326,7 +313,6 @@ def image_to_video(
     watermark: bool | None,
     generate_audio: bool | None,
     return_last_frame: bool | None,
-    service_tier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
     first_frame_url: str | None,
@@ -363,7 +349,6 @@ def image_to_video(
             watermark=watermark,
             generate_audio=generate_audio,
             return_last_frame=return_last_frame,
-            service_tier=service_tier,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
             async_mode=async_mode,

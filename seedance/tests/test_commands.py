@@ -149,8 +149,6 @@ class TestGenerateCommands:
                 "true",
                 "--return-last-frame",
                 "true",
-                "--service-tier",
-                "flex",
                 "--execution-expires-after",
                 "7200",
                 "--json",
@@ -162,7 +160,7 @@ class TestGenerateCommands:
         assert sent["watermark"] is False
         assert sent["generate_audio"] is True
         assert sent["return_last_frame"] is True
-        assert sent["service_tier"] == "flex"
+        assert "service_tier" not in sent
         assert sent["execution_expires_after"] == 7200
 
     @respx.mock
