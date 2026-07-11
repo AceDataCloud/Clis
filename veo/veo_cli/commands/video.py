@@ -15,6 +15,7 @@ from veo_cli.core.output import (
     print_video_result,
 )
 
+# OpenAPI defines 1080p upscale via /veo/videos with action=get1080p.
 UPSCALE_1080P_ACTION = "get1080p"
 
 
