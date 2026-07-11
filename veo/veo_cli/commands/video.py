@@ -15,6 +15,8 @@ from veo_cli.core.output import (
     print_video_result,
 )
 
+UPSCALE_ACTION = "get1080p"
+
 
 @click.command()
 @click.argument("prompt")
@@ -283,7 +285,7 @@ def upscale(
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.upsample_video(
-            action="get1080p",
+            action=UPSCALE_ACTION,
             video_id=video_id,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),

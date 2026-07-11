@@ -261,7 +261,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_upscale_json(self, runner, mock_video_response):
-        route = respx.post("https://api.acedata.cloud/veo/videos").mock(
+        respx.post("https://api.acedata.cloud/veo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -269,8 +269,8 @@ class TestGenerateCommands:
             ["--token", "test-token", "upscale", "video-123", "--json"],
         )
         assert result.exit_code == 0
-        assert route.calls.last is not None
-        payload = json.loads(route.calls.last.request.read().decode("utf-8"))
+        assert respx.calls.last is not None
+        payload = json.loads(respx.calls.last.request.read().decode("utf-8"))
         assert payload["action"] == "get1080p"
 
 
