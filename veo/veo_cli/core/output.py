@@ -11,7 +11,6 @@ console = Console()
 
 # Available models
 VEO_MODELS = [
-    "veo2-fast",
     "veo3",
     "veo3-fast",
     "veo31",
@@ -27,36 +26,11 @@ ASPECT_RATIOS = [
     "9:16",
 ]
 
-# Models supported by the extend endpoint
-EXTEND_MODELS = [
-    "veo31-fast",
-    "veo31",
-]
-
 # Available resolutions
 RESOLUTIONS = [
     "4k",
     "1080p",
     "gif",
-]
-
-# Camera motion types for reshoot
-MOTION_TYPES = [
-    "STATIONARY",
-    "STATIONARY_UP",
-    "STATIONARY_DOWN",
-    "STATIONARY_LEFT",
-    "STATIONARY_RIGHT",
-    "STATIONARY_DOLLY_IN_ZOOM_OUT",
-    "STATIONARY_DOLLY_OUT_ZOOM_IN",
-    "UP",
-    "DOWN",
-    "LEFT_TO_RIGHT",
-    "RIGHT_TO_LEFT",
-    "FORWARD",
-    "BACKWARD",
-    "DOLLY_IN_ZOOM_OUT",
-    "DOLLY_OUT_ZOOM_IN",
 ]
 
 DEFAULT_ASPECT_RATIO = "16:9"
@@ -148,11 +122,6 @@ def print_models() -> None:
     table.add_column("Version", style="bold")
     table.add_column("Notes")
 
-    table.add_row(
-        "veo2-fast",
-        "V2 Fast",
-        "Fast V2 model",
-    )
     table.add_row(
         "veo3",
         "V3",

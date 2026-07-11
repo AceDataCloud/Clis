@@ -91,17 +91,6 @@ class TestGenerateCommands:
         assert result.exit_code == 0
 
     @respx.mock
-    def test_generate_with_veo2_fast(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/videos").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "generate", "test", "-m", "veo2-fast", "--json"],
-        )
-        assert result.exit_code == 0
-
-    @respx.mock
     def test_generate_with_portrait_aspect_ratio(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/veo/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -272,7 +261,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_upscale_json(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/upsample").mock(
+        route = respx.post("https://api.acedata.cloud/veo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -280,139 +269,9 @@ class TestGenerateCommands:
             ["--token", "test-token", "upscale", "video-123", "--json"],
         )
         assert result.exit_code == 0
-
-    @respx.mock
-    def test_upscale_4k(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/upsample").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "upscale", "video-123", "--action", "4k", "--json"],
-        )
-        assert result.exit_code == 0
-
-    @respx.mock
-    def test_extend_json(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/extend").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "extend", "video-123", "-m", "veo31-fast", "--json"],
-        )
-        assert result.exit_code == 0
-
-    @respx.mock
-    def test_extend_with_prompt(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/extend").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "extend",
-                "video-123",
-                "-m",
-                "veo31",
-                "--prompt",
-                "Continue the scene",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-
-    @respx.mock
-    def test_reshoot_json(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/reshoot").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "reshoot",
-                "video-123",
-                "--motion-type",
-                "FORWARD",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-
-    def test_reshoot_rejects_legacy_motion_type(self, runner):
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "reshoot",
-                "video-123",
-                "--motion-type",
-                "STATIONARY_PAN_LEFT",
-            ],
-        )
-        assert result.exit_code != 0
-        assert "Invalid value for '--motion-type'" in result.output
-
-    @respx.mock
-    def test_objects_insert_json(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/objects").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "objects",
-                "video-123",
-                "--action",
-                "insert",
-                "--prompt",
-                "Add a red balloon",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-
-    @respx.mock
-    def test_objects_remove_json(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/veo/objects").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "objects",
-                "video-123",
-                "--action",
-                "remove",
-                "--image-mask",
-                "https://example.com/mask.jpg",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-
-    def test_objects_insert_requires_prompt(self, runner):
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "objects", "video-123", "--action", "insert"],
-        )
-        assert result.exit_code != 0
-
-    def test_objects_remove_requires_mask(self, runner):
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "objects", "video-123", "--action", "remove"],
-        )
-        assert result.exit_code != 0
+        assert route.calls.last is not None
+        payload = json.loads(route.calls.last.request.read().decode("utf-8"))
+        assert payload["action"] == "get1080p"
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────
@@ -457,7 +316,6 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
-        assert "veo2-fast" in result.output
         assert "veo3" in result.output
         assert "veo31-fast-ingredients" in result.output
 
