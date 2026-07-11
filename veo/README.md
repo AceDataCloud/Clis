@@ -96,6 +96,8 @@ veo models
 | `veo config` | Show current configuration |
 | `veo aspect-ratios` | List available aspect ratios |
 
+> Note: The current Veo API supports `upscale` as a 1080p action only.
+
 
 ## Global Options
 

@@ -18,7 +18,7 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(VEO_MODELS) == 6
+        assert len(VEO_MODELS) == 5
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in VEO_MODELS
