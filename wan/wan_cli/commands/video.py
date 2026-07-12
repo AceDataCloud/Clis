@@ -194,8 +194,8 @@ def generate(
 )
 @click.option(
     "--reference-video-urls",
-    default=None,
-    help="Reference video file URL for character/timbre extraction.",
+    multiple=True,
+    help="Reference video URL for character/timbre extraction (repeatable).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
@@ -220,7 +220,7 @@ def image_to_video(
     audio: bool | None,
     prompt_extend: bool | None,
     audio_url: str | None,
-    reference_video_urls: str | None,
+    reference_video_urls: tuple[str, ...],
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -250,7 +250,7 @@ def image_to_video(
             "audio": audio,
             "prompt_extend": prompt_extend,
             "audio_url": audio_url,
-            "reference_video_urls": reference_video_urls,
+            "reference_video_urls": list(reference_video_urls) if reference_video_urls else None,
             "callback_url": callback_url,
             "async": async_mode,
         }

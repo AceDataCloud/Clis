@@ -14,7 +14,7 @@ from openai_cli.core.output import (
 
 
 @click.command()
-@click.argument("text")
+@click.argument("text", nargs=-1, required=True)
 @click.option(
     "-m",
     "--model",
@@ -40,7 +40,7 @@ from openai_cli.core.output import (
 @click.pass_context
 def embed(
     ctx: click.Context,
-    text: str,
+    text: tuple[str, ...],
     model: str,
     encoding_format: str,
     dimensions: int | None,
@@ -48,18 +48,21 @@ def embed(
 ) -> None:
     """Generate text embeddings.
 
-    TEXT is the input string to embed.
+    TEXT is the input string(s) to embed. Pass multiple TEXT arguments to
+    embed a batch of inputs in a single request.
 
     \b
     Examples:
       openai-cli embed "Hello, world!"
       openai-cli embed "Semantic search query" -m text-embedding-3-large
       openai-cli embed "Document text" --dimensions 256
+      openai-cli embed "First text" "Second text" "Third text"
     """
     client = get_client(ctx.obj.get("token"))
+    input_value: str | list[str] = text[0] if len(text) == 1 else list(text)
     payload: dict[str, object] = {
         "model": model,
-        "input": text,
+        "input": input_value,
         "encoding_format": encoding_format,
         "dimensions": dimensions,
     }

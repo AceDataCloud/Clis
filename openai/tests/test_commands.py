@@ -328,6 +328,29 @@ class TestEmbedCommands:
         assert result.exit_code == 0
         assert "Dimensions" in result.output
 
+    @respx.mock
+    def test_embed_single_text_sends_string(self, runner, mock_embedding_response):
+        route = respx.post("https://api.acedata.cloud/openai/embeddings").mock(
+            return_value=Response(200, json=mock_embedding_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "embed", "Hello world", "--json"])
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["input"] == "Hello world"
+
+    @respx.mock
+    def test_embed_multiple_texts_sends_array(self, runner, mock_embedding_response):
+        route = respx.post("https://api.acedata.cloud/openai/embeddings").mock(
+            return_value=Response(200, json=mock_embedding_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "embed", "First text", "Second text", "Third text", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["input"] == ["First text", "Second text", "Third text"]
+
 
 # ─── Image Commands ────────────────────────────────────────────────────────
 
