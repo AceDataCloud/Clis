@@ -30,7 +30,7 @@ def _parse_json_option(value: str | None, param_hint: str) -> Any:
         raise click.BadParameter("Must be a valid JSON string.", param_hint=param_hint) from exc
 
 
-def _build_element_list(element_ids: tuple[str, ...]) -> list[dict[str, str]] | None:
+def _build_element_list(element_ids: tuple[int, ...]) -> list[dict[str, int]] | None:
     """Build an element_list payload from a tuple of element IDs."""
     return [{"element_id": eid} for eid in element_ids] if element_ids else None
 
@@ -101,8 +101,9 @@ def _build_element_list(element_ids: tuple[str, ...]) -> list[dict[str, str]] | 
     "--element-id",
     "element_ids",
     multiple=True,
+    type=int,
     help=(
-        "Reference subject ID from the subject library. "
+        "Reference subject ID (integer) from the subject library. "
         "Can be specified multiple times (max 7 without reference video, 4 with)."
     ),
 )
@@ -133,7 +134,7 @@ def generate(
     callback_url: str | None,
     async_mode: bool,
     camera_control: str | None,
-    element_ids: tuple[str, ...],
+    element_ids: tuple[int, ...],
     video_list: str | None,
     timeout: int | None,
     output_json: bool,
@@ -249,8 +250,9 @@ def generate(
     "--element-id",
     "element_ids",
     multiple=True,
+    type=int,
     help=(
-        "Reference subject ID from the subject library. "
+        "Reference subject ID (integer) from the subject library. "
         "Can be specified multiple times (max 7 without reference video, 4 with)."
     ),
 )
@@ -282,7 +284,7 @@ def image_to_video(
     callback_url: str | None,
     async_mode: bool,
     camera_control: str | None,
-    element_ids: tuple[str, ...],
+    element_ids: tuple[int, ...],
     video_list: str | None,
     timeout: int | None,
     output_json: bool,

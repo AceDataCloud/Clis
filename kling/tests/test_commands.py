@@ -266,15 +266,15 @@ class TestGenerateCommands:
                 "generate",
                 "test",
                 "--element-id",
-                "elem-001",
+                "1001",
                 "--element-id",
-                "elem-002",
+                "1002",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["element_list"] == [{"element_id": "elem-001"}, {"element_id": "elem-002"}]
+        assert body["element_list"] == [{"element_id": 1001}, {"element_id": 1002}]
 
     @respx.mock
     def test_generate_with_video_list(self, runner, mock_video_response):
@@ -351,13 +351,13 @@ class TestGenerateCommands:
                 "--start-image-url",
                 "https://example.com/photo.jpg",
                 "--element-id",
-                "elem-abc",
+                "2001",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["element_list"] == [{"element_id": "elem-abc"}]
+        assert body["element_list"] == [{"element_id": 2001}]
 
     @respx.mock
     def test_image_to_video_with_video_list(self, runner, mock_video_response):
