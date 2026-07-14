@@ -18,6 +18,9 @@ CHAT_MODELS = [
     "gpt-4.1:free",
     "gpt-4o:free",
     "gpt-4o-mini:free",
+    "gpt-5.6-luna",
+    "gpt-5.6-terra",
+    "gpt-5.6-sol",
     "gpt-5.5",
     "gpt-5.5-pro",
     "gpt-5.4",
@@ -73,6 +76,9 @@ IMAGE_MODELS = [
 
 # Response API models
 RESPONSE_MODELS = [
+    "gpt-5.6-luna",
+    "gpt-5.6-terra",
+    "gpt-5.6-sol",
     "gpt-5.5",
     "gpt-5.5-pro",
     "gpt-5.4",
