@@ -194,6 +194,43 @@ class TestGenerateCommands:
         assert body["action"] == "image2video"
 
     @respx.mock
+    def test_image_to_video_with_image_list(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this",
+                "--image-list",
+                '[{"image_url": "https://example.com/start.jpg", "type": "first_frame"}]',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["image_list"] == [
+            {"image_url": "https://example.com/start.jpg", "type": "first_frame"}
+        ]
+
+    def test_image_to_video_with_invalid_image_list(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this",
+                "--image-list",
+                "not-valid-json",
+            ],
+        )
+        assert result.exit_code != 0
+
+    @respx.mock
     def test_extend_json(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/kling/videos").mock(
             return_value=Response(200, json=mock_video_response)
