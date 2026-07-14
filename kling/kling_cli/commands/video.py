@@ -192,6 +192,15 @@ def generate(
     help="URL of the end image (last frame). Only valid with a non-empty start-image-url.",
 )
 @click.option(
+    "--image-list",
+    default=None,
+    help=(
+        "Reference image(s) as a JSON array string. Each item must have image_url and may "
+        'include type (first_frame or end_frame). Example: \'[{"image_url": '
+        '"https://...", "type": "first_frame"}]\''
+    ),
+)
+@click.option(
     "-m",
     "--model",
     type=click.Choice(KLING_MODELS),
@@ -275,6 +284,7 @@ def image_to_video(
     prompt: str,
     start_image_url: str | None,
     end_image_url: str | None,
+    image_list: str | None,
     model: str,
     mode: str,
     aspect_ratio: str,
@@ -298,6 +308,8 @@ def image_to_video(
       kling image-to-video "Animate this scene" --start-image-url https://example.com/photo.jpg
 
       kling image-to-video "Transition" --start-image-url img1.jpg --end-image-url img2.jpg
+
+      kling image-to-video "Animate this scene" --image-list '[{"image_url":"https://example.com/photo.jpg","type":"first_frame"}]'
     """
     client = get_client(ctx.obj.get("token"))
     try:
@@ -306,6 +318,7 @@ def image_to_video(
             prompt=prompt,
             start_image_url=start_image_url,
             end_image_url=end_image_url,
+            image_list=_parse_json_option(image_list, "--image-list"),
             model=model,
             mode=mode,
             aspect_ratio=aspect_ratio,
