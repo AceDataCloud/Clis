@@ -12,6 +12,7 @@ console = Console()
 
 # Available Grok chat models
 GROK_CHAT_MODELS = [
+    "grok-4.5",
     "grok-4",
     "grok-3",
 ]
@@ -181,7 +182,8 @@ def print_chat_models() -> None:
     table.add_column("Model", style="bold cyan")
     table.add_column("Notes")
 
-    table.add_row("grok-4", "Latest Grok model (default)")
+    table.add_row("grok-4.5", "Grok 4.5")
+    table.add_row("grok-4", "Grok 4 (default)")
     table.add_row("grok-3", "Grok 3")
 
     console.print(table)

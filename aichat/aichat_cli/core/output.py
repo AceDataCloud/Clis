@@ -89,6 +89,7 @@ MODELS = [
     "deepseek-v3",
     "deepseek-v3-250324",
     "deepseek-v4-flash",
+    "grok-4.5",
     "grok-3",
     "glm-5.2",
     "glm-5",
