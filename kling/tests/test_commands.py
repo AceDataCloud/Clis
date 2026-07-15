@@ -447,6 +447,8 @@ class TestMotionCommands:
                 "https://example.com/img.jpg",
                 "--video-url",
                 "https://example.com/ref.mp4",
+                "--character-orientation",
+                "image",
                 "--json",
             ],
         )
@@ -469,6 +471,8 @@ class TestMotionCommands:
                 "https://example.com/img.jpg",
                 "--video-url",
                 "https://example.com/ref.mp4",
+                "--character-orientation",
+                "image",
             ],
         )
         assert result.exit_code == 0
@@ -488,6 +492,8 @@ class TestMotionCommands:
                 "https://example.com/img.jpg",
                 "--video-url",
                 "https://example.com/ref.mp4",
+                "--character-orientation",
+                "image",
                 "--mode",
                 "pro",
                 "--no-keep-original-sound",
@@ -523,6 +529,40 @@ class TestMotionCommands:
                 "motion",
                 "--image-url",
                 "https://example.com/img.jpg",
+            ],
+        )
+        assert result.exit_code != 0
+
+    def test_motion_missing_character_orientation(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+            ],
+        )
+        assert result.exit_code != 0
+
+    def test_motion_invalid_mode_4k(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--character-orientation",
+                "image",
+                "--mode",
+                "4k",
             ],
         )
         assert result.exit_code != 0
@@ -607,6 +647,8 @@ class TestMotionCommands:
                 "https://example.com/img.jpg",
                 "--video-url",
                 "https://example.com/ref.mp4",
+                "--character-orientation",
+                "image",
                 "--model-name",
                 "kling-v3",
                 "--json",
@@ -648,6 +690,8 @@ class TestMotionCommands:
                 "https://example.com/img.jpg",
                 "--video-url",
                 "https://example.com/ref.mp4",
+                "--character-orientation",
+                "image",
                 "--watermark-info",
                 '{"enabled": true}',
                 "--json",

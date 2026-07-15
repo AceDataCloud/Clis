@@ -153,6 +153,34 @@ class TestGenerateCommands:
         )
         assert result.exit_code == 0
 
+    @respx.mock
+    def test_generate_with_reference_video_urls(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/wan/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "-m",
+                "wan2.6-r2v",
+                "--reference-video-urls",
+                "https://example.com/ref1.mp4",
+                "--reference-video-urls",
+                "https://example.com/ref2.mp4",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["reference_video_urls"] == [
+            "https://example.com/ref1.mp4",
+            "https://example.com/ref2.mp4",
+        ]
+
     def test_generate_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
         assert result.exit_code != 0

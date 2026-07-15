@@ -7,14 +7,14 @@ import click
 from kling_cli.core.client import get_client
 from kling_cli.core.exceptions import KlingError
 from kling_cli.core.output import (
-    DEFAULT_MODE,
-    KLING_MODES,
     print_error,
     print_json,
     print_video_result,
 )
 
 MOTION_MODELS = ["kling-v2-6", "kling-v3"]
+MOTION_MODES = ["std", "pro"]
+DEFAULT_MOTION_MODE = "std"
 
 
 @click.command()
@@ -32,14 +32,14 @@ MOTION_MODELS = ["kling-v2-6", "kling-v3"]
 )
 @click.option(
     "--character-orientation",
-    default=None,
+    required=True,
     type=click.Choice(["image", "video"]),
     help="Orientation of characters in the generated video: consistent with the image or video.",
 )
 @click.option(
     "--mode",
-    type=click.Choice(KLING_MODES),
-    default=DEFAULT_MODE,
+    type=click.Choice(MOTION_MODES),
+    default=DEFAULT_MOTION_MODE,
     help="Generation mode: std (High performance) or pro (High quality).",
 )
 @click.option(
