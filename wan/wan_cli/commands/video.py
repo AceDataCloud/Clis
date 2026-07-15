@@ -69,6 +69,11 @@ from wan_cli.core.output import (
     default=None,
     help="URL of an audio file to use in the generated video.",
 )
+@click.option(
+    "--reference-video-urls",
+    multiple=True,
+    help="Reference video URL for character/timbre extraction (repeatable). Used with the wan2.6-r2v model.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -91,6 +96,7 @@ def generate(
     audio: bool | None,
     prompt_extend: bool | None,
     audio_url: str | None,
+    reference_video_urls: tuple[str, ...],
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -104,6 +110,8 @@ def generate(
       wan generate "Astronauts shuttle from space to volcano"
 
       wan generate "A cat playing with yarn" -m wan2.6-t2v
+
+      wan generate "Transform this scene" -m wan2.6-r2v --reference-video-urls https://example.com/ref.mp4
     """
     client = get_client(ctx.obj.get("token"))
     try:
@@ -119,6 +127,7 @@ def generate(
             "audio": audio,
             "prompt_extend": prompt_extend,
             "audio_url": audio_url,
+            "reference_video_urls": list(reference_video_urls) if reference_video_urls else None,
             "callback_url": callback_url,
             "async": async_mode,
         }
