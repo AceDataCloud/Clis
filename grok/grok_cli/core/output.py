@@ -183,7 +183,7 @@ def print_chat_models() -> None:
     table.add_column("Notes")
 
     table.add_row("grok-4.5", "Grok 4.5")
-    table.add_row("grok-4", "Latest Grok model (default)")
+    table.add_row("grok-4", "Grok 4 (default)")
     table.add_row("grok-3", "Grok 3")
 
     console.print(table)
