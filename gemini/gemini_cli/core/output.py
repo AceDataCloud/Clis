@@ -39,6 +39,10 @@ DEFAULT_VIDEO_MODEL = "omni-flash"
 ASPECT_RATIOS = ["16:9", "9:16"]
 DEFAULT_ASPECT_RATIO = "16:9"
 
+# Available resolutions for video
+VIDEO_RESOLUTIONS = ["720p", "1080p"]
+DEFAULT_VIDEO_RESOLUTION = "720p"
+
 
 def print_json(data: Any) -> None:
     """Print data as formatted JSON."""

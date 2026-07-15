@@ -30,6 +30,7 @@ class TestGlobalCommands:
         assert "generate" in result.output
         assert "task" in result.output
         assert "wait" in result.output
+        assert "video-to-video" in result.output
 
     def test_help_chat(self, runner):
         result = runner.invoke(cli, ["chat", "--help"])
@@ -43,11 +44,19 @@ class TestGlobalCommands:
         assert "PROMPT" in result.output
         assert "--model" in result.output
         assert "--aspect-ratio" in result.output
+        assert "--resolution" in result.output
 
     def test_help_image_to_video(self, runner):
         result = runner.invoke(cli, ["image-to-video", "--help"])
         assert result.exit_code == 0
         assert "--image-url" in result.output
+        assert "--resolution" in result.output
+
+    def test_help_video_to_video(self, runner):
+        result = runner.invoke(cli, ["video-to-video", "--help"])
+        assert result.exit_code == 0
+        assert "--video-url" in result.output
+        assert "--resolution" in result.output
 
 
 class TestChatCommand:
@@ -197,6 +206,74 @@ class TestVideoCommand:
 
     def test_generate_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "generate", "A sunset"])
+        assert result.exit_code != 0
+
+    @respx.mock
+    def test_generate_with_resolution(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/gemini/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token", "test-token", "generate", "A sunset",
+                "--resolution", "1080p", "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_image_to_video_with_resolution(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/gemini/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token", "test-token", "image-to-video", "Animate this",
+                "-i", "https://example.com/photo.jpg", "--resolution", "1080p", "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    @respx.mock
+    def test_video_to_video(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/gemini/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token", "test-token", "video-to-video", "Transform this",
+                "-v", "https://example.com/video.mp4", "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["data"]["id"] == "task-video-123"
+
+    @respx.mock
+    def test_video_to_video_with_resolution(self, runner, mock_video_response):
+        respx.post("https://api.acedata.cloud/gemini/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token", "test-token", "video-to-video", "Transform this",
+                "-v", "https://example.com/video.mp4", "--resolution", "1080p", "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+    def test_video_to_video_no_token(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token", "", "video-to-video", "Transform this",
+                "-v", "https://example.com/video.mp4",
+            ],
+        )
         assert result.exit_code != 0
 
 
