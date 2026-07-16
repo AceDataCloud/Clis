@@ -17,7 +17,7 @@ KLING_MODELS = [
     "kling-v2-6",
     "kling-v3",
     "kling-v3-omni",
-    "kling-video-o1",
+    "kling-o1",
     "kling-v2-master",
     "kling-v2-1-master",
 ]
@@ -138,7 +138,7 @@ def print_models() -> None:
         "kling-v2-6": "Version 2.6",
         "kling-v3": "Version 3 (supports 4K mode)",
         "kling-v3-omni": "Version 3 Omni (supports 4K mode)",
-        "kling-video-o1": "Video O1",
+        "kling-o1": "Video O1",
         "kling-v2-master": "Version 2 Master",
         "kling-v2-1-master": "Version 2.1 Master",
     }
