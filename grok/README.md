@@ -38,7 +38,7 @@ grok chat "Your prompt here" [OPTIONS]
 ```
 
 Options:
-- `-m, --model`: Model to use (`grok-4`, `grok-3`, default: `grok-4`)
+- `-m, --model`: Model to use (`grok-4.5`, `grok-4`, `grok-3`, default: `grok-4`)
 - `-s, --system`: System prompt
 - `--temperature`: Sampling temperature (0-2)
 - `--max-tokens`: Maximum tokens to generate
@@ -67,7 +67,7 @@ grok video [PROMPT] [OPTIONS]
 ```
 
 Options:
-- `-m, --model`: Video model (`grok-imagine-video`, `grok-imagine-video-1.5-preview`)
+- `-m, --model`: Video model (`grok-imagine-video-1.5-fast`, `grok-imagine-video-1.5`, default: `grok-imagine-video-1.5-fast`)
 - `--image-url`: Reference image URL for image-to-video
 - `--reference-image-url`: Additional reference image URLs (repeatable)
 - `-a, --aspect-ratio`: Aspect ratio (1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3)
