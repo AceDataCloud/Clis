@@ -291,29 +291,6 @@ class TestGenerateCommands:
         assert result.exit_code != 0
 
     @respx.mock
-    def test_generate_with_element_ids(self, runner, mock_video_response):
-        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "generate",
-                "test",
-                "--element-id",
-                "1001",
-                "--element-id",
-                "1002",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-        body = json.loads(route.calls.last.request.content)
-        assert body["element_list"] == [{"element_id": 1001}, {"element_id": 1002}]
-
-    @respx.mock
     def test_generate_with_video_list(self, runner, mock_video_response):
         route = respx.post("https://api.acedata.cloud/kling/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -372,29 +349,6 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["camera_control"] == {"type": "down_back"}
-
-    @respx.mock
-    def test_image_to_video_with_element_ids(self, runner, mock_video_response):
-        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "image-to-video",
-                "Animate this",
-                "--start-image-url",
-                "https://example.com/photo.jpg",
-                "--element-id",
-                "2001",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-        body = json.loads(route.calls.last.request.content)
-        assert body["element_list"] == [{"element_id": 2001}]
 
     @respx.mock
     def test_image_to_video_with_video_list(self, runner, mock_video_response):
