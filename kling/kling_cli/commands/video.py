@@ -30,11 +30,6 @@ def _parse_json_option(value: str | None, param_hint: str) -> Any:
         raise click.BadParameter("Must be a valid JSON string.", param_hint=param_hint) from exc
 
 
-def _build_element_list(element_ids: tuple[int, ...]) -> list[dict[str, int]] | None:
-    """Build an element_list payload from a tuple of element IDs."""
-    return [{"element_id": eid} for eid in element_ids] if element_ids else None
-
-
 @click.command()
 @click.argument("prompt")
 @click.option(
@@ -98,16 +93,6 @@ def _build_element_list(element_ids: tuple[int, ...]) -> list[dict[str, int]] | 
     ),
 )
 @click.option(
-    "--element-id",
-    "element_ids",
-    multiple=True,
-    type=int,
-    help=(
-        "Reference subject ID (integer) from the subject library. "
-        "Can be specified multiple times (max 7 without reference video, 4 with)."
-    ),
-)
-@click.option(
     "--video-list",
     default=None,
     help=(
@@ -134,7 +119,6 @@ def generate(
     callback_url: str | None,
     async_mode: bool,
     camera_control: str | None,
-    element_ids: tuple[int, ...],
     video_list: str | None,
     timeout: int | None,
     output_json: bool,
@@ -164,7 +148,6 @@ def generate(
             "callback_url": callback_url,
             "async": async_mode,
             "camera_control": _parse_json_option(camera_control, "--camera-control"),
-            "element_list": _build_element_list(element_ids),
             "video_list": _parse_json_option(video_list, "--video-list"),
             "timeout": timeout,
         }
@@ -256,16 +239,6 @@ def generate(
     ),
 )
 @click.option(
-    "--element-id",
-    "element_ids",
-    multiple=True,
-    type=int,
-    help=(
-        "Reference subject ID (integer) from the subject library. "
-        "Can be specified multiple times (max 7 without reference video, 4 with)."
-    ),
-)
-@click.option(
     "--video-list",
     default=None,
     help=(
@@ -294,7 +267,6 @@ def image_to_video(
     callback_url: str | None,
     async_mode: bool,
     camera_control: str | None,
-    element_ids: tuple[int, ...],
     video_list: str | None,
     timeout: int | None,
     output_json: bool,
@@ -328,7 +300,6 @@ def image_to_video(
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
             camera_control=_parse_json_option(camera_control, "--camera-control"),
-            element_list=_build_element_list(element_ids),
             video_list=_parse_json_option(video_list, "--video-list"),
             timeout=timeout,
         )
