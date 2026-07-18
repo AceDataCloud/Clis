@@ -206,6 +206,7 @@ class TestVideoCommand:
         assert data["task_id"] == "test-task-123"
         sent = json.loads(route.calls[0].request.content)
         assert sent["prompt"] == "A sunset over the ocean"
+        assert sent["duration"] == 6
 
     @respx.mock
     def test_video_rich_output(self, runner, mock_video_response):

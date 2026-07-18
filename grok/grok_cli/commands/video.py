@@ -55,7 +55,8 @@ from grok_cli.core.output import (
 @click.option(
     "--duration",
     type=int,
-    default=None,
+    default=6,
+    show_default=True,
     help="Duration of the video in seconds.",
 )
 @click.option(
