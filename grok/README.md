@@ -72,7 +72,7 @@ Options:
 - `--reference-image-url`: Additional reference image URLs (repeatable)
 - `-a, --aspect-ratio`: Aspect ratio (1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3)
 - `-r, --resolution`: Output resolution (480p, 720p, 1080p)
-- `--duration`: Duration in seconds
+- `--duration`: Duration in seconds (default: `6`)
 - `--callback-url`: Webhook callback URL
 - `--async`: Submit asynchronously
 - `--json`: Output raw JSON
