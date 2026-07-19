@@ -23,7 +23,7 @@ KIMI_MODELS = [
     "kimi-k2-0711-preview",
 ]
 
-DEFAULT_MODEL = "kimi-k2.6"
+DEFAULT_MODEL = "kimi-k3"
 
 # Available reasoning efforts
 REASONING_EFFORTS = ["max"]
@@ -97,8 +97,8 @@ def print_models() -> None:
     table.add_column("Notes")
 
     model_notes = {
-        "kimi-k3": "Kimi K3 (latest)",
-        "kimi-k2.6": "Kimi K2.6 (default)",
+        "kimi-k3": "Kimi K3 (default, latest)",
+        "kimi-k2.6": "Kimi K2.6",
         "kimi-k2-thinking-turbo": "Kimi K2 Thinking Turbo",
         "kimi-k2.5": "Kimi K2.5",
         "kimi-k2-thinking": "Kimi K2 Thinking",

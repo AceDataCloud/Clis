@@ -214,6 +214,7 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "kimi-k3" in result.output
         assert "kimi-k2.6" in result.output
+        assert "default" in result.output.lower()
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])

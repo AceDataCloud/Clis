@@ -3,13 +3,19 @@
 import click
 
 from aichat_cli.core.config import settings
-from aichat_cli.core.output import console, print_models
+from aichat_cli.core.output import console, print_models, print_models2
 
 
 @click.command()
 def models() -> None:
-    """List all available AI models."""
+    """List all available AI models for /aichat/conversations."""
     print_models()
+
+
+@click.command()
+def models2() -> None:
+    """List all available AI models for /aichat2/conversations."""
+    print_models2()
 
 
 @click.command()

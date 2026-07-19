@@ -30,7 +30,9 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["--help"])
         assert result.exit_code == 0
         assert "chat" in result.output
+        assert "chat2" in result.output
         assert "models" in result.output
+        assert "models2" in result.output
         assert "config" in result.output
 
     def test_help_chat(self, runner):
@@ -39,6 +41,14 @@ class TestGlobalCommands:
         assert "QUESTION" in result.output
         assert "--model" in result.output
         assert "--id" in result.output
+
+    def test_help_chat2(self, runner):
+        result = runner.invoke(cli, ["chat2", "--help"])
+        assert result.exit_code == 0
+        assert "QUESTION" in result.output
+        assert "--model" in result.output
+        assert "--action" in result.output
+        assert "--model-group" in result.output
 
 
 # ─── Chat Commands ────────────────────────────────────────────────────────
@@ -180,3 +190,118 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["config"])
         assert result.exit_code == 0
         assert "api.acedata.cloud" in result.output
+
+    def test_models2(self, runner):
+        result = runner.invoke(cli, ["models2"])
+        assert result.exit_code == 0
+        assert "claude-sonnet-5" in result.output
+        assert "gemini-3.1-pro" in result.output
+        assert "kimi-k3" in result.output
+        assert "kimi-k2.6" in result.output
+        assert "grok-4" in result.output
+
+
+# ─── Chat2 Commands ──────────────────────────────────────────────────────────
+
+
+class TestChat2Commands:
+    """Tests for chat2 command."""
+
+    @respx.mock
+    def test_chat2_json(self, runner, mock_chat_response):
+        respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "What is AI?", "--json"],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "answer" in data
+        assert "id" in data
+
+    @respx.mock
+    def test_chat2_with_model(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "-m", "claude-sonnet-5", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "claude-sonnet-5"
+
+    @respx.mock
+    def test_chat2_with_model_group(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--model-group",
+                "claude",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model_group"] == "claude"
+
+    @respx.mock
+    def test_chat2_with_action(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "--action", "chat", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == "chat"
+
+    @respx.mock
+    def test_chat2_with_max_turns(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "--max-turns", "5", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["max_turns"] == 5
+
+    @respx.mock
+    def test_chat2_sends_question(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "What is the meaning of life?", "--json"],
+        )
+        body = json.loads(route.calls.last.request.content)
+        assert body["question"] == "What is the meaning of life?"
+
+    @respx.mock
+    def test_chat2_with_kimi_model(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "-m", "kimi-k2.6", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "kimi-k2.6"
