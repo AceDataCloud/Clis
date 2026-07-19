@@ -105,11 +105,18 @@ class TestChatCommand:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "--reasoning-effort", "high", "--json"],
+            ["--token", "test-token", "chat", "Hello", "--reasoning-effort", "max", "--json"],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["reasoning_effort"] == "high"
+        assert sent["reasoning_effort"] == "max"
+
+    def test_chat_with_invalid_reasoning_effort(self, runner):
+        result = runner.invoke(
+            cli,
+            ["chat", "Hello", "--reasoning-effort", "minimal"],
+        )
+        assert result.exit_code != 0
 
     @respx.mock
     def test_chat_with_service_tier(self, runner, mock_chat_response):

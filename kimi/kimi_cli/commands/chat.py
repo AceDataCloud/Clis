@@ -7,6 +7,7 @@ from kimi_cli.core.exceptions import KimiError
 from kimi_cli.core.output import (
     DEFAULT_MODEL,
     KIMI_MODELS,
+    REASONING_EFFORTS,
     SERVICE_TIERS,
     print_chat_result,
     print_error,
@@ -87,8 +88,8 @@ from kimi_cli.core.output import (
 @click.option(
     "--reasoning-effort",
     default=None,
-    type=click.Choice(["minimal", "low", "medium", "high"]),
-    help="Reasoning effort level (minimal/low/medium/high).",
+    type=click.Choice(REASONING_EFFORTS),
+    help="Reasoning effort level (standard/high/max).",
 )
 @click.option(
     "--service-tier",
