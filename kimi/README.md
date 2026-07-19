@@ -50,7 +50,7 @@ Options:
 - `--seed`: Seed for deterministic sampling
 - `--stop`: Stop sequences (repeatable)
 - `--user`: End-user identifier
-- `--reasoning-effort`: Reasoning effort level (`max`)
+- `--reasoning-effort`: Reasoning effort level (currently only `max` is supported)
 - `--service-tier`: Service tier (auto/default/flex/scale/priority)
 - `--logprobs`: Return log probabilities of output tokens
 - `--top-logprobs`: Number of most likely tokens with log probabilities to return
