@@ -89,7 +89,7 @@ from kimi_cli.core.output import (
     "--reasoning-effort",
     default=None,
     type=click.Choice(REASONING_EFFORTS),
-    help="Reasoning effort level (standard/high/max).",
+    help="Reasoning effort level (currently only max is supported).",
 )
 @click.option(
     "--service-tier",

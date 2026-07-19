@@ -114,7 +114,7 @@ class TestChatCommand:
     def test_chat_with_invalid_reasoning_effort(self, runner):
         result = runner.invoke(
             cli,
-            ["chat", "Hello", "--reasoning-effort", "minimal"],
+            ["chat", "Hello", "--reasoning-effort", "high"],
         )
         assert result.exit_code != 0
 

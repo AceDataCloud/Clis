@@ -26,7 +26,7 @@ KIMI_MODELS = [
 DEFAULT_MODEL = "kimi-k2.6"
 
 # Available reasoning efforts
-REASONING_EFFORTS = ["standard", "high", "max"]
+REASONING_EFFORTS = ["max"]
 
 # Available service tiers
 SERVICE_TIERS = ["auto", "default", "flex", "scale", "priority"]
