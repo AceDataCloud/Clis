@@ -158,6 +158,24 @@ class TestImageCommands:
         )
         assert result.exit_code == 0
 
+    @respx.mock
+    def test_generate_with_count(self, runner, mock_image_response):
+        respx.post("https://api.acedata.cloud/nano-banana/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "test", "-n", "3", "--json"],
+        )
+        assert result.exit_code == 0
+
+    def test_generate_count_out_of_range(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "test", "-n", "5"],
+        )
+        assert result.exit_code != 0
+
     def test_generate_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
         assert result.exit_code != 0
@@ -243,6 +261,27 @@ class TestImageCommands:
         )
         assert result.exit_code == 0
         assert "test-task-123" in result.output
+
+    @respx.mock
+    def test_edit_with_count(self, runner, mock_image_response):
+        respx.post("https://api.acedata.cloud/nano-banana/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Make it artistic",
+                "-i",
+                "https://example.com/photo.jpg",
+                "-n",
+                "2",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────

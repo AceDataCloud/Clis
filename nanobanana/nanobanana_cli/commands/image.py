@@ -39,6 +39,13 @@ from nanobanana_cli.core.output import (
     default=None,
     help="Output resolution (nano-banana-pro only).",
 )
+@click.option(
+    "-n",
+    "--count",
+    type=click.IntRange(1, 4),
+    default=1,
+    help="Number of images to generate (1-4, default 1).",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -55,6 +62,7 @@ def generate(
     model: str,
     aspect_ratio: str,
     resolution: str | None,
+    count: int,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -79,6 +87,7 @@ def generate(
             "prompt": prompt,
             "model": model,
             "aspect_ratio": aspect_ratio,
+            "count": count,
             "callback_url": callback_url,
             "async": async_mode,
         }
@@ -112,6 +121,13 @@ def generate(
     default=DEFAULT_MODEL,
     help="NanoBanana model version.",
 )
+@click.option(
+    "-n",
+    "--count",
+    type=click.IntRange(1, 4),
+    default=1,
+    help="Number of images to generate (1-4, default 1).",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -127,6 +143,7 @@ def edit(
     prompt: str,
     image_urls: tuple[str, ...],
     model: str,
+    count: int,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -153,6 +170,7 @@ def edit(
             prompt=prompt,
             image_urls=list(image_urls),
             model=model,
+            count=count,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )
