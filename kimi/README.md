@@ -38,7 +38,7 @@ kimi chat "Your prompt here" [OPTIONS]
 ```
 
 Options:
-- `-m, --model`: Model to use (default: `kimi-k2.6`)
+- `-m, --model`: Model to use (default: `kimi-k3`)
 - `-s, --system`: System prompt
 - `--temperature`: Sampling temperature (0-2)
 - `--max-tokens`: Maximum tokens to generate
@@ -78,8 +78,8 @@ kimi config
 
 | Model | Notes |
 |-------|-------|
-| `kimi-k3` | Kimi K3 (latest) |
-| `kimi-k2.6` | Kimi K2.6 (default) |
+| `kimi-k3` | Kimi K3 (default, latest) |
+| `kimi-k2.6` | Kimi K2.6 |
 | `kimi-k2-thinking-turbo` | Kimi K2 Thinking Turbo |
 | `kimi-k2.5` | Kimi K2.5 |
 | `kimi-k2-thinking` | Kimi K2 Thinking |
