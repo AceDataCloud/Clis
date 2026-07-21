@@ -1,0 +1,7 @@
+version: "3"
+services:
+  midjourney-cli:
+    platform: linux/amd64
+    container_name: "midjourney-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/midjourney-cli:${BUILD_NUMBER}"

@@ -1,0 +1,1 @@
+"""Midjourney CLI core package."""
