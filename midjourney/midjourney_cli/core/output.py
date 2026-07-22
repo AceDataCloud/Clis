@@ -111,8 +111,8 @@ def _print_data_items(items: Any) -> None:
             "video_url",
             "seed",
             "descriptions",
-            "shortened_prompts",
-            "translated_content",
+            "prompts",
+            "content",
             "model_name",
             "created_at",
         ]:
