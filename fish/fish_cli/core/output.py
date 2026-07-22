@@ -13,13 +13,14 @@ console = Console()
 # Available Fish TTS models
 FISH_TTS_MODELS = [
     "s2-pro",
+    "s2.1-pro",
     "s1",
 ]
 
 DEFAULT_TTS_MODEL = "s2-pro"
 
 # Available audio formats
-AUDIO_FORMATS = ["mp3", "wav", "opus", "flac", "pcm"]
+AUDIO_FORMATS = ["mp3", "wav", "opus", "pcm"]
 
 DEFAULT_AUDIO_FORMAT = "mp3"
 
@@ -194,6 +195,7 @@ def print_tts_models() -> None:
     table.add_column("Notes")
 
     table.add_row("s2-pro", "Fish Audio S2 Pro (default)")
+    table.add_row("s2.1-pro", "Fish Audio S2.1 Pro")
     table.add_row("s1", "Fish Audio S1")
 
     console.print(table)

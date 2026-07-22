@@ -1,5 +1,7 @@
 """TTS generation command."""
 
+import json
+
 import click
 
 from fish_cli.core.client import get_client
@@ -15,6 +17,32 @@ from fish_cli.core.output import (
     print_json,
     print_tts_result,
 )
+
+
+def _parse_json_object_option(value: str | None, option_name: str) -> dict[str, object] | None:
+    """Parse a JSON object option."""
+    if value is None:
+        return None
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise click.BadParameter(f"{option_name} must be valid JSON.") from exc
+    if not isinstance(parsed, dict):
+        raise click.BadParameter(f"{option_name} must be a JSON object.")
+    return parsed
+
+
+def _parse_json_array_option(value: str | None, option_name: str) -> list[object] | None:
+    """Parse a JSON array option."""
+    if value is None:
+        return None
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise click.BadParameter(f"{option_name} must be valid JSON.") from exc
+    if not isinstance(parsed, list):
+        raise click.BadParameter(f"{option_name} must be a JSON array.")
+    return parsed
 
 
 @click.command()
@@ -53,11 +81,29 @@ from fish_cli.core.output import (
     help="MP3 output bitrate.",
 )
 @click.option(
+    "--opus-bitrate",
+    type=int,
+    default=None,
+    help="Opus output bitrate.",
+)
+@click.option(
     "--latency",
     type=click.Choice(LATENCY_MODES),
     default=DEFAULT_LATENCY,
     show_default=True,
     help="Latency mode.",
+)
+@click.option(
+    "--chunk-length",
+    type=int,
+    default=None,
+    help="Streaming chunk length.",
+)
+@click.option(
+    "--min-chunk-length",
+    type=int,
+    default=None,
+    help="Minimum streaming chunk length.",
 )
 @click.option(
     "--temperature",
@@ -89,6 +135,16 @@ from fish_cli.core.output import (
     help="Normalize audio output.",
 )
 @click.option(
+    "--prosody",
+    default=None,
+    help="Prosody controls as a JSON object.",
+)
+@click.option(
+    "--references",
+    default=None,
+    help="Reference clips as a JSON array.",
+)
+@click.option(
     "--callback-url",
     default=None,
     help="Webhook callback URL for async delivery.",
@@ -110,12 +166,17 @@ def tts(
     audio_format: str,
     sample_rate: int | None,
     mp3_bitrate: int | None,
+    opus_bitrate: int | None,
     latency: str,
+    chunk_length: int | None,
+    min_chunk_length: int | None,
     temperature: float | None,
     top_p: float | None,
     repetition_penalty: float | None,
     max_new_tokens: int | None,
     normalize: bool | None,
+    prosody: str | None,
+    references: str | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -143,6 +204,12 @@ def tts(
         payload["sample_rate"] = sample_rate
     if mp3_bitrate is not None:
         payload["mp3_bitrate"] = mp3_bitrate
+    if opus_bitrate is not None:
+        payload["opus_bitrate"] = opus_bitrate
+    if chunk_length is not None:
+        payload["chunk_length"] = chunk_length
+    if min_chunk_length is not None:
+        payload["min_chunk_length"] = min_chunk_length
     if temperature is not None:
         payload["temperature"] = temperature
     if top_p is not None:
@@ -153,6 +220,12 @@ def tts(
         payload["max_new_tokens"] = max_new_tokens
     if normalize is not None:
         payload["normalize"] = normalize
+    parsed_prosody = _parse_json_object_option(prosody, "--prosody")
+    if parsed_prosody is not None:
+        payload["prosody"] = parsed_prosody
+    parsed_references = _parse_json_array_option(references, "--references")
+    if parsed_references is not None:
+        payload["references"] = parsed_references
     if callback_url is not None:
         payload["callback_url"] = callback_url
     if async_mode:

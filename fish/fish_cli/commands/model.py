@@ -49,6 +49,16 @@ from fish_cli.core.output import print_error, print_json, print_model_detail, pr
     default=None,
     help="Filter by voice model language.",
 )
+@click.option(
+    "--title-language",
+    default=None,
+    help="Filter by title language.",
+)
+@click.option(
+    "--sort-by",
+    default=None,
+    help="Sort models by a specific field.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def models(
@@ -60,6 +70,8 @@ def models(
     self_only: bool,
     author_id: str | None,
     language: str | None,
+    title_language: str | None,
+    sort_by: str | None,
     output_json: bool,
 ) -> None:
     """List available Fish voice models.
@@ -86,6 +98,10 @@ def models(
         params["author_id"] = author_id
     if language is not None:
         params["language"] = language
+    if title_language is not None:
+        params["title_language"] = title_language
+    if sort_by is not None:
+        params["sort_by"] = sort_by
 
     try:
         result = client.list_models(params=params)
