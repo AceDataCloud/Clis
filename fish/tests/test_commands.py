@@ -38,11 +38,16 @@ class TestGlobalCommands:
         assert "--model" in result.output
         assert "--reference-id" in result.output
         assert "--format" in result.output
+        assert "--opus-bitrate" in result.output
+        assert "--prosody" in result.output
+        assert "--references" in result.output
 
     def test_help_models(self, runner):
         result = runner.invoke(cli, ["models", "--help"])
         assert result.exit_code == 0
         assert "--page-size" in result.output
+        assert "--title-language" in result.output
+        assert "--sort-by" in result.output
 
     def test_help_model(self, runner):
         result = runner.invoke(cli, ["model", "--help"])
@@ -156,6 +161,55 @@ class TestTTSCommand:
         assert sent["callback_url"] == "https://webhook.site/test"
 
     @respx.mock
+    def test_tts_with_additional_openapi_fields(self, runner, mock_tts_response):
+        route = respx.post("https://api.acedata.cloud/fish/tts").mock(
+            return_value=Response(200, json=mock_tts_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tts",
+                "Hello",
+                "--opus-bitrate",
+                "64000",
+                "--chunk-length",
+                "120",
+                "--min-chunk-length",
+                "30",
+                "--prosody",
+                '{"speed": 1.1}',
+                "--references",
+                '[{"audio":"https://example.com/ref.wav"}]',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["opus_bitrate"] == 64000
+        assert sent["chunk_length"] == 120
+        assert sent["min_chunk_length"] == 30
+        assert sent["prosody"] == {"speed": 1.1}
+        assert sent["references"] == [{"audio": "https://example.com/ref.wav"}]
+
+    def test_tts_with_invalid_prosody_json(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "tts", "Hello", "--prosody", "not-json"],
+        )
+        assert result.exit_code != 0
+        assert "--prosody must be valid JSON." in result.output
+
+    def test_tts_with_invalid_references_json(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "tts", "Hello", "--references", '{"a":1}'],
+        )
+        assert result.exit_code != 0
+        assert "--references must be a JSON array." in result.output
+
+    @respx.mock
     def test_tts_async(self, runner, mock_tts_async_response):
         route = respx.post("https://api.acedata.cloud/fish/tts").mock(
             return_value=Response(200, json=mock_tts_async_response)
@@ -214,6 +268,28 @@ class TestModelCommands:
         result = runner.invoke(cli, ["--token", "test-token", "models", "--self", "--json"])
         assert result.exit_code == 0
         assert "self=true" in str(route.calls[0].request.url)
+
+    @respx.mock
+    def test_models_with_new_query_params(self, runner, mock_models_response):
+        route = respx.get("https://api.acedata.cloud/fish/model").mock(
+            return_value=Response(200, json=mock_models_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "models",
+                "--title-language",
+                "en",
+                "--sort-by",
+                "created_at",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "title_language=en" in str(route.calls[0].request.url)
+        assert "sort_by=created_at" in str(route.calls[0].request.url)
 
     @respx.mock
     def test_model_get_json(self, runner, mock_model_response):
@@ -316,6 +392,7 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["tts-models"])
         assert result.exit_code == 0
         assert "s2-pro" in result.output
+        assert "s2.1-pro" in result.output
         assert "s1" in result.output
 
     def test_config(self, runner):
