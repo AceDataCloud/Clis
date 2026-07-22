@@ -105,7 +105,7 @@ def mock_shorten_response():
         "task_id": "test-shorten-task-123",
         "trace_id": "test-trace-456",
         "data": {
-            "shortened_prompts": [
+            "prompts": [
                 "sunset ocean",
                 "beautiful coastal scene",
             ]
@@ -119,7 +119,7 @@ def mock_translate_response():
     return {
         "success": True,
         "data": {
-            "translated_content": "A beautiful sunset over the ocean",
+            "content": "A beautiful sunset over the ocean",
         },
     }
 
