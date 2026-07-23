@@ -38,6 +38,14 @@ def mock_recognition_response():
 
 
 @pytest.fixture
+def mock_recognition_async_response():
+    """Mock async hCaptcha recognition submission response."""
+    return {
+        "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+    }
+
+
+@pytest.fixture
 def mock_token_response():
     """Mock successful hCaptcha token response."""
     return {

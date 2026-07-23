@@ -38,12 +38,20 @@ def _parse_json_array_option(value: str | None, option_name: str) -> list[object
     default=None,
     help="Question or instruction for the recognition task.",
 )
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Return immediately with a task_id instead of blocking until the captcha is solved.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def recognize(
     ctx: click.Context,
     queries: str | None,
     question: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Recognize hCaptcha challenge images.
@@ -60,6 +68,8 @@ def recognize(
         payload["queries"] = parsed_queries
     if question is not None:
         payload["question"] = question
+    if async_mode:
+        payload["async"] = True
 
     try:
         result = client.recognize(**payload)

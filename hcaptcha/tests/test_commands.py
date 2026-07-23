@@ -35,6 +35,7 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "--queries" in result.output
         assert "--question" in result.output
+        assert "--async" in result.output
 
     def test_help_token(self, runner):
         result = runner.invoke(cli, ["token", "--help"])
@@ -112,6 +113,28 @@ class TestRecognizeCommand:
             "https://example.com/img2.jpg",
         ]
         assert sent["question"] == "Select all vehicles"
+        assert "async" not in sent
+
+    @respx.mock
+    def test_recognize_async(self, runner, mock_recognition_async_response):
+        route = respx.post("https://api.acedata.cloud/captcha/recognition/hcaptcha").mock(
+            return_value=Response(200, json=mock_recognition_async_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "recognize",
+                "--queries",
+                '["https://example.com/img1.jpg"]',
+                "--async",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["async"] is True
 
     def test_recognize_invalid_queries_json(self, runner):
         result = runner.invoke(

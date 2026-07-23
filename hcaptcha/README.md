@@ -17,6 +17,9 @@ export ACEDATACLOUD_API_TOKEN=your_token
 # Recognize hCaptcha images
 hcaptcha recognize --queries '["https://example.com/img.jpg"]' --question "Select all cars"
 
+# Recognize hCaptcha images asynchronously
+hcaptcha recognize --queries '["https://example.com/img.jpg"]' --async
+
 # Get a hCaptcha bypass token
 hcaptcha token <website_key> <website_url>
 
