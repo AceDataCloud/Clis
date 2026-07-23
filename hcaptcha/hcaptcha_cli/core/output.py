@@ -28,7 +28,20 @@ def print_success(message: str) -> None:
 
 def print_recognition_result(data: dict[str, Any]) -> None:
     """Print hCaptcha recognition result."""
+    task_id = data.get("task_id")
     solution = data.get("solution", {})
+    if task_id and not solution:
+        content = f"[bold]Task ID:[/bold] {task_id}"
+        console.print(
+            Panel(
+                content,
+                title="[bold green]Recognition Task Submitted[/bold green]",
+                border_style="green",
+            )
+        )
+        console.print("[dim]Poll POST /captcha/tasks with the task_id to retrieve the result.[/dim]")
+        return
+
     if not solution:
         console.print("[yellow]No solution returned.[/yellow]")
         return
