@@ -136,6 +136,26 @@ class TestRecognizeCommand:
         sent = json.loads(route.calls[0].request.content)
         assert sent["async"] is True
 
+    @respx.mock
+    def test_recognize_async_rich_output(self, runner, mock_recognition_async_response):
+        respx.post("https://api.acedata.cloud/captcha/recognition/hcaptcha").mock(
+            return_value=Response(200, json=mock_recognition_async_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "recognize",
+                "--queries",
+                '["https://example.com/img1.jpg"]',
+                "--async",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "Recognition Task Submitted" in result.output
+        assert "3a8b1c2d" in result.output
+
     def test_recognize_invalid_queries_json(self, runner):
         result = runner.invoke(
             cli,
