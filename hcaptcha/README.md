@@ -26,6 +26,9 @@ hcaptcha token <website_key> <website_url>
 # Get token asynchronously
 hcaptcha token <website_key> <website_url> --async
 
+# Get token using a proxy
+hcaptcha token <website_key> <website_url> --proxy http://127.0.0.1:8080
+
 # Show configuration
 hcaptcha config
 ```
