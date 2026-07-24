@@ -84,3 +84,8 @@ mappings:
     exclude:
       - .github
       - .gitbooks
+  producer:
+    repo: AceDataCloud/ProducerCli
+    exclude:
+      - .github
+      - .gitbooks
