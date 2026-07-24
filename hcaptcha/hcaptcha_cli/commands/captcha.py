@@ -92,6 +92,11 @@ def recognize(
     default=False,
     help="Return immediately with a task_id instead of blocking until the token is solved.",
 )
+@click.option(
+    "--proxy",
+    default=None,
+    help="Optional proxy URL to use while solving the captcha.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def token(
@@ -99,6 +104,7 @@ def token(
     website_key: str,
     website_url: str,
     async_mode: bool,
+    proxy: str | None,
     output_json: bool,
 ) -> None:
     """Solve hCaptcha and retrieve a token.
@@ -117,6 +123,8 @@ def token(
         "website_key": website_key,
         "website_url": website_url,
     }
+    if proxy is not None:
+        payload["proxy"] = proxy
     if async_mode:
         payload["async"] = True
 
