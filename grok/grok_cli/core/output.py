@@ -21,11 +21,14 @@ DEFAULT_CHAT_MODEL = "grok-4"
 
 # Available Grok video models
 GROK_VIDEO_MODELS = [
-    "grok-imagine-video-1.5-fast",
-    "grok-imagine-video-1.5",
+    "grok-imagine-video-1.5-fast:reverse",
+    "grok-imagine-video:reverse",
+    "grok-imagine-video:official",
+    "grok-imagine-video-1.5:official",
+    "grok-imagine-video",
 ]
 
-DEFAULT_VIDEO_MODEL = "grok-imagine-video-1.5-fast"
+DEFAULT_VIDEO_MODEL = "grok-imagine-video-1.5-fast:reverse"
 
 # Available aspect ratios for video generation
 ASPECT_RATIOS = [
@@ -196,8 +199,11 @@ def print_video_models() -> None:
     table.add_column("Model", style="bold cyan")
     table.add_column("Notes")
 
-    table.add_row("grok-imagine-video-1.5-fast", "Grok Imagine Video 1.5 Fast (default)")
-    table.add_row("grok-imagine-video-1.5", "Grok Imagine Video 1.5")
+    table.add_row("grok-imagine-video-1.5-fast:reverse", "Grok Imagine Video 1.5 Fast Reverse (default)")
+    table.add_row("grok-imagine-video:reverse", "Grok Imagine Video Reverse")
+    table.add_row("grok-imagine-video:official", "Grok Imagine Video Official")
+    table.add_row("grok-imagine-video-1.5:official", "Grok Imagine Video 1.5 Official")
+    table.add_row("grok-imagine-video", "Grok Imagine Video")
 
     console.print(table)
     console.print(f"\n[dim]Default model: {DEFAULT_VIDEO_MODEL}[/dim]")

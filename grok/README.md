@@ -67,7 +67,7 @@ grok video [PROMPT] [OPTIONS]
 ```
 
 Options:
-- `-m, --model`: Video model (`grok-imagine-video-1.5-fast`, `grok-imagine-video-1.5`, default: `grok-imagine-video-1.5-fast`)
+- `-m, --model`: Video model (`grok-imagine-video-1.5-fast:reverse`, `grok-imagine-video:reverse`, `grok-imagine-video:official`, `grok-imagine-video-1.5:official`, `grok-imagine-video`, default: `grok-imagine-video-1.5-fast:reverse`)
 - `--image-url`: Reference image URL for image-to-video
 - `--reference-image-url`: Additional reference image URLs (repeatable)
 - `-a, --aspect-ratio`: Aspect ratio (1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3)
