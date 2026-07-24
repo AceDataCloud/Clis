@@ -1,0 +1,1 @@
+"""Kickart CLI package."""
