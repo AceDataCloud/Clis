@@ -201,6 +201,8 @@ class TestVideoCommand:
             ["--token", "test-token", "video", "A sunset over the ocean", "--json"],
         )
         assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["model"] == "grok-imagine-video-1.5-fast:reverse"
         data = json.loads(result.output)
         assert data["success"] is True
         assert data["task_id"] == "test-task-123"
@@ -229,13 +231,13 @@ class TestVideoCommand:
             [
                 "--token", "test-token",
                 "video", "test",
-                "-m", "grok-imagine-video-1.5",
+                "-m", "grok-imagine-video:official",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "grok-imagine-video-1.5"
+        assert sent["model"] == "grok-imagine-video:official"
 
     @respx.mock
     def test_video_with_image_url(self, runner, mock_video_response):
@@ -339,7 +341,7 @@ class TestInfoCommands:
     def test_models_video(self, runner):
         result = runner.invoke(cli, ["models", "--type", "video"])
         assert result.exit_code == 0
-        assert "grok-imagine-video" in result.output
+        assert "grok-imagine-video-1.5-fast:reverse" in result.output
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
