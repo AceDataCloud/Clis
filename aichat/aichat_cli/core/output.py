@@ -132,6 +132,7 @@ MODELS2 = [
     "claude-opus-4-5-20251101",
     "claude-opus-4-6",
     "claude-fable-5",
+    "claude-opus-5",
     "claude-opus-4-8",
     "claude-opus-4-7",
     "claude-sonnet-4-20250514",

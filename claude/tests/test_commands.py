@@ -104,12 +104,12 @@ class TestChatCommands:
                 "chat",
                 "Hello",
                 "-m",
-                "claude-3-5-sonnet-20241022",
+                "claude-opus-5",
             ],
         )
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
-        assert request_body["model"] == "claude-3-5-sonnet-20241022"
+        assert request_body["model"] == "claude-opus-5"
 
     @respx.mock
     def test_chat_with_system(self, runner, mock_chat_response):
@@ -251,11 +251,11 @@ class TestMessagesCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "messages", "Hello", "-m", "claude-3-5-sonnet-20241022"],
+            ["--token", "test-token", "messages", "Hello", "-m", "claude-opus-5"],
         )
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
-        assert request_body["model"] == "claude-3-5-sonnet-20241022"
+        assert request_body["model"] == "claude-opus-5"
 
     @respx.mock
     def test_messages_auth_error(self, runner):
@@ -350,6 +350,7 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "claude" in result.output.lower()
         assert "claude-fable-5" in result.output
+        assert "claude-opus-5" in result.output
 
     def test_models_first_entry(self, runner):
         result = runner.invoke(cli, ["models"])
