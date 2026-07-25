@@ -194,6 +194,7 @@ class TestInfoCommands:
     def test_models2(self, runner):
         result = runner.invoke(cli, ["models2"])
         assert result.exit_code == 0
+        assert "claude-opus-5" in result.output
         assert "claude-sonnet-5" in result.output
         assert "gemini-3.1-pro" in result.output
         assert "kimi-k3" in result.output
@@ -228,11 +229,11 @@ class TestChat2Commands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat2", "Hello", "-m", "claude-sonnet-5", "--json"],
+            ["--token", "test-token", "chat2", "Hello", "-m", "claude-opus-5", "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "claude-sonnet-5"
+        assert body["model"] == "claude-opus-5"
 
     @respx.mock
     def test_chat2_with_model_group(self, runner, mock_chat_response):
