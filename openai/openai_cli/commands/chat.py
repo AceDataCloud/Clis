@@ -127,14 +127,14 @@ from openai_cli.core.output import (
 @click.option(
     "--parallel-tool-calls",
     "parallel_tool_calls",
-    flag_value="true",
+    flag_value=True,
     default=None,
     help="Enable parallel function calling during tool use.",
 )
 @click.option(
     "--no-parallel-tool-calls",
     "parallel_tool_calls",
-    flag_value="false",
+    flag_value=False,
     help="Disable parallel function calling during tool use.",
 )
 @click.option("--stream", is_flag=True, default=False, help="Stream partial chat completion events.")
@@ -210,7 +210,7 @@ def chat(
     store: bool,
     logprobs: bool,
     top_logprobs: int | None,
-    parallel_tool_calls: str | None,
+    parallel_tool_calls: bool | None,
     stream: bool,
     response_format: str | None,
     tools: str | None,
@@ -258,14 +258,10 @@ def chat(
     except click.BadParameter as e:
         print_error(e.format_message())
         raise SystemExit(1) from None
-    parallel_tool_calls_value: bool | None = None
-    if parallel_tool_calls is not None:
-        parallel_tool_calls_value = parallel_tool_calls == "true"
-
     payload: dict[str, object] = {
         "model": model,
         "messages": messages,
-        "stream": True if stream else None,
+        "stream": stream or None,
         "temperature": temperature,
         "max_tokens": max_tokens,
         "max_completion_tokens": max_completion_tokens,
@@ -287,7 +283,7 @@ def chat(
         "logit_bias": parsed_logit_bias,
         "logprobs": logprobs if logprobs else None,
         "top_logprobs": top_logprobs,
-        "parallel_tool_calls": parallel_tool_calls_value,
+        "parallel_tool_calls": parallel_tool_calls,
         "modalities": parsed_modalities,
         "audio": parsed_audio,
         "prediction": parsed_prediction,
