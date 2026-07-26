@@ -87,6 +87,61 @@ class OpenAIClient:
                     raise
                 raise OpenAIAPIError(message=str(e)) from e
 
+    def request_bytes(
+        self,
+        endpoint: str,
+        payload: dict[str, Any] | None = None,
+        timeout: float | None = None,
+        method: str = "POST",
+    ) -> bytes:
+        """Make a request that returns binary content."""
+        url = f"{self.base_url}{endpoint}"
+        request_timeout = timeout or self.timeout
+
+        payload = payload or {}
+        payload = {k: v for k, v in payload.items() if v is not None}
+        headers = self._get_headers()
+        headers["accept"] = "*/*"
+
+        with httpx.Client() as http_client:
+            try:
+                response = http_client.request(
+                    method,
+                    url,
+                    json=payload if method.upper() != "GET" else None,
+                    headers=headers,
+                    timeout=request_timeout,
+                )
+
+                if response.status_code == 401:
+                    raise OpenAIAuthError("Invalid API token")
+
+                if response.status_code == 403:
+                    raise OpenAIAuthError("Access denied. Check your API permissions.")
+
+                response.raise_for_status()
+                return response.content
+
+            except httpx.TimeoutException as e:
+                raise OpenAITimeoutError(
+                    f"Request to {endpoint} timed out after {request_timeout}s"
+                ) from e
+
+            except OpenAIAuthError:
+                raise
+
+            except httpx.HTTPStatusError as e:
+                raise OpenAIAPIError(
+                    message=e.response.text,
+                    code=f"http_{e.response.status_code}",
+                    status_code=e.response.status_code,
+                ) from e
+
+            except Exception as e:
+                if isinstance(e, OpenAIAPIError | OpenAITimeoutError):
+                    raise
+                raise OpenAIAPIError(message=str(e)) from e
+
     def chat_completions(self, **kwargs: Any) -> dict[str, Any]:
         """Send a chat completion request."""
         return self.request("/openai/chat/completions", kwargs)
@@ -106,6 +161,10 @@ class OpenAIClient:
     def responses(self, **kwargs: Any) -> dict[str, Any]:
         """Send a Responses API request."""
         return self.request("/openai/responses", kwargs)
+
+    def audio_speech(self, **kwargs: Any) -> bytes:
+        """Synthesize speech audio."""
+        return self.request_bytes("/v1/audio/speech", kwargs)
 
     def tasks(self, **kwargs: Any) -> dict[str, Any]:
         """Query OpenAI async task results."""

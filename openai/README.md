@@ -48,6 +48,12 @@ openai-cli edit "Add a rainbow" --image-url https://example.com/photo.jpg
 # Use the Responses API
 openai-cli response "Summarize this article" -m gpt-4o
 
+# Synthesize speech audio
+openai-cli speech "Hello from AceDataCloud" --voice nova --output hello.mp3
+
+# Show realtime WebSocket connection details
+openai-cli realtime --model gpt-realtime
+
 # Retrieve an async task result
 openai-cli tasks retrieve --id 7489df4c-ef03-4de0-b598-e9a590793434
 openai-cli tasks retrieve --trace-id my-custom-trace-001
@@ -71,6 +77,8 @@ openai-cli config
 | `image` | Image generation (`/openai/images/generations`) |
 | `edit` | Image editing (`/openai/images/edits`) |
 | `response` | Responses API (`/openai/responses`) |
+| `speech` | Speech synthesis (`/v1/audio/speech`) |
+| `realtime` | Realtime WebSocket connection info (`/v1/realtime`) |
 | `tasks retrieve` | Retrieve a single async task result (`/openai/tasks`) |
 | `tasks batch` | Retrieve multiple async task results (`/openai/tasks`) |
 | `models` | List available models (`/openai/models`) |

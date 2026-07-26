@@ -1,9 +1,8 @@
 """Responses API command."""
 
-import json as json_module
-
 import click
 
+from openai_cli.commands._json import parse_json_array, parse_json_object
 from openai_cli.core.client import get_client
 from openai_cli.core.exceptions import OpenAIError
 from openai_cli.core.output import (
@@ -50,6 +49,12 @@ from openai_cli.core.output import (
     help='Response format as JSON string (e.g. \'{"type": "json_object"}\').',
 )
 @click.option(
+    "--tools",
+    default=None,
+    help='Tool definitions as a JSON array (e.g. \'[{"type":"web_search_preview"}]\').',
+)
+@click.option("--stream", is_flag=True, default=False, help="Stream partial response events.")
+@click.option(
     "--background",
     is_flag=True,
     default=False,
@@ -65,6 +70,8 @@ def response(
     max_tokens: int | None,
     count: int | None,
     response_format: str | None,
+    tools: str | None,
+    stream: bool,
     background: bool,
     output_json: bool,
 ) -> None:
@@ -79,16 +86,17 @@ def response(
       openai-cli response "Write a haiku" --temperature 1.2
     """
     client = get_client(ctx.obj.get("token"))
-    parsed_response_format = None
-    if response_format:
-        try:
-            parsed_response_format = json_module.loads(response_format)
-        except json_module.JSONDecodeError:
-            print_error(f"Invalid JSON for --response-format: {response_format}")
-            raise SystemExit(1) from None
+    try:
+        parsed_response_format = parse_json_object(response_format, "--response-format")
+        parsed_tools = parse_json_array(tools, "--tools")
+    except click.BadParameter as e:
+        print_error(e.format_message())
+        raise SystemExit(1) from None
     payload: dict[str, object] = {
         "model": model,
         "input": [{"role": "user", "content": prompt}],
+        "stream": stream if stream else None,
+        "tools": parsed_tools,
         "temperature": temperature,
         "max_tokens": max_tokens,
         "n": count,

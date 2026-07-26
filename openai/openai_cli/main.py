@@ -15,7 +15,9 @@ from openai_cli.commands.chat import chat
 from openai_cli.commands.embed import embed
 from openai_cli.commands.image import edit, image
 from openai_cli.commands.info import config, models
+from openai_cli.commands.realtime import realtime
 from openai_cli.commands.response import response
+from openai_cli.commands.speech import speech
 from openai_cli.commands.tasks import tasks
 
 load_dotenv()
@@ -40,7 +42,8 @@ def get_version() -> str:
 def cli(ctx: click.Context, token: str | None) -> None:
     """OpenAI CLI - OpenAI-compatible APIs via AceDataCloud.
 
-    Chat with GPT models, generate embeddings, create and edit images.
+    Chat with GPT models, generate embeddings, create and edit images,
+    synthesize speech, and inspect realtime connection details.
 
     Get your API token at https://platform.acedata.cloud
 
@@ -52,6 +55,8 @@ def cli(ctx: click.Context, token: str | None) -> None:
       openai-cli image "A sunset over mountains"
       openai-cli edit "Add clouds" --image-url https://example.com/photo.jpg
       openai-cli response "Summarize this topic" -m gpt-4o
+      openai-cli speech "Hello from AceDataCloud"
+      openai-cli realtime --model gpt-realtime
       openai-cli tasks retrieve --id <task-id>
 
     Set your token:
@@ -67,6 +72,8 @@ cli.add_command(embed)
 cli.add_command(image)
 cli.add_command(edit)
 cli.add_command(response)
+cli.add_command(speech)
+cli.add_command(realtime)
 cli.add_command(tasks)
 cli.add_command(models)
 cli.add_command(config)
