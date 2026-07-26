@@ -32,6 +32,8 @@ class TestGlobalCommands:
         assert "chat" in result.output
         assert "embed" in result.output
         assert "image" in result.output
+        assert "speech" in result.output
+        assert "realtime" in result.output
 
     def test_chat_help(self, runner):
         result = runner.invoke(cli, ["chat", "--help"])
@@ -60,6 +62,17 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["response", "--help"])
         assert result.exit_code == 0
         assert "PROMPT" in result.output
+
+    def test_speech_help(self, runner):
+        result = runner.invoke(cli, ["speech", "--help"])
+        assert result.exit_code == 0
+        assert "INPUT_TEXT" in result.output
+        assert "--voice" in result.output
+
+    def test_realtime_help(self, runner):
+        result = runner.invoke(cli, ["realtime", "--help"])
+        assert result.exit_code == 0
+        assert "--model" in result.output
 
 
 # ─── Chat Commands ────────────────────────────────────────────────────────
@@ -288,6 +301,58 @@ class TestChatCommands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-4o-mini:free"
+
+    @respx.mock
+    def test_chat_with_extended_openapi_options(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--stream",
+                "--response-format",
+                '{"type":"json_object"}',
+                "--tools",
+                '[{"type":"function","function":{"name":"lookup"}}]',
+                "--tool-choice",
+                '{"type":"function","function":{"name":"lookup"}}',
+                "--stream-options",
+                '{"include_usage":true}',
+                "--metadata",
+                '{"source":"cli"}',
+                "--logit-bias",
+                '{"42":1}',
+                "--modalities",
+                '["text"]',
+                "--audio",
+                '{"voice":"alloy","format":"mp3"}',
+                "--prediction",
+                '{"type":"content","content":"Hi"}',
+                "--web-search-options",
+                '{"search_context_size":"medium"}',
+                "--no-parallel-tool-calls",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["stream"] is True
+        assert body["response_format"] == {"type": "json_object"}
+        assert body["tools"][0]["function"]["name"] == "lookup"
+        assert body["tool_choice"]["function"]["name"] == "lookup"
+        assert body["stream_options"] == {"include_usage": True}
+        assert body["metadata"] == {"source": "cli"}
+        assert body["logit_bias"] == {"42": 1}
+        assert body["modalities"] == ["text"]
+        assert body["audio"] == {"voice": "alloy", "format": "mp3"}
+        assert body["prediction"] == {"type": "content", "content": "Hi"}
+        assert body["web_search_options"] == {"search_context_size": "medium"}
+        assert body["parallel_tool_calls"] is False
 
 
 # ─── Embed Commands ────────────────────────────────────────────────────────
@@ -571,6 +636,80 @@ class TestResponseCommands:
             ],
         )
         assert result.exit_code != 0
+
+    @respx.mock
+    def test_response_with_tools_and_stream(self, runner, mock_response_api_response):
+        route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(200, json=mock_response_api_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "response",
+                "Hello",
+                "--tools",
+                '[{"type":"web_search_preview"}]',
+                "--stream",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["tools"] == [{"type": "web_search_preview"}]
+        assert body["stream"] is True
+
+
+class TestSpeechAndRealtimeCommands:
+    """Tests for speech and realtime commands."""
+
+    @respx.mock
+    def test_speech_saves_audio_file(self, runner, tmp_path):
+        route = respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+            return_value=Response(200, content=b"fake-audio-data")
+        )
+        output_path = tmp_path / "voice.wav"
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "speech",
+                "Hello from AceDataCloud",
+                "--model",
+                "tts-1",
+                "--voice",
+                "nova",
+                "--response-format",
+                "wav",
+                "--speed",
+                "1.25",
+                "--output",
+                str(output_path),
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body == {
+            "model": "tts-1",
+            "input": "Hello from AceDataCloud",
+            "voice": "nova",
+            "response_format": "wav",
+            "speed": 1.25,
+        }
+        assert output_path.read_bytes() == b"fake-audio-data"
+        data = json.loads(result.output)
+        assert data["path"] == str(output_path)
+        assert data["bytes"] == len(b"fake-audio-data")
+
+    def test_realtime_json(self, runner):
+        result = runner.invoke(cli, ["realtime", "--model", "gpt-realtime-2", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["model"] == "gpt-realtime-2"
+        assert data["url"] == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2"
 
 
 class TestInfoCommands:

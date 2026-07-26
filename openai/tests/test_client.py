@@ -54,6 +54,16 @@ class TestOpenAIClient:
         assert "data" in result
 
     @respx.mock
+    def test_audio_speech_request(self):
+        route = respx.post("https://api.acedata.cloud/v1/audio/speech").mock(
+            return_value=Response(200, content=b"fake-mp3-bytes")
+        )
+        client = OpenAIClient(api_token="test-token")
+        result = client.audio_speech(input="Hello", model="tts-1-hd")
+        assert route.called
+        assert result == b"fake-mp3-bytes"
+
+    @respx.mock
     def test_unauthorized_raises_auth_error(self):
         respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
             return_value=Response(401, json={"error": "Unauthorized"})
