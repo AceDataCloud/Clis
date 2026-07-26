@@ -135,7 +135,7 @@ from openai_cli.core.output import (
     "--no-parallel-tool-calls",
     "parallel_tool_calls",
     flag_value="false",
-    help="Enable or disable parallel function calling during tool use.",
+    help="Disable parallel function calling during tool use.",
 )
 @click.option("--stream", is_flag=True, default=False, help="Stream partial chat completion events.")
 @click.option(
