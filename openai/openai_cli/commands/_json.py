@@ -41,6 +41,6 @@ def parse_json_or_string(value: str | None, option_name: str) -> Any:
     if value is None:
         return None
     stripped = value.strip()
-    if stripped.startswith("{") or stripped.startswith("[") or stripped.startswith('"'):
+    if stripped.startswith("{") or stripped.startswith("["):
         return parse_json_value(value, option_name)
     return value

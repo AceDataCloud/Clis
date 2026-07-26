@@ -95,7 +95,7 @@ def response(
     payload: dict[str, object] = {
         "model": model,
         "input": [{"role": "user", "content": prompt}],
-        "stream": stream if stream else None,
+        "stream": True if stream else None,
         "tools": parsed_tools,
         "temperature": temperature,
         "max_tokens": max_tokens,

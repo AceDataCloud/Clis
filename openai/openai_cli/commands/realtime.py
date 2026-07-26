@@ -26,7 +26,7 @@ def realtime(model: str, output_json: bool) -> None:
         "url": url,
         "model": model,
         "protocol": "websocket",
-        "authentication": "Pass your token via Authorization: ******",
+        "authentication": "Authorization: ******",
     }
 
     if output_json:

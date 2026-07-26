@@ -265,7 +265,7 @@ def chat(
     payload: dict[str, object] = {
         "model": model,
         "messages": messages,
-        "stream": stream if stream else None,
+        "stream": True if stream else None,
         "temperature": temperature,
         "max_tokens": max_tokens,
         "max_completion_tokens": max_completion_tokens,
