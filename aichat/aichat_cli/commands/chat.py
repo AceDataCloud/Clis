@@ -169,6 +169,35 @@ def chat(
     default=False,
     help="Enable asynchronous processing.",
 )
+@click.option(
+    "--application-id",
+    default=None,
+    help="Application ID for the conversation.",
+)
+@click.option(
+    "--allowed-skill",
+    "allowed_skills",
+    multiple=True,
+    help="Allowed skill name (can be repeated).",
+)
+@click.option(
+    "--allowed-mcp-server",
+    "allowed_mcp_servers",
+    multiple=True,
+    help="Allowed MCP server name (can be repeated).",
+)
+@click.option(
+    "--offset",
+    default=None,
+    type=int,
+    help="Offset for paginated retrieval (minimum: 0).",
+)
+@click.option(
+    "--limit",
+    default=None,
+    type=int,
+    help="Limit for paginated retrieval (1-100).",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat2(
@@ -186,6 +215,11 @@ def chat2(
     user_id: str | None,
     callback_url: str | None,
     async_mode: bool,
+    application_id: str | None,
+    allowed_skills: tuple[str, ...],
+    allowed_mcp_servers: tuple[str, ...],
+    offset: int | None,
+    limit: int | None,
     output_json: bool,
 ) -> None:
     """Send a question to an AI model via the aichat2 endpoint.
@@ -198,6 +232,7 @@ def chat2(
       aichat chat2 "Explain AI" -m claude-sonnet-5
       aichat chat2 "Tell me more" --id 64a67fff-61dc-4801-8339-2c69334c61d6
       aichat chat2 "Summarize this" --ref "https://example.com/doc.txt" --model-group claude
+      aichat chat2 "Hello" --allowed-skill web_search --allowed-mcp-server my-server
     """
     client = get_client(ctx.obj.get("token"))
     try:
@@ -213,8 +248,13 @@ def chat2(
             "max_turns": max_turns,
             "title": title,
             "user_id": user_id,
+            "application_id": application_id,
             "callback_url": callback_url,
             "async": async_mode if async_mode else None,
+            "allowed_skills": list(allowed_skills) if allowed_skills else None,
+            "allowed_mcp_servers": list(allowed_mcp_servers) if allowed_mcp_servers else None,
+            "offset": offset,
+            "limit": limit,
         }
 
         result = client.converse2(**payload)  # type: ignore[arg-type]

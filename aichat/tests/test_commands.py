@@ -306,3 +306,92 @@ class TestChat2Commands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "kimi-k2.6"
+
+    @respx.mock
+    def test_chat2_with_application_id(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--application-id",
+                "app-123",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["application_id"] == "app-123"
+
+    @respx.mock
+    def test_chat2_with_allowed_skills(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--allowed-skill",
+                "web_search",
+                "--allowed-skill",
+                "code_interpreter",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["allowed_skills"] == ["web_search", "code_interpreter"]
+
+    @respx.mock
+    def test_chat2_with_allowed_mcp_servers(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--allowed-mcp-server",
+                "my-server",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["allowed_mcp_servers"] == ["my-server"]
+
+    @respx.mock
+    def test_chat2_with_offset_and_limit(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--offset",
+                "10",
+                "--limit",
+                "50",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["offset"] == 10
+        assert body["limit"] == 50
