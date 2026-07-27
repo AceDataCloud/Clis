@@ -7,6 +7,7 @@ import click
 from webextrator_cli.core.client import get_client
 from webextrator_cli.core.exceptions import WebExtratorError
 from webextrator_cli.core.output import (
+    BLOCK_RESOURCE_TYPES,
     WAIT_UNTIL_OPTIONS,
     print_error,
     print_extract_result,
@@ -68,9 +69,14 @@ def _parse_headers(headers: str | None) -> dict[str, str] | None:
     help="CSS selector to wait for before starting extraction.",
 )
 @click.option(
-    "--block-resources/--no-block-resources",
-    default=None,
-    help="Block non-essential resources (images/fonts/media) during page load.",
+    "--block-resources",
+    "block_resources",
+    type=click.Choice(BLOCK_RESOURCE_TYPES),
+    multiple=True,
+    help=(
+        "Resource type(s) to block during page load. "
+        "Can be specified multiple times (e.g. --block-resources image --block-resources font)."
+    ),
 )
 @click.option(
     "--headers",
@@ -105,7 +111,7 @@ def extract(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
-    block_resources: bool | None,
+    block_resources: tuple[str, ...],
     headers: str | None,
     user_agent: str | None,
     callback_url: str | None,
@@ -121,6 +127,7 @@ def extract(
       webextrator extract https://www.amazon.com/dp/B0C1234567
       webextrator extract https://example.com/article --expected-type article
       webextrator extract https://shop.example.com --enable-llm
+      webextrator extract https://example.com --block-resources image --block-resources font
     """
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
@@ -131,7 +138,7 @@ def extract(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
-        "block_resources": block_resources,
+        "block_resources": list(block_resources) if block_resources else None,
         "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
@@ -175,9 +182,14 @@ def extract(
     help="CSS selector to wait for before capturing HTML.",
 )
 @click.option(
-    "--block-resources/--no-block-resources",
-    default=None,
-    help="Block non-essential resources (images/fonts/media) during page load.",
+    "--block-resources",
+    "block_resources",
+    type=click.Choice(BLOCK_RESOURCE_TYPES),
+    multiple=True,
+    help=(
+        "Resource type(s) to block during page load. "
+        "Can be specified multiple times (e.g. --block-resources image --block-resources font)."
+    ),
 )
 @click.option(
     "--headers",
@@ -210,7 +222,7 @@ def render(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
-    block_resources: bool | None,
+    block_resources: tuple[str, ...],
     headers: str | None,
     user_agent: str | None,
     callback_url: str | None,
@@ -226,6 +238,7 @@ def render(
       webextrator render https://example.com
       webextrator render https://example.com --wait-until load
       webextrator render https://spa.example.com --delay 2 --wait-for-selector "#app"
+      webextrator render https://example.com --block-resources image --block-resources stylesheet
     """
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
@@ -234,7 +247,7 @@ def render(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
-        "block_resources": block_resources,
+        "block_resources": list(block_resources) if block_resources else None,
         "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
