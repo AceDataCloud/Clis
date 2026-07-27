@@ -1,6 +1,6 @@
 """Chat command."""
 
-import json as _json
+import json
 
 import click
 
@@ -19,13 +19,13 @@ from aichat_cli.core.output import (
 )
 
 
-def _parse_json_option(value: str | None, param_hint: str) -> object:
+def _parse_json_option(value: str | None, param_hint: str) -> dict | list | None:
     """Parse a JSON string option, raising BadParameter on invalid JSON."""
     if value is None:
         return None
     try:
-        return _json.loads(value)
-    except _json.JSONDecodeError as exc:
+        return json.loads(value)
+    except json.JSONDecodeError as exc:
         raise click.BadParameter("Must be a valid JSON string.", param_hint=param_hint) from exc
 
 
