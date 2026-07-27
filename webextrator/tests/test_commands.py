@@ -127,6 +127,9 @@ class TestExtractCommand:
                 "extract",
                 "https://example.com",
                 "--block-resources",
+                "image",
+                "--block-resources",
+                "font",
                 "--headers",
                 '{"Accept-Language":"en-US"}',
                 "--json",
@@ -134,7 +137,7 @@ class TestExtractCommand:
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["block_resources"] is True
+        assert sent["block_resources"] == ["image", "font"]
         assert sent["headers"] == {"Accept-Language": "en-US"}
 
     def test_extract_no_token(self, runner):
@@ -221,6 +224,7 @@ class TestRenderCommand:
                 "render",
                 "https://example.com",
                 "--block-resources",
+                "image",
                 "--headers",
                 '{"X-Test":"1"}',
                 "--json",
@@ -228,7 +232,7 @@ class TestRenderCommand:
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["block_resources"] is True
+        assert sent["block_resources"] == ["image"]
         assert sent["headers"] == {"X-Test": "1"}
 
     def test_render_no_token(self, runner):

@@ -7,6 +7,7 @@ import click
 from webextrator_cli.core.client import get_client
 from webextrator_cli.core.exceptions import WebExtratorError
 from webextrator_cli.core.output import (
+    BLOCK_RESOURCE_TYPES,
     WAIT_UNTIL_OPTIONS,
     print_error,
     print_extract_result,
@@ -68,9 +69,10 @@ def _parse_headers(headers: str | None) -> dict[str, str] | None:
     help="CSS selector to wait for before starting extraction.",
 )
 @click.option(
-    "--block-resources/--no-block-resources",
-    default=None,
-    help="Block non-essential resources (images/fonts/media) during page load.",
+    "--block-resources",
+    type=click.Choice(BLOCK_RESOURCE_TYPES),
+    multiple=True,
+    help="Resource types to block during page load (can be repeated). Choices: image, font, media, stylesheet, xhr, fetch.",
 )
 @click.option(
     "--headers",
@@ -105,7 +107,7 @@ def extract(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
-    block_resources: bool | None,
+    block_resources: tuple[str, ...],
     headers: str | None,
     user_agent: str | None,
     callback_url: str | None,
@@ -131,7 +133,7 @@ def extract(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
-        "block_resources": block_resources,
+        "block_resources": list(block_resources) if block_resources else None,
         "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
@@ -175,9 +177,10 @@ def extract(
     help="CSS selector to wait for before capturing HTML.",
 )
 @click.option(
-    "--block-resources/--no-block-resources",
-    default=None,
-    help="Block non-essential resources (images/fonts/media) during page load.",
+    "--block-resources",
+    type=click.Choice(BLOCK_RESOURCE_TYPES),
+    multiple=True,
+    help="Resource types to block during page load (can be repeated). Choices: image, font, media, stylesheet, xhr, fetch.",
 )
 @click.option(
     "--headers",
@@ -210,7 +213,7 @@ def render(
     timeout: float | None,
     delay: float | None,
     wait_for_selector: str | None,
-    block_resources: bool | None,
+    block_resources: tuple[str, ...],
     headers: str | None,
     user_agent: str | None,
     callback_url: str | None,
@@ -234,7 +237,7 @@ def render(
         "timeout": timeout,
         "delay": delay,
         "wait_for_selector": wait_for_selector,
-        "block_resources": block_resources,
+        "block_resources": list(block_resources) if block_resources else None,
         "headers": _parse_headers(headers),
         "user_agent": user_agent,
         "callback_url": callback_url,
