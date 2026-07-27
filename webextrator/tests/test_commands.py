@@ -140,6 +140,20 @@ class TestExtractCommand:
         assert sent["block_resources"] == ["image", "font"]
         assert sent["headers"] == {"Accept-Language": "en-US"}
 
+    def test_extract_invalid_block_resource_type(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extract",
+                "https://example.com",
+                "--block-resources",
+                "invalid-type",
+            ],
+        )
+        assert result.exit_code != 0
+
     def test_extract_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "extract", "https://example.com"])
         assert result.exit_code != 0
