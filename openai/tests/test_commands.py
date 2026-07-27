@@ -932,3 +932,38 @@ class TestTasksCommands:
         )
         assert result.exit_code == 0
         assert "Found 1 task" in result.output
+
+    @respx.mock
+    def test_tasks_batch_type_filter(self, runner, mock_task_batch_response):
+        route = respx.post("https://api.acedata.cloud/openai/tasks").mock(
+            return_value=Response(200, json=mock_task_batch_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "batch",
+                "--type",
+                "images_generations",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["type"] == "images_generations"
+
+    def test_tasks_batch_invalid_type(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "batch",
+                "--type",
+                "invalid_type",
+            ],
+        )
+        assert result.exit_code != 0

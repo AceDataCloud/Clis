@@ -76,7 +76,11 @@ def retrieve(
 @click.option("--application-id", default=None, help="Filter by application ID.")
 @click.option("--user-id", default=None, help="Filter by end-user ID.")
 @click.option(
-    "--type", "task_type", default=None, help="Filter by task type (e.g. images_generations)."
+    "--type",
+    "task_type",
+    type=click.Choice(["images", "images_generations", "images_edits"]),
+    default=None,
+    help="Filter by task type (images, images_generations, or images_edits).",
 )
 @click.option("--offset", default=None, type=int, help="Pagination offset (default 0).")
 @click.option("--limit", default=None, type=int, help="Page size (default 12).")
