@@ -395,3 +395,105 @@ class TestChat2Commands:
         body = json.loads(route.calls.last.request.content)
         assert body["offset"] == 10
         assert body["limit"] == 50
+
+    @respx.mock
+    def test_chat2_with_messages(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        msgs = json.dumps([{"role": "user", "content": "Hello"}])
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--messages",
+                msgs,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["messages"] == [{"role": "user", "content": "Hello"}]
+
+    @respx.mock
+    def test_chat2_with_message(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        msg = json.dumps({"role": "user", "content": "Hello"})
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--message",
+                msg,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["message"] == {"role": "user", "content": "Hello"}
+
+    @respx.mock
+    def test_chat2_with_tool_results(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        tool_results = json.dumps([{"tool_call_id": "call_abc", "content": "42"}])
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--tool-results",
+                tool_results,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["tool_results"] == [{"tool_call_id": "call_abc", "content": "42"}]
+
+    @respx.mock
+    def test_chat2_with_unattended_policy(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        policy = json.dumps({"mode": "allow", "allowed_skills": ["web_search"]})
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--unattended-policy",
+                policy,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["unattended_policy"] == {"mode": "allow", "allowed_skills": ["web_search"]}
+
+    def test_chat2_invalid_messages_json(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "Hello",
+                "--messages",
+                "not-valid-json",
+            ],
+        )
+        assert result.exit_code != 0
