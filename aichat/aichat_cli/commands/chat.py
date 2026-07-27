@@ -1,5 +1,7 @@
 """Chat command."""
 
+import json as _json
+
 import click
 
 from aichat_cli.core.client import get_client
@@ -15,6 +17,16 @@ from aichat_cli.core.output import (
     print_error,
     print_json,
 )
+
+
+def _parse_json_option(value: str | None, param_hint: str) -> object:
+    """Parse a JSON string option, raising BadParameter on invalid JSON."""
+    if value is None:
+        return None
+    try:
+        return _json.loads(value)
+    except _json.JSONDecodeError as exc:
+        raise click.BadParameter("Must be a valid JSON string.", param_hint=param_hint) from exc
 
 
 @click.command()
@@ -198,6 +210,29 @@ def chat(
     type=int,
     help="Limit for paginated retrieval (1-100).",
 )
+@click.option(
+    "--message",
+    default=None,
+    help="Single message value as a JSON string (alternative to --question for complex message types).",
+)
+@click.option(
+    "--messages",
+    default=None,
+    help='Conversation messages as a JSON array, e.g. \'[{"role":"user","content":"Hello"}]\'.',
+)
+@click.option(
+    "--tool-results",
+    default=None,
+    help='Tool call results as a JSON array, e.g. \'[{"tool_call_id":"id","content":"result"}]\'.',
+)
+@click.option(
+    "--unattended-policy",
+    default=None,
+    help=(
+        "Unattended agent policy as a JSON object, "
+        'e.g. \'{"mode":"allow","allowed_skills":["web_search"]}\'.'
+    ),
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat2(
@@ -220,6 +255,10 @@ def chat2(
     allowed_mcp_servers: tuple[str, ...],
     offset: int | None,
     limit: int | None,
+    message: str | None,
+    messages: str | None,
+    tool_results: str | None,
+    unattended_policy: str | None,
     output_json: bool,
 ) -> None:
     """Send a question to an AI model via the aichat2 endpoint.
@@ -255,6 +294,10 @@ def chat2(
             "allowed_mcp_servers": list(allowed_mcp_servers) if allowed_mcp_servers else None,
             "offset": offset,
             "limit": limit,
+            "message": _parse_json_option(message, "--message"),
+            "messages": _parse_json_option(messages, "--messages"),
+            "tool_results": _parse_json_option(tool_results, "--tool-results"),
+            "unattended_policy": _parse_json_option(unattended_policy, "--unattended-policy"),
         }
 
         result = client.converse2(**payload)  # type: ignore[arg-type]
