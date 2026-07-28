@@ -18,9 +18,6 @@ TALKING_PHOTO_MODELS = [
 DEFAULT_LIP_SYNC_AUDIO_TYPE = "url"
 DEFAULT_LIP_SYNC_VOICE_LANGUAGE = "zh"
 DEFAULT_LIP_SYNC_VOICE_SPEED = 1.0
-DEFAULT_TALKING_PHOTO_MODEL = "kling-v2-1-master"
-DEFAULT_TALKING_PHOTO_DURATION = 5
-DEFAULT_TALKING_PHOTO_MODE = "pro"
 
 
 def _validate_duration(
@@ -126,7 +123,7 @@ def lip_sync(
     "-m",
     "--model",
     type=click.Choice(TALKING_PHOTO_MODELS),
-    default=DEFAULT_TALKING_PHOTO_MODEL,
+    default="kling-v2-1-master",
     show_default=True,
     help="Model to use for generation.",
 )
@@ -134,14 +131,14 @@ def lip_sync(
     "--duration",
     type=int,
     callback=_validate_duration,
-    default=DEFAULT_TALKING_PHOTO_DURATION,
+    default=5,
     show_default=True,
     help="Video duration in seconds.",
 )
 @click.option(
     "--mode",
     type=click.Choice(["std", "pro"]),
-    default=DEFAULT_TALKING_PHOTO_MODE,
+    default="pro",
     show_default=True,
     help="Generation mode: std or pro.",
 )
