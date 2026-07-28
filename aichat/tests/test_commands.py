@@ -331,10 +331,11 @@ class TestChat2Commands:
         body = json.loads(route.calls.last.request.content)
         assert body["stateful"] is False
 
-    def test_chat2_invalid_limit(self, runner):
+    @pytest.mark.parametrize("limit", ["0", "101", "-1"])
+    def test_chat2_invalid_limit(self, runner, limit):
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat2", "Hello", "--limit", "0"],
+            ["--token", "test-token", "chat2", "Hello", "--limit", limit],
         )
         assert result.exit_code != 0
 
