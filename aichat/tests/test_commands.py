@@ -45,7 +45,7 @@ class TestGlobalCommands:
     def test_help_chat2(self, runner):
         result = runner.invoke(cli, ["chat2", "--help"])
         assert result.exit_code == 0
-        assert "QUESTION" in result.output
+        assert "[QUESTION]" in result.output
         assert "--model" in result.output
         assert "--action" in result.output
         assert "--model-group" in result.output
@@ -283,6 +283,30 @@ class TestChat2Commands:
         assert body["max_turns"] == 5
 
     @respx.mock
+    def test_chat2_without_question(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat2",
+                "--action",
+                "retrieve",
+                "--id",
+                "abc-123",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == "retrieve"
+        assert body["id"] == "abc-123"
+        assert "question" not in body
+
+    @respx.mock
     def test_chat2_sends_question(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
@@ -293,6 +317,27 @@ class TestChat2Commands:
         )
         body = json.loads(route.calls.last.request.content)
         assert body["question"] == "What is the meaning of life?"
+
+    @respx.mock
+    def test_chat2_with_no_stateful(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "--no-stateful", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["stateful"] is False
+
+    @pytest.mark.parametrize("limit", ["0", "101", "-1"])
+    def test_chat2_invalid_limit(self, runner, limit):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "--limit", limit],
+        )
+        assert result.exit_code != 0
 
     @respx.mock
     def test_chat2_with_kimi_model(self, runner, mock_chat_response):

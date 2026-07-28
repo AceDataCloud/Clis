@@ -108,7 +108,7 @@ def chat(
 
 
 @click.command(name="chat2")
-@click.argument("question")
+@click.argument("question", required=False, default=None)
 @click.option(
     "-m",
     "--model",
@@ -136,10 +136,9 @@ def chat(
     help="Preset model name.",
 )
 @click.option(
-    "--stateful",
-    is_flag=True,
-    default=False,
-    help="Enable stateful conversation (server remembers context).",
+    "--stateful/--no-stateful",
+    default=None,
+    help="Enable or disable stateful conversation (omitted by default; server default: true).",
 )
 @click.option(
     "--ref",
@@ -156,7 +155,7 @@ def chat(
 @click.option(
     "--max-turns",
     default=None,
-    type=int,
+    type=click.IntRange(min=1),
     help="Maximum number of conversation turns.",
 )
 @click.option(
@@ -201,13 +200,13 @@ def chat(
 @click.option(
     "--offset",
     default=None,
-    type=int,
+    type=click.IntRange(min=0),
     help="Offset for paginated retrieval (minimum: 0).",
 )
 @click.option(
     "--limit",
     default=None,
-    type=int,
+    type=click.IntRange(min=1, max=100),
     help="Limit for paginated retrieval (1-100).",
 )
 @click.option(
@@ -237,12 +236,12 @@ def chat(
 @click.pass_context
 def chat2(
     ctx: click.Context,
-    question: str,
+    question: str | None,
     model: str,
     action: str,
     conversation_id: str | None,
     preset: str | None,
-    stateful: bool,
+    stateful: bool | None,
     references: tuple[str, ...],
     model_group: str | None,
     max_turns: int | None,
@@ -261,9 +260,11 @@ def chat2(
     unattended_policy: str | None,
     output_json: bool,
 ) -> None:
-    """Send a question to an AI model via the aichat2 endpoint.
+    """Send a question or conversation payload to an AI model via the aichat2 endpoint.
 
-    QUESTION is the prompt or question to send to the model.
+    QUESTION is an optional prompt or question to send to the model.
+    Omit it for actions like retrieve, or when sending structured payloads
+    with --message or --messages.
 
     \b
     Examples:
@@ -272,6 +273,7 @@ def chat2(
       aichat chat2 "Tell me more" --id 64a67fff-61dc-4801-8339-2c69334c61d6
       aichat chat2 "Summarize this" --ref "https://example.com/doc.txt" --model-group claude
       aichat chat2 "Hello" --allowed-skill web_search --allowed-mcp-server my-server
+      aichat chat2 --action retrieve --id 64a67fff-61dc-4801-8339-2c69334c61d6
     """
     client = get_client(ctx.obj.get("token"))
     try:
@@ -281,7 +283,7 @@ def chat2(
             "action": action,
             "id": conversation_id,
             "preset": preset,
-            "stateful": stateful if stateful else None,
+            "stateful": stateful,
             "references": list(references) if references else None,
             "model_group": model_group,
             "max_turns": max_turns,
