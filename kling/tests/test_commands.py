@@ -731,6 +731,32 @@ class TestLipSyncCommands:
         assert body["voice_language"] == "en"
 
     @respx.mock
+    def test_lip_sync_defaults_follow_openapi(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/lip-sync").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "lip-sync",
+                "--mode",
+                "audio2video",
+                "--video-url",
+                "https://example.com/video.mp4",
+                "--audio-url",
+                "https://example.com/audio.mp3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["audio_type"] == "url"
+        assert body["voice_language"] == "zh"
+        assert body["voice_speed"] == 1.0
+
+    @respx.mock
     def test_talking_photo_json(self, runner, mock_motion_response):
         respx.post("https://api.acedata.cloud/kling/talking-photo").mock(
             return_value=Response(200, json=mock_motion_response)
@@ -778,6 +804,30 @@ class TestLipSyncCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "kling-v2-6"
         assert body["duration"] == 10
+        assert body["mode"] == "pro"
+
+    @respx.mock
+    def test_talking_photo_defaults_follow_openapi(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/talking-photo").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "talking-photo",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--audio-url",
+                "https://example.com/audio.mp3",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "kling-v2-1-master"
+        assert body["duration"] == 5
         assert body["mode"] == "pro"
 
     def test_talking_photo_missing_required(self, runner):

@@ -15,6 +15,13 @@ TALKING_PHOTO_MODELS = [
     "kling-v2-6",
 ]
 
+DEFAULT_LIP_SYNC_AUDIO_TYPE = "url"
+DEFAULT_LIP_SYNC_VOICE_LANGUAGE = "zh"
+DEFAULT_LIP_SYNC_VOICE_SPEED = 1.0
+DEFAULT_TALKING_PHOTO_MODEL = "kling-v2-1-master"
+DEFAULT_TALKING_PHOTO_DURATION = 5
+DEFAULT_TALKING_PHOTO_MODE = "pro"
+
 
 def _validate_duration(
     _ctx: click.Context, _param: click.Parameter, value: int | None
@@ -38,7 +45,8 @@ def _validate_duration(
 @click.option(
     "--audio-type",
     type=click.Choice(["url", "file"]),
-    default=None,
+    default=DEFAULT_LIP_SYNC_AUDIO_TYPE,
+    show_default=True,
     help="Audio source type.",
 )
 @click.option("--audio-file", default=None, help="Path or content string for audio2video mode.")
@@ -47,13 +55,15 @@ def _validate_duration(
 @click.option(
     "--voice-language",
     type=click.Choice(["zh", "en"]),
-    default=None,
+    default=DEFAULT_LIP_SYNC_VOICE_LANGUAGE,
+    show_default=True,
     help="Voice language for text2video mode.",
 )
 @click.option(
     "--voice-speed",
-    default=None,
+    default=DEFAULT_LIP_SYNC_VOICE_SPEED,
     type=float,
+    show_default=True,
     help="Voice speed multiplier for text2video mode (1.0 = normal).",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
@@ -116,20 +126,23 @@ def lip_sync(
     "-m",
     "--model",
     type=click.Choice(TALKING_PHOTO_MODELS),
-    default=None,
+    default=DEFAULT_TALKING_PHOTO_MODEL,
+    show_default=True,
     help="Model to use for generation.",
 )
 @click.option(
     "--duration",
     type=int,
     callback=_validate_duration,
-    default=None,
+    default=DEFAULT_TALKING_PHOTO_DURATION,
+    show_default=True,
     help="Video duration in seconds.",
 )
 @click.option(
     "--mode",
     type=click.Choice(["std", "pro"]),
-    default=None,
+    default=DEFAULT_TALKING_PHOTO_MODE,
+    show_default=True,
     help="Generation mode: std or pro.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
