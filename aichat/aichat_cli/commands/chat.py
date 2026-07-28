@@ -138,7 +138,7 @@ def chat(
 @click.option(
     "--stateful/--no-stateful",
     default=None,
-    help="Enable or disable stateful conversation (default: true).",
+    help="Enable or disable stateful conversation (omitted by default; server default: true).",
 )
 @click.option(
     "--ref",
@@ -263,6 +263,8 @@ def chat2(
     """Send a question or conversation payload to an AI model via the aichat2 endpoint.
 
     QUESTION is an optional prompt or question to send to the model.
+    Omit it for actions like retrieve, or when sending structured payloads
+    with --message or --messages.
 
     \b
     Examples:
