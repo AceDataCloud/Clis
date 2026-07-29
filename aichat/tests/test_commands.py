@@ -49,6 +49,10 @@ class TestGlobalCommands:
         assert "--model" in result.output
         assert "--action" in result.output
         assert "--model-group" in result.output
+        assert "tool_use_id" in result.output
+        assert "tool_call_id" not in result.output
+        assert '"expires_at":1790000000' in result.output
+        assert "allow_selected" not in result.output
 
 
 # ─── Chat Commands ────────────────────────────────────────────────────────
@@ -490,7 +494,7 @@ class TestChat2Commands:
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
         )
-        tool_results = json.dumps([{"tool_call_id": "call_abc", "content": "42"}])
+        tool_results = json.dumps([{"tool_use_id": "call_abc", "output": "42"}])
         result = runner.invoke(
             cli,
             [
@@ -505,14 +509,20 @@ class TestChat2Commands:
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["tool_results"] == [{"tool_call_id": "call_abc", "content": "42"}]
+        assert body["tool_results"] == [{"tool_use_id": "call_abc", "output": "42"}]
 
     @respx.mock
     def test_chat2_with_unattended_policy(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
         )
-        policy = json.dumps({"mode": "allow", "allowed_skills": ["web_search"]})
+        policy = json.dumps(
+            {
+                "allowed_skills": ["web_search"],
+                "allowed_mcp_servers": [],
+                "expires_at": 1790000000,
+            }
+        )
         result = runner.invoke(
             cli,
             [
@@ -527,7 +537,11 @@ class TestChat2Commands:
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["unattended_policy"] == {"mode": "allow", "allowed_skills": ["web_search"]}
+        assert body["unattended_policy"] == {
+            "allowed_skills": ["web_search"],
+            "allowed_mcp_servers": [],
+            "expires_at": 1790000000,
+        }
 
     def test_chat2_invalid_messages_json(self, runner):
         result = runner.invoke(

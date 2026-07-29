@@ -222,14 +222,14 @@ def chat(
 @click.option(
     "--tool-results",
     default=None,
-    help='Tool call results as a JSON array, e.g. \'[{"tool_call_id":"id","content":"result"}]\'.',
+    help='Tool call results as a JSON array, e.g. \'[{"tool_use_id":"id","output":"result"}]\'.',
 )
 @click.option(
     "--unattended-policy",
     default=None,
     help=(
         "Unattended agent policy as a JSON object, "
-        'e.g. \'{"mode":"allow","allowed_skills":["web_search"]}\'.'
+        'e.g. \'{"allowed_skills":["web_search"],"allowed_mcp_servers":[],"expires_at":1790000000}\'.'
     ),
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
