@@ -50,7 +50,7 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             "--frames",
             type=int,
             default=None,
-            help="Frame count (29-361, must satisfy 25+4n). Mutually exclusive with --duration.",
+            help="Frame count (29-289, must satisfy 25+4n). Mutually exclusive with --duration.",
         ),
         click.option(
             "--seed",
