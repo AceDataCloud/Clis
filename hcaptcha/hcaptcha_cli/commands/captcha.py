@@ -10,6 +10,7 @@ from hcaptcha_cli.core.output import (
     print_error,
     print_json,
     print_recognition_result,
+    print_task_result,
     print_token_result,
 )
 
@@ -134,6 +135,39 @@ def token(
             print_json(result)
         else:
             print_token_result(result)
+    except HcaptchaError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e
+
+
+@click.command()
+@click.argument("task_id")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def task(
+    ctx: click.Context,
+    task_id: str,
+    output_json: bool,
+) -> None:
+    """Poll the result of an asynchronous captcha task.
+
+    TASK_ID is the task identifier returned when calling recognize or token with --async.
+
+    \\b
+    Examples:
+      hcaptcha task 61138bb6-19aa-11ec-a9c8-0242ac110002
+      hcaptcha task 61138bb6-19aa-11ec-a9c8-0242ac110002 --json
+    """
+    client = get_client(ctx.obj.get("token"))
+
+    payload: dict[str, object] = {"task_id": task_id}
+
+    try:
+        result = client.get_task(**payload)
+        if output_json:
+            print_json(result)
+        else:
+            print_task_result(result)
     except HcaptchaError as e:
         print_error(e.message)
         raise SystemExit(1) from e

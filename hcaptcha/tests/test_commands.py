@@ -28,6 +28,7 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "recognize" in result.output
         assert "token" in result.output
+        assert "task" in result.output
         assert "config" in result.output
 
     def test_help_recognize(self, runner):
@@ -329,3 +330,115 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["config"])
         assert result.exit_code == 0
         assert "api.acedata.cloud" in result.output
+
+
+class TestTaskCommand:
+    """Tests for hCaptcha task polling command."""
+
+    def test_help_task(self, runner):
+        result = runner.invoke(cli, ["task", "--help"])
+        assert result.exit_code == 0
+        assert "TASK_ID" in result.output
+
+    @respx.mock
+    def test_task_processing_json(self, runner, mock_task_processing_response):
+        respx.post("https://api.acedata.cloud/captcha/tasks").mock(
+            return_value=Response(200, json=mock_task_processing_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["status"] == "processing"
+
+    @respx.mock
+    def test_task_processing_rich_output(self, runner, mock_task_processing_response):
+        respx.post("https://api.acedata.cloud/captcha/tasks").mock(
+            return_value=Response(200, json=mock_task_processing_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "Task Processing" in result.output
+
+    @respx.mock
+    def test_task_ready_token_json(self, runner, mock_task_ready_token_response):
+        respx.post("https://api.acedata.cloud/captcha/tasks").mock(
+            return_value=Response(200, json=mock_task_ready_token_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["status"] == "ready"
+        assert "token" in data
+
+    @respx.mock
+    def test_task_ready_rich_output(self, runner, mock_task_ready_token_response):
+        respx.post("https://api.acedata.cloud/captcha/tasks").mock(
+            return_value=Response(200, json=mock_task_ready_token_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "Task Result" in result.output
+
+    @respx.mock
+    def test_task_sends_correct_payload(self, runner, mock_task_processing_response):
+        route = respx.post("https://api.acedata.cloud/captcha/tasks").mock(
+            return_value=Response(200, json=mock_task_processing_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["task_id"] == "3a8b1c2d-4e5f-6789-abcd-ef0123456789"
+
+    def test_task_missing_task_id(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "task"])
+        assert result.exit_code != 0
+
+    def test_task_no_token(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "", "task", "3a8b1c2d-4e5f-6789-abcd-ef0123456789"],
+        )
+        assert result.exit_code != 0

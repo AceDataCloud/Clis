@@ -11,7 +11,7 @@ from importlib import metadata
 import click
 from dotenv import load_dotenv
 
-from hcaptcha_cli.commands.captcha import recognize, token
+from hcaptcha_cli.commands.captcha import recognize, task, token
 from hcaptcha_cli.commands.info import config
 
 load_dotenv()
@@ -45,6 +45,7 @@ def cli(ctx: click.Context, api_token: str | None) -> None:
     Examples:
       hcaptcha recognize --queries '["https://example.com/img.jpg"]' --question "Select cars"
       hcaptcha token a5f74b19-9e45-40e0-b45d-47ff91b7a6c2 https://accounts.hcaptcha.com/demo
+      hcaptcha task 61138bb6-19aa-11ec-a9c8-0242ac110002
 
     Set your token:
       export ACEDATACLOUD_API_TOKEN=your_token
@@ -56,6 +57,7 @@ def cli(ctx: click.Context, api_token: str | None) -> None:
 # Register commands
 cli.add_command(recognize)
 cli.add_command(token)
+cli.add_command(task)
 cli.add_command(config)
 
 

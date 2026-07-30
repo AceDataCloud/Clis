@@ -102,6 +102,10 @@ class HcaptchaClient:
         """Get hCaptcha token using the /captcha/token/hcaptcha endpoint."""
         return self.request("/captcha/token/hcaptcha", kwargs)
 
+    def get_task(self, **kwargs: Any) -> dict[str, Any]:
+        """Poll an async task result using the /captcha/tasks endpoint."""
+        return self.request("/captcha/tasks", kwargs)
+
 
 def get_client(token: str | None = None) -> HcaptchaClient:
     """Get an HcaptchaClient instance, optionally overriding the token."""

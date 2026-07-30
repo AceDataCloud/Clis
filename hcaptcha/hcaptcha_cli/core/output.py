@@ -67,6 +67,44 @@ def print_recognition_result(data: dict[str, Any]) -> None:
     )
 
 
+def print_task_result(data: dict[str, Any]) -> None:
+    """Print hCaptcha task poll result."""
+    task_id = data.get("task_id")
+    status = data.get("status")
+    token = data.get("token")
+    solution = data.get("solution")
+    text = data.get("text")
+
+    if status == "processing":
+        content = f"[bold]Task ID:[/bold] {task_id}\n[bold]Status:[/bold] {status}"
+        console.print(
+            Panel(
+                content,
+                title="[bold yellow]Task Processing[/bold yellow]",
+                border_style="yellow",
+            )
+        )
+        console.print("[dim]The task is still being processed. Poll again shortly.[/dim]")
+        return
+
+    content_parts = [f"[bold]Task ID:[/bold] {task_id}", f"[bold]Status:[/bold] {status}"]
+    if token:
+        content_parts.append(f"[bold]Token:[/bold] {token}")
+    if text:
+        content_parts.append(f"[bold]Text:[/bold] {text}")
+    if solution:
+        content_parts.append(f"[bold]Solution:[/bold] {solution}")
+
+    content = "\n".join(content_parts)
+    console.print(
+        Panel(
+            content,
+            title="[bold green]Task Result[/bold green]",
+            border_style="green",
+        )
+    )
+
+
 def print_token_result(data: dict[str, Any]) -> None:
     """Print hCaptcha token result."""
     token = data.get("token")
