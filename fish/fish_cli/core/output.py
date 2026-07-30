@@ -20,7 +20,7 @@ FISH_TTS_MODELS = [
 DEFAULT_TTS_MODEL = "s2-pro"
 
 # Available audio formats
-AUDIO_FORMATS = ["mp3", "wav", "opus", "pcm"]
+AUDIO_FORMATS = ["mp3", "wav", "pcm"]
 
 DEFAULT_AUDIO_FORMAT = "mp3"
 

@@ -38,7 +38,6 @@ class TestGlobalCommands:
         assert "--model" in result.output
         assert "--reference-id" in result.output
         assert "--format" in result.output
-        assert "--opus-bitrate" in result.output
         assert "--prosody" in result.output
         assert "--references" in result.output
 
@@ -172,8 +171,6 @@ class TestTTSCommand:
                 "test-token",
                 "tts",
                 "Hello",
-                "--opus-bitrate",
-                "64000",
                 "--chunk-length",
                 "120",
                 "--min-chunk-length",
@@ -187,7 +184,6 @@ class TestTTSCommand:
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["opus_bitrate"] == 64000
         assert sent["chunk_length"] == 120
         assert sent["min_chunk_length"] == 30
         assert sent["prosody"] == {"speed": 1.1}
@@ -208,6 +204,14 @@ class TestTTSCommand:
         )
         assert result.exit_code != 0
         assert "--references must be a JSON array." in result.output
+
+    def test_tts_with_unsupported_opus_format(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "tts", "Hello", "--format", "opus"],
+        )
+        assert result.exit_code != 0
+        assert "'opus' is not one of" in result.output
 
     @respx.mock
     def test_tts_async(self, runner, mock_tts_async_response):
