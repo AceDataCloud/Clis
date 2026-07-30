@@ -60,3 +60,39 @@ def mock_token_async_response():
     return {
         "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
     }
+
+
+@pytest.fixture
+def mock_task_processing_response():
+    """Mock task poll response while still processing."""
+    return {
+        "success": True,
+        "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+        "status": "processing",
+    }
+
+
+@pytest.fixture
+def mock_task_ready_token_response():
+    """Mock task poll response when token task is ready."""
+    return {
+        "success": True,
+        "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+        "status": "ready",
+        "token": "P1_eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.test-token",
+    }
+
+
+@pytest.fixture
+def mock_task_ready_solution_response():
+    """Mock task poll response when recognition task is ready."""
+    return {
+        "success": True,
+        "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+        "status": "ready",
+        "solution": {
+            "box": ["565", "140"],
+            "label": "Please click the center of the seahorses head",
+            "confidences": 0.7175476551055908,
+        },
+    }
