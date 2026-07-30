@@ -79,15 +79,17 @@ class TestGlobalCommands:
     def test_help_task(self, runner):
         result = runner.invoke(cli, ["task", "--help"])
         assert result.exit_code == 0
-        assert "TASK_ID" in result.output
+        assert "--trace-id" in result.output
 
     def test_help_tasks(self, runner):
         result = runner.invoke(cli, ["tasks", "--help"])
         assert result.exit_code == 0
+        assert "--trace-ids" in result.output
 
     def test_help_wait(self, runner):
         result = runner.invoke(cli, ["wait", "--help"])
         assert result.exit_code == 0
+        assert "--trace-id" in result.output
         assert "--interval" in result.output
         assert "--timeout" in result.output
 
@@ -470,6 +472,20 @@ class TestTaskCommands:
         assert body["action"] == "retrieve"
 
     @respx.mock
+    def test_task_request_payload_with_trace_id_only(self, runner, mock_task_response):
+        route = respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "task", "--trace-id", "trace-123", "--json"]
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["trace_id"] == "trace-123"
+        assert body["action"] == "retrieve"
+        assert "id" not in body
+
+    @respx.mock
     def test_tasks_batch_request_payload(self, runner, mock_task_response):
         route = respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
             return_value=Response(200, json=mock_task_response)
@@ -484,6 +500,38 @@ class TestTaskCommands:
         assert body["action"] == "retrieve_batch"
 
     @respx.mock
+    def test_tasks_batch_request_payload_with_trace_ids_and_paging(
+        self, runner, mock_task_response
+    ):
+        route = respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "--trace-ids",
+                "trace-123",
+                "--trace-ids",
+                "trace-456",
+                "--offset",
+                "2",
+                "--limit",
+                "10",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["trace_ids"] == ["trace-123", "trace-456"]
+        assert body["offset"] == 2
+        assert body["limit"] == 10
+        assert body["action"] == "retrieve_batch"
+        assert "ids" not in body
+
+    @respx.mock
     def test_wait_completes(self, runner, mock_task_response):
         respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
             return_value=Response(200, json=mock_task_response)
@@ -492,6 +540,21 @@ class TestTaskCommands:
             cli, ["--token", "test-token", "wait", "abc123-def456", "--json"]
         )
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_wait_with_trace_id(self, runner, mock_task_response):
+        route = respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "wait", "--trace-id", "trace-123", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["trace_id"] == "trace-123"
+        assert body["action"] == "retrieve"
+        assert "id" not in body
 
     @respx.mock
     def test_wait_timeout(self, runner):
