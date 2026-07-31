@@ -37,6 +37,13 @@ from flux_cli.core.output import (
     help="Number of images to generate.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -46,6 +53,7 @@ def generate(
     size: str | None,
     count: int | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate an image from a text prompt.
@@ -68,6 +76,8 @@ def generate(
             "count": count,
             "callback_url": callback_url,
         }
+        if async_mode:
+            payload["async"] = True
 
         result = client.generate_image(**payload)  # type: ignore[arg-type]
         if output_json:
@@ -100,6 +110,13 @@ def generate(
     help="Output size: pixels or aspect ratio.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def edit(
@@ -109,6 +126,7 @@ def edit(
     model: str,
     size: str | None,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Edit an existing image with a text prompt.
@@ -130,6 +148,8 @@ def edit(
             "size": size,
             "callback_url": callback_url,
         }
+        if async_mode:
+            payload["async"] = True
 
         result = client.edit_image(**payload)  # type: ignore[arg-type]
         if output_json:

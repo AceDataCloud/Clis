@@ -1,0 +1,1 @@
+"""QRArt CLI package."""
