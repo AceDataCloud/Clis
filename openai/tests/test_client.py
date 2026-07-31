@@ -64,6 +64,20 @@ class TestOpenAIClient:
         assert result == b"fake-mp3-bytes"
 
     @respx.mock
+    def test_audio_transcriptions_request(self):
+        route = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+            return_value=Response(200, json={"text": "Hello world."})
+        )
+        client = OpenAIClient(api_token="test-token")
+        result = client.audio_transcriptions(
+            file=b"fake-audio-bytes",
+            filename="audio.mp3",
+            model="whisper-1",
+        )
+        assert route.called
+        assert result == {"text": "Hello world."}
+
+    @respx.mock
     def test_unauthorized_raises_auth_error(self):
         respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
             return_value=Response(401, json={"error": "Unauthorized"})
