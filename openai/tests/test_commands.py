@@ -712,6 +712,85 @@ class TestSpeechAndRealtimeCommands:
         assert data["url"] == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2"
 
 
+class TestTranscribeCommands:
+    """Tests for the transcribe command."""
+
+    @respx.mock
+    def test_transcribe_basic(self, runner, tmp_path):
+        audio_file = tmp_path / "audio.mp3"
+        audio_file.write_bytes(b"fake-audio-data")
+        route = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+            return_value=Response(200, json={"text": "Hello world."})
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "transcribe",
+                str(audio_file),
+            ],
+        )
+        assert result.exit_code == 0
+        assert route.called
+        assert "Hello world." in result.output
+
+    @respx.mock
+    def test_transcribe_json_output(self, runner, tmp_path):
+        audio_file = tmp_path / "audio.wav"
+        audio_file.write_bytes(b"fake-audio-data")
+        respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+            return_value=Response(200, json={"text": "Testing transcription."})
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "transcribe",
+                str(audio_file),
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["text"] == "Testing transcription."
+
+    @respx.mock
+    def test_transcribe_with_options(self, runner, tmp_path):
+        audio_file = tmp_path / "speech.flac"
+        audio_file.write_bytes(b"fake-audio-data")
+        route = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+            return_value=Response(200, json={"text": "Bonjour."})
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "transcribe",
+                str(audio_file),
+                "--language",
+                "fr",
+                "--response-format",
+                "verbose_json",
+                "--temperature",
+                "0.2",
+                "--prompt",
+                "French speech",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert route.called
+
+    def test_transcribe_help(self, runner):
+        result = runner.invoke(cli, ["transcribe", "--help"])
+        assert result.exit_code == 0
+        assert "transcribe" in result.output.lower()
+        assert "FILE" in result.output
+
+
 class TestInfoCommands:
     """Tests for info and utility commands."""
 

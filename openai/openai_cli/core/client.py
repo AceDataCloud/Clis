@@ -162,9 +162,98 @@ class OpenAIClient:
         """Send a Responses API request."""
         return self.request("/openai/responses", kwargs)
 
+    def request_multipart(
+        self,
+        endpoint: str,
+        fields: dict[str, Any] | None = None,
+        files: dict[str, Any] | None = None,
+        timeout: float | None = None,
+    ) -> dict[str, Any]:
+        """Make a multipart/form-data request."""
+        url = f"{self.base_url}{endpoint}"
+        request_timeout = timeout or self.timeout
+
+        if not self.api_token:
+            raise OpenAIAuthError(
+                "API token not configured. Set ACEDATACLOUD_API_TOKEN or use --token option."
+            )
+        headers = {
+            "accept": "application/json",
+            "authorization": f"Bearer {self.api_token}",
+        }
+
+        # Build multipart parts as a list so repeated keys (e.g. timestamp_granularities[])
+        # are supported.  Plain fields use (None, value); file fields keep their tuple form.
+        multipart: list[tuple[str, Any]] = []
+        for key, value in (fields or {}).items():
+            if value is None:
+                continue
+            if isinstance(value, list):
+                for item in value:
+                    multipart.append((key, (None, str(item))))
+            else:
+                multipart.append((key, (None, str(value))))
+        for key, value in (files or {}).items():
+            multipart.append((key, value))
+
+        with httpx.Client() as http_client:
+            try:
+                response = http_client.post(
+                    url,
+                    files=multipart,
+                    headers=headers,
+                    timeout=request_timeout,
+                )
+
+                if response.status_code == 401:
+                    raise OpenAIAuthError("Invalid API token")
+
+                if response.status_code == 403:
+                    raise OpenAIAuthError("Access denied. Check your API permissions.")
+
+                response.raise_for_status()
+                return response.json()  # type: ignore[no-any-return]
+
+            except httpx.TimeoutException as e:
+                raise OpenAITimeoutError(
+                    f"Request to {endpoint} timed out after {request_timeout}s"
+                ) from e
+
+            except OpenAIAuthError:
+                raise
+
+            except httpx.HTTPStatusError as e:
+                raise OpenAIAPIError(
+                    message=e.response.text,
+                    code=f"http_{e.response.status_code}",
+                    status_code=e.response.status_code,
+                ) from e
+
+            except Exception as e:
+                if isinstance(e, OpenAIAPIError | OpenAITimeoutError):
+                    raise
+                raise OpenAIAPIError(message=str(e)) from e
+
     def audio_speech(self, **kwargs: Any) -> bytes:
         """Synthesize speech audio."""
         return self.request_bytes("/v1/audio/speech", kwargs)
+
+    def audio_transcriptions(
+        self,
+        file: bytes,
+        filename: str = "audio.wav",
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Transcribe audio to text."""
+        timestamp_granularities = kwargs.pop("timestamp_granularities", None)
+        fields = dict(kwargs)
+        if timestamp_granularities:
+            fields["timestamp_granularities[]"] = timestamp_granularities
+        return self.request_multipart(
+            "/v1/audio/transcriptions",
+            fields=fields,
+            files={"file": (filename, file, "application/octet-stream")},
+        )
 
     def tasks(self, **kwargs: Any) -> dict[str, Any]:
         """Query OpenAI async task results."""

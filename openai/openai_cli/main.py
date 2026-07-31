@@ -19,6 +19,7 @@ from openai_cli.commands.realtime import realtime
 from openai_cli.commands.response import response
 from openai_cli.commands.speech import speech
 from openai_cli.commands.tasks import tasks
+from openai_cli.commands.transcribe import transcribe
 
 load_dotenv()
 
@@ -56,6 +57,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
       openai-cli edit "Add clouds" --image-url https://example.com/photo.jpg
       openai-cli response "Summarize this topic" -m gpt-4o
       openai-cli speech "Hello from AceDataCloud"
+      openai-cli transcribe audio.mp3
       openai-cli realtime --model gpt-realtime
       openai-cli tasks retrieve --id <task-id>
 
@@ -73,6 +75,7 @@ cli.add_command(image)
 cli.add_command(edit)
 cli.add_command(response)
 cli.add_command(speech)
+cli.add_command(transcribe)
 cli.add_command(realtime)
 cli.add_command(tasks)
 cli.add_command(models)

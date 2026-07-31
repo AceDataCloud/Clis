@@ -384,6 +384,18 @@ def print_task_result(data: dict[str, Any]) -> None:
     )
 
 
+def print_transcription_result(data: dict[str, Any] | str) -> None:
+    """Print an audio transcription result."""
+    if isinstance(data, str):
+        console.print(data)
+        return
+    text = data.get("text", "")
+    if text:
+        console.print(text)
+    else:
+        console.print("[yellow]No transcription text returned.[/yellow]")
+
+
 def print_task_batch_result(data: dict[str, Any]) -> None:
     """Print a batch of task results."""
     items = data.get("items", [])
