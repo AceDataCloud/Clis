@@ -343,8 +343,9 @@ def print_task_result(data: dict[str, Any]) -> None:
     trace_id = data.get("trace_id", "")
     task_type = data.get("type", "")
     created_at = data.get("created_at", "")
+    started_at = data.get("started_at", "")
     finished_at = data.get("finished_at", "")
-    duration = data.get("duration", "")
+    elapsed = data.get("elapsed", "") or data.get("duration", "")
 
     lines = []
     if task_id:
@@ -355,10 +356,12 @@ def print_task_result(data: dict[str, Any]) -> None:
         lines.append(f"[bold]Type:[/bold] {task_type}")
     if created_at:
         lines.append(f"[bold]Created:[/bold] {created_at}")
+    if started_at:
+        lines.append(f"[bold]Started:[/bold] {started_at}")
     if finished_at:
         lines.append(f"[bold]Finished:[/bold] {finished_at}")
-    if duration:
-        lines.append(f"[bold]Duration:[/bold] {duration}s")
+    if elapsed:
+        lines.append(f"[bold]Elapsed:[/bold] {elapsed}s")
 
     response = data.get("response", {})
     if response:
