@@ -75,7 +75,7 @@ def generate(
 @click.option(
     "-m",
     "--model",
-    type=click.Choice(["minimax-i2v", "minimax-i2v-director"]),
+    type=click.Choice(["minimax-i2v", "minimax-t2v", "minimax-i2v-director"]),
     default="minimax-i2v",
     help="Hailuo image-to-video model (default: minimax-i2v).",
 )
