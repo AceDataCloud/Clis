@@ -132,8 +132,9 @@ def mock_task_response():
         "type": "images_generations",
         "application_id": "9dec7b2a-1cad-41ff-8536-d4ddaf2525d4",
         "created_at": 1763142607.967,
+        "started_at": "2025-10-26T00:00:00.069+00:00",
         "finished_at": 1763142637.404,
-        "duration": 29.437,
+        "elapsed": 29.437,
         "request": {
             "model": "gpt-image-1",
             "prompt": "A cat sitting on a table",

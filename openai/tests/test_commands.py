@@ -847,6 +847,8 @@ class TestTasksCommands:
         )
         assert result.exit_code == 0
         assert "7489df4c" in result.output
+        assert "Started" in result.output
+        assert "Elapsed" in result.output
 
     @respx.mock
     def test_tasks_retrieve_empty_response(self, runner):
