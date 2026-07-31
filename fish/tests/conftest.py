@@ -39,7 +39,7 @@ def mock_tts_async_response():
     """Mock async TTS submission response."""
     return {
         "task_id": "2725a2d3-f87e-4905-9c53-9988d5a7b2f5",
-        "started_at": "2025-05-09T12:34:56.789Z",
+        "started_at": 1746794096.789,
     }
 
 

@@ -54,8 +54,8 @@ def mock_task_done_response():
         "id": "maestro-task-123",
         "status": "succeeded",
         "created_at": "2025-01-21T00:00:00.000Z",
-        "started_at": "2025-01-21T00:00:05.000Z",
-        "finished_at": "2025-01-21T00:01:00.000Z",
+        "started_at": 1737417605.0,
+        "finished_at": 1737417660.0,
         "elapsed": 55,
         "response": {
             "data": {
