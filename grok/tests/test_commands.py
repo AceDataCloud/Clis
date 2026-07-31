@@ -183,6 +183,47 @@ class TestChatCommand:
         sent = json.loads(route.calls[0].request.content)
         assert sent["store"] is True
 
+    @respx.mock
+    def test_chat_with_extended_openapi_options(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/grok/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--stream",
+                "--response-format",
+                '{"type":"json_object"}',
+                "--tools",
+                '[{"type":"function","function":{"name":"lookup"}}]',
+                "--tool-choice",
+                '{"type":"function","function":{"name":"lookup"}}',
+                "--stream-options",
+                '{"include_usage":true}',
+                "--metadata",
+                '{"source":"cli"}',
+                "--modalities",
+                '["text"]',
+                "--web-search-options",
+                '{"search_context_size":"medium"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["stream"] is True
+        assert body["response_format"] == {"type": "json_object"}
+        assert body["tools"][0]["function"]["name"] == "lookup"
+        assert body["tool_choice"]["function"]["name"] == "lookup"
+        assert body["stream_options"] == {"include_usage": True}
+        assert body["metadata"] == {"source": "cli"}
+        assert body["modalities"] == ["text"]
+        assert body["web_search_options"] == {"search_context_size": "medium"}
+
     def test_chat_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "chat", "Hello"])
         assert result.exit_code != 0
