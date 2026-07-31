@@ -200,3 +200,31 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["config"])
         assert result.exit_code == 0
         assert "api.acedata.cloud" in result.output
+
+
+class TestImageToVideoModelChoices:
+    """Tests for image-to-video model enum including minimax-t2v."""
+
+    @respx.mock
+    def test_image_to_video_with_minimax_t2v(self, mock_video_response):
+        runner = CliRunner()
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this scene",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--model",
+                "minimax-t2v",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["model"] == "minimax-t2v"
