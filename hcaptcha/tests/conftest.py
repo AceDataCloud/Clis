@@ -69,6 +69,7 @@ def mock_task_processing_response():
         "success": True,
         "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
         "status": "processing",
+        "trace_id": "trace-hcaptcha-processing-123",
     }
 
 
@@ -79,6 +80,7 @@ def mock_task_ready_token_response():
         "success": True,
         "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
         "status": "ready",
+        "trace_id": "trace-hcaptcha-ready-123",
         "token": "P1_eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.test-token",
     }
 
@@ -90,6 +92,7 @@ def mock_task_ready_solution_response():
         "success": True,
         "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
         "status": "ready",
+        "trace_id": "trace-hcaptcha-solution-123",
         "solution": {
             "box": ["565", "140"],
             "label": "Please click the center of the seahorses head",

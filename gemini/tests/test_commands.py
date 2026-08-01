@@ -341,6 +341,17 @@ class TestTaskCommands:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["data"]["id"] == "task-video-123"
+        assert data["trace_id"] == "trace-task-123"
+
+    @respx.mock
+    def test_task_rich_output_contains_trace_id(self, runner, mock_task_response):
+        respx.post("https://api.acedata.cloud/gemini/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "task", "task-video-123"])
+        assert result.exit_code == 0
+        assert "Trace ID" in result.output
+        assert "trace-task-123" in result.output
 
     @respx.mock
     def test_tasks_batch_json(self, runner, mock_task_response):
