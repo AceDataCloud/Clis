@@ -9,8 +9,8 @@ def mock_extract_response() -> dict:
         "success": True,
         "task_id": "550e8400-e29b-41d4-a716-446655440000",
         "trace_id": "550e8400-e29b-41d4-a716-446655440001",
-        "started_at": "2025-05-02T10:30:00.123Z",
-        "finished_at": "2025-05-02T10:30:08.789Z",
+        "started_at": 1746181800.123,
+        "finished_at": 1746181808.789,
         "elapsed": 8.666,
         "data": {
             "kind": "extract",
@@ -28,8 +28,8 @@ def mock_render_response() -> dict:
         "success": True,
         "task_id": "550e8400-e29b-41d4-a716-446655440002",
         "trace_id": "550e8400-e29b-41d4-a716-446655440003",
-        "started_at": "2025-05-02T10:30:00.123Z",
-        "finished_at": "2025-05-02T10:30:05.456Z",
+        "started_at": 1746181800.123,
+        "finished_at": 1746181805.456,
         "elapsed": 5.333,
         "data": {
             "kind": "render",
@@ -49,7 +49,7 @@ def mock_task_response() -> dict:
         "task_id": "550e8400-e29b-41d4-a716-446655440000",
         "trace_id": "550e8400-e29b-41d4-a716-446655440001",
         "type": "extract",
-        "started_at": "2025-05-02T10:30:00.123Z",
-        "finished_at": "2025-05-02T10:30:08.789Z",
+        "started_at": 1746181800.123,
+        "finished_at": 1746181808.789,
         "elapsed": 8.666,
     }
