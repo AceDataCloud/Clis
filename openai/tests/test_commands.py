@@ -784,11 +784,36 @@ class TestTranscribeCommands:
         assert result.exit_code == 0
         assert route.called
 
+    @respx.mock
+    def test_transcribe_stream(self, runner, tmp_path):
+        audio_file = tmp_path / "audio.mp3"
+        audio_file.write_bytes(b"fake-audio-data")
+        route = respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+            return_value=Response(200, json={"text": "Streamed text."})
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "transcribe",
+                str(audio_file),
+                "--stream",
+            ],
+        )
+        assert result.exit_code == 0
+        assert route.called
+        request = route.calls[0].request
+        content = request.content.decode()
+        assert "stream" in content
+        assert "True" in content
+
     def test_transcribe_help(self, runner):
         result = runner.invoke(cli, ["transcribe", "--help"])
         assert result.exit_code == 0
         assert "transcribe" in result.output.lower()
         assert "FILE" in result.output
+        assert "--stream" in result.output
 
 
 class TestInfoCommands:

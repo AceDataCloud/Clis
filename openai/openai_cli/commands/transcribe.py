@@ -52,6 +52,7 @@ TRANSCRIPTION_FORMATS = ["json", "text", "srt", "verbose_json", "vtt"]
     type=click.Choice(["word", "segment"]),
     help="Timestamp granularities to include (repeatable: word, segment).",
 )
+@click.option("--stream", is_flag=True, default=False, help="Stream partial transcription events.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def transcribe(
@@ -63,6 +64,7 @@ def transcribe(
     response_format: str,
     temperature: float | None,
     timestamp_granularities: tuple[str, ...],
+    stream: bool,
     output_json: bool,
 ) -> None:
     """Transcribe audio to text using `/v1/audio/transcriptions`.
@@ -86,6 +88,7 @@ def transcribe(
         "response_format": response_format,
         "temperature": temperature,
         "timestamp_granularities": list(timestamp_granularities) if timestamp_granularities else None,
+        "stream": stream or None,
     }
 
     try:
