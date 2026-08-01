@@ -62,9 +62,7 @@ class TestTTSCommand:
         respx.post("https://api.acedata.cloud/fish/tts").mock(
             return_value=Response(200, json=mock_tts_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "tts", "Hello, world!", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "tts", "Hello, world!", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert "audio_url" in data
@@ -218,9 +216,7 @@ class TestTTSCommand:
         route = respx.post("https://api.acedata.cloud/fish/tts").mock(
             return_value=Response(200, json=mock_tts_async_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "tts", "Hello", "--async", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "tts", "Hello", "--async", "--json"])
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["async"] is True
@@ -230,9 +226,7 @@ class TestTTSCommand:
         respx.post("https://api.acedata.cloud/fish/tts").mock(
             return_value=Response(200, json=mock_tts_async_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "tts", "Hello", "--async"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "tts", "Hello", "--async"])
         assert result.exit_code == 0
         assert "2725a2d3" in result.output
 

@@ -69,9 +69,7 @@ class TestCreateCommand:
         respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "create", "A product demo video"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "create", "A product demo video"])
         assert result.exit_code == 0
         assert "maestro-task-123" in result.output
 
