@@ -770,8 +770,18 @@ class TestTranscribeCommands:
                 "test-token",
                 "transcribe",
                 str(audio_file),
+                "--model",
+                "gpt-transcribe",
                 "--language",
                 "fr",
+                "--languages",
+                "fr",
+                "--languages",
+                "en",
+                "--keywords",
+                "bonjour",
+                "--keywords",
+                "salut",
                 "--response-format",
                 "verbose_json",
                 "--temperature",
@@ -783,6 +793,37 @@ class TestTranscribeCommands:
         )
         assert result.exit_code == 0
         assert route.called
+        content = route.calls[0].request.content.decode()
+        assert 'name="model"' in content
+        assert "gpt-transcribe" in content
+        assert 'name="languages[]"' in content
+        assert "bonjour" in content
+        assert "salut" in content
+
+    @respx.mock
+    def test_transcribe_text_response_format(self, runner, tmp_path):
+        audio_file = tmp_path / "audio.mp3"
+        audio_file.write_bytes(b"fake-audio-data")
+        respx.post("https://api.acedata.cloud/v1/audio/transcriptions").mock(
+            return_value=Response(
+                200,
+                text="WEBVTT\n\n1\n00:00:00.000 --> 00:00:01.000\nHello world.\n",
+                headers={"content-type": "text/plain; charset=utf-8"},
+            )
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "transcribe",
+                str(audio_file),
+                "--response-format",
+                "vtt",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "WEBVTT" in result.output
 
     @respx.mock
     def test_transcribe_stream(self, runner, tmp_path):
@@ -813,6 +854,7 @@ class TestTranscribeCommands:
         assert result.exit_code == 0
         assert "transcribe" in result.output.lower()
         assert "FILE" in result.output
+        assert "--languages" in result.output
         assert "--stream" in result.output
 
 
