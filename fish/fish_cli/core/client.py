@@ -24,8 +24,7 @@ class FishClient:
         """Get request headers with authentication."""
         if not self.api_token:
             raise FishAuthError(
-                "API token not configured. "
-                "Set ACEDATACLOUD_API_TOKEN or use --token option."
+                "API token not configured. Set ACEDATACLOUD_API_TOKEN or use --token option."
             )
         headers = {
             "accept": "application/json",
