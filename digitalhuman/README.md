@@ -17,6 +17,10 @@ export ACEDATACLOUD_API_TOKEN=your_token
 digitalhuman generate --video-url https://example.com/face.mp4 \
                       --audio-url https://example.com/speech.mp3
 
+# You can also use a still image as the face source
+digitalhuman generate --image-url https://example.com/portrait.jpg \
+                      --audio-url https://example.com/speech.mp3
+
 # Clone a voice first, then use it for TTS
 digitalhuman clone-voice --audio-url https://example.com/voice.wav
 digitalhuman generate --video-url https://example.com/face.mp4 \
@@ -38,3 +42,8 @@ digitalhuman wait task_abc123
 - `wait` – Poll until a task completes
 - `engines` – List available engines
 - `config` – Show current configuration
+
+## Notes
+
+- `--engine` is still accepted for backward compatibility, but no longer changes the output or pricing.
+- `--resolution` is still accepted for backward compatibility, but output is always rendered at 720p.

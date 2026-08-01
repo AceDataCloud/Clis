@@ -15,21 +15,21 @@ from digitalhuman_cli.core.output import (
 )
 
 
-@click.command()
+@click.command(short_help="Digital Human Videos.")
 @click.option(
     "--video-url",
     default=None,
-    help="Public URL of the source face video (preferred).",
+    help="Public URL of the source face video (preferred). Supply either --video-url or --image-url.",
 )
 @click.option(
     "--image-url",
     default=None,
-    help="Public URL of a source face photo (photo-driven path).",
+    help="Public URL of a source face photo (photo-driven path). Supply either --video-url or --image-url.",
 )
 @click.option(
     "--audio-url",
     default=None,
-    help="Public URL of the driving audio (.wav/.mp3/.m4a).",
+    help="Public URL of the driving audio (.wav/.mp3/.m4a). Or use --text with --voice-id.",
 )
 @click.option(
     "--text",
@@ -46,7 +46,7 @@ from digitalhuman_cli.core.output import (
     type=click.Choice(ENGINES),
     default=DEFAULT_ENGINE,
     show_default=True,
-    help="Engine to use: latentsync (quality) or heygem (fast).",
+    help="[Deprecated] Accepted for backward compatibility but no longer changes the output or the price.",
 )
 @click.option(
     "--guidance",
@@ -78,7 +78,7 @@ from digitalhuman_cli.core.output import (
     type=click.Choice(RESOLUTIONS),
     default=DEFAULT_RESOLUTION,
     show_default=True,
-    help="Output video resolution.",
+    help="[Deprecated] Output is always rendered at 720p.",
 )
 @click.option(
     "--callback-url",

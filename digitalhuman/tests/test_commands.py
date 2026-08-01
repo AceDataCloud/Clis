@@ -36,6 +36,9 @@ class TestGlobalCommands:
         assert "--video-url" in result.output
         assert "--audio-url" in result.output
         assert "--engine" in result.output
+        assert "Supply either --video-url or --image-url." in result.output
+        assert "Accepted for backward compatibility" in result.output
+        assert "Output is always rendered at 720p." in result.output
 
     def test_help_clone_voice(self, runner):
         result = runner.invoke(cli, ["clone-voice", "--help"])
