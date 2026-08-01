@@ -71,12 +71,15 @@ def print_task_result(data: dict[str, Any]) -> None:
     """Print hCaptcha task poll result."""
     task_id = data.get("task_id")
     status = data.get("status")
+    trace_id = data.get("trace_id")
     token = data.get("token")
     solution = data.get("solution")
     text = data.get("text")
 
     if status == "processing":
         content = f"[bold]Task ID:[/bold] {task_id}\n[bold]Status:[/bold] {status}"
+        if trace_id:
+            content += f"\n[bold]Trace ID:[/bold] {trace_id}"
         console.print(
             Panel(
                 content,
@@ -88,6 +91,8 @@ def print_task_result(data: dict[str, Any]) -> None:
         return
 
     content_parts = [f"[bold]Task ID:[/bold] {task_id}", f"[bold]Status:[/bold] {status}"]
+    if trace_id:
+        content_parts.append(f"[bold]Trace ID:[/bold] {trace_id}")
     if token:
         content_parts.append(f"[bold]Token:[/bold] {token}")
     if text:

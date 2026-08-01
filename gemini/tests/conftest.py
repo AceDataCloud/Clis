@@ -31,6 +31,7 @@ def mock_chat_response() -> dict:
 @pytest.fixture
 def mock_video_response() -> dict:
     return {
+        "trace_id": "trace-video-123",
         "data": {
             "id": "task-video-123",
             "state": "succeeded",
@@ -42,6 +43,7 @@ def mock_video_response() -> dict:
 @pytest.fixture
 def mock_task_response() -> dict:
     return {
+        "trace_id": "trace-task-123",
         "data": {
             "id": "task-video-123",
             "state": "succeeded",

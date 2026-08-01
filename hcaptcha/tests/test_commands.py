@@ -375,6 +375,8 @@ class TestTaskCommand:
         )
         assert result.exit_code == 0
         assert "Task Processing" in result.output
+        assert "Trace ID" in result.output
+        assert "trace-hcaptcha-processing-123" in result.output
 
     @respx.mock
     def test_task_ready_token_json(self, runner, mock_task_ready_token_response):
@@ -412,6 +414,7 @@ class TestTaskCommand:
         )
         assert result.exit_code == 0
         assert "Task Result" in result.output
+        assert "trace-hcaptcha-ready-123" in result.output
 
     @respx.mock
     def test_task_sends_correct_payload(self, runner, mock_task_processing_response):

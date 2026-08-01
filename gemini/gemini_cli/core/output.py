@@ -112,6 +112,7 @@ def print_video_result(data: dict[str, Any]) -> None:
     if isinstance(task_data, dict):
         task_id = task_data.get("id", task_data.get("task_id", ""))
         state = task_data.get("state", task_data.get("status", ""))
+        trace_id = task_data.get("trace_id") or data.get("trace_id", "")
         video_url = task_data.get("video_url", "")
         if not video_url:
             videos = task_data.get("videos", [])
@@ -125,6 +126,8 @@ def print_video_result(data: dict[str, Any]) -> None:
             table.add_row("Task ID", str(task_id))
         if state:
             table.add_row("State", str(state))
+        if trace_id:
+            table.add_row("Trace ID", str(trace_id))
         if video_url:
             table.add_row("Video URL", str(video_url))
         console.print(table)
