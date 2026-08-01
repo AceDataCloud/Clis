@@ -8,7 +8,7 @@ from openai_cli.core.client import get_client
 from openai_cli.core.exceptions import OpenAIError
 from openai_cli.core.output import print_error, print_json, print_transcription_result
 
-TRANSCRIPTION_MODELS = ["whisper-1"]
+TRANSCRIPTION_MODELS = ["whisper-1", "gpt-transcribe"]
 TRANSCRIPTION_FORMATS = ["json", "text", "srt", "verbose_json", "vtt"]
 
 
@@ -31,6 +31,18 @@ TRANSCRIPTION_FORMATS = ["json", "text", "srt", "verbose_json", "vtt"]
     "--prompt",
     default=None,
     help="Optional text to guide the model's style or continue a previous segment.",
+)
+@click.option(
+    "--languages",
+    "languages",
+    multiple=True,
+    help="Candidate language codes to guide recognition (repeatable).",
+)
+@click.option(
+    "--keywords",
+    "keywords",
+    multiple=True,
+    help="Keywords to bias recognition toward specific terms (repeatable).",
 )
 @click.option(
     "--response-format",
@@ -61,6 +73,8 @@ def transcribe(
     model: str,
     language: str | None,
     prompt: str | None,
+    languages: tuple[str, ...],
+    keywords: tuple[str, ...],
     response_format: str,
     temperature: float | None,
     timestamp_granularities: tuple[str, ...],
@@ -85,6 +99,8 @@ def transcribe(
         "model": model,
         "language": language,
         "prompt": prompt,
+        "languages": list(languages) if languages else None,
+        "keywords": list(keywords) if keywords else None,
         "response_format": response_format,
         "temperature": temperature,
         "timestamp_granularities": list(timestamp_granularities) if timestamp_granularities else None,

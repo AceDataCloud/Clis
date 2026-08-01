@@ -168,7 +168,7 @@ class OpenAIClient:
         fields: dict[str, Any] | None = None,
         files: dict[str, Any] | None = None,
         timeout: float | None = None,
-    ) -> dict[str, Any]:
+    ) -> dict[str, Any] | str:
         """Make a multipart/form-data request."""
         url = f"{self.base_url}{endpoint}"
         request_timeout = timeout or self.timeout
@@ -212,7 +212,10 @@ class OpenAIClient:
                     raise OpenAIAuthError("Access denied. Check your API permissions.")
 
                 response.raise_for_status()
-                return response.json()  # type: ignore[no-any-return]
+                content_type = response.headers.get("content-type", "")
+                if "application/json" in content_type:
+                    return response.json()  # type: ignore[no-any-return]
+                return response.text
 
             except httpx.TimeoutException as e:
                 raise OpenAITimeoutError(
@@ -243,12 +246,19 @@ class OpenAIClient:
         file: bytes,
         filename: str = "audio.wav",
         **kwargs: Any,
-    ) -> dict[str, Any]:
+    ) -> dict[str, Any] | str:
         """Transcribe audio to text."""
-        timestamp_granularities = kwargs.pop("timestamp_granularities", None)
+        repeated_fields = {
+            "timestamp_granularities": "timestamp_granularities[]",
+            "languages": "languages[]",
+            "keywords": "keywords[]",
+        }
         fields = dict(kwargs)
-        if timestamp_granularities:
-            fields["timestamp_granularities[]"] = timestamp_granularities
+        for source_name, target_name in repeated_fields.items():
+            values = kwargs.pop(source_name, None)
+            if values:
+                fields[target_name] = values
+                fields.pop(source_name, None)
         return self.request_multipart(
             "/v1/audio/transcriptions",
             fields=fields,
