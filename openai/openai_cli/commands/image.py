@@ -184,7 +184,8 @@ def image(
 @click.option(
     "--image-url",
     required=True,
-    help="URL of the reference image to edit.",
+    multiple=True,
+    help="Reference image URL to edit (repeat up to 16 times).",
 )
 @click.option(
     "-m",
@@ -278,7 +279,7 @@ def image(
 def edit(
     ctx: click.Context,
     prompt: str,
-    image_url: str,
+    image_url: tuple[str, ...],
     model: str,
     count: int | None,
     size: str | None,
@@ -303,10 +304,14 @@ def edit(
       openai-cli edit "Add a rainbow" --image-url https://example.com/photo.jpg
       openai-cli edit "Change background to forest" --image-url https://example.com/pic.jpg -m gpt-image-1
     """
+    if len(image_url) > 16:
+        raise click.UsageError("Provide at most 16 --image-url options.")
+
     client = get_client(ctx.obj.get("token"))
+    image: str | list[str] = image_url[0] if len(image_url) == 1 else list(image_url)
     payload: dict[str, object] = {
         "prompt": prompt,
-        "image": image_url,
+        "image": image,
         "model": model,
         "n": count,
         "size": size,

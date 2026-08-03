@@ -498,6 +498,32 @@ class TestImageCommands:
         assert body["image"] == "https://example.com/base.png"
 
     @respx.mock
+    def test_edit_sends_multiple_image_urls(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Combine these images",
+                "--image-url",
+                "https://example.com/base.png",
+                "--image-url",
+                "https://example.com/reference.png",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["image"] == [
+            "https://example.com/base.png",
+            "https://example.com/reference.png",
+        ]
+
+    @respx.mock
     def test_edit_with_mask_url(self, runner, mock_image_response):
         route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
             return_value=Response(200, json=mock_image_response)
@@ -549,6 +575,24 @@ class TestImageCommands:
             ["--token", "test-token", "edit", "Add a rainbow"],
         )
         assert result.exit_code != 0
+
+    def test_edit_rejects_more_than_sixteen_image_urls(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Combine these images",
+                *[
+                    value
+                    for index in range(17)
+                    for value in ("--image-url", f"https://example.com/{index}.png")
+                ],
+            ],
+        )
+        assert result.exit_code != 0
+        assert "at most 16" in result.output
 
 
 # ─── Response Commands ─────────────────────────────────────────────────────
