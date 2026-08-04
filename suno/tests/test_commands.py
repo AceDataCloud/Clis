@@ -63,11 +63,13 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_generate_json(self, runner, mock_audio_response):
-        respx.post("https://api.acedata.cloud/suno/audios").mock(
+        route = respx.post("https://api.acedata.cloud/suno/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "generate", "A happy song", "--json"])
         assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["model"] == "chirp-v5-5"
         data = json.loads(result.output)
         assert data["success"] is True
         assert data["task_id"] == "test-task-123"
