@@ -49,12 +49,9 @@ gemini models
 | `gemini-3.5-flash` | Gemini 3.5 Flash |
 | `gemini-3-flash-preview` | Gemini 3 Flash Preview |
 | `gemini-3.1-flash-lite-preview` | Gemini 3.1 Flash Lite Preview |
-| `gemini-3.1-flash-image` | Gemini 3.1 Flash Image |
-| `gemini-3-pro-image` | Gemini 3 Pro Image |
 | `gemini-2.5-pro` | Gemini 2.5 Pro |
 | `gemini-2.5-flash` | Gemini 2.5 Flash (default) |
 | `gemini-2.5-flash-lite` | Gemini 2.5 Flash Lite |
-| `gemini-2.5-flash-image` | Gemini 2.5 Flash Image |
 | `gemini-2.0-flash` | Gemini 2.0 Flash |
 
 ## Available Video Models
