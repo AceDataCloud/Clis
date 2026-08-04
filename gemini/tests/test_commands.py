@@ -98,9 +98,6 @@ class TestChatCommand:
         for model in [
             "gemini-2.5-flash-lite",
             "gemini-3.1-flash-lite-preview",
-            "gemini-3.1-flash-image",
-            "gemini-2.5-flash-image",
-            "gemini-3-pro-image",
         ]:
             respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
                 return_value=Response(200, json=mock_chat_response)
@@ -109,6 +106,18 @@ class TestChatCommand:
                 cli, ["--token", "test-token", "chat", "Hello", "-m", model, "--json"]
             )
             assert result.exit_code == 0, f"Model {model} failed: {result.output}"
+
+    def test_chat_rejects_image_models(self, runner):
+        """Image models are native-only; the chat endpoint can't serve them."""
+        for model in [
+            "gemini-3.1-flash-image",
+            "gemini-2.5-flash-image",
+            "gemini-3-pro-image",
+        ]:
+            result = runner.invoke(
+                cli, ["--token", "test-token", "chat", "Hello", "-m", model, "--json"]
+            )
+            assert result.exit_code != 0, f"Model {model} should be rejected"
 
     @respx.mock
     def test_chat_with_max_completion_tokens(self, runner, mock_chat_response):
