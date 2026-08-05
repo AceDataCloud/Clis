@@ -31,19 +31,12 @@ from seedream_cli.core.output import (
     help="Output resolution.",
 )
 @click.option(
-    "--seed",
-    type=int,
-    default=None,
-    help="Seed for reproducible generation (range: -1 to 2147483647).",
-)
-@click.option(
     "--sequential-image-generation",
     type=click.Choice(["auto", "disabled"]),
     default=None,
     help="Sequential image generation mode (auto or disabled).",
 )
 @click.option("--stream", is_flag=True, default=False, help="Stream image generation progress.")
-@click.option("--guidance-scale", type=float, default=None, help="Prompt weight (range: 1-10).")
 @click.option(
     "--response-format",
     type=str,
@@ -92,12 +85,10 @@ def generate(
     prompt: str,
     model: str,
     resolution: str | None,
-    seed: int | None,
     sequential_image_generation: str | None,
     sequential_max_images: int | None,
     optimize_prompt_mode: str | None,
     stream: bool,
-    guidance_scale: float | None,
     response_format: str | None,
     watermark: bool | None,
     output_format: str | None,
@@ -121,7 +112,6 @@ def generate(
         payload: dict[str, object] = {
             "prompt": prompt,
             "model": model,
-            "seed": seed,
             "sequential_image_generation": sequential_image_generation,
             "sequential_image_generation_options": {"max_images": sequential_max_images}
             if sequential_max_images is not None
@@ -130,7 +120,6 @@ def generate(
             if optimize_prompt_mode is not None
             else None,
             "stream": stream if stream else None,
-            "guidance_scale": guidance_scale,
             "response_format": response_format,
             "watermark": watermark,
             "output_format": output_format,
@@ -169,13 +158,6 @@ def generate(
     help="Seedream model version.",
 )
 @click.option(
-    "--seed",
-    type=int,
-    default=None,
-    help="Seed for reproducible generation (range: -1 to 2147483647).",
-)
-@click.option("--guidance-scale", type=float, default=None, help="Prompt weight (range: 1-10).")
-@click.option(
     "--response-format",
     type=str,
     default=None,
@@ -199,8 +181,6 @@ def edit(
     prompt: str,
     image_urls: tuple[str, ...],
     model: str,
-    seed: int | None,
-    guidance_scale: float | None,
     response_format: str | None,
     watermark: bool | None,
     callback_url: str | None,
@@ -223,8 +203,6 @@ def edit(
             prompt=prompt,
             image=list(image_urls),
             model=model,
-            seed=seed,
-            guidance_scale=guidance_scale,
             response_format=response_format,
             watermark=watermark,
             callback_url=callback_url,

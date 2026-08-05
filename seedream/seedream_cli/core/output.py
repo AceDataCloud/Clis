@@ -118,6 +118,11 @@ def print_models() -> None:
     table.add_column("Notes")
 
     table.add_row(
+        "doubao-seedream-5-0-pro-260628",
+        "V5.0 Pro",
+        "Flagship single image model",
+    )
+    table.add_row(
         "doubao-seedream-5-0-260128",
         "V5.0",
         "Latest model (default)",

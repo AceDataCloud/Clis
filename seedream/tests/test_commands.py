@@ -46,6 +46,12 @@ class TestGlobalCommands:
 class TestGenerateCommands:
     """Tests for image generation commands."""
 
+    @pytest.mark.parametrize("option", ["--seed", "--guidance-scale"])
+    def test_generate_rejects_removed_options(self, runner, option):
+        result = runner.invoke(cli, ["generate", "test", option, "1"])
+        assert result.exit_code != 0
+        assert f"No such option: {option}" in result.output
+
     @respx.mock
     def test_generate_json(self, runner, mock_image_response):
         respx.post("https://api.acedata.cloud/seedream/images").mock(
@@ -109,32 +115,6 @@ class TestGenerateCommands:
     def test_generate_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
         assert result.exit_code != 0
-
-    @respx.mock
-    def test_generate_with_seed(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "generate", "test", "--seed", "42", "--json"],
-        )
-        assert result.exit_code == 0
-        assert route.called
-        assert json.loads(route.calls[0].request.content)["seed"] == 42
-
-    @respx.mock
-    def test_generate_with_guidance_scale(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "generate", "test", "--guidance-scale", "3.5", "--json"],
-        )
-        assert result.exit_code == 0
-        assert route.called
-        assert json.loads(route.calls[0].request.content)["guidance_scale"] == 3.5
 
     @respx.mock
     def test_generate_with_watermark_disabled(self, runner, mock_image_response):
@@ -273,6 +253,12 @@ class TestGenerateCommands:
         )
         assert result.exit_code == 0
 
+    @pytest.mark.parametrize("option", ["--seed", "--guidance-scale"])
+    def test_edit_rejects_removed_options(self, runner, option):
+        result = runner.invoke(cli, ["edit", "test", "-i", "https://example.com/photo.jpg", option, "1"])
+        assert result.exit_code != 0
+        assert f"No such option: {option}" in result.output
+
     @respx.mock
     def test_edit_uses_image_key(self, runner, mock_image_response):
         """Verify edit command sends 'image' (not 'image_urls') and no 'action' field."""
@@ -297,32 +283,6 @@ class TestGenerateCommands:
         assert body["image"] == ["https://example.com/photo.jpg"]
         assert "image_urls" not in body
         assert "action" not in body
-
-    @respx.mock
-    def test_edit_with_seed_and_guidance(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "edit",
-                "Make it blue",
-                "-i",
-                "https://example.com/photo.jpg",
-                "--seed",
-                "123",
-                "--guidance-scale",
-                "5.5",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-        body = json.loads(route.calls[0].request.content)
-        assert body["seed"] == 123
-        assert body["guidance_scale"] == 5.5
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────
@@ -367,6 +327,7 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
+        assert "doubao-seedream-5-0-pro-260628" in result.output
         assert "doubao-seedream-4-5-251128" in result.output
 
     def test_resolutions(self, runner):
