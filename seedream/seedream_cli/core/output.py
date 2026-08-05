@@ -15,8 +15,6 @@ SEEDREAM_MODELS = [
     "doubao-seedream-5-0-260128",
     "doubao-seedream-4-5-251128",
     "doubao-seedream-4-0-250828",
-    "doubao-seedream-3-0-t2i-250415",
-    "doubao-seededit-3-0-i2i-250628",
 ]
 
 DEFAULT_MODEL = "doubao-seedream-5-0-260128"
@@ -134,16 +132,5 @@ def print_models() -> None:
         "V4.0",
         "Standard quality",
     )
-    table.add_row(
-        "doubao-seedream-3-0-t2i-250415",
-        "V3.0 T2I",
-        "Text-to-image generation",
-    )
-    table.add_row(
-        "doubao-seededit-3-0-i2i-250628",
-        "V3.0 I2I",
-        "Image-to-image editing",
-    )
-
     console.print(table)
     console.print(f"\n[dim]Default model: {DEFAULT_MODEL}[/dim]")
