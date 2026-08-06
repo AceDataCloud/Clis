@@ -42,6 +42,12 @@ from glm_cli.core.output import (
     help="Maximum number of tokens to generate.",
 )
 @click.option(
+    "--max-completion-tokens",
+    default=None,
+    type=int,
+    help="Upper bound for tokens generated in a completion (including reasoning tokens).",
+)
+@click.option(
     "-n",
     "--count",
     default=None,
@@ -83,6 +89,42 @@ from glm_cli.core.output import (
     default=None,
     help="Unique end-user identifier for monitoring and abuse detection.",
 )
+@click.option(
+    "--reasoning-effort",
+    type=click.Choice(["minimal", "low", "medium", "high"]),
+    default=None,
+    help="Reasoning effort for extended thinking models.",
+)
+@click.option(
+    "--service-tier",
+    type=click.Choice(["auto", "default", "flex", "scale", "priority"]),
+    default=None,
+    help="Processing type for serving the request.",
+)
+@click.option(
+    "--store",
+    is_flag=True,
+    default=False,
+    help="Store the output for model distillation or evals.",
+)
+@click.option(
+    "--logprobs",
+    is_flag=True,
+    default=False,
+    help="Return log probabilities of the output tokens.",
+)
+@click.option(
+    "--top-logprobs",
+    default=None,
+    type=click.IntRange(0, 20),
+    help="Number of most likely tokens (0-20) to return at each token position.",
+)
+@click.option(
+    "--parallel-tool-calls",
+    is_flag=True,
+    default=False,
+    help="Enable parallel function calling during tool use.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -92,6 +134,7 @@ def chat(
     system: str | None,
     temperature: float | None,
     max_tokens: int | None,
+    max_completion_tokens: int | None,
     count: int | None,
     top_p: float | None,
     frequency_penalty: float | None,
@@ -99,6 +142,12 @@ def chat(
     seed: int | None,
     stop: tuple[str, ...],
     user: str | None,
+    reasoning_effort: str | None,
+    service_tier: str | None,
+    store: bool,
+    logprobs: bool,
+    top_logprobs: int | None,
+    parallel_tool_calls: bool,
     output_json: bool,
 ) -> None:
     """Chat with a GLM model.
@@ -123,6 +172,7 @@ def chat(
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "max_completion_tokens": max_completion_tokens,
         "n": count,
         "top_p": top_p,
         "frequency_penalty": frequency_penalty,
@@ -130,6 +180,12 @@ def chat(
         "seed": seed,
         "stop": list(stop) if stop else None,
         "user": user,
+        "reasoning_effort": reasoning_effort,
+        "service_tier": service_tier,
+        "store": store if store else None,
+        "logprobs": logprobs if logprobs else None,
+        "top_logprobs": top_logprobs,
+        "parallel_tool_calls": parallel_tool_calls if parallel_tool_calls else None,
     }
 
     try:

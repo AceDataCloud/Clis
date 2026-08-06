@@ -97,6 +97,42 @@ class TestChatCommand:
         )
         assert result.exit_code == 0
 
+    @respx.mock
+    def test_chat_with_openai_compatible_options(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--max-completion-tokens",
+                "512",
+                "--reasoning-effort",
+                "high",
+                "--service-tier",
+                "priority",
+                "--store",
+                "--logprobs",
+                "--top-logprobs",
+                "3",
+                "--parallel-tool-calls",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["max_completion_tokens"] == 512
+        assert body["reasoning_effort"] == "high"
+        assert body["service_tier"] == "priority"
+        assert body["store"] is True
+        assert body["logprobs"] is True
+        assert body["top_logprobs"] == 3
+        assert body["parallel_tool_calls"] is True
+
     def test_chat_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "chat", "Hello"])
         assert result.exit_code != 0
