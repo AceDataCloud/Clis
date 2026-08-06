@@ -203,6 +203,10 @@ class TestInfoCommands:
         assert "gemini-3.1-pro" in result.output
         assert "kimi-k3" in result.output
         assert "kimi-k2.6" in result.output
+        assert "kimi-k2-0711-preview" not in result.output
+        assert "kimi-k2-0905-preview" not in result.output
+        assert "kimi-k2-instruct-0905" not in result.output
+        assert "kimi-k2-turbo-preview" not in result.output
         assert "grok-4" in result.output
 
 
@@ -355,6 +359,22 @@ class TestChat2Commands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "kimi-k2.6"
+
+    @pytest.mark.parametrize(
+        "model",
+        [
+            "kimi-k2-0711-preview",
+            "kimi-k2-0905-preview",
+            "kimi-k2-instruct-0905",
+            "kimi-k2-turbo-preview",
+        ],
+    )
+    def test_chat2_rejects_removed_kimi_models(self, runner, model):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "-m", model],
+        )
+        assert result.exit_code != 0
 
     @respx.mock
     def test_chat2_with_application_id(self, runner, mock_chat_response):
