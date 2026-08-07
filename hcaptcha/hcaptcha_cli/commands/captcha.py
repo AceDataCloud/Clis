@@ -98,6 +98,11 @@ def recognize(
     default=None,
     help="Optional proxy URL to use while solving the captcha.",
 )
+@click.option(
+    "--rqdata",
+    default=None,
+    help="Optional hCaptcha rqdata value for the captcha challenge.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def token(
@@ -106,6 +111,7 @@ def token(
     website_url: str,
     async_mode: bool,
     proxy: str | None,
+    rqdata: str | None,
     output_json: bool,
 ) -> None:
     """Solve hCaptcha and retrieve a token.
@@ -126,6 +132,8 @@ def token(
     }
     if proxy is not None:
         payload["proxy"] = proxy
+    if rqdata is not None:
+        payload["rqdata"] = rqdata
     if async_mode:
         payload["async"] = True
 
