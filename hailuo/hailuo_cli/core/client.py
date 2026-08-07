@@ -93,11 +93,11 @@ class HailuoClient:
     # Convenience methods
     def generate_video(self, **kwargs: Any) -> dict[str, Any]:
         """Generate video using the videos endpoint."""
-        return self.request("/hailuo/videos", kwargs)
+        return self.request("/minimax/videos", kwargs)
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""
-        return self.request("/hailuo/tasks", kwargs)
+        return self.request("/minimax/tasks", kwargs)
 
 
 def get_client(token: str | None = None) -> HailuoClient:
