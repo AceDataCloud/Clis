@@ -12,6 +12,8 @@ from hailuo_cli.core.output import (
     print_video_result,
 )
 
+RESOLUTION_CHOICES = ["768P", "2K"]
+
 
 @click.command()
 @click.argument("prompt", required=False)
@@ -48,6 +50,19 @@ from hailuo_cli.core.output import (
     show_default=True,
     help="Output duration in seconds.",
 )
+@click.option(
+    "--resolution",
+    type=click.Choice(RESOLUTION_CHOICES),
+    default="2K",
+    show_default=True,
+    help="Output resolution.",
+)
+@click.option(
+    "--aigc-watermark/--no-aigc-watermark",
+    default=False,
+    show_default=True,
+    help="Whether to enable AIGC watermark.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -66,6 +81,8 @@ def generate(
     audio_urls: tuple[str, ...],
     ratio: str,
     duration: int,
+    resolution: str,
+    aigc_watermark: bool,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -85,14 +102,20 @@ def generate(
             raise click.UsageError(
                 "Provide PROMPT or at least one --image-url or --audio-url input."
             )
+        if len(image_urls) > 9:
+            raise click.UsageError("You can provide at most 9 --image-url values.")
+        if len(audio_urls) > 3:
+            raise click.UsageError("You can provide at most 3 --audio-url values.")
 
         payload: dict[str, object] = {
             "prompt": prompt,
             "model": model,
             "image_urls": list(image_urls) or None,
             "audio_urls": list(audio_urls) or None,
+            "resolution": resolution,
             "ratio": ratio,
             "duration": duration,
+            "aigc_watermark": aigc_watermark,
             "callback_url": callback_url,
             "async": async_mode,
         }
@@ -131,6 +154,19 @@ def generate(
     show_default=True,
     help="Output duration in seconds.",
 )
+@click.option(
+    "--resolution",
+    type=click.Choice(RESOLUTION_CHOICES),
+    default="2K",
+    show_default=True,
+    help="Output resolution.",
+)
+@click.option(
+    "--aigc-watermark/--no-aigc-watermark",
+    default=False,
+    show_default=True,
+    help="Whether to enable AIGC watermark.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -148,6 +184,8 @@ def image_to_video(
     model: str,
     ratio: str,
     duration: int,
+    resolution: str,
+    aigc_watermark: bool,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -167,8 +205,10 @@ def image_to_video(
             "prompt": prompt,
             "model": model,
             "image_urls": [image_url],
+            "resolution": resolution,
             "ratio": ratio,
             "duration": duration,
+            "aigc_watermark": aigc_watermark,
             "callback_url": callback_url,
             "async": async_mode,
         }
