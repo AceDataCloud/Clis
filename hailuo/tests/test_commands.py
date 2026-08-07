@@ -65,7 +65,8 @@ class TestGenerateCommands:
         assert data["success"] is True
         assert data["task_id"] == "test-task-123"
         sent = json.loads(route.calls[0].request.content)
-        assert sent["prompt"] == "A test prompt"
+        assert sent["content"] == [{"type": "text", "text": "A test prompt"}]
+        assert sent["model"] == "MiniMax-H3"
 
     @respx.mock
     def test_generate_rich_output(self, mock_video_response):
@@ -85,11 +86,11 @@ class TestGenerateCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate", "test", "--model", "minimax-h3", "--json"],
+            ["--token", "test-token", "generate", "test", "--model", "MiniMax-H3", "--json"],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "minimax-h3"
+        assert sent["model"] == "MiniMax-H3"
 
     @respx.mock
     def test_generate_with_image_and_audio_inputs(self, mock_video_response):
@@ -105,15 +106,38 @@ class TestGenerateCommands:
                 "generate",
                 "--image-url",
                 "https://example.com/1.jpg",
+                "--image-role",
+                "reference_image",
+                "--video-url",
+                "https://example.com/1.mp4",
+                "--video-role",
+                "reference_video",
                 "--audio-url",
                 "https://example.com/1.mp3",
+                "--audio-role",
+                "reference_audio",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["image_urls"] == ["https://example.com/1.jpg"]
-        assert sent["audio_urls"] == ["https://example.com/1.mp3"]
+        assert sent["content"] == [
+            {
+                "type": "image_url",
+                "image_url": {"url": "https://example.com/1.jpg"},
+                "role": "reference_image",
+            },
+            {
+                "type": "video_url",
+                "video_url": {"url": "https://example.com/1.mp4"},
+                "role": "reference_video",
+            },
+            {
+                "type": "audio_url",
+                "audio_url": {"url": "https://example.com/1.mp3"},
+                "role": "reference_audio",
+            },
+        ]
 
     @respx.mock
     def test_generate_with_resolution_and_watermark(self, mock_video_response):
@@ -144,23 +168,30 @@ class TestGenerateCommands:
         result = runner.invoke(cli, ["--token", "test-token", "generate"])
         assert result.exit_code != 0
 
-    def test_generate_rejects_too_many_image_urls(self):
+    def test_generate_rejects_long_prompt(self):
         runner = CliRunner()
-        args = ["--token", "test-token", "generate", "A test prompt"]
-        for i in range(10):
-            args.extend(["--image-url", f"https://example.com/{i}.jpg"])
-        result = runner.invoke(cli, args)
+        result = runner.invoke(cli, ["--token", "test-token", "generate", "a" * 7001])
         assert result.exit_code != 0
-        assert "at most 9 --image-url" in result.output
+        assert "at most 7000 characters" in result.output
 
-    def test_generate_rejects_too_many_audio_urls(self):
+    def test_generate_rejects_unmatched_media_roles(self):
         runner = CliRunner()
-        args = ["--token", "test-token", "generate", "A test prompt"]
-        for i in range(4):
-            args.extend(["--audio-url", f"https://example.com/{i}.mp3"])
-        result = runner.invoke(cli, args)
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "--image-url",
+                "https://example.com/1.jpg",
+                "--image-role",
+                "first_frame",
+                "--image-role",
+                "last_frame",
+            ],
+        )
         assert result.exit_code != 0
-        assert "at most 3 --audio-url" in result.output
+        assert "one --image-role for each --image-url" in result.output
 
     def test_generate_no_token(self):
         runner = CliRunner()
@@ -189,7 +220,11 @@ class TestGenerateCommands:
         data = json.loads(result.output)
         assert data["success"] is True
         sent = json.loads(route.calls[0].request.content)
-        assert sent["image_urls"] == ["https://example.com/photo.jpg"]
+        assert sent["content"][1] == {
+            "type": "image_url",
+            "image_url": {"url": "https://example.com/photo.jpg"},
+            "role": "first_frame",
+        }
 
     @respx.mock
     def test_image_to_video_with_model(self, mock_video_response):
@@ -207,13 +242,13 @@ class TestGenerateCommands:
                 "--image-url",
                 "https://example.com/img.jpg",
                 "--model",
-                "minimax-h3",
+                "MiniMax-H3",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "minimax-h3"
+        assert sent["model"] == "MiniMax-H3"
 
     @respx.mock
     def test_image_to_video_with_resolution_and_watermark(self, mock_video_response):
@@ -254,7 +289,7 @@ class TestTaskCommands:
         result = runner.invoke(cli, ["--token", "test-token", "task", "task-123", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["success"] is True
+        assert data["task"]["id"] == "task-123"
         sent = json.loads(route.calls[0].request.content)
         assert sent["action"] == "retrieve"
         assert sent["id"] == "task-123"
@@ -280,6 +315,48 @@ class TestTaskCommands:
         assert sent["action"] == "retrieve_batch"
         assert sent["ids"] == ["t-1", "t-2"]
 
+    @respx.mock
+    def test_tasks_batch_filters(self, mock_tasks_batch_response):
+        runner = CliRunner()
+        route = respx.post("https://api.acedata.cloud/minimax/tasks").mock(
+            return_value=Response(200, json=mock_tasks_batch_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "--limit",
+                "10",
+                "--offset",
+                "2",
+                "--created-at-min",
+                "100",
+                "--created-at-max",
+                "200",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert json.loads(route.calls[0].request.content) == {
+            "action": "retrieve_batch",
+            "limit": 10,
+            "offset": 2,
+            "created_at_min": 100.0,
+            "created_at_max": 200.0,
+        }
+
+    @respx.mock
+    def test_delete_task(self):
+        runner = CliRunner()
+        route = respx.post("https://api.acedata.cloud/minimax/tasks").mock(
+            return_value=Response(200, json={"id": "task-123", "deleted": True})
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "delete", "task-123", "--json"])
+        assert result.exit_code == 0
+        assert json.loads(route.calls[0].request.content) == {"action": "delete", "id": "task-123"}
+
 
 class TestInfoCommands:
     """Tests for info and utility commands."""
@@ -288,7 +365,7 @@ class TestInfoCommands:
         runner = CliRunner()
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
-        assert "minimax-h3" in result.output
+        assert "MiniMax-H3" in result.output
 
     def test_config(self):
         runner = CliRunner()
@@ -301,7 +378,7 @@ class TestImageToVideoModelChoices:
     """Tests for image-to-video model enum."""
 
     @respx.mock
-    def test_image_to_video_with_minimax_t2v(self, mock_video_response):
+    def test_image_to_video_with_minimax_h3(self, mock_video_response):
         runner = CliRunner()
         route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -316,10 +393,10 @@ class TestImageToVideoModelChoices:
                 "--image-url",
                 "https://example.com/img.jpg",
                 "--model",
-                "minimax-h3",
+                "MiniMax-H3",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "minimax-h3"
+        assert sent["model"] == "MiniMax-H3"

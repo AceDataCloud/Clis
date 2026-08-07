@@ -11,10 +11,10 @@ console = Console()
 
 # Available models
 HAILUO_MODELS = [
-    "minimax-h3",
+    "MiniMax-H3",
 ]
 
-DEFAULT_MODEL = "minimax-h3"
+DEFAULT_MODEL = "MiniMax-H3"
 
 
 def print_json(data: Any) -> None:
@@ -35,11 +35,10 @@ def print_success(message: str) -> None:
 def print_video_result(data: dict[str, Any]) -> None:
     """Print video generation result in a rich format."""
     task_id = data.get("task_id", "N/A")
-    trace_id = data.get("trace_id", "N/A")
 
     console.print(
         Panel(
-            f"[bold]Task ID:[/bold] {task_id}\n[bold]Trace ID:[/bold] {trace_id}",
+            f"[bold]Task ID:[/bold] {task_id}",
             title="[bold green]Video Result[/bold green]",
             border_style="green",
         )
@@ -56,42 +55,32 @@ def print_video_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
-    # Handle single task response
-    if isinstance(data.get("data"), dict):
-        task_data = data["data"]
+    def print_task(task_data: dict[str, Any]) -> None:
         table = Table(show_header=False, box=None, padding=(0, 2))
         table.add_column("Field", style="bold cyan", width=15)
         table.add_column("Value")
-        for key in ["id", "status", "state", "video_url", "model", "created_at"]:
+        for key in ["id", "status", "model", "resolution", "duration", "ratio", "created_at"]:
             if task_data.get(key):
                 table.add_row(key.replace("_", " ").title(), str(task_data[key]))
+        content = task_data.get("content")
+        if isinstance(content, dict) and content.get("url"):
+            table.add_row("Video Url", str(content["url"]))
         console.print(table)
+
+    if isinstance(data.get("task"), dict):
+        print_task(data["task"])
         return
 
-    # Handle batch response
-    items = data.get("data", [])
+    items = data.get("items", [])
     if isinstance(items, list) and items:
         for item in items:
-            table = Table(show_header=False, box=None, padding=(0, 2))
-            table.add_column("Field", style="bold cyan", width=15)
-            table.add_column("Value")
-            for key in ["id", "status", "state", "video_url", "model", "created_at"]:
-                if item.get(key):
-                    table.add_row(key.replace("_", " ").title(), str(item[key]))
-            console.print(table)
+            if isinstance(item, dict):
+                print_task(item)
             console.print()
         return
 
-    # Handle direct top-level task fields
-    if data.get("task_id") or data.get("video_url"):
-        table = Table(show_header=False, box=None, padding=(0, 2))
-        table.add_column("Field", style="bold cyan", width=15)
-        table.add_column("Value")
-        for key in ["task_id", "video_url", "model", "status", "state"]:
-            val = data.get(key)
-            if val:
-                table.add_row(key.replace("_", " ").title(), str(val))
-        console.print(table)
+    if data.get("id") and "deleted" in data:
+        print_success(f"Task {data['id']} deleted.")
         return
 
     console.print("[yellow]No data available.[/yellow]")
@@ -104,7 +93,7 @@ def print_models() -> None:
     table.add_column("Type")
     table.add_column("Notes")
 
-    table.add_row("minimax-h3", "Video Generation", "Supports text, image, and audio inputs")
+    table.add_row("MiniMax-H3", "Video Generation", "Supports text, image, video, and audio inputs")
 
     console.print(table)
     console.print(f"\n[dim]Default model: {DEFAULT_MODEL}[/dim]")

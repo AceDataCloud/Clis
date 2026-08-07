@@ -48,12 +48,10 @@ class TestOutputFunctions:
     def test_print_task_result_single(self, capsys):
         print_task_result(
             {
-                "success": True,
-                "data": {
+                "task": {
                     "id": "task-123",
-                    "status": "completed",
-                    "state": "succeeded",
-                    "video_url": "https://cdn.example.com/video.mp4",
+                    "status": "succeeded",
+                    "content": {"url": "https://cdn.example.com/video.mp4"},
                 },
             }
         )
@@ -63,11 +61,11 @@ class TestOutputFunctions:
     def test_print_task_result_batch(self, capsys):
         print_task_result(
             {
-                "success": True,
-                "data": [
-                    {"id": "task-1", "status": "completed"},
-                    {"id": "task-2", "status": "completed"},
+                "items": [
+                    {"id": "task-1", "status": "succeeded"},
+                    {"id": "task-2", "status": "succeeded"},
                 ],
+                "total": 2,
             }
         )
         captured = capsys.readouterr()
@@ -80,4 +78,4 @@ class TestOutputFunctions:
             assert model in captured.out
 
     def test_hailuo_models_list(self):
-        assert HAILUO_MODELS == ["minimax-h3"]
+        assert HAILUO_MODELS == ["MiniMax-H3"]

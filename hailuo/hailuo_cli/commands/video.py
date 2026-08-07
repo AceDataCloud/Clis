@@ -13,6 +13,14 @@ from hailuo_cli.core.output import (
 )
 
 RESOLUTION_CHOICES = ["768P", "2K"]
+RATIO_CHOICES = ["adaptive", "21:9", "16:9", "4:3", "1:1", "3:4", "9:16"]
+CONTENT_ROLE_CHOICES = [
+    "first_frame",
+    "last_frame",
+    "reference_image",
+    "reference_video",
+    "reference_audio",
+]
 
 
 @click.command()
@@ -22,24 +30,48 @@ RESOLUTION_CHOICES = ["768P", "2K"]
     "--model",
     type=click.Choice(HAILUO_MODELS),
     default=DEFAULT_MODEL,
-    help="Hailuo model to use (default: minimax-h3).",
+    help="Hailuo model to use (default: MiniMax-H3).",
 )
 @click.option(
     "--image-url",
     "image_urls",
     multiple=True,
-    help="Image URL input (repeat up to 9 times).",
+    help="Image URL input (repeat as needed).",
+)
+@click.option(
+    "--image-role",
+    type=click.Choice(CONTENT_ROLE_CHOICES),
+    multiple=True,
+    help="Role for each --image-url, in the same order.",
+)
+@click.option(
+    "--video-url",
+    "video_urls",
+    multiple=True,
+    help="Video URL input (repeat as needed).",
+)
+@click.option(
+    "--video-role",
+    type=click.Choice(CONTENT_ROLE_CHOICES),
+    multiple=True,
+    help="Role for each --video-url, in the same order.",
 )
 @click.option(
     "--audio-url",
     "audio_urls",
     multiple=True,
-    help="Audio URL input (repeat up to 3 times).",
+    help="Audio URL input (repeat as needed).",
+)
+@click.option(
+    "--audio-role",
+    type=click.Choice(CONTENT_ROLE_CHOICES),
+    multiple=True,
+    help="Role for each --audio-url, in the same order.",
 )
 @click.option(
     "--ratio",
-    type=click.Choice(["16:9", "9:16"]),
-    default="16:9",
+    type=click.Choice(RATIO_CHOICES),
+    default="adaptive",
     show_default=True,
     help="Output aspect ratio.",
 )
@@ -64,13 +96,6 @@ RESOLUTION_CHOICES = ["768P", "2K"]
     help="Whether to enable AIGC watermark.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option(
-    "--async",
-    "async_mode",
-    is_flag=True,
-    default=False,
-    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
-)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -78,13 +103,16 @@ def generate(
     prompt: str | None,
     model: str,
     image_urls: tuple[str, ...],
+    image_role: tuple[str, ...],
+    video_urls: tuple[str, ...],
+    video_role: tuple[str, ...],
     audio_urls: tuple[str, ...],
+    audio_role: tuple[str, ...],
     ratio: str,
     duration: int,
     resolution: str,
     aigc_watermark: bool,
     callback_url: str | None,
-    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from a text prompt.
@@ -94,30 +122,43 @@ def generate(
     \b
     Examples:
       hailuo generate "A cat playing in the snow"
-      hailuo generate "Ocean waves at sunset" --model minimax-h3
+      hailuo generate "Ocean waves at sunset" --model MiniMax-H3
     """
     client = get_client(ctx.obj.get("token"))
     try:
-        if not prompt and not image_urls and not audio_urls:
+        if not prompt and not image_urls and not video_urls and not audio_urls:
             raise click.UsageError(
-                "Provide PROMPT or at least one --image-url or --audio-url input."
+                "Provide PROMPT or at least one media URL input."
             )
-        if len(image_urls) > 9:
-            raise click.UsageError("You can provide at most 9 --image-url values.")
-        if len(audio_urls) > 3:
-            raise click.UsageError("You can provide at most 3 --audio-url values.")
+        if prompt and len(prompt) > 7000:
+            raise click.UsageError("PROMPT must be at most 7000 characters.")
+        content: list[dict[str, object]] = []
+        if prompt:
+            content.append({"type": "text", "text": prompt})
+        for content_type, urls, roles in (
+            ("image_url", image_urls, image_role),
+            ("video_url", video_urls, video_role),
+            ("audio_url", audio_urls, audio_role),
+        ):
+            if roles and len(urls) != len(roles):
+                raise click.UsageError(
+                    f"Provide one --{content_type.removesuffix('_url')}-role for each "
+                    f"--{content_type.replace('_', '-')}."
+                )
+            for index, url in enumerate(urls):
+                item: dict[str, object] = {"type": content_type, content_type: {"url": url}}
+                if roles:
+                    item["role"] = roles[index]
+                content.append(item)
 
         payload: dict[str, object] = {
-            "prompt": prompt,
             "model": model,
-            "image_urls": list(image_urls) or None,
-            "audio_urls": list(audio_urls) or None,
+            "content": content,
             "resolution": resolution,
             "ratio": ratio,
             "duration": duration,
             "aigc_watermark": aigc_watermark,
             "callback_url": callback_url,
-            "async": async_mode,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
@@ -138,12 +179,12 @@ def generate(
     "--model",
     type=click.Choice(HAILUO_MODELS),
     default=DEFAULT_MODEL,
-    help="Hailuo image-to-video model (default: minimax-h3).",
+    help="Hailuo image-to-video model (default: MiniMax-H3).",
 )
 @click.option(
     "--ratio",
-    type=click.Choice(["16:9", "9:16"]),
-    default="16:9",
+    type=click.Choice(RATIO_CHOICES),
+    default="adaptive",
     show_default=True,
     help="Output aspect ratio.",
 )
@@ -168,13 +209,6 @@ def generate(
     help="Whether to enable AIGC watermark.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
-@click.option(
-    "--async",
-    "async_mode",
-    is_flag=True,
-    default=False,
-    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
-)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(
@@ -187,7 +221,6 @@ def image_to_video(
     resolution: str,
     aigc_watermark: bool,
     callback_url: str | None,
-    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from an image and text prompt.
@@ -197,20 +230,25 @@ def image_to_video(
     \b
     Examples:
       hailuo image-to-video "Animate this scene" --image-url https://example.com/photo.jpg
-      hailuo image-to-video "Cinematic pan" --image-url img.jpg --model minimax-h3
+      hailuo image-to-video "Cinematic pan" --image-url img.jpg --model MiniMax-H3
     """
     client = get_client(ctx.obj.get("token"))
     try:
         payload: dict[str, object] = {
-            "prompt": prompt,
             "model": model,
-            "image_urls": [image_url],
+            "content": [
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": image_url},
+                    "role": "first_frame",
+                },
+            ],
             "resolution": resolution,
             "ratio": ratio,
             "duration": duration,
             "aigc_watermark": aigc_watermark,
             "callback_url": callback_url,
-            "async": async_mode,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]

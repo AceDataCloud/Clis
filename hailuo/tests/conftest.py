@@ -42,14 +42,12 @@ def mock_video_response():
 def mock_task_response():
     """Mock task query response."""
     return {
-        "success": True,
-        "data": {
+        "task": {
             "id": "task-123",
-            "status": "completed",
-            "state": "succeeded",
-            "video_url": "https://cdn.example.com/test-video.mp4",
-            "model": "minimax-h3",
-            "created_at": "2026-04-26T00:00:00.000Z",
+            "status": "succeeded",
+            "content": {"url": "https://cdn.example.com/test-video.mp4"},
+            "model": "MiniMax-H3",
+            "created_at": 1785125529,
         },
     }
 
@@ -58,25 +56,23 @@ def mock_task_response():
 def mock_tasks_batch_response():
     """Mock batch task query response."""
     return {
-        "success": True,
-        "data": [
+        "items": [
             {
                 "id": "task-123",
-                "status": "completed",
-                "state": "succeeded",
-                "video_url": "https://cdn.example.com/test-video.mp4",
-                "model": "minimax-h3",
-                "created_at": "2026-04-26T00:00:00.000Z",
+                "status": "succeeded",
+                "content": {"url": "https://cdn.example.com/test-video.mp4"},
+                "model": "MiniMax-H3",
+                "created_at": 1785125529,
             },
             {
                 "id": "task-456",
-                "status": "completed",
-                "state": "succeeded",
-                "video_url": "https://cdn.example.com/test-video2.mp4",
-                "model": "minimax-h3",
-                "created_at": "2026-04-26T00:00:00.000Z",
+                "status": "succeeded",
+                "content": {"url": "https://cdn.example.com/test-video2.mp4"},
+                "model": "MiniMax-H3",
+                "created_at": 1785125529,
             },
         ],
+        "total": 2,
     }
 
 
