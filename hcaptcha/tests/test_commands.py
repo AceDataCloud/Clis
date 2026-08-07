@@ -44,6 +44,7 @@ class TestGlobalCommands:
         assert "WEBSITE_KEY" in result.output
         assert "WEBSITE_URL" in result.output
         assert "--proxy" in result.output
+        assert "--rqdata" in result.output
         assert "--async" in result.output
 
 
@@ -264,6 +265,28 @@ class TestTokenCommand:
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["proxy"] == "******127.0.0.1:8080"
+
+    @respx.mock
+    def test_token_sends_rqdata_when_provided(self, runner, mock_token_response):
+        route = respx.post("https://api.acedata.cloud/captcha/token/hcaptcha").mock(
+            return_value=Response(200, json=mock_token_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "token",
+                "a5f74b19-9e45-40e0-b45d-47ff91b7a6c2",
+                "https://accounts.hcaptcha.com/demo",
+                "--rqdata",
+                "challenge-data",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["rqdata"] == "challenge-data"
 
     @respx.mock
     def test_token_async(self, runner, mock_token_async_response):
