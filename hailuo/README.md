@@ -22,7 +22,7 @@ Or copy `.env.example` to `.env` and fill in your token.
 
 | Command | Description |
 |---------|-------------|
-| `hailuo generate <prompt>` | Generate a video from text (minimax-h3) |
+| `hailuo generate <prompt>` | Generate a video from text (MiniMax-H3) |
 | `hailuo image-to-video <prompt> --image-url <url>` | Generate video from image + text |
 
 ### Task Management
@@ -31,6 +31,7 @@ Or copy `.env.example` to `.env` and fill in your token.
 |---------|-------------|
 | `hailuo task <task_id>` | Query a single task status |
 | `hailuo tasks <id1> <id2> [...]` | Query multiple tasks at once |
+| `hailuo delete <task_id>` | Delete a task |
 | `hailuo wait <task_id>` | Wait for task completion with polling |
 
 ### Utilities
@@ -65,7 +66,7 @@ hailuo generate "A cat playing in the snow"
 hailuo image-to-video "Animate the scene" --image-url https://example.com/photo.jpg
 
 # Use a specific model
-hailuo generate "Ocean waves" --model minimax-h3
+hailuo generate "Ocean waves" --model MiniMax-H3
 
 # Check task status
 hailuo task abc123-def456

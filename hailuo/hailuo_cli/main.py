@@ -12,7 +12,7 @@ import click
 from dotenv import load_dotenv
 
 from hailuo_cli.commands.info import config, models
-from hailuo_cli.commands.task import task, tasks_batch, wait
+from hailuo_cli.commands.task import delete, task, tasks_batch, wait
 from hailuo_cli.commands.video import generate, image_to_video
 
 load_dotenv()
@@ -60,6 +60,7 @@ cli.add_command(generate)
 cli.add_command(image_to_video)
 cli.add_command(task)
 cli.add_command(tasks_batch)
+cli.add_command(delete)
 cli.add_command(wait)
 cli.add_command(models)
 cli.add_command(config)
