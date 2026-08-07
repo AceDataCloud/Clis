@@ -48,7 +48,7 @@ def mock_task_response():
             "status": "completed",
             "state": "succeeded",
             "video_url": "https://cdn.example.com/test-video.mp4",
-            "model": "minimax-t2v",
+            "model": "minimax-h3",
             "created_at": "2026-04-26T00:00:00.000Z",
         },
     }
@@ -65,7 +65,7 @@ def mock_tasks_batch_response():
                 "status": "completed",
                 "state": "succeeded",
                 "video_url": "https://cdn.example.com/test-video.mp4",
-                "model": "minimax-t2v",
+                "model": "minimax-h3",
                 "created_at": "2026-04-26T00:00:00.000Z",
             },
             {
@@ -73,7 +73,7 @@ def mock_tasks_batch_response():
                 "status": "completed",
                 "state": "succeeded",
                 "video_url": "https://cdn.example.com/test-video2.mp4",
-                "model": "minimax-t2v",
+                "model": "minimax-h3",
                 "created_at": "2026-04-26T00:00:00.000Z",
             },
         ],

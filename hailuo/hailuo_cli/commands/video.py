@@ -14,13 +14,39 @@ from hailuo_cli.core.output import (
 
 
 @click.command()
-@click.argument("prompt")
+@click.argument("prompt", required=False)
 @click.option(
     "-m",
     "--model",
     type=click.Choice(HAILUO_MODELS),
     default=DEFAULT_MODEL,
-    help="Hailuo model to use (default: minimax-t2v).",
+    help="Hailuo model to use (default: minimax-h3).",
+)
+@click.option(
+    "--image-url",
+    "image_urls",
+    multiple=True,
+    help="Image URL input (repeat up to 9 times).",
+)
+@click.option(
+    "--audio-url",
+    "audio_urls",
+    multiple=True,
+    help="Audio URL input (repeat up to 3 times).",
+)
+@click.option(
+    "--ratio",
+    type=click.Choice(["16:9", "9:16"]),
+    default="16:9",
+    show_default=True,
+    help="Output aspect ratio.",
+)
+@click.option(
+    "--duration",
+    type=click.IntRange(4, 15),
+    default=4,
+    show_default=True,
+    help="Output duration in seconds.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
@@ -34,8 +60,12 @@ from hailuo_cli.core.output import (
 @click.pass_context
 def generate(
     ctx: click.Context,
-    prompt: str,
+    prompt: str | None,
     model: str,
+    image_urls: tuple[str, ...],
+    audio_urls: tuple[str, ...],
+    ratio: str,
+    duration: int,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -47,14 +77,22 @@ def generate(
     \b
     Examples:
       hailuo generate "A cat playing in the snow"
-      hailuo generate "Ocean waves at sunset" --model minimax-t2v
+      hailuo generate "Ocean waves at sunset" --model minimax-h3
     """
     client = get_client(ctx.obj.get("token"))
     try:
+        if not prompt and not image_urls and not audio_urls:
+            raise click.UsageError(
+                "Provide PROMPT or at least one --image-url or --audio-url input."
+            )
+
         payload: dict[str, object] = {
-            "action": "generate",
             "prompt": prompt,
             "model": model,
+            "image_urls": list(image_urls) or None,
+            "audio_urls": list(audio_urls) or None,
+            "ratio": ratio,
+            "duration": duration,
             "callback_url": callback_url,
             "async": async_mode,
         }
@@ -75,9 +113,23 @@ def generate(
 @click.option(
     "-m",
     "--model",
-    type=click.Choice(["minimax-i2v", "minimax-t2v", "minimax-i2v-director"]),
-    default="minimax-i2v",
-    help="Hailuo image-to-video model (default: minimax-i2v).",
+    type=click.Choice(HAILUO_MODELS),
+    default=DEFAULT_MODEL,
+    help="Hailuo image-to-video model (default: minimax-h3).",
+)
+@click.option(
+    "--ratio",
+    type=click.Choice(["16:9", "9:16"]),
+    default="16:9",
+    show_default=True,
+    help="Output aspect ratio.",
+)
+@click.option(
+    "--duration",
+    type=click.IntRange(4, 15),
+    default=4,
+    show_default=True,
+    help="Output duration in seconds.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
@@ -94,6 +146,8 @@ def image_to_video(
     prompt: str,
     image_url: str,
     model: str,
+    ratio: str,
+    duration: int,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -105,15 +159,16 @@ def image_to_video(
     \b
     Examples:
       hailuo image-to-video "Animate this scene" --image-url https://example.com/photo.jpg
-      hailuo image-to-video "Cinematic pan" --image-url img.jpg --model minimax-i2v-director
+      hailuo image-to-video "Cinematic pan" --image-url img.jpg --model minimax-h3
     """
     client = get_client(ctx.obj.get("token"))
     try:
         payload: dict[str, object] = {
-            "action": "generate",
             "prompt": prompt,
             "model": model,
-            "first_image_url": image_url,
+            "image_urls": [image_url],
+            "ratio": ratio,
+            "duration": duration,
             "callback_url": callback_url,
             "async": async_mode,
         }

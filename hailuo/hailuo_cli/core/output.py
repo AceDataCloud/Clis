@@ -11,12 +11,10 @@ console = Console()
 
 # Available models
 HAILUO_MODELS = [
-    "minimax-t2v",
-    "minimax-i2v",
-    "minimax-i2v-director",
+    "minimax-h3",
 ]
 
-DEFAULT_MODEL = "minimax-t2v"
+DEFAULT_MODEL = "minimax-h3"
 
 
 def print_json(data: Any) -> None:
@@ -106,11 +104,7 @@ def print_models() -> None:
     table.add_column("Type")
     table.add_column("Notes")
 
-    table.add_row("minimax-t2v", "Text-to-Video", "Generate video from text prompt (default)")
-    table.add_row("minimax-i2v", "Image-to-Video", "Generate video from image + text")
-    table.add_row(
-        "minimax-i2v-director", "Image-to-Video", "Cinematic director mode with image reference"
-    )
+    table.add_row("minimax-h3", "Video Generation", "Supports text, image, and audio inputs")
 
     console.print(table)
     console.print(f"\n[dim]Default model: {DEFAULT_MODEL}[/dim]")

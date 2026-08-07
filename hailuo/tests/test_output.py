@@ -80,6 +80,4 @@ class TestOutputFunctions:
             assert model in captured.out
 
     def test_hailuo_models_list(self):
-        assert "minimax-t2v" in HAILUO_MODELS
-        assert "minimax-i2v" in HAILUO_MODELS
-        assert "minimax-i2v-director" in HAILUO_MODELS
+        assert HAILUO_MODELS == ["minimax-h3"]
