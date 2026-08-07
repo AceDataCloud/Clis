@@ -22,7 +22,7 @@ Or copy `.env.example` to `.env` and fill in your token.
 
 | Command | Description |
 |---------|-------------|
-| `hailuo generate <prompt>` | Generate a video from text (minimax-t2v) |
+| `hailuo generate <prompt>` | Generate a video from text (minimax-h3) |
 | `hailuo image-to-video <prompt> --image-url <url>` | Generate video from image + text |
 
 ### Task Management
@@ -65,10 +65,7 @@ hailuo generate "A cat playing in the snow"
 hailuo image-to-video "Animate the scene" --image-url https://example.com/photo.jpg
 
 # Use a specific model
-hailuo generate "Ocean waves" --model minimax-t2v
-
-# Director model with image reference
-hailuo image-to-video "Cinematic pan" --image-url img.jpg --model minimax-i2v-director
+hailuo generate "Ocean waves" --model minimax-h3
 
 # Check task status
 hailuo task abc123-def456

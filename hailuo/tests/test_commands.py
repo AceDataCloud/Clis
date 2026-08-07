@@ -115,10 +115,52 @@ class TestGenerateCommands:
         assert sent["image_urls"] == ["https://example.com/1.jpg"]
         assert sent["audio_urls"] == ["https://example.com/1.mp3"]
 
+    @respx.mock
+    def test_generate_with_resolution_and_watermark(self, mock_video_response):
+        runner = CliRunner()
+        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "A test prompt",
+                "--resolution",
+                "768P",
+                "--aigc-watermark",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["resolution"] == "768P"
+        assert sent["aigc_watermark"] is True
+
     def test_generate_requires_any_input(self):
         runner = CliRunner()
         result = runner.invoke(cli, ["--token", "test-token", "generate"])
         assert result.exit_code != 0
+
+    def test_generate_rejects_too_many_image_urls(self):
+        runner = CliRunner()
+        args = ["--token", "test-token", "generate", "A test prompt"]
+        for i in range(10):
+            args.extend(["--image-url", f"https://example.com/{i}.jpg"])
+        result = runner.invoke(cli, args)
+        assert result.exit_code != 0
+        assert "at most 9 --image-url" in result.output
+
+    def test_generate_rejects_too_many_audio_urls(self):
+        runner = CliRunner()
+        args = ["--token", "test-token", "generate", "A test prompt"]
+        for i in range(4):
+            args.extend(["--audio-url", f"https://example.com/{i}.mp3"])
+        result = runner.invoke(cli, args)
+        assert result.exit_code != 0
+        assert "at most 3 --audio-url" in result.output
 
     def test_generate_no_token(self):
         runner = CliRunner()
@@ -172,6 +214,32 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["model"] == "minimax-h3"
+
+    @respx.mock
+    def test_image_to_video_with_resolution_and_watermark(self, mock_video_response):
+        runner = CliRunner()
+        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this",
+                "--image-url",
+                "https://example.com/photo.jpg",
+                "--resolution",
+                "768P",
+                "--aigc-watermark",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["resolution"] == "768P"
+        assert sent["aigc_watermark"] is True
 
 
 class TestTaskCommands:
