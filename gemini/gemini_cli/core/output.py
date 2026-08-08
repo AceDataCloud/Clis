@@ -23,6 +23,13 @@ GEMINI_CHAT_MODELS = [
     "gemini-2.0-flash",
 ]
 
+GEMINI_NATIVE_MODELS = [
+    *GEMINI_CHAT_MODELS,
+    "gemini-3.1-flash-image",
+    "gemini-2.5-flash-image",
+    "gemini-3-pro-image",
+]
+
 DEFAULT_CHAT_MODEL = "gemini-2.5-flash"
 
 # Available Gemini video models

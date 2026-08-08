@@ -160,6 +160,56 @@ class TestChatCommands:
         assert request_body["reasoning_effort"] == "high"
 
     @respx.mock
+    def test_chat_with_extended_openapi_options(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--stream",
+                "--response-format",
+                '{"type":"json_object"}',
+                "--tools",
+                '[{"type":"function","function":{"name":"lookup"}}]',
+                "--tool-choice",
+                '{"type":"function","function":{"name":"lookup"}}',
+                "--stream-options",
+                '{"include_usage":true}',
+                "--metadata",
+                '{"source":"cli"}',
+                "--modalities",
+                '["text"]',
+                "--web-search-options",
+                '{"search_context_size":"medium"}',
+                "--store",
+                "--logprobs",
+                "--top-logprobs",
+                "3",
+                "--no-parallel-tool-calls",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["stream"] is True
+        assert request_body["response_format"] == {"type": "json_object"}
+        assert request_body["tools"][0]["function"]["name"] == "lookup"
+        assert request_body["tool_choice"]["function"]["name"] == "lookup"
+        assert request_body["stream_options"] == {"include_usage": True}
+        assert request_body["metadata"] == {"source": "cli"}
+        assert request_body["modalities"] == ["text"]
+        assert request_body["web_search_options"] == {"search_context_size": "medium"}
+        assert request_body["store"] is True
+        assert request_body["logprobs"] is True
+        assert request_body["top_logprobs"] == 3
+        assert request_body["parallel_tool_calls"] is False
+
+    @respx.mock
     def test_chat_auth_error(self, runner):
         respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
             return_value=Response(401, json={"error": "Unauthorized"})
@@ -258,6 +308,34 @@ class TestMessagesCommands:
         assert request_body["model"] == "claude-opus-5"
 
     @respx.mock
+    def test_messages_with_extended_openapi_options(self, runner, mock_messages_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+            return_value=Response(200, json=mock_messages_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "messages",
+                "Hello",
+                "--metadata",
+                '{"user_id":"user-1"}',
+                "--stream",
+                "--tools",
+                '[{"name":"lookup"}]',
+                "--tool-choice",
+                '{"type":"auto"}',
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["metadata"] == {"user_id": "user-1"}
+        assert request_body["stream"] is True
+        assert request_body["tools"] == [{"name": "lookup"}]
+        assert request_body["tool_choice"] == {"type": "auto"}
+
+    @respx.mock
     def test_messages_auth_error(self, runner):
         respx.post("https://api.acedata.cloud/v1/messages").mock(
             return_value=Response(401, json={"error": "Unauthorized"})
@@ -338,6 +416,29 @@ class TestCountTokensCommands:
         request_body = json.loads(route.calls[0].request.content)
         assert request_body["system"] == "You are a summarizer."
 
+    @respx.mock
+    def test_count_tokens_with_tools(self, runner, mock_count_tokens_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
+            return_value=Response(200, json=mock_count_tokens_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "count-tokens",
+                "Hello",
+                "--tools",
+                '[{"name":"lookup"}]',
+                "--tool-choice",
+                '{"type":"auto"}',
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["tools"] == [{"name": "lookup"}]
+        assert request_body["tool_choice"] == {"type": "auto"}
+
 
 # ─── Models / Config Commands ────────────────────────────────────────────
 
@@ -387,11 +488,17 @@ class TestMessagesThinking:
                 "enabled",
                 "--thinking-budget-tokens",
                 "2048",
+                "--thinking-display",
+                "summarized",
             ],
         )
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
-        assert request_body["thinking"] == {"type": "enabled", "budget_tokens": 2048}
+        assert request_body["thinking"] == {
+            "type": "enabled",
+            "budget_tokens": 2048,
+            "display": "summarized",
+        }
 
     @respx.mock
     def test_messages_with_thinking_disabled(self, runner, mock_messages_response):
@@ -509,3 +616,16 @@ class TestMessagesThinking:
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
         assert request_body.get("thinking") is None
+
+    @respx.mock
+    def test_count_tokens_thinking_enabled_without_budget(self, runner, mock_count_tokens_response):
+        route = respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
+            return_value=Response(200, json=mock_count_tokens_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "count-tokens", "Hello", "--thinking-type", "enabled"],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["thinking"] == {"type": "enabled"}

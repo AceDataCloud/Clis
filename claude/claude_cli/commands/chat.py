@@ -2,6 +2,11 @@
 
 import click
 
+from claude_cli.commands._json import (
+    parse_json_array,
+    parse_json_object,
+    parse_json_or_string,
+)
 from claude_cli.core.client import get_client
 from claude_cli.core.exceptions import ClaudeError
 from claude_cli.core.output import (
@@ -121,10 +126,44 @@ from claude_cli.core.output import (
 )
 @click.option(
     "--parallel-tool-calls",
-    is_flag=True,
-    default=False,
+    "parallel_tool_calls",
+    flag_value=True,
+    default=None,
     help="Enable parallel function calling during tool use.",
 )
+@click.option(
+    "--no-parallel-tool-calls",
+    "parallel_tool_calls",
+    flag_value=False,
+    help="Disable parallel function calling during tool use.",
+)
+@click.option("--stream", is_flag=True, default=False, help="Stream partial chat completion events.")
+@click.option(
+    "--response-format",
+    default=None,
+    help='Response format as JSON (e.g. \'{"type": "json_object"}\').',
+)
+@click.option(
+    "--tools",
+    default=None,
+    help='Tool definitions as a JSON array (e.g. \'[{"type":"function","function":{...}}]\').',
+)
+@click.option(
+    "--tool-choice",
+    default=None,
+    help='Tool selection mode or JSON object (e.g. "auto" or \'{"type":"function","function":{"name":"lookup"}}\').',
+)
+@click.option(
+    "--stream-options",
+    default=None,
+    help='Streaming options as a JSON object (e.g. \'{"include_usage": true}\').',
+)
+@click.option("--metadata", default=None, help="Metadata as a JSON object.")
+@click.option("--logit-bias", default=None, help="Logit bias map as a JSON object.")
+@click.option("--modalities", default=None, help="Requested modalities as a JSON array.")
+@click.option("--audio", default=None, help="Audio output settings as a JSON object.")
+@click.option("--prediction", default=None, help="Prediction settings as a JSON object.")
+@click.option("--web-search-options", default=None, help="Web search settings as a JSON object.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -147,7 +186,18 @@ def chat(
     store: bool,
     logprobs: bool,
     top_logprobs: int | None,
-    parallel_tool_calls: bool,
+    parallel_tool_calls: bool | None,
+    stream: bool,
+    response_format: str | None,
+    tools: str | None,
+    tool_choice: str | None,
+    stream_options: str | None,
+    metadata: str | None,
+    logit_bias: str | None,
+    modalities: str | None,
+    audio: str | None,
+    prediction: str | None,
+    web_search_options: str | None,
     output_json: bool,
 ) -> None:
     """Chat with a Claude model using the OpenAI-compatible endpoint.
@@ -167,25 +217,51 @@ def chat(
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
 
+    try:
+        parsed_response_format = parse_json_object(response_format, "--response-format")
+        parsed_tools = parse_json_array(tools, "--tools")
+        parsed_tool_choice = parse_json_or_string(tool_choice, "--tool-choice")
+        parsed_stream_options = parse_json_object(stream_options, "--stream-options")
+        parsed_metadata = parse_json_object(metadata, "--metadata")
+        parsed_logit_bias = parse_json_object(logit_bias, "--logit-bias")
+        parsed_modalities = parse_json_array(modalities, "--modalities")
+        parsed_audio = parse_json_object(audio, "--audio")
+        parsed_prediction = parse_json_object(prediction, "--prediction")
+        parsed_web_search_options = parse_json_object(web_search_options, "--web-search-options")
+    except click.BadParameter as e:
+        print_error(e.format_message())
+        raise SystemExit(1) from None
+
     payload: dict[str, object] = {
         "model": model,
         "messages": messages,
+        "stream": stream or None,
         "temperature": temperature,
         "max_tokens": max_tokens,
         "max_completion_tokens": max_completion_tokens,
         "n": count,
+        "response_format": parsed_response_format,
+        "tools": parsed_tools,
+        "tool_choice": parsed_tool_choice,
         "top_p": top_p,
         "frequency_penalty": frequency_penalty,
         "presence_penalty": presence_penalty,
         "seed": seed,
         "stop": list(stop) if stop else None,
+        "stream_options": parsed_stream_options,
         "reasoning_effort": reasoning_effort,
         "user": user,
         "service_tier": service_tier,
         "store": store if store else None,
+        "metadata": parsed_metadata,
+        "logit_bias": parsed_logit_bias,
         "logprobs": logprobs if logprobs else None,
         "top_logprobs": top_logprobs,
-        "parallel_tool_calls": parallel_tool_calls if parallel_tool_calls else None,
+        "parallel_tool_calls": parallel_tool_calls,
+        "modalities": parsed_modalities,
+        "audio": parsed_audio,
+        "prediction": parsed_prediction,
+        "web_search_options": parsed_web_search_options,
     }
 
     try:

@@ -2,6 +2,7 @@
 
 import click
 
+from claude_cli.commands._json import parse_json_array, parse_json_object
 from claude_cli.core.client import get_client
 from claude_cli.core.exceptions import ClaudeError
 from claude_cli.core.output import (
@@ -73,6 +74,16 @@ from claude_cli.core.output import (
     type=click.IntRange(min=1024),
     help="Token budget for extended thinking (required when --thinking-type=enabled, min 1024).",
 )
+@click.option(
+    "--thinking-display",
+    type=click.Choice(["summarized", "omitted"]),
+    default=None,
+    help="Display mode for enabled or adaptive thinking.",
+)
+@click.option("--metadata", default=None, help='Metadata as a JSON object (e.g. \'{"user_id":"u1"}\').')
+@click.option("--stream", is_flag=True, default=False, help="Stream incremental events.")
+@click.option("--tools", default=None, help="Tool definitions as a JSON array.")
+@click.option("--tool-choice", default=None, help="Tool choice as a JSON object.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def messages(
@@ -87,6 +98,11 @@ def messages(
     stop_sequences: tuple[str, ...],
     thinking_type: str | None,
     thinking_budget_tokens: int | None,
+    thinking_display: str | None,
+    metadata: str | None,
+    stream: bool,
+    tools: str | None,
+    tool_choice: str | None,
     output_json: bool,
 ) -> None:
     """Send a message using the Claude native Messages API.
@@ -112,13 +128,31 @@ def messages(
             thinking = {"type": thinking_type, "budget_tokens": thinking_budget_tokens}
         else:
             thinking = {"type": thinking_type}
+        if thinking_display is not None:
+            if thinking_type == "disabled":
+                raise click.UsageError("--thinking-display is only valid with enabled or adaptive thinking")
+            thinking["display"] = thinking_display
+    elif thinking_display is not None:
+        raise click.UsageError("--thinking-display requires --thinking-type")
+
+    try:
+        parsed_metadata = parse_json_object(metadata, "--metadata")
+        parsed_tools = parse_json_array(tools, "--tools")
+        parsed_tool_choice = parse_json_object(tool_choice, "--tool-choice")
+    except click.BadParameter as e:
+        print_error(e.format_message())
+        raise SystemExit(1) from None
 
     payload: dict[str, object] = {
         "model": model,
         "messages": msg_list,
         "max_tokens": max_tokens,
+        "metadata": parsed_metadata,
         "system": system,
+        "stream": stream or None,
         "temperature": temperature,
+        "tool_choice": parsed_tool_choice,
+        "tools": parsed_tools,
         "top_p": top_p,
         "top_k": top_k,
         "stop_sequences": list(stop_sequences) if stop_sequences else None,
@@ -161,9 +195,11 @@ def messages(
 @click.option(
     "--thinking-budget-tokens",
     default=None,
-    type=click.IntRange(min=1024),
-    help="Token budget for extended thinking (required when --thinking-type=enabled, min 1024).",
+    type=int,
+    help="Token budget for extended thinking.",
 )
+@click.option("--tools", default=None, help="Tool definitions as a JSON array.")
+@click.option("--tool-choice", default=None, help="Tool choice as a JSON object.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def count_tokens(
@@ -173,6 +209,8 @@ def count_tokens(
     system: str | None,
     thinking_type: str | None,
     thinking_budget_tokens: int | None,
+    tools: str | None,
+    tool_choice: str | None,
     output_json: bool,
 ) -> None:
     """Count tokens for a Claude Messages API request.
@@ -190,18 +228,24 @@ def count_tokens(
 
     thinking: dict[str, str | int] | None = None
     if thinking_type is not None:
-        if thinking_type == "enabled":
-            if thinking_budget_tokens is None:
-                raise click.UsageError("--thinking-budget-tokens is required when --thinking-type=enabled")
-            thinking = {"type": thinking_type, "budget_tokens": thinking_budget_tokens}
-        else:
-            thinking = {"type": thinking_type}
+        thinking = {"type": thinking_type}
+        if thinking_budget_tokens is not None:
+            thinking["budget_tokens"] = thinking_budget_tokens
+
+    try:
+        parsed_tools = parse_json_array(tools, "--tools")
+        parsed_tool_choice = parse_json_object(tool_choice, "--tool-choice")
+    except click.BadParameter as e:
+        print_error(e.format_message())
+        raise SystemExit(1) from None
 
     payload: dict[str, object] = {
         "model": model,
         "messages": msg_list,
         "system": system,
         "thinking": thinking,
+        "tool_choice": parsed_tool_choice,
+        "tools": parsed_tools,
     }
 
     try:

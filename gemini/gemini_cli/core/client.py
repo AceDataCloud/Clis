@@ -88,6 +88,17 @@ class GeminiClient:
         """Send a chat completion request."""
         return self.request("/gemini/chat/completions", kwargs)
 
+    def generate_content(self, model: str, **kwargs: Any) -> dict[str, Any]:
+        """Generate content using the native Gemini API."""
+        return self.request(f"/v1beta/models/{model}:generateContent", kwargs)
+
+    def stream_generate_content(self, model: str, alt: str | None = None, **kwargs: Any) -> dict[str, Any]:
+        """Generate streamed content using the native Gemini API."""
+        endpoint = f"/v1beta/models/{model}:streamGenerateContent"
+        if alt is not None:
+            endpoint = f"{endpoint}?alt={alt}"
+        return self.request(endpoint, kwargs)
+
     def generate_video(self, **kwargs: Any) -> dict[str, Any]:
         """Generate a video."""
         return self.request("/gemini/videos", kwargs)

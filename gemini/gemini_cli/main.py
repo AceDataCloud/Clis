@@ -12,6 +12,7 @@ import click
 from dotenv import load_dotenv
 
 from gemini_cli.commands.chat import chat
+from gemini_cli.commands.content import generate_content, stream_generate_content
 from gemini_cli.commands.info import aspect_ratios, config, models
 from gemini_cli.commands.task import task, tasks_batch, wait
 from gemini_cli.commands.video import generate, image_to_video, video_to_video
@@ -58,6 +59,8 @@ def cli(ctx: click.Context, token: str | None) -> None:
 
 # Register commands
 cli.add_command(chat)
+cli.add_command(generate_content)
+cli.add_command(stream_generate_content)
 cli.add_command(generate)
 cli.add_command(image_to_video)
 cli.add_command(video_to_video)
