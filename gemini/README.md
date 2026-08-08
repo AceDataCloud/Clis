@@ -26,6 +26,9 @@ gemini models
 | `gemini chat <prompt>` | Chat with a Gemini model |
 | `gemini generate <prompt>` | Generate a video from a text prompt |
 | `gemini image-to-video <prompt>` | Generate a video from reference image(s) |
+| `gemini video-to-video <prompt>` | Generate a video from a reference video |
+| `gemini generate-content` | Generate content with the native Gemini API |
+| `gemini stream-generate-content` | Generate streamed content with the native Gemini API |
 | `gemini task <task_id>` | Query a task status |
 | `gemini tasks <task_ids...>` | Query multiple tasks |
 | `gemini wait <task_id>` | Wait for a task to complete |
