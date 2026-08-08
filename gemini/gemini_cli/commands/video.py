@@ -185,10 +185,9 @@ def image_to_video(
 @click.option(
     "-v",
     "--video-url",
-    "video_urls",
+    "video_url",
     required=True,
-    multiple=True,
-    help="Video URL(s) for reference. Can be specified multiple times.",
+    help="Video URL for reference.",
 )
 @click.option(
     "-m",
@@ -227,7 +226,7 @@ def image_to_video(
 def video_to_video(
     ctx: click.Context,
     prompt: str,
-    video_urls: tuple[str, ...],
+    video_url: str,
     model: str,
     aspect_ratio: str,
     resolution: str,
@@ -237,19 +236,18 @@ def video_to_video(
 ) -> None:
     """Generate a video from reference video(s).
 
-    PROMPT describes the desired video. Provide one or more video URLs as reference.
+    PROMPT describes the desired video. Provide a video URL as reference.
 
     \b
     Examples:
       gemini video-to-video "Transform this scene" -v https://example.com/video.mp4
-      gemini video-to-video "Restyle" -v vid1.mp4 -v vid2.mp4
       gemini video-to-video "Transform" -v vid.mp4 --resolution 1080p
     """
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.generate_video(
             prompt=prompt,
-            video_urls=list(video_urls),
+            video_urls=[video_url],
             model=model,
             aspect_ratio=aspect_ratio,
             resolution=resolution,

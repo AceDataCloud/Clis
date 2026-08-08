@@ -15,7 +15,6 @@ def _build_payload(
     tools: str | None,
     tool_config: str | None,
     safety_settings: str | None,
-    cached_content: str | None,
 ) -> dict[str, object]:
     try:
         parsed_contents = parse_json_array(contents, "--contents")
@@ -35,12 +34,10 @@ def _build_payload(
         "tools": parsed_tools,
         "toolConfig": parsed_tool_config,
         "safetySettings": parsed_safety_settings,
-        "cachedContent": cached_content,
     }
 
 
 def _content_options(command):
-    command = click.option("--cached-content", default=None, help="Cached content resource name.")(command)
     command = click.option("--safety-settings", default=None, help="Safety settings as a JSON array.")(
         command
     )
@@ -85,7 +82,6 @@ def generate_content(
     tools: str | None,
     tool_config: str | None,
     safety_settings: str | None,
-    cached_content: str | None,
 ) -> None:
     """Generate content using the native Gemini API."""
     client = get_client(ctx.obj.get("token"))
@@ -96,7 +92,6 @@ def generate_content(
         tools,
         tool_config,
         safety_settings,
-        cached_content,
     )
 
     try:
@@ -125,7 +120,6 @@ def stream_generate_content(
     tools: str | None,
     tool_config: str | None,
     safety_settings: str | None,
-    cached_content: str | None,
 ) -> None:
     """Generate streamed content using the native Gemini API."""
     client = get_client(ctx.obj.get("token"))
@@ -136,7 +130,6 @@ def stream_generate_content(
         tools,
         tool_config,
         safety_settings,
-        cached_content,
     )
 
     try:

@@ -63,6 +63,13 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "--contents" in result.output
         assert "--generation-config" in result.output
+        assert "--cached-content" not in result.output
+
+    def test_help_stream_generate_content(self, runner):
+        result = runner.invoke(cli, ["stream-generate-content", "--help"])
+        assert result.exit_code == 0
+        assert "--contents" in result.output
+        assert "--cached-content" not in result.output
 
 
 class TestChatCommand:
@@ -303,7 +310,7 @@ class TestVideoCommand:
 
     @respx.mock
     def test_video_to_video(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/gemini/videos").mock(
+        route = respx.post("https://api.acedata.cloud/gemini/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -316,6 +323,24 @@ class TestVideoCommand:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["data"]["id"] == "task-video-123"
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["video_urls"] == ["https://example.com/video.mp4"]
+
+    def test_video_to_video_rejects_multiple_urls(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "video-to-video",
+                "Transform this",
+                "-v",
+                "https://example.com/first.mp4",
+                "-v",
+                "https://example.com/second.mp4",
+            ],
+        )
+        assert result.exit_code != 0
 
     @respx.mock
     def test_video_to_video_with_resolution(self, runner, mock_video_response):
@@ -388,22 +413,19 @@ class TestContentCommands:
                 "--alt",
                 "sse",
                 "--tools",
-                '[{"googleSearch":{}}]',
+                '[{"functionDeclarations":[{"name":"lookup"}]}]',
                 "--tool-config",
                 '{"functionCallingConfig":{"mode":"AUTO"}}',
                 "--safety-settings",
                 '[{"category":"HARM_CATEGORY_HARASSMENT","threshold":"OFF"}]',
-                "--cached-content",
-                "cachedContents/abc",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
-        assert request_body["tools"] == [{"googleSearch": {}}]
+        assert request_body["tools"] == [{"functionDeclarations": [{"name": "lookup"}]}]
         assert request_body["toolConfig"] == {"functionCallingConfig": {"mode": "AUTO"}}
         assert request_body["safetySettings"][0]["threshold"] == "OFF"
-        assert request_body["cachedContent"] == "cachedContents/abc"
 
 
 class TestTaskCommands:
