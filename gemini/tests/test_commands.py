@@ -58,6 +58,12 @@ class TestGlobalCommands:
         assert "--video-url" in result.output
         assert "--resolution" in result.output
 
+    def test_help_generate_content(self, runner):
+        result = runner.invoke(cli, ["generate-content", "--help"])
+        assert result.exit_code == 0
+        assert "--contents" in result.output
+        assert "--generation-config" in result.output
+
 
 class TestChatCommand:
     """Tests for chat commands."""
@@ -334,6 +340,70 @@ class TestVideoCommand:
             ],
         )
         assert result.exit_code != 0
+
+
+class TestContentCommands:
+    """Tests for native Gemini content commands."""
+
+    @respx.mock
+    def test_generate_content_json(self, runner, mock_chat_response):
+        route = respx.post(
+            "https://api.acedata.cloud/v1beta/models/gemini-2.5-flash:generateContent"
+        ).mock(return_value=Response(200, json=mock_chat_response))
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate-content",
+                "--model",
+                "gemini-2.5-flash",
+                "--contents",
+                '[{"parts":[{"text":"Hello"}]}]',
+                "--generation-config",
+                '{"temperature":0.5}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["contents"] == [{"parts": [{"text": "Hello"}]}]
+        assert request_body["generationConfig"] == {"temperature": 0.5}
+
+    @respx.mock
+    def test_stream_generate_content_json(self, runner, mock_chat_response):
+        route = respx.post(
+            "https://api.acedata.cloud/v1beta/models/gemini-3.1-flash-image:streamGenerateContent?alt=sse"
+        ).mock(return_value=Response(200, json=mock_chat_response))
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "stream-generate-content",
+                "--model",
+                "gemini-3.1-flash-image",
+                "--contents",
+                '[{"parts":[{"text":"Hello"}]}]',
+                "--alt",
+                "sse",
+                "--tools",
+                '[{"googleSearch":{}}]',
+                "--tool-config",
+                '{"functionCallingConfig":{"mode":"AUTO"}}',
+                "--safety-settings",
+                '[{"category":"HARM_CATEGORY_HARASSMENT","threshold":"OFF"}]',
+                "--cached-content",
+                "cachedContents/abc",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        request_body = json.loads(route.calls[0].request.content)
+        assert request_body["tools"] == [{"googleSearch": {}}]
+        assert request_body["toolConfig"] == {"functionCallingConfig": {"mode": "AUTO"}}
+        assert request_body["safetySettings"][0]["threshold"] == "OFF"
+        assert request_body["cachedContent"] == "cachedContents/abc"
 
 
 class TestTaskCommands:
