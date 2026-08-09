@@ -192,6 +192,53 @@ class TestGenerateCommands:
         assert result.exit_code != 0
         assert "one --image-role for each --image-url" in result.output
 
+    def test_generate_rejects_video_without_role(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "--video-url",
+                "https://example.com/1.mp4",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "one --video-role for each --video-url" in result.output
+
+    def test_generate_rejects_audio_without_role(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "--audio-url",
+                "https://example.com/1.mp3",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "one --audio-role for each --audio-url" in result.output
+
+    def test_generate_rejects_invalid_image_role(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "--image-url",
+                "https://example.com/1.jpg",
+                "--image-role",
+                "reference_audio",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "Invalid value for '--image-role'" in result.output
+
     def test_generate_no_token(self):
         runner = CliRunner()
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
