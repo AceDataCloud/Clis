@@ -1,0 +1,7 @@
+version: "3"
+services:
+  minimax-cli:
+    platform: linux/amd64
+    container_name: "minimax-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/minimax-cli:${BUILD_NUMBER}"
