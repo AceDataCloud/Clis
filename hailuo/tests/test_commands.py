@@ -140,7 +140,7 @@ class TestGenerateCommands:
         ]
 
     @respx.mock
-    def test_generate_with_resolution_and_watermark(self, mock_video_response):
+    def test_generate_with_resolution(self, mock_video_response):
         runner = CliRunner()
         route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -154,14 +154,22 @@ class TestGenerateCommands:
                 "A test prompt",
                 "--resolution",
                 "768P",
-                "--aigc-watermark",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["resolution"] == "768P"
-        assert sent["aigc_watermark"] is True
+        assert "aigc_watermark" not in sent
+
+    def test_generate_rejects_removed_watermark_flag(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "A test prompt", "--aigc-watermark"],
+        )
+        assert result.exit_code != 0
+        assert "No such option: --aigc-watermark" in result.output
 
     def test_generate_requires_any_input(self):
         runner = CliRunner()
@@ -251,7 +259,7 @@ class TestGenerateCommands:
         assert sent["model"] == "MiniMax-H3"
 
     @respx.mock
-    def test_image_to_video_with_resolution_and_watermark(self, mock_video_response):
+    def test_image_to_video_with_resolution(self, mock_video_response):
         runner = CliRunner()
         route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -267,14 +275,13 @@ class TestGenerateCommands:
                 "https://example.com/photo.jpg",
                 "--resolution",
                 "768P",
-                "--aigc-watermark",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["resolution"] == "768P"
-        assert sent["aigc_watermark"] is True
+        assert "aigc_watermark" not in sent
 
 
 class TestTaskCommands:
