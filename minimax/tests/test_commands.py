@@ -162,6 +162,20 @@ class TestGenerateCommands:
         assert sent["resolution"] == "768P"
         assert "aigc_watermark" not in sent
 
+    @respx.mock
+    def test_generate_with_async(self, mock_video_response):
+        runner = CliRunner()
+        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "A test prompt", "--async", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["async"] is True
+
     def test_generate_requires_any_input(self):
         runner = CliRunner()
         result = runner.invoke(cli, ["--token", "test-token", "generate"])
@@ -320,6 +334,29 @@ class TestGenerateCommands:
         sent = json.loads(route.calls[0].request.content)
         assert sent["resolution"] == "768P"
         assert "aigc_watermark" not in sent
+
+    @respx.mock
+    def test_image_to_video_with_async(self, mock_video_response):
+        runner = CliRunner()
+        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this",
+                "--image-url",
+                "https://example.com/photo.jpg",
+                "--async",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["async"] is True
 
 
 class TestTaskCommands:
