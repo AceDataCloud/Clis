@@ -131,6 +131,38 @@ class TestSearchCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["image_size"] == "12mp"
 
+    def test_search_rejects_whitespace_query(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "search", "   "])
+        assert result.exit_code != 0
+        assert "QUERY must contain a non-whitespace character" in result.output
+
+    @pytest.mark.parametrize(
+        ("option", "error"),
+        [
+            ("--country", "--country must not be empty"),
+            ("--language", "--language must not be empty"),
+        ],
+    )
+    def test_search_rejects_empty_localization_option(self, runner, option, error):
+        result = runner.invoke(cli, ["--token", "test-token", "search", "test", option, "   "])
+        assert result.exit_code != 0
+        assert error in result.output
+
+    def test_search_rejects_image_size_for_non_image_search(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "search",
+                "test",
+                "--image-size",
+                "large",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "--image-size is only valid when --type is images" in result.output
+
     def test_search_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "search", "test"])
         assert result.exit_code != 0
