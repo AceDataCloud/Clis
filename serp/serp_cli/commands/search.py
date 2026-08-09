@@ -88,8 +88,17 @@ def search(
       serp search "sunset photography" -t images -n 20
       serp search "wildlife wallpaper" -t images --image-size 12mp
     """
-    client = get_client(ctx.obj.get("token"))
     try:
+        if not query.strip():
+            raise click.UsageError("QUERY must contain a non-whitespace character.")
+        if country is not None and not country.strip():
+            raise click.UsageError("--country must not be empty.")
+        if language is not None and not language.strip():
+            raise click.UsageError("--language must not be empty.")
+        if image_size is not None and search_type != "images":
+            raise click.UsageError("--image-size is only valid when --type is images.")
+
+        client = get_client(ctx.obj.get("token"))
         payload: dict[str, object] = {
             "query": query,
             "type": search_type,
