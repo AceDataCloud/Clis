@@ -89,7 +89,12 @@ def print_video_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
-    tasks = data.get("data", [])
+    tasks = data.get("data", data.get("items", data))
+    if isinstance(tasks, dict) and not any(
+        key in tasks for key in ("id", "status", "state", "video_url", "model_name", "created_at")
+    ):
+        console.print(str(tasks))
+        return
 
     if isinstance(tasks, list):
         for task_data in tasks:
@@ -97,7 +102,16 @@ def print_task_result(data: dict[str, Any]) -> None:
             table.add_column("Field", style="bold cyan", width=15)
             table.add_column("Value")
 
-            for key in ["id", "status", "state", "video_url", "model_name", "created_at"]:
+            for key in [
+                "id",
+                "trace_id",
+                "type",
+                "status",
+                "state",
+                "video_url",
+                "model_name",
+                "created_at",
+            ]:
                 if task_data.get(key):
                     table.add_row(key.replace("_", " ").title(), str(task_data[key]))
 
@@ -108,7 +122,16 @@ def print_task_result(data: dict[str, Any]) -> None:
         table.add_column("Field", style="bold cyan", width=15)
         table.add_column("Value")
 
-        for key in ["id", "status", "state", "video_url", "model_name", "created_at"]:
+        for key in [
+            "id",
+            "trace_id",
+            "type",
+            "status",
+            "state",
+            "video_url",
+            "model_name",
+            "created_at",
+        ]:
             if tasks.get(key):
                 table.add_row(key.replace("_", " ").title(), str(tasks[key]))
 

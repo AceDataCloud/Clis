@@ -39,6 +39,12 @@ class TestGlobalCommands:
         assert "PROMPT" in result.output
         assert "--model" in result.output
 
+    def test_help_task_options(self, runner):
+        result = runner.invoke(cli, ["tasks", "--help"])
+        assert result.exit_code == 0
+        assert "--trace-ids" in result.output
+        assert "--created-at-max" in result.output
+
 
 # ─── Generate Commands ─────────────────────────────────────────────────────
 
@@ -291,6 +297,27 @@ class TestTaskCommands:
         assert data["data"][0]["id"] == "task-123"
 
     @respx.mock
+    def test_task_with_trace_id(self, runner, mock_task_response):
+        respx.post("https://api.acedata.cloud/veo/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "task", "--trace-id", "trace-123", "--json"],
+        )
+        assert result.exit_code == 0
+        assert respx.calls.last is not None
+        payload = json.loads(respx.calls.last.request.read().decode("utf-8"))
+        assert payload["action"] == "retrieve"
+        assert payload["trace_id"] == "trace-123"
+        assert "id" not in payload
+
+    def test_task_requires_id_or_trace_id(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "task"])
+        assert result.exit_code != 0
+        assert "Provide TASK_ID or --trace-id" in result.output
+
+    @respx.mock
     def test_task_rich_output(self, runner, mock_task_response):
         respx.post("https://api.acedata.cloud/veo/tasks").mock(
             return_value=Response(200, json=mock_task_response)
@@ -305,6 +332,73 @@ class TestTaskCommands:
         )
         result = runner.invoke(cli, ["--token", "test-token", "tasks", "t-1", "t-2", "--json"])
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_tasks_batch_with_trace_ids_and_filters(self, runner, mock_task_response):
+        respx.post("https://api.acedata.cloud/veo/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tasks",
+                "--trace-ids",
+                "trace-1",
+                "--trace-ids",
+                "trace-2",
+                "--offset",
+                "2",
+                "--limit",
+                "10",
+                "--type",
+                "videos",
+                "--created-at-min",
+                "100.5",
+                "--created-at-max",
+                "200.5",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert respx.calls.last is not None
+        payload = json.loads(respx.calls.last.request.read().decode("utf-8"))
+        assert payload == {
+            "trace_ids": ["trace-1", "trace-2"],
+            "offset": 2,
+            "limit": 10,
+            "type": "videos",
+            "created_at_min": 100.5,
+            "created_at_max": 200.5,
+            "action": "retrieve_batch",
+        }
+
+    @respx.mock
+    def test_wait_accepts_trace_id_and_single_task_response(self, runner):
+        respx.post("https://api.acedata.cloud/veo/tasks").mock(
+            return_value=Response(
+                200,
+                json={
+                    "id": "task-123",
+                    "trace_id": "trace-123",
+                    "type": "videos",
+                    "state": "succeeded",
+                    "created_at": 1786281000.1,
+                },
+            )
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "wait", "--trace-id", "trace-123", "--json"],
+        )
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["id"] == "task-123"
+        assert respx.calls.last is not None
+        payload = json.loads(respx.calls.last.request.read().decode("utf-8"))
+        assert payload["trace_id"] == "trace-123"
+        assert "id" not in payload
 
 
 # ─── Info Commands ─────────────────────────────────────────────────────────
