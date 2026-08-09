@@ -89,12 +89,6 @@ CONTENT_ROLE_CHOICES = [
     show_default=True,
     help="Output resolution.",
 )
-@click.option(
-    "--aigc-watermark/--no-aigc-watermark",
-    default=False,
-    show_default=True,
-    help="Whether to enable AIGC watermark.",
-)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -111,7 +105,6 @@ def generate(
     ratio: str,
     duration: int,
     resolution: str,
-    aigc_watermark: bool,
     callback_url: str | None,
     output_json: bool,
 ) -> None:
@@ -127,9 +120,7 @@ def generate(
     client = get_client(ctx.obj.get("token"))
     try:
         if not prompt and not image_urls and not video_urls and not audio_urls:
-            raise click.UsageError(
-                "Provide PROMPT or at least one media URL input."
-            )
+            raise click.UsageError("Provide PROMPT or at least one media URL input.")
         if prompt and len(prompt) > 7000:
             raise click.UsageError("PROMPT must be at most 7000 characters.")
         content: list[dict[str, object]] = []
@@ -157,7 +148,6 @@ def generate(
             "resolution": resolution,
             "ratio": ratio,
             "duration": duration,
-            "aigc_watermark": aigc_watermark,
             "callback_url": callback_url,
         }
 
@@ -202,12 +192,6 @@ def generate(
     show_default=True,
     help="Output resolution.",
 )
-@click.option(
-    "--aigc-watermark/--no-aigc-watermark",
-    default=False,
-    show_default=True,
-    help="Whether to enable AIGC watermark.",
-)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -219,7 +203,6 @@ def image_to_video(
     ratio: str,
     duration: int,
     resolution: str,
-    aigc_watermark: bool,
     callback_url: str | None,
     output_json: bool,
 ) -> None:
@@ -247,7 +230,6 @@ def image_to_video(
             "resolution": resolution,
             "ratio": ratio,
             "duration": duration,
-            "aigc_watermark": aigc_watermark,
             "callback_url": callback_url,
         }
 
