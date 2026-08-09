@@ -26,6 +26,8 @@ def time_ranges() -> None:
     table.add_row("qdr:d", "Past Day", "Results from the last 24 hours")
     table.add_row("qdr:w", "Past Week", "Results from the last 7 days")
     table.add_row("qdr:m", "Past Month", "Results from the last 30 days")
+    table.add_row("qdr:y", "Past Year", "Results from the last 12 months")
+    table.add_row("h / d / w / m / y", "Shorthand", "Alias form accepted by API")
     table.add_row("(none)", "Any Time", "No time restriction (default)")
 
     console.print(table)

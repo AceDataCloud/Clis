@@ -15,7 +15,24 @@ SEARCH_TYPES = ["search", "images", "news", "maps", "places", "videos"]
 DEFAULT_SEARCH_TYPE = "search"
 
 # Common time ranges
-TIME_RANGES = ["qdr:h", "qdr:d", "qdr:w", "qdr:m"]
+TIME_RANGES = ["h", "d", "w", "m", "y", "qdr:h", "qdr:d", "qdr:w", "qdr:m", "qdr:y"]
+
+# Image size filters
+IMAGE_SIZES = [
+    "large",
+    "medium",
+    "icon",
+    "2mp",
+    "4mp",
+    "6mp",
+    "8mp",
+    "10mp",
+    "12mp",
+    "15mp",
+    "20mp",
+    "40mp",
+    "70mp",
+]
 
 
 def print_json(data: Any) -> None:

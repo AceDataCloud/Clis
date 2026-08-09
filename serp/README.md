@@ -31,6 +31,9 @@ serp search "artificial intelligence"
 # Image search
 serp images "sunset photography"
 
+# Image search with image-size filter
+serp images "sunset photography" --image-size 12mp
+
 # News with time filter
 serp news "tech news" --time-range qdr:d
 
@@ -65,7 +68,8 @@ serp search "hello world" --json | jq '.organic[0].title'
 | `-t`, `--type` | Search type: search, images, news, maps, places, videos |
 | `-c`, `--country` | Country code (e.g. us, cn, uk) |
 | `-l`, `--language` | Language code (e.g. en, zh-cn, fr) |
-| `--time-range` | Time filter: qdr:h (hour), qdr:d (day), qdr:w (week), qdr:m (month) |
+| `--time-range` | Time filter: h, d, w, m, y (or qdr:h, qdr:d, qdr:w, qdr:m, qdr:y) |
+| `--image-size` | Image size filter: large, medium, icon, 2mp, 4mp, 6mp, 8mp, 10mp, 12mp, 15mp, 20mp, 40mp, 70mp |
 | `-n`, `--number` | Number of results per page (default: 10) |
 | `-p`, `--page` | Page number for pagination |
 | `--json` | Output raw JSON |

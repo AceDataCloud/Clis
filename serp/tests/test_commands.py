@@ -39,6 +39,7 @@ class TestGlobalCommands:
         assert "QUERY" in result.output
         assert "--type" in result.output
         assert "--country" in result.output
+        assert "--image-size" in result.output
 
 
 # ─── Search Commands ──────────────────────────────────────────────────────
@@ -107,6 +108,29 @@ class TestSearchCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["number"] == 20
 
+    @respx.mock
+    def test_search_with_image_size(self, runner, mock_images_response):
+        route = respx.post("https://api.acedata.cloud/serp/google").mock(
+            return_value=Response(200, json=mock_images_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "search",
+                "mountains",
+                "-t",
+                "images",
+                "--image-size",
+                "12mp",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["image_size"] == "12mp"
+
     def test_search_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "search", "test"])
         assert result.exit_code != 0
@@ -127,6 +151,20 @@ class TestShortcutCommands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["type"] == "images"
+
+    @respx.mock
+    def test_images_with_image_size(self, runner, mock_images_response):
+        route = respx.post("https://api.acedata.cloud/serp/google").mock(
+            return_value=Response(200, json=mock_images_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "images", "sunset", "--image-size", "large", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["type"] == "images"
+        assert body["image_size"] == "large"
 
     @respx.mock
     def test_news(self, runner, mock_news_response):
@@ -187,6 +225,7 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "qdr:h" in result.output
         assert "qdr:d" in result.output
+        assert "qdr:y" in result.output
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
