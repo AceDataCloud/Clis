@@ -58,7 +58,7 @@ def tasks_batch(
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.query_task(
-            task_id=task_ids[0] if len(task_ids) == 1 else None,
+            task_id=task_ids[0],
             action="retrieve_batch",
         )
         if output_json:

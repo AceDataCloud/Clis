@@ -11,14 +11,14 @@ from hailuo_cli.main import cli
 
 @respx.mock
 def _mock_videos(response):
-    return respx.post("https://api.acedata.cloud/minimax/videos").mock(
+    return respx.post("https://api.acedata.cloud/hailuo/videos").mock(
         return_value=Response(200, json=response)
     )
 
 
 @respx.mock
 def _mock_tasks(response):
-    return respx.post("https://api.acedata.cloud/minimax/tasks").mock(
+    return respx.post("https://api.acedata.cloud/hailuo/tasks").mock(
         return_value=Response(200, json=response)
     )
 
@@ -54,7 +54,7 @@ class TestGenerateCommands:
     @respx.mock
     def test_generate_json(self, mock_video_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -65,13 +65,14 @@ class TestGenerateCommands:
         assert data["success"] is True
         assert data["task_id"] == "test-task-123"
         sent = json.loads(route.calls[0].request.content)
-        assert sent["content"] == [{"type": "text", "text": "A test prompt"}]
-        assert sent["model"] == "MiniMax-H3"
+        assert sent["action"] == "generate"
+        assert sent["prompt"] == "A test prompt"
+        assert sent["model"] == "minimax-t2v"
 
     @respx.mock
     def test_generate_rich_output(self, mock_video_response):
         runner = CliRunner()
-        respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "generate", "A test prompt"])
@@ -81,21 +82,21 @@ class TestGenerateCommands:
     @respx.mock
     def test_generate_with_model(self, mock_video_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate", "test", "--model", "MiniMax-H3", "--json"],
+            ["--token", "test-token", "generate", "test", "--model", "minimax-t2v", "--json"],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "MiniMax-H3"
+        assert sent["model"] == "minimax-t2v"
 
     @respx.mock
-    def test_generate_with_image_and_audio_inputs(self, mock_video_response):
+    def test_generate_with_first_image(self, mock_video_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -104,45 +105,19 @@ class TestGenerateCommands:
                 "--token",
                 "test-token",
                 "generate",
-                "--image-url",
+                "--first-image-url",
                 "https://example.com/1.jpg",
-                "--image-role",
-                "reference_image",
-                "--video-url",
-                "https://example.com/1.mp4",
-                "--video-role",
-                "reference_video",
-                "--audio-url",
-                "https://example.com/1.mp3",
-                "--audio-role",
-                "reference_audio",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["content"] == [
-            {
-                "type": "image_url",
-                "image_url": {"url": "https://example.com/1.jpg"},
-                "role": "reference_image",
-            },
-            {
-                "type": "video_url",
-                "video_url": {"url": "https://example.com/1.mp4"},
-                "role": "reference_video",
-            },
-            {
-                "type": "audio_url",
-                "audio_url": {"url": "https://example.com/1.mp3"},
-                "role": "reference_audio",
-            },
-        ]
+        assert sent["first_image_url"] == "https://example.com/1.jpg"
 
     @respx.mock
-    def test_generate_with_resolution(self, mock_video_response):
+    def test_generate_async(self, mock_video_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -152,15 +127,13 @@ class TestGenerateCommands:
                 "test-token",
                 "generate",
                 "A test prompt",
-                "--resolution",
-                "768P",
+                "--async",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["resolution"] == "768P"
-        assert "aigc_watermark" not in sent
+        assert sent["async"] is True
 
     def test_generate_rejects_removed_watermark_flag(self):
         runner = CliRunner()
@@ -172,7 +145,7 @@ class TestGenerateCommands:
         assert "No such option" in result.output
         assert "--aigc-watermark" in result.output
 
-    def test_generate_requires_any_input(self):
+    def test_generate_allows_empty_prompt(self):
         runner = CliRunner()
         result = runner.invoke(cli, ["--token", "test-token", "generate"])
         assert result.exit_code != 0
@@ -183,7 +156,7 @@ class TestGenerateCommands:
         assert result.exit_code != 0
         assert "at most 7000 characters" in result.output
 
-    def test_generate_rejects_unmatched_media_roles(self):
+    def test_generate_rejects_removed_media_options(self):
         runner = CliRunner()
         result = runner.invoke(
             cli,
@@ -200,7 +173,7 @@ class TestGenerateCommands:
             ],
         )
         assert result.exit_code != 0
-        assert "one --image-role for each --image-url" in result.output
+        assert "No such option" in result.output
 
     def test_generate_no_token(self):
         runner = CliRunner()
@@ -210,7 +183,7 @@ class TestGenerateCommands:
     @respx.mock
     def test_image_to_video_json(self, mock_video_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -229,16 +202,13 @@ class TestGenerateCommands:
         data = json.loads(result.output)
         assert data["success"] is True
         sent = json.loads(route.calls[0].request.content)
-        assert sent["content"][1] == {
-            "type": "image_url",
-            "image_url": {"url": "https://example.com/photo.jpg"},
-            "role": "first_frame",
-        }
+        assert sent["action"] == "generate"
+        assert sent["first_image_url"] == "https://example.com/photo.jpg"
 
     @respx.mock
     def test_image_to_video_with_model(self, mock_video_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -251,18 +221,18 @@ class TestGenerateCommands:
                 "--image-url",
                 "https://example.com/img.jpg",
                 "--model",
-                "MiniMax-H3",
+                "minimax-i2v",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "MiniMax-H3"
+        assert sent["model"] == "minimax-i2v"
 
     @respx.mock
-    def test_image_to_video_with_resolution(self, mock_video_response):
+    def test_image_to_video_async(self, mock_video_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -274,15 +244,13 @@ class TestGenerateCommands:
                 "Animate this",
                 "--image-url",
                 "https://example.com/photo.jpg",
-                "--resolution",
-                "768P",
+                "--async",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["resolution"] == "768P"
-        assert "aigc_watermark" not in sent
+        assert sent["async"] is True
 
 
 class TestTaskCommands:
@@ -291,7 +259,7 @@ class TestTaskCommands:
     @respx.mock
     def test_task_json(self, mock_task_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/tasks").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "task", "task-123", "--json"])
@@ -305,7 +273,7 @@ class TestTaskCommands:
     @respx.mock
     def test_task_rich_output(self, mock_task_response):
         runner = CliRunner()
-        respx.post("https://api.acedata.cloud/minimax/tasks").mock(
+        respx.post("https://api.acedata.cloud/hailuo/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "task", "task-123"])
@@ -314,7 +282,7 @@ class TestTaskCommands:
     @respx.mock
     def test_tasks_batch(self, mock_tasks_batch_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/tasks").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/tasks").mock(
             return_value=Response(200, json=mock_tasks_batch_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "tasks", "t-1", "t-2", "--json"])
@@ -323,12 +291,8 @@ class TestTaskCommands:
         assert sent["action"] == "retrieve_batch"
         assert sent["ids"] == ["t-1", "t-2"]
 
-    @respx.mock
-    def test_tasks_batch_filters(self, mock_tasks_batch_response):
+    def test_tasks_rejects_removed_filters(self):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/tasks").mock(
-            return_value=Response(200, json=mock_tasks_batch_response)
-        )
         result = runner.invoke(
             cli,
             [
@@ -346,24 +310,13 @@ class TestTaskCommands:
                 "--json",
             ],
         )
-        assert result.exit_code == 0
-        assert json.loads(route.calls[0].request.content) == {
-            "action": "retrieve_batch",
-            "limit": 10,
-            "offset": 2,
-            "created_at_min": 100.0,
-            "created_at_max": 200.0,
-        }
+        assert result.exit_code != 0
+        assert "No such option" in result.output
 
-    @respx.mock
-    def test_delete_task(self):
+    def test_delete_is_no_longer_available(self):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/tasks").mock(
-            return_value=Response(200, json={"id": "task-123", "deleted": True})
-        )
         result = runner.invoke(cli, ["--token", "test-token", "delete", "task-123", "--json"])
-        assert result.exit_code == 0
-        assert json.loads(route.calls[0].request.content) == {"action": "delete", "id": "task-123"}
+        assert result.exit_code != 0
 
 
 class TestInfoCommands:
@@ -373,7 +326,7 @@ class TestInfoCommands:
         runner = CliRunner()
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
-        assert "MiniMax-H3" in result.output
+        assert "minimax-t2v" in result.output
 
     def test_config(self):
         runner = CliRunner()
@@ -386,9 +339,9 @@ class TestImageToVideoModelChoices:
     """Tests for image-to-video model enum."""
 
     @respx.mock
-    def test_image_to_video_with_minimax_h3(self, mock_video_response):
+    def test_image_to_video_with_minimax_i2v(self, mock_video_response):
         runner = CliRunner()
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -401,10 +354,10 @@ class TestImageToVideoModelChoices:
                 "--image-url",
                 "https://example.com/img.jpg",
                 "--model",
-                "MiniMax-H3",
+                "minimax-i2v",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "MiniMax-H3"
+        assert sent["model"] == "minimax-i2v"

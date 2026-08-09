@@ -110,7 +110,6 @@ def generate(
     "-i",
     "--image-url",
     "image_urls",
-    required=True,
     multiple=True,
     help="Image URL(s) to edit. Can be specified multiple times.",
 )
@@ -128,6 +127,20 @@ def generate(
     default=1,
     help="Number of images to generate (1-4, default 1).",
 )
+@click.option(
+    "-a",
+    "--aspect-ratio",
+    type=click.Choice(ASPECT_RATIOS),
+    default=DEFAULT_ASPECT_RATIO,
+    help="Aspect ratio of the output image.",
+)
+@click.option(
+    "-r",
+    "--resolution",
+    type=click.Choice(RESOLUTIONS),
+    default=None,
+    help="Output resolution.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -144,6 +157,8 @@ def edit(
     image_urls: tuple[str, ...],
     model: str,
     count: int,
+    aspect_ratio: str,
+    resolution: str | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -165,14 +180,20 @@ def edit(
     """
     client = get_client(ctx.obj.get("token"))
     try:
+        payload: dict[str, object] = {
+            "action": "edit",
+            "prompt": prompt,
+            "image_urls": list(image_urls),
+            "model": model,
+            "count": count,
+            "aspect_ratio": aspect_ratio,
+            "callback_url": callback_url,
+            "async": async_mode,
+        }
+        if resolution:
+            payload["resolution"] = resolution
         result = client.edit_image(
-            action="edit",
-            prompt=prompt,
-            image_urls=list(image_urls),
-            model=model,
-            count=count,
-            callback_url=callback_url,
-            **({"async": True} if async_mode else {}),
+            **payload,  # type: ignore[arg-type]
         )
         if output_json:
             print_json(result)

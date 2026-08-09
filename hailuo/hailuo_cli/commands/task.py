@@ -45,19 +45,11 @@ def task(
 
 @click.command("tasks")
 @click.argument("task_ids", nargs=-1)
-@click.option("--limit", type=int, help="Maximum number of tasks to return.")
-@click.option("--offset", type=int, help="Number of tasks to skip.")
-@click.option("--created-at-min", type=float, help="Minimum creation timestamp.")
-@click.option("--created-at-max", type=float, help="Maximum creation timestamp.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def tasks_batch(
     ctx: click.Context,
     task_ids: tuple[str, ...],
-    limit: int | None,
-    offset: int | None,
-    created_at_min: float | None,
-    created_at_max: float | None,
     output_json: bool,
 ) -> None:
     """Query multiple tasks at once.
@@ -73,10 +65,6 @@ def tasks_batch(
         result = client.query_task(
             ids=list(task_ids) or None,
             action="retrieve_batch",
-            limit=limit,
-            offset=offset,
-            created_at_min=created_at_min,
-            created_at_max=created_at_max,
         )
         if output_json:
             print_json(result)
@@ -85,28 +73,6 @@ def tasks_batch(
     except HailuoError as e:
         print_error(e.message)
         raise SystemExit(1) from e
-
-
-@click.command()
-@click.argument("task_id")
-@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
-@click.pass_context
-def delete(ctx: click.Context, task_id: str, output_json: bool) -> None:
-    """Delete a task.
-
-    TASK_ID is the task ID to delete.
-    """
-    client = get_client(ctx.obj.get("token"))
-    try:
-        result = client.query_task(id=task_id, action="delete")
-        if output_json:
-            print_json(result)
-        else:
-            print_task_result(result)
-    except HailuoError as e:
-        print_error(e.message)
-        raise SystemExit(1) from e
-
 
 @click.command()
 @click.argument("task_id")

@@ -341,6 +341,25 @@ def image_to_video(
     type=int,
     help="Video duration in seconds.",
 )
+@click.option(
+    "--generate-audio/--no-generate-audio",
+    default=None,
+    help="Generate audio along with the video.",
+)
+@click.option("--cfg-scale", default=None, type=float, help="Degree of freedom to generate video [0,1].")
+@click.option(
+    "--camera-control",
+    default=None,
+    help="Camera movement control as a JSON string.",
+)
+@click.option(
+    "--video-list",
+    default=None,
+    help="Reference video(s) as a JSON array string.",
+)
+@click.option("--negative-prompt", default=None, help="Negative prompt (max 200 characters).")
+@click.option("--start-image-url", default=None, help="URL of the start image.")
+@click.option("--end-image-url", default=None, help="URL of the end image.")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -362,6 +381,13 @@ def extend(
     mode: str,
     aspect_ratio: str,
     duration: int | None,
+    generate_audio: bool | None,
+    cfg_scale: float | None,
+    camera_control: str | None,
+    video_list: str | None,
+    negative_prompt: str | None,
+    start_image_url: str | None,
+    end_image_url: str | None,
     callback_url: str | None,
     async_mode: bool,
     timeout: int | None,
@@ -389,6 +415,13 @@ def extend(
             mode=mode,
             aspect_ratio=aspect_ratio,
             duration=duration,
+            generate_audio=generate_audio,
+            cfg_scale=cfg_scale,
+            camera_control=_parse_json_option(camera_control, "--camera-control"),
+            video_list=_parse_json_option(video_list, "--video-list"),
+            negative_prompt=negative_prompt,
+            start_image_url=start_image_url,
+            end_image_url=end_image_url,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
             timeout=timeout,

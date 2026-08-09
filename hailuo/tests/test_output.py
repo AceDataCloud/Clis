@@ -78,4 +78,4 @@ class TestOutputFunctions:
             assert model in captured.out
 
     def test_hailuo_models_list(self):
-        assert HAILUO_MODELS == ["MiniMax-H3"]
+        assert HAILUO_MODELS == ["minimax-i2v", "minimax-t2v", "minimax-i2v-director"]
