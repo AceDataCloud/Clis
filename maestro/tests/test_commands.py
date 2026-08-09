@@ -133,6 +133,27 @@ class TestCreateCommand:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_create_with_legacy_scenario(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "create",
+                "test",
+                "--scenario",
+                "general",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["scenario"] == "general"
+
+    @respx.mock
     def test_create_with_style(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -152,6 +173,27 @@ class TestCreateCommand:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_create_with_custom_style(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "create",
+                "test",
+                "--style",
+                "my-custom-style",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["style"] == "my-custom-style"
+
+    @respx.mock
     def test_create_with_voice(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -169,6 +211,28 @@ class TestCreateCommand:
             ],
         )
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_create_with_custom_voice_reference_id(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        voice_id = "1234567890abcdef1234567890abcdef"
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "create",
+                "test",
+                "--voice",
+                voice_id,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["voice"] == voice_id
 
     @respx.mock
     def test_create_with_duration(self, runner, mock_video_response):

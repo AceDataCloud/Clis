@@ -15,9 +15,7 @@ from maestro_cli.core.output import (
     DEFAULT_VOICE,
     MAESTRO_ACTIONS,
     QUALITY_TIERS,
-    SCENARIOS,
-    STYLES,
-    VOICES,
+    SCENARIO_CHOICES,
     print_error,
     print_json,
     print_video_result,
@@ -76,24 +74,24 @@ from maestro_cli.core.output import (
 )
 @click.option(
     "--scenario",
-    type=click.Choice(SCENARIOS),
+    type=click.Choice(SCENARIO_CHOICES),
     default=DEFAULT_SCENARIO,
     show_default=True,
     help="How to route the video: auto/narrated/drama/avatar/motion/slideshow.",
 )
 @click.option(
     "--style",
-    type=click.Choice(STYLES),
+    type=str,
     default=DEFAULT_STYLE,
     show_default=True,
-    help="Visual-style preset.",
+    help="Visual-style preset or custom style hint.",
 )
 @click.option(
     "--voice",
-    type=click.Choice(VOICES),
+    type=str,
     default=DEFAULT_VOICE,
     show_default=True,
-    help="Narration voice timbre.",
+    help="Narration voice timbre preset or a 32-char Fish reference_id.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
