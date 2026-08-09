@@ -256,6 +256,33 @@ class TestGenerateCommands:
         assert body["video_id"] == "video-123"
 
     @respx.mock
+    def test_extend_with_documented_video_options(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extend",
+                "--video-id",
+                "video-123",
+                "--generate-audio",
+                "--cfg-scale",
+                "0.5",
+                "--start-image-url",
+                "https://example.com/start.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["generate_audio"] is True
+        assert body["cfg_scale"] == 0.5
+        assert body["start_image_url"] == "https://example.com/start.jpg"
+
+    @respx.mock
     def test_generate_with_camera_control(self, runner, mock_video_response):
         route = respx.post("https://api.acedata.cloud/kling/videos").mock(
             return_value=Response(200, json=mock_video_response)

@@ -180,6 +180,10 @@ def image_to_video(
     default=DEFAULT_ASPECT_RATIO,
     help="Aspect ratio.",
 )
+@click.option("--loop/--no-loop", default=False, help="Create a looping video.")
+@click.option("--enhancement/--no-enhancement", default=False, help="Enable prompt enhancement.")
+@click.option("--start-image-url", default=None, help="URL of the start image.")
+@click.option("--end-image-url", default=None, help="URL of the end image.")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -199,6 +203,10 @@ def extend(
     video_url: str | None,
     prompt: str | None,
     aspect_ratio: str,
+    loop: bool,
+    enhancement: bool,
+    start_image_url: str | None,
+    end_image_url: str | None,
     callback_url: str | None,
     async_mode: bool,
     timeout: int | None,
@@ -226,6 +234,10 @@ def extend(
             video_url=video_url,
             prompt=prompt,
             aspect_ratio=aspect_ratio,
+            loop=loop,
+            enhancement=enhancement,
+            start_image_url=start_image_url,
+            end_image_url=end_image_url,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
             timeout=timeout,

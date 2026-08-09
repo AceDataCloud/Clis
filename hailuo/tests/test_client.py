@@ -29,7 +29,7 @@ class TestHailuoClient:
     @respx.mock
     def test_generate_video(self):
         mock_response = {"success": True, "task_id": "task-123"}
-        respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json=mock_response)
         )
         client = HailuoClient(api_token="test-token")
@@ -40,7 +40,7 @@ class TestHailuoClient:
     @respx.mock
     def test_query_task(self):
         mock_response = {"success": True, "data": {"id": "task-123", "status": "completed"}}
-        respx.post("https://api.acedata.cloud/minimax/tasks").mock(
+        respx.post("https://api.acedata.cloud/hailuo/tasks").mock(
             return_value=Response(200, json=mock_response)
         )
         client = HailuoClient(api_token="test-token")
@@ -49,7 +49,7 @@ class TestHailuoClient:
 
     @respx.mock
     def test_unauthorized(self):
-        respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(401, json={"error": "unauthorized"})
         )
         client = HailuoClient(api_token="bad-token")
@@ -58,7 +58,7 @@ class TestHailuoClient:
 
     @respx.mock
     def test_none_values_removed(self):
-        route = respx.post("https://api.acedata.cloud/minimax/videos").mock(
+        route = respx.post("https://api.acedata.cloud/hailuo/videos").mock(
             return_value=Response(200, json={"success": True, "task_id": "t1"})
         )
         client = HailuoClient(api_token="test-token")

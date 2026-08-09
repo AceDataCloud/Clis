@@ -198,6 +198,30 @@ class TestImageCommands:
             ],
         )
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_edit_with_output_options(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/nano-banana/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Make it blue",
+                "--aspect-ratio",
+                "16:9",
+                "--resolution",
+                "4K",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["aspect_ratio"] == "16:9"
+        assert body["resolution"] == "4K"
         data = json.loads(result.output)
         assert data["success"] is True
 

@@ -187,6 +187,34 @@ class TestGenerateCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["timeout"] == 120
 
+    @respx.mock
+    def test_extend_with_generation_options(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/luma/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extend",
+                "video-123",
+                "--loop",
+                "--enhancement",
+                "--start-image-url",
+                "https://example.com/start.jpg",
+                "--end-image-url",
+                "https://example.com/end.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["loop"] is True
+        assert body["enhancement"] is True
+        assert body["start_image_url"] == "https://example.com/start.jpg"
+        assert body["end_image_url"] == "https://example.com/end.jpg"
+
 
 # ─── Task Commands ─────────────────────────────────────────────────────────
 
