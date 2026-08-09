@@ -48,6 +48,17 @@ SCENARIOS = [
     "slideshow",
 ]
 
+SCENARIO_CHOICES = [
+    *SCENARIOS,
+    "general",
+    "explainer",
+    "product",
+    "website",
+    "changelog",
+    "captions",
+    "slides",
+]
+
 DEFAULT_SCENARIO = "auto"
 
 # Available styles
