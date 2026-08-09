@@ -5,7 +5,9 @@ import click
 from serp_cli.core.client import get_client
 from serp_cli.core.exceptions import SerpError
 from serp_cli.core.output import (
+    IMAGE_SIZES,
     SEARCH_TYPES,
+    TIME_RANGES,
     print_error,
     print_json,
     print_search_result,
@@ -36,8 +38,15 @@ from serp_cli.core.output import (
 )
 @click.option(
     "--time-range",
+    type=click.Choice(TIME_RANGES),
     default=None,
-    help="Time filter: qdr:h (hour), qdr:d (day), qdr:w (week), qdr:m (month).",
+    help="Time filter: h, d, w, m, y (or qdr:h, qdr:d, qdr:w, qdr:m, qdr:y).",
+)
+@click.option(
+    "--image-size",
+    type=click.Choice(IMAGE_SIZES),
+    default=None,
+    help="Image size filter (only valid when --type images).",
 )
 @click.option(
     "-n",
@@ -62,6 +71,7 @@ def search(
     country: str | None,
     language: str | None,
     time_range: str | None,
+    image_size: str | None,
     number: int | None,
     page: int | None,
     output_json: bool,
@@ -76,6 +86,7 @@ def search(
       serp search "tech news" -t news --time-range qdr:d
       serp search "best restaurants" -t places -c uk
       serp search "sunset photography" -t images -n 20
+      serp search "wildlife wallpaper" -t images --image-size 12mp
     """
     client = get_client(ctx.obj.get("token"))
     try:
@@ -85,6 +96,7 @@ def search(
             "country": country,
             "language": language,
             "range": time_range,
+            "image_size": image_size,
             "number": number,
             "page": page,
         }
@@ -103,6 +115,12 @@ def search(
 @click.argument("query")
 @click.option("-c", "--country", default=None, help="Country code (e.g. us, cn, uk).")
 @click.option("-l", "--language", default=None, help="Language code (e.g. en, zh-cn).")
+@click.option(
+    "--image-size",
+    type=click.Choice(IMAGE_SIZES),
+    default=None,
+    help="Image size filter.",
+)
 @click.option("-n", "--number", default=None, type=int, help="Number of results.")
 @click.option("-p", "--page", default=None, type=int, help="Page number.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
@@ -112,6 +130,7 @@ def images(
     query: str,
     country: str | None,
     language: str | None,
+    image_size: str | None,
     number: int | None,
     page: int | None,
     output_json: bool,
@@ -131,6 +150,7 @@ def images(
         country=country,
         language=language,
         time_range=None,
+        image_size=image_size,
         number=number,
         page=page,
         output_json=output_json,
@@ -175,6 +195,7 @@ def news(
         country=country,
         language=language,
         time_range=time_range,
+        image_size=None,
         number=number,
         page=page,
         output_json=output_json,
@@ -213,6 +234,7 @@ def videos(
         country=country,
         language=language,
         time_range=None,
+        image_size=None,
         number=number,
         page=page,
         output_json=output_json,
@@ -251,6 +273,7 @@ def places(
         country=country,
         language=language,
         time_range=None,
+        image_size=None,
         number=number,
         page=page,
         output_json=output_json,
@@ -289,6 +312,7 @@ def maps(
         country=country,
         language=language,
         time_range=None,
+        image_size=None,
         number=number,
         page=page,
         output_json=output_json,
