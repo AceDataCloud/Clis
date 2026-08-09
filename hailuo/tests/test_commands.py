@@ -169,7 +169,8 @@ class TestGenerateCommands:
             ["--token", "test-token", "generate", "A test prompt", "--aigc-watermark"],
         )
         assert result.exit_code != 0
-        assert "No such option: --aigc-watermark" in result.output
+        assert "No such option" in result.output
+        assert "--aigc-watermark" in result.output
 
     def test_generate_requires_any_input(self):
         runner = CliRunner()
