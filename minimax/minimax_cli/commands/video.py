@@ -90,6 +90,13 @@ AUDIO_ROLE_CHOICES = ["reference_audio"]
     help="Output resolution.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -106,6 +113,7 @@ def generate(
     duration: int,
     resolution: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from a text prompt.
@@ -151,6 +159,7 @@ def generate(
             "ratio": ratio,
             "duration": duration,
             "callback_url": callback_url,
+            "async": async_mode,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
@@ -195,6 +204,13 @@ def generate(
     help="Output resolution.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--async",
+    "async_mode",
+    is_flag=True,
+    default=False,
+    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(
@@ -206,6 +222,7 @@ def image_to_video(
     duration: int,
     resolution: str,
     callback_url: str | None,
+    async_mode: bool,
     output_json: bool,
 ) -> None:
     """Generate a video from an image and text prompt.
@@ -233,6 +250,7 @@ def image_to_video(
             "ratio": ratio,
             "duration": duration,
             "callback_url": callback_url,
+            "async": async_mode,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
