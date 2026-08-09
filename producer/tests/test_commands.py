@@ -48,7 +48,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_generate_json(self, runner, mock_audio_response):
-        respx.post("https://api.acedata.cloud/producer/audios").mock(
+        route = respx.post("https://api.acedata.cloud/producer/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
         result = runner.invoke(
@@ -59,6 +59,9 @@ class TestGenerateCommands:
         data = json.loads(result.output)
         assert data["success"] is True
         assert data["task_id"] == "test-task-123"
+        body = json.loads(route.calls.last.request.content)
+        assert body["prompt"] == "A test music prompt"
+        assert body["lyric"] == ""
 
     @respx.mock
     def test_generate_rich_output(self, runner, mock_audio_response):
@@ -147,7 +150,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_cover_json(self, runner, mock_audio_response):
-        respx.post("https://api.acedata.cloud/producer/audios").mock(
+        route = respx.post("https://api.acedata.cloud/producer/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
         result = runner.invoke(
@@ -157,6 +160,9 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["success"] is True
+        body = json.loads(route.calls.last.request.content)
+        assert body["prompt"] == ""
+        assert body["lyric"] == ""
 
     @respx.mock
     def test_extend_json(self, runner, mock_audio_response):
@@ -244,7 +250,7 @@ class TestGenerateCommands:
 
     @respx.mock
     def test_stems_json(self, runner, mock_audio_response):
-        respx.post("https://api.acedata.cloud/producer/audios").mock(
+        route = respx.post("https://api.acedata.cloud/producer/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
         result = runner.invoke(
@@ -252,6 +258,9 @@ class TestGenerateCommands:
             ["--token", "test-token", "stems", "audio-abc-123", "--json"],
         )
         assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["prompt"] == ""
+        assert body["lyric"] == ""
 
 
 # ─── Lyrics Commands ────────────────────────────────────────────────────────

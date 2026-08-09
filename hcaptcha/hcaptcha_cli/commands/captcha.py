@@ -15,7 +15,7 @@ from hcaptcha_cli.core.output import (
 )
 
 
-def _parse_json_array_option(value: str | None, option_name: str) -> list[object] | None:
+def _parse_json_array_option(value: str | None, option_name: str) -> list[str] | None:
     """Parse a JSON array option."""
     if value is None:
         return None
@@ -25,6 +25,8 @@ def _parse_json_array_option(value: str | None, option_name: str) -> list[object
         raise click.BadParameter(f"{option_name} must be valid JSON.") from exc
     if not isinstance(parsed, list):
         raise click.BadParameter(f"{option_name} must be a JSON array.")
+    if not all(isinstance(item, str) for item in parsed):
+        raise click.BadParameter(f"{option_name} must be a JSON array of strings.")
     return parsed
 
 

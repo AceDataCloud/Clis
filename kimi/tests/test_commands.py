@@ -73,6 +73,13 @@ class TestChatCommand:
         sent = json.loads(route.calls[0].request.content)
         assert sent["model"] == "kimi-k3"
 
+    def test_chat_rejects_removed_model(self, runner):
+        result = runner.invoke(
+            cli,
+            ["chat", "Hello", "-m", "kimi-k2-turbo-preview"],
+        )
+        assert result.exit_code != 0
+
     @respx.mock
     def test_chat_with_system_prompt(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
@@ -200,6 +207,64 @@ class TestChatCommand:
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["store"] is True
+
+    @respx.mock
+    def test_chat_with_extended_openapi_options(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--stream",
+                "--response-format",
+                '{"type": "json_object"}',
+                "--tools",
+                '[{"type":"function","function":{"name":"lookup"}}]',
+                "--tool-choice",
+                "auto",
+                "--stream-options",
+                '{"include_usage": true}',
+                "--metadata",
+                '{"source": "test"}',
+                "--logit-bias",
+                '{"123": -1}',
+                "--modalities",
+                '["text"]',
+                "--audio",
+                '{"voice": "alloy"}',
+                "--prediction",
+                '{"type": "content", "content": "Hello"}',
+                "--web-search-options",
+                '{"search_context_size": "low"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["stream"] is True
+        assert sent["response_format"] == {"type": "json_object"}
+        assert sent["tools"] == [{"type": "function", "function": {"name": "lookup"}}]
+        assert sent["tool_choice"] == "auto"
+        assert sent["stream_options"] == {"include_usage": True}
+        assert sent["metadata"] == {"source": "test"}
+        assert sent["logit_bias"] == {"123": -1}
+        assert sent["modalities"] == ["text"]
+        assert sent["audio"] == {"voice": "alloy"}
+        assert sent["prediction"] == {"type": "content", "content": "Hello"}
+        assert sent["web_search_options"] == {"search_context_size": "low"}
+
+    def test_chat_rejects_invalid_json_option(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--metadata", "not-json"],
+        )
+        assert result.exit_code != 0
+        assert "--metadata must be valid JSON." in result.output
 
     def test_chat_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "chat", "Hello"])

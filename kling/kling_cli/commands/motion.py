@@ -51,8 +51,8 @@ DEFAULT_MOTION_MODE = "std"
 )
 @click.option(
     "--keep-original-sound/--no-keep-original-sound",
-    default=True,
-    help="Whether to keep the original sound from the reference video (default: keep).",
+    default=None,
+    help="Whether to keep the original sound from the reference video.",
 )
 @click.option(
     "--watermark-info",
@@ -80,7 +80,7 @@ def motion(
     character_orientation: str | None,
     mode: str,
     model_name: str | None,
-    keep_original_sound: bool,
+    keep_original_sound: bool | None,
     watermark_info: str | None,
     prompt: str | None,
     callback_url: str | None,
@@ -116,7 +116,11 @@ def motion(
             character_orientation=character_orientation,
             mode=mode,
             model_name=model_name,
-            keep_original_sound="yes" if keep_original_sound else "no",
+            **(
+                {"keep_original_sound": "yes" if keep_original_sound else "no"}
+                if keep_original_sound is not None
+                else {}
+            ),
             watermark_info=parsed_watermark_info,
             prompt=prompt,
             callback_url=callback_url,

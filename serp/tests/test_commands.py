@@ -209,6 +209,28 @@ class TestShortcutCommands:
         assert body["type"] == "news"
 
     @respx.mock
+    def test_news_with_time_range(self, runner, mock_news_response):
+        route = respx.post("https://api.acedata.cloud/serp/google").mock(
+            return_value=Response(200, json=mock_news_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "news", "AI news", "--time-range", "qdr:y", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["type"] == "news"
+        assert body["range"] == "qdr:y"
+
+    def test_news_rejects_invalid_time_range(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "news", "AI news", "--time-range", "invalid"],
+        )
+        assert result.exit_code != 0
+        assert "Invalid value for '--time-range'" in result.output
+
+    @respx.mock
     def test_videos(self, runner, mock_search_response):
         route = respx.post("https://api.acedata.cloud/serp/google").mock(
             return_value=Response(200, json=mock_search_response)

@@ -17,10 +17,6 @@ KIMI_MODELS = [
     "kimi-k2-thinking-turbo",
     "kimi-k2.5",
     "kimi-k2-thinking",
-    "kimi-k2-instruct-0905",
-    "kimi-k2-0905-preview",
-    "kimi-k2-turbo-preview",
-    "kimi-k2-0711-preview",
 ]
 
 DEFAULT_MODEL = "kimi-k3"
@@ -102,10 +98,6 @@ def print_models() -> None:
         "kimi-k2-thinking-turbo": "Kimi K2 Thinking Turbo",
         "kimi-k2.5": "Kimi K2.5",
         "kimi-k2-thinking": "Kimi K2 Thinking",
-        "kimi-k2-instruct-0905": "Kimi K2 Instruct 0905",
-        "kimi-k2-0905-preview": "Kimi K2 0905 Preview",
-        "kimi-k2-turbo-preview": "Kimi K2 Turbo Preview",
-        "kimi-k2-0711-preview": "Kimi K2 0711 Preview",
     }
 
     for model in KIMI_MODELS:
