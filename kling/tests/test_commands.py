@@ -415,7 +415,7 @@ class TestMotionCommands:
 
     @respx.mock
     def test_motion_json(self, runner, mock_motion_response):
-        respx.post("https://api.acedata.cloud/kling/motion").mock(
+        route = respx.post("https://api.acedata.cloud/kling/motion").mock(
             return_value=Response(200, json=mock_motion_response)
         )
         result = runner.invoke(
@@ -436,6 +436,8 @@ class TestMotionCommands:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["success"] is True
+        body = json.loads(route.calls.last.request.content)
+        assert "keep_original_sound" not in body
 
     @respx.mock
     def test_motion_rich_output(self, runner, mock_motion_response):
@@ -487,6 +489,31 @@ class TestMotionCommands:
         assert body["video_url"] == "https://example.com/ref.mp4"
         assert body["mode"] == "pro"
         assert body["keep_original_sound"] == "no"
+
+    @respx.mock
+    def test_motion_keep_original_sound(self, runner, mock_motion_response):
+        route = respx.post("https://api.acedata.cloud/kling/motion").mock(
+            return_value=Response(200, json=mock_motion_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "motion",
+                "--image-url",
+                "https://example.com/img.jpg",
+                "--video-url",
+                "https://example.com/ref.mp4",
+                "--character-orientation",
+                "image",
+                "--keep-original-sound",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["keep_original_sound"] == "yes"
 
     def test_motion_missing_image_url(self, runner):
         result = runner.invoke(

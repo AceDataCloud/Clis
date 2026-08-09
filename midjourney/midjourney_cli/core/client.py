@@ -20,12 +20,12 @@ class MidjourneyClient:
         self.base_url = base_url or settings.api_base_url
         self.timeout = settings.request_timeout
 
-    def _get_headers(self) -> dict[str, str]:
+    def _get_headers(self, accept: str = "application/json") -> dict[str, str]:
         """Get request headers with authentication."""
         if not self.api_token:
             raise MidjourneyAuthError("API token not configured")
         return {
-            "accept": "application/json",
+            "accept": accept,
             "authorization": f"Bearer {self.api_token}",
             "content-type": "application/json",
         }
@@ -48,6 +48,7 @@ class MidjourneyClient:
         """
         url = f"{self.base_url}{endpoint}"
         request_timeout = timeout or self.timeout
+        accept = payload.pop("accept", "application/json")
 
         # Remove None values from payload
         payload = {k: v for k, v in payload.items() if v is not None}
@@ -57,7 +58,7 @@ class MidjourneyClient:
                 response = http_client.post(
                     url,
                     json=payload,
-                    headers=self._get_headers(),
+                    headers=self._get_headers(str(accept)),
                     timeout=request_timeout,
                 )
 

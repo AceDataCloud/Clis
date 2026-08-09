@@ -546,29 +546,6 @@ class TestImageCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["mask"] == "https://example.com/mask.png"
 
-    @respx.mock
-    def test_edit_with_partial_images(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "edit",
-                "Add clouds",
-                "--image-url",
-                "https://example.com/base.png",
-                "--partial-images",
-                "2",
-                "--json",
-            ],
-        )
-        assert result.exit_code == 0
-        body = json.loads(route.calls.last.request.content)
-        assert body["partial_images"] == 2
-
     def test_edit_requires_image_url(self, runner):
         result = runner.invoke(
             cli,

@@ -175,6 +175,14 @@ class TestRecognizeCommand:
         assert result.exit_code != 0
         assert "--queries must be a JSON array." in result.output
 
+    def test_recognize_queries_rejects_non_string_items(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "recognize", "--queries", '["https://example.com/img.jpg", 1]'],
+        )
+        assert result.exit_code != 0
+        assert "--queries must be a JSON array of strings." in result.output
+
     def test_recognize_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "recognize"])
         assert result.exit_code != 0

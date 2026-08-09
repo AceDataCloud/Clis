@@ -251,12 +251,6 @@ def image(
     help="Compression level (0-100) for webp/jpeg output.",
 )
 @click.option(
-    "--partial-images",
-    default=None,
-    type=click.IntRange(0, 3),
-    help="Number of partial images in streaming responses (0-3).",
-)
-@click.option(
     "--response-format",
     type=click.Choice(["url", "b64_json"]),
     default=None,
@@ -289,7 +283,6 @@ def edit(
     input_fidelity: str | None,
     mask_url: str | None,
     output_compression: int | None,
-    partial_images: int | None,
     response_format: str | None,
     callback_url: str | None,
     async_mode: bool,
@@ -321,7 +314,6 @@ def edit(
         "input_fidelity": input_fidelity,
         "mask": mask_url,
         "output_compression": output_compression,
-        "partial_images": partial_images,
         "response_format": response_format,
         "callback_url": callback_url,
         "async": async_mode,

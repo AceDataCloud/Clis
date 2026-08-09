@@ -116,7 +116,7 @@ def generate(
         "action": "generate",
         "prompt": prompt,
         "model": model,
-        "lyric": lyric,
+        "lyric": lyric or "",
         "title": title,
         "custom": custom if custom else None,
         "instrumental": instrumental if instrumental else None,
@@ -191,7 +191,8 @@ def cover(
         "action": "cover",
         "audio_id": audio_id,
         "model": model,
-        "prompt": prompt,
+        "prompt": prompt or "",
+        "lyric": "",
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }
@@ -266,7 +267,8 @@ def extend(
         "action": "extend",
         "audio_id": audio_id,
         "model": model,
-        "prompt": prompt,
+        "prompt": prompt or "",
+        "lyric": "",
         "continue_at": continue_at,
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
@@ -335,7 +337,8 @@ def variation(
         "action": "variation",
         "audio_id": audio_id,
         "model": model,
-        "prompt": prompt,
+        "prompt": prompt or "",
+        "lyric": "",
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }
@@ -392,7 +395,8 @@ def swap_vocals(
     payload: dict[str, object] = {
         "action": "swap_vocals",
         "audio_id": audio_id,
-        "prompt": prompt,
+        "prompt": prompt or "",
+        "lyric": "",
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }
@@ -449,7 +453,8 @@ def swap_instrumentals(
     payload: dict[str, object] = {
         "action": "swap_instrumentals",
         "audio_id": audio_id,
-        "prompt": prompt,
+        "prompt": prompt or "",
+        "lyric": "",
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }
@@ -521,7 +526,8 @@ def replace_section(
     payload: dict[str, object] = {
         "action": "replace_section",
         "audio_id": audio_id,
-        "prompt": prompt,
+        "prompt": prompt or "",
+        "lyric": "",
         "replace_section_start": replace_section_start,
         "replace_section_end": replace_section_end,
         "callback_url": callback_url,
@@ -574,6 +580,8 @@ def stems(
     payload: dict[str, object] = {
         "action": "stems",
         "audio_id": audio_id,
+        "prompt": "",
+        "lyric": "",
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }

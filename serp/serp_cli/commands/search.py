@@ -172,8 +172,9 @@ def images(
 @click.option("-l", "--language", default=None, help="Language code (e.g. en, zh-cn).")
 @click.option(
     "--time-range",
+    type=click.Choice(TIME_RANGES),
     default=None,
-    help="Time filter: qdr:h, qdr:d, qdr:w, qdr:m.",
+    help="Time filter: h, d, w, m, y (or qdr:h, qdr:d, qdr:w, qdr:m, qdr:y).",
 )
 @click.option("-n", "--number", default=None, type=int, help="Number of results.")
 @click.option("-p", "--page", default=None, type=int, help="Page number.")
