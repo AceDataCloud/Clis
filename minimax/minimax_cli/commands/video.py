@@ -14,13 +14,13 @@ from minimax_cli.core.output import (
 
 RESOLUTION_CHOICES = ["768P", "2K"]
 RATIO_CHOICES = ["adaptive", "21:9", "16:9", "4:3", "1:1", "3:4", "9:16"]
-CONTENT_ROLE_CHOICES = [
+IMAGE_ROLE_CHOICES = [
     "first_frame",
     "last_frame",
     "reference_image",
-    "reference_video",
-    "reference_audio",
 ]
+VIDEO_ROLE_CHOICES = ["reference_video"]
+AUDIO_ROLE_CHOICES = ["reference_audio"]
 
 
 @click.command()
@@ -40,7 +40,7 @@ CONTENT_ROLE_CHOICES = [
 )
 @click.option(
     "--image-role",
-    type=click.Choice(CONTENT_ROLE_CHOICES),
+    type=click.Choice(IMAGE_ROLE_CHOICES),
     multiple=True,
     help="Role for each --image-url, in the same order.",
 )
@@ -52,9 +52,9 @@ CONTENT_ROLE_CHOICES = [
 )
 @click.option(
     "--video-role",
-    type=click.Choice(CONTENT_ROLE_CHOICES),
+    type=click.Choice(VIDEO_ROLE_CHOICES),
     multiple=True,
-    help="Role for each --video-url, in the same order.",
+    help="Role for each --video-url, in the same order (required).",
 )
 @click.option(
     "--audio-url",
@@ -64,9 +64,9 @@ CONTENT_ROLE_CHOICES = [
 )
 @click.option(
     "--audio-role",
-    type=click.Choice(CONTENT_ROLE_CHOICES),
+    type=click.Choice(AUDIO_ROLE_CHOICES),
     multiple=True,
-    help="Role for each --audio-url, in the same order.",
+    help="Role for each --audio-url, in the same order (required).",
 )
 @click.option(
     "--ratio",
@@ -128,12 +128,12 @@ def generate(
         content: list[dict[str, object]] = []
         if prompt:
             content.append({"type": "text", "text": prompt})
-        for content_type, urls, roles in (
-            ("image_url", image_urls, image_role),
-            ("video_url", video_urls, video_role),
-            ("audio_url", audio_urls, audio_role),
+        for content_type, urls, roles, require_roles in (
+            ("image_url", image_urls, image_role, False),
+            ("video_url", video_urls, video_role, True),
+            ("audio_url", audio_urls, audio_role, True),
         ):
-            if roles and len(urls) != len(roles):
+            if (roles or require_roles) and len(urls) != len(roles):
                 raise click.UsageError(
                     f"Provide one --{content_type.removesuffix('_url')}-role for each "
                     f"--{content_type.replace('_', '-')}."
