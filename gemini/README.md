@@ -49,6 +49,7 @@ gemini models
 |-------|-------|
 | `gemini-3.1-pro` | Latest Gemini Pro model |
 | `gemini-3.0-pro` | Gemini 3.0 Pro |
+| `gemini-3.6-flash` | Gemini 3.6 Flash |
 | `gemini-3.5-flash` | Gemini 3.5 Flash |
 | `gemini-3-flash-preview` | Gemini 3 Flash Preview |
 | `gemini-3.1-flash-lite-preview` | Gemini 3.1 Flash Lite Preview |
