@@ -213,6 +213,14 @@ class TestTTSCommand:
         assert result.exit_code != 0
         assert "'opus' is not one of" in result.output
 
+    def test_tts_with_unsupported_mp3_bitrate(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "tts", "Hello", "--mp3-bitrate", "320"],
+        )
+        assert result.exit_code != 0
+        assert "'320' is not one of" in result.output
+
     @respx.mock
     def test_tts_async(self, runner, mock_tts_async_response):
         route = respx.post("https://api.acedata.cloud/fish/tts").mock(
