@@ -101,9 +101,6 @@ def _parse_json_option(value: str | None, param_hint: str) -> Any:
         'Example: \'[{"video_url": "https://...", "refer_type": "base"}]\''
     ),
 )
-@click.option(
-    "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
-)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def generate(
@@ -120,7 +117,6 @@ def generate(
     async_mode: bool,
     camera_control: str | None,
     video_list: str | None,
-    timeout: int | None,
     output_json: bool,
 ) -> None:
     """Generate a video from a text prompt (text2video).
@@ -149,7 +145,6 @@ def generate(
             "async": async_mode,
             "camera_control": _parse_json_option(camera_control, "--camera-control"),
             "video_list": _parse_json_option(video_list, "--video-list"),
-            "timeout": timeout,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
@@ -247,9 +242,6 @@ def generate(
         'Example: \'[{"video_url": "https://...", "refer_type": "base"}]\''
     ),
 )
-@click.option(
-    "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
-)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def image_to_video(
@@ -268,7 +260,6 @@ def image_to_video(
     async_mode: bool,
     camera_control: str | None,
     video_list: str | None,
-    timeout: int | None,
     output_json: bool,
 ) -> None:
     """Generate a video from reference image(s) (image2video).
@@ -301,7 +292,6 @@ def image_to_video(
             **({"async": True} if async_mode else {}),
             camera_control=_parse_json_option(camera_control, "--camera-control"),
             video_list=_parse_json_option(video_list, "--video-list"),
-            timeout=timeout,
         )
         if output_json:
             print_json(result)
@@ -368,9 +358,6 @@ def image_to_video(
     default=False,
     help="Submit asynchronously; returns a task_id to poll instead of waiting.",
 )
-@click.option(
-    "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
-)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def extend(
@@ -390,7 +377,6 @@ def extend(
     end_image_url: str | None,
     callback_url: str | None,
     async_mode: bool,
-    timeout: int | None,
     output_json: bool,
 ) -> None:
     """Extend an existing video.
@@ -424,7 +410,6 @@ def extend(
             end_image_url=end_image_url,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
-            timeout=timeout,
         )
         if output_json:
             print_json(result)

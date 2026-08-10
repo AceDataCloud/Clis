@@ -110,31 +110,11 @@ class TestGenerateCommands:
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
         assert result.exit_code != 0
 
-    @respx.mock
-    def test_generate_with_seed(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "generate", "test", "--seed", "42", "--json"],
-        )
+    def test_generate_help_excludes_removed_options(self, runner):
+        result = runner.invoke(cli, ["generate", "--help"])
         assert result.exit_code == 0
-        assert route.called
-        assert json.loads(route.calls[0].request.content)["seed"] == 42
-
-    @respx.mock
-    def test_generate_with_guidance_scale(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "generate", "test", "--guidance-scale", "3.5", "--json"],
-        )
-        assert result.exit_code == 0
-        assert route.called
-        assert json.loads(route.calls[0].request.content)["guidance_scale"] == 3.5
+        assert "--seed" not in result.output
+        assert "--guidance-scale" not in result.output
 
     @respx.mock
     def test_generate_with_watermark_disabled(self, runner, mock_image_response):
@@ -298,31 +278,11 @@ class TestGenerateCommands:
         assert "image_urls" not in body
         assert "action" not in body
 
-    @respx.mock
-    def test_edit_with_seed_and_guidance(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "edit",
-                "Make it blue",
-                "-i",
-                "https://example.com/photo.jpg",
-                "--seed",
-                "123",
-                "--guidance-scale",
-                "5.5",
-                "--json",
-            ],
-        )
+    def test_edit_help_excludes_removed_options(self, runner):
+        result = runner.invoke(cli, ["edit", "--help"])
         assert result.exit_code == 0
-        body = json.loads(route.calls[0].request.content)
-        assert body["seed"] == 123
-        assert body["guidance_scale"] == 5.5
+        assert "--seed" not in result.output
+        assert "--guidance-scale" not in result.output
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────

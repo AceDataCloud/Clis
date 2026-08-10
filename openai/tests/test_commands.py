@@ -523,28 +523,10 @@ class TestImageCommands:
             "https://example.com/reference.png",
         ]
 
-    @respx.mock
-    def test_edit_with_mask_url(self, runner, mock_image_response):
-        route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
-            return_value=Response(200, json=mock_image_response)
-        )
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "edit",
-                "Add clouds",
-                "--image-url",
-                "https://example.com/base.png",
-                "--mask-url",
-                "https://example.com/mask.png",
-                "--json",
-            ],
-        )
+    def test_edit_help_excludes_mask_url(self, runner):
+        result = runner.invoke(cli, ["edit", "--help"])
         assert result.exit_code == 0
-        body = json.loads(route.calls.last.request.content)
-        assert body["mask"] == "https://example.com/mask.png"
+        assert "--mask-url" not in result.output
 
     def test_edit_requires_image_url(self, runner):
         result = runner.invoke(
