@@ -68,9 +68,6 @@ DEFAULT_MOTION_MODE = "std"
     default=False,
     help="Submit asynchronously; returns a task_id to poll instead of waiting.",
 )
-@click.option(
-    "--timeout", default=None, type=int, help="Timeout in seconds for the API to return data."
-)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def motion(
@@ -85,7 +82,6 @@ def motion(
     prompt: str | None,
     callback_url: str | None,
     async_mode: bool,
-    timeout: int | None,
     output_json: bool,
 ) -> None:
     """Generate a motion video from a reference image and reference video.
@@ -125,7 +121,6 @@ def motion(
             prompt=prompt,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
-            timeout=timeout,
         )
         if output_json:
             print_json(result)

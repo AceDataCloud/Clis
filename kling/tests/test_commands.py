@@ -132,20 +132,10 @@ class TestGenerateCommands:
         )
         assert result.exit_code == 0
 
-    @respx.mock
-    def test_generate_with_timeout(self, runner, mock_video_response):
-        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "generate", "test", "--timeout", "600", "--json"],
-        )
+    def test_generate_help_excludes_timeout(self, runner):
+        result = runner.invoke(cli, ["generate", "--help"])
         assert result.exit_code == 0
-        assert route.called
-        assert route.calls.last.request.content
-        body = json.loads(route.calls.last.request.content)
-        assert body["timeout"] == 600
+        assert "--timeout" not in result.output
 
     def test_generate_no_token(self, runner):
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
