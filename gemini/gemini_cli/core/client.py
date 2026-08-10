@@ -94,13 +94,15 @@ class GeminiClient:
         payload = {k: v for k, v in kwargs.items() if v is not None}
         endpoint = "/gemini/chat/completions"
         url = f"{self.base_url}{endpoint}"
+        headers = self._get_headers()
+        headers["accept"] = "text/event-stream"
 
         try:
             with httpx.Client() as http_client, http_client.stream(
                 "POST",
                 url,
                 json=payload,
-                headers=self._get_headers(),
+                headers=headers,
                 timeout=self.timeout,
             ) as response:
                 if response.status_code == 401:
@@ -134,12 +136,50 @@ class GeminiClient:
         """Generate content using the native Gemini API."""
         return self.request(f"/v1beta/models/{model}:generateContent", kwargs)
 
-    def stream_generate_content(self, model: str, alt: str | None = None, **kwargs: Any) -> dict[str, Any]:
+    def stream_generate_content(
+        self, model: str, alt: str | None = None, **kwargs: Any
+    ) -> Iterator[str]:
         """Generate streamed content using the native Gemini API."""
         endpoint = f"/v1beta/models/{model}:streamGenerateContent"
         if alt is not None:
             endpoint = f"{endpoint}?alt={alt}"
-        return self.request(endpoint, kwargs)
+        url = f"{self.base_url}{endpoint}"
+        payload = {k: v for k, v in kwargs.items() if v is not None}
+        headers = self._get_headers()
+        headers["accept"] = "text/event-stream"
+
+        try:
+            with httpx.Client() as http_client, http_client.stream(
+                "POST",
+                url,
+                json=payload,
+                headers=headers,
+                timeout=self.timeout,
+            ) as response:
+                if response.status_code == 401:
+                    raise GeminiAuthError("Invalid API token")
+
+                if response.status_code == 403:
+                    raise GeminiAuthError("Access denied. Check your API permissions.")
+
+                response.raise_for_status()
+                yield from response.iter_lines()
+        except httpx.TimeoutException as e:
+            raise GeminiTimeoutError(
+                f"Request to {endpoint} timed out after {self.timeout}s"
+            ) from e
+        except GeminiAuthError:
+            raise
+        except httpx.HTTPStatusError as e:
+            raise GeminiAPIError(
+                message=e.response.text,
+                code=f"http_{e.response.status_code}",
+                status_code=e.response.status_code,
+            ) from e
+        except Exception as e:
+            if isinstance(e, GeminiAPIError | GeminiTimeoutError):
+                raise
+            raise GeminiAPIError(message=str(e)) from e
 
     def generate_video(self, **kwargs: Any) -> dict[str, Any]:
         """Generate a video."""

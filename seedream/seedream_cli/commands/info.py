@@ -27,6 +27,7 @@ def resolutions() -> None:
         "1080p": "Full HD",
         "1K": "Default",
         "2K": "High resolution",
+        "3K": "High resolution",
         "4K": "Ultra-high resolution",
         "adaptive": "Adaptive resolution",
     }

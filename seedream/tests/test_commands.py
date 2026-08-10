@@ -367,12 +367,14 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
+        assert "doubao-seedream-5-0-pro-260628" in result.output
         assert "doubao-seedream-4-5-251128" in result.output
 
     def test_resolutions(self, runner):
         result = runner.invoke(cli, ["resolutions"])
         assert result.exit_code == 0
         assert "1K" in result.output
+        assert "3K" in result.output
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
