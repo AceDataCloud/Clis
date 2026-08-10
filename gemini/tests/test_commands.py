@@ -110,6 +110,7 @@ class TestChatCommand:
     def test_chat_with_new_models(self, runner, mock_chat_response):
         for model in [
             "gemini-2.5-flash-lite",
+            "gemini-3.6-flash",
             "gemini-3.1-flash-lite-preview",
         ]:
             respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
@@ -131,6 +132,22 @@ class TestChatCommand:
                 cli, ["--token", "test-token", "chat", "Hello", "-m", model, "--json"]
             )
             assert result.exit_code != 0, f"Model {model} should be rejected"
+
+    def test_generate_content_rejects_chat_only_models(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate-content",
+                "--model",
+                "gemini-3.6-flash",
+                "--contents",
+                '[{"parts":[{"text":"Hello"}]}]',
+                "--json",
+            ],
+        )
+        assert result.exit_code != 0
 
     @respx.mock
     def test_chat_with_max_completion_tokens(self, runner, mock_chat_response):

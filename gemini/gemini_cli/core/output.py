@@ -14,6 +14,7 @@ console = Console()
 GEMINI_CHAT_MODELS = [
     "gemini-3.1-pro",
     "gemini-3.0-pro",
+    "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-3-flash-preview",
     "gemini-3.1-flash-lite-preview",
@@ -24,7 +25,15 @@ GEMINI_CHAT_MODELS = [
 ]
 
 GEMINI_NATIVE_MODELS = [
-    *GEMINI_CHAT_MODELS,
+    "gemini-3.1-pro",
+    "gemini-3.0-pro",
+    "gemini-3.5-flash",
+    "gemini-3-flash-preview",
+    "gemini-3.1-flash-lite-preview",
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-2.0-flash",
     "gemini-3.1-flash-image",
     "gemini-2.5-flash-image",
     "gemini-3-pro-image",
@@ -152,6 +161,7 @@ def print_models() -> None:
 
     table.add_row("gemini-3.1-pro", "Latest Gemini Pro model")
     table.add_row("gemini-3.0-pro", "Gemini 3.0 Pro")
+    table.add_row("gemini-3.6-flash", "Gemini 3.6 Flash")
     table.add_row("gemini-3.5-flash", "Gemini 3.5 Flash")
     table.add_row("gemini-3-flash-preview", "Gemini 3 Flash Preview")
     table.add_row("gemini-3.1-flash-lite-preview", "Gemini 3.1 Flash Lite Preview")
