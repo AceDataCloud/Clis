@@ -726,11 +726,16 @@ class TestSpeechAndRealtimeCommands:
         assert data["bytes"] == len(b"fake-audio-data")
 
     def test_realtime_json(self, runner):
-        result = runner.invoke(cli, ["realtime", "--model", "gpt-realtime-2", "--json"])
+        result = runner.invoke(cli, ["realtime", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["model"] == "gpt-realtime-2"
-        assert data["url"] == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2"
+        assert data["model"] == "gpt-realtime-2.1"
+        assert data["url"] == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2.1"
+
+    def test_realtime_accepts_new_mini_model(self, runner):
+        result = runner.invoke(cli, ["realtime", "--model", "gpt-realtime-2.1-mini", "--json"])
+        assert result.exit_code == 0
+        assert json.loads(result.output)["model"] == "gpt-realtime-2.1-mini"
 
 
 class TestTranscribeCommands:
