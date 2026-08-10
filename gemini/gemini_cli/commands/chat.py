@@ -289,11 +289,15 @@ def chat(
     }
 
     try:
-        result = client.chat_completions(**payload)  # type: ignore[arg-type]
-        if output_json:
-            print_json(result)
+        if stream:
+            for event in client.stream_chat_completions(**payload):
+                click.echo(event)
         else:
-            print_chat_result(result)
+            result = client.chat_completions(**payload)  # type: ignore[arg-type]
+            if output_json:
+                print_json(result)
+            else:
+                print_chat_result(result)
     except GeminiError as e:
         print_error(e.message)
         raise SystemExit(1) from e

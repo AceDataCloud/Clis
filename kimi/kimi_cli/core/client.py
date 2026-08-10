@@ -1,5 +1,6 @@
 """HTTP client for Kimi API."""
 
+from collections.abc import Iterator
 from typing import Any
 
 import httpx
@@ -87,6 +88,47 @@ class KimiClient:
     def chat_completions(self, **kwargs: Any) -> dict[str, Any]:
         """Send a chat completion request."""
         return self.request("/kimi/chat/completions", kwargs)
+
+    def stream_chat_completions(self, **kwargs: Any) -> Iterator[str]:
+        """Stream chat completion events."""
+        payload = {k: v for k, v in kwargs.items() if v is not None}
+        endpoint = "/kimi/chat/completions"
+        url = f"{self.base_url}{endpoint}"
+
+        try:
+            with httpx.Client() as http_client, http_client.stream(
+                "POST",
+                url,
+                json=payload,
+                headers=self._get_headers(),
+                timeout=self.timeout,
+            ) as response:
+                if response.status_code == 401:
+                    raise KimiAuthError("Invalid API token")
+
+                if response.status_code == 403:
+                    raise KimiAuthError(
+                        "Access denied. Check your API permissions."
+                    )
+
+                response.raise_for_status()
+                yield from response.iter_lines()
+        except httpx.TimeoutException as e:
+            raise KimiTimeoutError(
+                f"Request to {endpoint} timed out after {self.timeout}s"
+            ) from e
+        except KimiAuthError:
+            raise
+        except httpx.HTTPStatusError as e:
+            raise KimiAPIError(
+                message=e.response.text,
+                code=f"http_{e.response.status_code}",
+                status_code=e.response.status_code,
+            ) from e
+        except Exception as e:
+            if isinstance(e, KimiAPIError | KimiTimeoutError):
+                raise
+            raise KimiAPIError(message=str(e)) from e
 
 
 def get_client(token: str | None = None) -> KimiClient:

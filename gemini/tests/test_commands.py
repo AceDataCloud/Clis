@@ -183,6 +183,21 @@ class TestChatCommand:
         assert result.exit_code != 0
 
     @respx.mock
+    def test_chat_streams_server_sent_events(self, runner):
+        route = respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
+            return_value=Response(
+                200,
+                content='data: {"choices":[{"delta":{"content":"Hello"}}]}\n\ndata: [DONE]\n\n',
+                headers={"content-type": "text/event-stream"},
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "chat", "Hello", "--stream"])
+        assert result.exit_code == 0
+        assert 'data: {"choices":[{"delta":{"content":"Hello"}}]}' in result.output
+        assert "data: [DONE]" in result.output
+        assert json.loads(route.calls.last.request.content)["stream"] is True
+
+    @respx.mock
     def test_chat_with_extended_openapi_options(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)

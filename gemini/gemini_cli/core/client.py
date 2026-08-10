@@ -1,5 +1,6 @@
 """HTTP client for Gemini API."""
 
+from collections.abc import Iterator
 from typing import Any
 
 import httpx
@@ -87,6 +88,47 @@ class GeminiClient:
     def chat_completions(self, **kwargs: Any) -> dict[str, Any]:
         """Send a chat completion request."""
         return self.request("/gemini/chat/completions", kwargs)
+
+    def stream_chat_completions(self, **kwargs: Any) -> Iterator[str]:
+        """Stream chat completion events."""
+        payload = {k: v for k, v in kwargs.items() if v is not None}
+        endpoint = "/gemini/chat/completions"
+        url = f"{self.base_url}{endpoint}"
+
+        try:
+            with httpx.Client() as http_client, http_client.stream(
+                "POST",
+                url,
+                json=payload,
+                headers=self._get_headers(),
+                timeout=self.timeout,
+            ) as response:
+                if response.status_code == 401:
+                    raise GeminiAuthError("Invalid API token")
+
+                if response.status_code == 403:
+                    raise GeminiAuthError(
+                        "Access denied. Check your API permissions."
+                    )
+
+                response.raise_for_status()
+                yield from response.iter_lines()
+        except httpx.TimeoutException as e:
+            raise GeminiTimeoutError(
+                f"Request to {endpoint} timed out after {self.timeout}s"
+            ) from e
+        except GeminiAuthError:
+            raise
+        except httpx.HTTPStatusError as e:
+            raise GeminiAPIError(
+                message=e.response.text,
+                code=f"http_{e.response.status_code}",
+                status_code=e.response.status_code,
+            ) from e
+        except Exception as e:
+            if isinstance(e, GeminiAPIError | GeminiTimeoutError):
+                raise
+            raise GeminiAPIError(message=str(e)) from e
 
     def generate_content(self, model: str, **kwargs: Any) -> dict[str, Any]:
         """Generate content using the native Gemini API."""
