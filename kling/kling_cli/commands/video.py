@@ -31,7 +31,7 @@ def _parse_json_option(value: str | None, param_hint: str) -> Any:
 
 
 @click.command()
-@click.argument("prompt")
+@click.argument("prompt", required=False)
 @click.option(
     "-m",
     "--model",
@@ -55,7 +55,7 @@ def _parse_json_option(value: str | None, param_hint: str) -> Any:
 @click.option(
     "--duration",
     default=None,
-    type=int,
+    type=float,
     help="Video duration in seconds (5 or 10 for most models; 3-15 for kling-v3/kling-v3-omni).",
 )
 @click.option(
@@ -105,11 +105,11 @@ def _parse_json_option(value: str | None, param_hint: str) -> Any:
 @click.pass_context
 def generate(
     ctx: click.Context,
-    prompt: str,
+    prompt: str | None,
     model: str,
     mode: str,
     aspect_ratio: str,
-    duration: int | None,
+    duration: float | None,
     cfg_scale: float | None,
     negative_prompt: str | None,
     generate_audio: bool | None,
@@ -158,7 +158,7 @@ def generate(
 
 
 @click.command("image-to-video")
-@click.argument("prompt")
+@click.argument("prompt", required=False)
 @click.option(
     "--start-image-url",
     default=None,
@@ -201,7 +201,7 @@ def generate(
 @click.option(
     "--duration",
     default=None,
-    type=int,
+    type=float,
     help="Video duration in seconds.",
 )
 @click.option(
@@ -246,14 +246,14 @@ def generate(
 @click.pass_context
 def image_to_video(
     ctx: click.Context,
-    prompt: str,
+    prompt: str | None,
     start_image_url: str | None,
     end_image_url: str | None,
     image_list: str | None,
     model: str,
     mode: str,
     aspect_ratio: str,
-    duration: int | None,
+    duration: float | None,
     cfg_scale: float | None,
     negative_prompt: str | None,
     callback_url: str | None,
@@ -328,7 +328,7 @@ def image_to_video(
 @click.option(
     "--duration",
     default=None,
-    type=int,
+    type=float,
     help="Video duration in seconds.",
 )
 @click.option(
@@ -367,7 +367,7 @@ def extend(
     model: str,
     mode: str,
     aspect_ratio: str,
-    duration: int | None,
+    duration: float | None,
     generate_audio: bool | None,
     cfg_scale: float | None,
     camera_control: str | None,

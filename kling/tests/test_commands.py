@@ -114,6 +114,29 @@ class TestGenerateCommands:
         assert body["mode"] == "4k"
 
     @respx.mock
+    def test_generate_without_prompt(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "generate", "--json"])
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert "prompt" not in body
+
+    @respx.mock
+    def test_generate_with_decimal_duration(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "test", "--duration", "3.5", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["duration"] == 3.5
+
+    @respx.mock
     def test_generate_with_callback(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/kling/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -182,6 +205,26 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["action"] == "image2video"
+
+    @respx.mock
+    def test_image_to_video_without_prompt(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "--start-image-url",
+                "https://example.com/photo.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert "prompt" not in body
 
     @respx.mock
     def test_image_to_video_with_image_list(self, runner, mock_video_response):
