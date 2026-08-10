@@ -76,7 +76,7 @@ def _parse_json_array_option(value: str | None, option_name: str) -> list[object
 )
 @click.option(
     "--mp3-bitrate",
-    type=int,
+    type=click.Choice(["64", "128", "192"]),
     default=None,
     help="MP3 output bitrate.",
 )
@@ -159,7 +159,7 @@ def tts(
     reference_id: str | None,
     audio_format: str,
     sample_rate: int | None,
-    mp3_bitrate: int | None,
+    mp3_bitrate: str | None,
     latency: str,
     chunk_length: int | None,
     min_chunk_length: int | None,
@@ -196,7 +196,7 @@ def tts(
     if sample_rate is not None:
         payload["sample_rate"] = sample_rate
     if mp3_bitrate is not None:
-        payload["mp3_bitrate"] = mp3_bitrate
+        payload["mp3_bitrate"] = int(mp3_bitrate)
     if chunk_length is not None:
         payload["chunk_length"] = chunk_length
     if min_chunk_length is not None:
