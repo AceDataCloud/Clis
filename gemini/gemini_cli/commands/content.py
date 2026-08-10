@@ -121,7 +121,8 @@ def stream_generate_content(
     tool_config: str | None,
     safety_settings: str | None,
 ) -> None:
-    """Generate streamed content using the native Gemini API."""
+    """Stream content using the native Gemini API as server-sent events."""
+    del output_json
     client = get_client(ctx.obj.get("token"))
     payload = _build_payload(
         contents,
@@ -133,11 +134,8 @@ def stream_generate_content(
     )
 
     try:
-        result = client.stream_generate_content(model, alt=alt, **payload)  # type: ignore[arg-type]
-        if output_json:
-            print_json(result)
-        else:
-            print_chat_result(result)
+        for event in client.stream_generate_content(model, alt=alt, **payload):  # type: ignore[arg-type]
+            click.echo(event)
     except GeminiError as e:
         print_error(e.message)
         raise SystemExit(1) from e

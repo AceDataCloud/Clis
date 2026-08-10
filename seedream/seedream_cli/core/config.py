@@ -23,7 +23,7 @@ class Settings:
     )
     default_model: str = field(
         default_factory=lambda: os.environ.get(
-            "SEEDREAM_DEFAULT_MODEL", "doubao-seedream-4-0-250828"
+            "SEEDREAM_DEFAULT_MODEL", "doubao-seedream-5-0-260128"
         )
     )
 

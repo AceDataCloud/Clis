@@ -122,4 +122,5 @@ class TestPrintModels:
     def test_print_models(self, capsys):
         print_models()
         captured = capsys.readouterr()
+        assert "doubao-seedream-5-0-pro-260628" in captured.out
         assert "doubao-seedream-4-5-251128" in captured.out

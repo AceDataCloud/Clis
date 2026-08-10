@@ -196,6 +196,7 @@ class TestChatCommand:
         assert 'data: {"choices":[{"delta":{"content":"Hello"}}]}' in result.output
         assert "data: [DONE]" in result.output
         assert json.loads(route.calls.last.request.content)["stream"] is True
+        assert route.calls.last.request.headers["accept"] == "text/event-stream"
 
     @respx.mock
     def test_chat_with_extended_openapi_options(self, runner, mock_chat_response):
@@ -411,10 +412,16 @@ class TestContentCommands:
         assert request_body["generationConfig"] == {"temperature": 0.5}
 
     @respx.mock
-    def test_stream_generate_content_json(self, runner, mock_chat_response):
+    def test_stream_generate_content_server_sent_events(self, runner):
         route = respx.post(
             "https://api.acedata.cloud/v1beta/models/gemini-3.1-flash-image:streamGenerateContent?alt=sse"
-        ).mock(return_value=Response(200, json=mock_chat_response))
+        ).mock(
+            return_value=Response(
+                200,
+                content='data: {"candidates":[{"content":{"parts":[{"text":"Hello"}]}}]}\n\ndata: [DONE]\n\n',
+                headers={"content-type": "text/event-stream"},
+            )
+        )
         result = runner.invoke(
             cli,
             [
@@ -433,14 +440,16 @@ class TestContentCommands:
                 '{"functionCallingConfig":{"mode":"AUTO"}}',
                 "--safety-settings",
                 '[{"category":"HARM_CATEGORY_HARASSMENT","threshold":"OFF"}]',
-                "--json",
             ],
         )
         assert result.exit_code == 0
+        assert 'data: {"candidates":[{"content":{"parts":[{"text":"Hello"}]}}]}' in result.output
+        assert "data: [DONE]" in result.output
         request_body = json.loads(route.calls[0].request.content)
         assert request_body["tools"] == [{"functionDeclarations": [{"name": "lookup"}]}]
         assert request_body["toolConfig"] == {"functionCallingConfig": {"mode": "AUTO"}}
         assert request_body["safetySettings"][0]["threshold"] == "OFF"
+        assert route.calls[0].request.headers["accept"] == "text/event-stream"
 
 
 class TestTaskCommands:
