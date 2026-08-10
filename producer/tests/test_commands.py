@@ -285,7 +285,7 @@ class TestLyricsCommands:
         assert body["prompt"] == "A love song about the ocean"
 
     @respx.mock
-    def test_lyrics_json_object_prompt(self, runner, mock_lyrics_response):
+    def test_lyrics_json_like_prompt_stays_string(self, runner, mock_lyrics_response):
         route = respx.post("https://api.acedata.cloud/producer/lyrics").mock(
             return_value=Response(200, json=mock_lyrics_response)
         )
@@ -301,7 +301,7 @@ class TestLyricsCommands:
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["prompt"] == {"theme": "winter", "mood": "calm"}
+        assert body["prompt"] == '{"theme":"winter","mood":"calm"}'
 
     @respx.mock
     def test_lyrics_rich_output(self, runner, mock_lyrics_response):
