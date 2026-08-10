@@ -73,6 +73,7 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["realtime", "--help"])
         assert result.exit_code == 0
         assert "--model" in result.output
+        assert "--voice" in result.output
 
 
 # ─── Chat Commands ────────────────────────────────────────────────────────
@@ -712,12 +713,21 @@ class TestSpeechAndRealtimeCommands:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["model"] == "gpt-realtime-2.1"
-        assert data["url"] == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2.1"
+        assert data["voice"] == "alloy"
+        assert (
+            data["url"]
+            == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2.1&voice=alloy"
+        )
 
     def test_realtime_accepts_new_mini_model(self, runner):
-        result = runner.invoke(cli, ["realtime", "--model", "gpt-realtime-2.1-mini", "--json"])
+        result = runner.invoke(
+            cli,
+            ["realtime", "--model", "gpt-realtime-2.1-mini", "--voice", "cedar", "--json"],
+        )
         assert result.exit_code == 0
-        assert json.loads(result.output)["model"] == "gpt-realtime-2.1-mini"
+        data = json.loads(result.output)
+        assert data["model"] == "gpt-realtime-2.1-mini"
+        assert data["voice"] == "cedar"
 
 
 class TestTranscribeCommands:
