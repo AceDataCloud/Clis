@@ -1,5 +1,5 @@
 [project]
-name = "openai-cli"
+name = "openai-pro-cli"
 version = "0.1.0"
 description = "CLI tool for OpenAI-compatible APIs via AceDataCloud"
 readme = "README.md"
@@ -58,7 +58,7 @@ release = [
     "twine>=6.1.0",
 ]
 all = [
-    "openai-cli[dev,test,release]",
+    "openai-pro-cli[dev,test,release]",
 ]
 
 [project.scripts]
