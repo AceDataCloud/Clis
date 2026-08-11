@@ -1,7 +1,7 @@
 """Rich terminal output formatting for Maestro CLI."""
 
 import json
-from typing import Any
+from typing import Any, TypedDict
 
 import click
 from rich.console import Console
@@ -29,12 +29,41 @@ ASPECT_RATIOS = [
 
 DEFAULT_ASPECT_RATIO = "9:16"
 
+
+class SkuLimits(TypedDict):
+    duration: int
+    languages: int
+    actions: set[str]
+    scenarios: set[str]
+
+
 # Available quality tiers
 QUALITY_TIERS = [
     "lite",
     "standard",
     "pro",
 ]
+
+SKU_LIMITS: dict[str, SkuLimits] = {
+    "lite": {
+        "duration": 30,
+        "languages": 1,
+        "actions": {"generate", "edit"},
+        "scenarios": {"auto", "narrated", "captions"},
+    },
+    "standard": {
+        "duration": 120,
+        "languages": 2,
+        "actions": {"generate", "remix", "edit"},
+        "scenarios": {"auto", "narrated", "captions", "avatar"},
+    },
+    "pro": {
+        "duration": 300,
+        "languages": 4,
+        "actions": {"generate", "remix", "edit", "extend"},
+        "scenarios": {"auto", "narrated", "captions", "avatar", "drama"},
+    },
+}
 
 DEFAULT_QUALITY = "standard"
 
@@ -191,9 +220,9 @@ def print_models() -> None:
     scenario_notes = {
         "auto": "AI director chooses from your brief (default)",
         "narrated": "Multi-scene narrated video with real photos + voiceover",
-        "captions": "Caption an existing source video",
-        "avatar": "Talking-head / digital human (1.15×)",
-        "drama": "Acted short drama with characters + dialogue (1.35×)",
+        "captions": "Kinetic captions for an uploaded source video",
+        "avatar": "Talking-head / digital human (Standard or Pro, 1.15×)",
+        "drama": "Acted short drama (Pro only, 1.35×)",
     }
     for scenario, note in scenario_notes.items():
         table.add_row(scenario, note)
