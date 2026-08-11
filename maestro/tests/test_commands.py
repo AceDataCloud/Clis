@@ -96,7 +96,7 @@ class TestCreateCommand:
 
     @respx.mock
     def test_create_with_quality(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/maestro/videos").mock(
+        route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -107,11 +107,13 @@ class TestCreateCommand:
                 "create",
                 "test",
                 "--quality",
-                "premium",
+                "pro",
                 "--json",
             ],
         )
         assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["quality"] == "pro"
 
     @respx.mock
     def test_create_with_scenario(self, runner, mock_video_response):
@@ -133,7 +135,7 @@ class TestCreateCommand:
         assert result.exit_code == 0
 
     @respx.mock
-    def test_create_with_legacy_scenario(self, runner, mock_video_response):
+    def test_create_with_captions_scenario(self, runner, mock_video_response):
         route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
@@ -145,13 +147,13 @@ class TestCreateCommand:
                 "create",
                 "test",
                 "--scenario",
-                "general",
+                "captions",
                 "--json",
             ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["scenario"] == "general"
+        assert sent["scenario"] == "captions"
 
     @respx.mock
     def test_create_with_style(self, runner, mock_video_response):
@@ -276,7 +278,7 @@ class TestCreateCommand:
 
     @respx.mock
     def test_create_with_multiple_langs(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/maestro/videos").mock(
+        route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -294,6 +296,8 @@ class TestCreateCommand:
             ],
         )
         assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["langs"] == ["zh-cn", "en"]
 
     @respx.mock
     def test_create_with_file_urls(self, runner, mock_video_response):
@@ -347,6 +351,45 @@ class TestCreateCommand:
             ],
         )
         assert result.exit_code != 0
+
+    @pytest.mark.parametrize("duration", ["4", "301"])
+    def test_create_rejects_duration_outside_api_range(self, runner, duration):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "create", "test", "--duration", duration],
+        )
+        assert result.exit_code != 0
+
+    def test_create_requires_ref_task_id_for_non_generate_action(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "create", "test", "--action", "edit"],
+        )
+        assert result.exit_code != 0
+        assert "--ref-task-id is required" in result.output
+
+    def test_create_rejects_more_than_four_languages(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "create",
+                "test",
+                "--lang",
+                "zh-cn",
+                "--lang",
+                "en",
+                "--lang",
+                "es",
+                "--lang",
+                "fr",
+                "--lang",
+                "de",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "At most four --lang" in result.output
 
     @respx.mock
     def test_create_api_error(self, runner, mock_error_response):
