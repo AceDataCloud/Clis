@@ -7,7 +7,7 @@ A command-line tool for AI image generation and editing using [Flux](https://bla
 - **Text-to-Image Generation** — Generate images from text prompts with multiple Flux models
 - **Image Editing** — Edit existing images using text descriptions (kontext models)
 - **Task Management** — Query status, batch check, and poll for completion
-- **Multiple Models** — flux-dev, flux-pro, flux-kontext-pro, flux-kontext-max, flux-2-flex, flux-2-pro, flux-2-max
+- **Multiple Models** — flux-dev, flux-pro, flux-kontext-pro, flux-kontext-max, flux-2-flex, flux-2-pro, flux-2-max, flux-2-klein
 - **Rich Output** — Beautiful terminal formatting with `--json` for scripting
 
 ## Installation
@@ -71,6 +71,7 @@ flux tasks task-1 task-2 task-3
 | `flux-2-flex` | Flux 2 | Pixels | Fast Flux 2 generation |
 | `flux-2-pro` | Flux 2 | Pixels | Higher quality Flux 2 generation |
 | `flux-2-max` | Flux 2 | Pixels | Maximum quality Flux 2 generation |
+| `flux-2-klein` | Flux 2 | Pixels | Compact Flux 2 generation |
 
 ## JSON Output
 

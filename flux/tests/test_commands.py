@@ -139,6 +139,31 @@ class TestGenerateCommands:
         assert body["count"] == 3
 
     @respx.mock
+    def test_generate_with_fractional_count_and_ndjson_accept(
+        self, runner, mock_image_response
+    ):
+        route = respx.post("https://api.acedata.cloud/flux/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--count",
+                "1.5",
+                "--accept",
+                "application/x-ndjson",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content)["count"] == 1.5
+        assert route.calls.last.request.headers["accept"] == "application/x-ndjson"
+
+    @respx.mock
     def test_generate_with_callback(self, runner, mock_image_response):
         respx.post("https://api.acedata.cloud/flux/images").mock(
             return_value=Response(200, json=mock_image_response)
@@ -231,9 +256,16 @@ class TestEditCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "flux-kontext-max"
 
-    def test_edit_missing_image_url(self, runner):
-        result = runner.invoke(cli, ["--token", "test-token", "edit", "test prompt"])
-        assert result.exit_code != 0
+    @respx.mock
+    def test_edit_without_image_url(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/flux/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "edit", "test prompt", "--json"]
+        )
+        assert result.exit_code == 0
+        assert "image_url" not in json.loads(route.calls.last.request.content)
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────
