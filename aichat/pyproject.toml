@@ -1,5 +1,5 @@
 [project]
-name = "aichat-cli"
+name = "aichat-pro-cli"
 version = "0.1.0"
 description = "CLI tool for AI Dialogue (aichat) via AceDataCloud API"
 readme = "README.md"
@@ -58,7 +58,7 @@ release = [
     "twine>=6.1.0",
 ]
 all = [
-    "aichat-cli[dev,test,release]",
+    "aichat-pro-cli[dev,test,release]",
 ]
 
 [project.scripts]
