@@ -14,7 +14,7 @@ A command-line tool for AI Dialogue via the [AceDataCloud](https://platform.aced
 ## Installation
 
 ```bash
-pip install aichat-cli
+pip install aichat-pro-cli
 ```
 
 ## Quick Start
