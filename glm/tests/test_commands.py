@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from glm_cli.main import cli
+from glm_cli.main import cli, get_version
 
 
 @pytest.fixture
@@ -22,6 +22,14 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
         assert "glm-cli" in result.output
+
+    def test_version_uses_distribution_name(self, monkeypatch):
+        monkeypatch.setattr(
+            "glm_cli.main.metadata.version",
+            lambda name: "1.2.3" if name == "glm-pro-cli" else None,
+        )
+
+        assert get_version() == "1.2.3"
 
     def test_help(self, runner):
         result = runner.invoke(cli, ["--help"])
@@ -55,9 +63,7 @@ class TestChatCommand:
         respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "chat", "Hello"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "chat", "Hello"])
         assert result.exit_code == 0
         assert "Paris" in result.output
 
@@ -81,8 +87,13 @@ class TestChatCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token", "chat", "Hello",
-                "-s", "You are a helpful assistant", "--json",
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "-s",
+                "You are a helpful assistant",
+                "--json",
             ],
         )
         assert result.exit_code == 0
