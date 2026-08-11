@@ -20,7 +20,7 @@ load_dotenv()
 def get_version() -> str:
     """Get the package version."""
     try:
-        return metadata.version("aichat-cli")
+        return metadata.version("aichat-pro-cli")
     except metadata.PackageNotFoundError:
         return "dev"
 
