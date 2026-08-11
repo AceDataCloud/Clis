@@ -1,5 +1,5 @@
 [project]
-name = "glm-cli"
+name = "glm-pro-cli"
 version = "0.1.0"
 description = "CLI tool for GLM Chat Completions via AceDataCloud"
 readme = "README.md"
@@ -56,7 +56,7 @@ release = [
     "twine>=6.1.0",
 ]
 all = [
-    "glm-cli[dev,test,release]",
+    "glm-pro-cli[dev,test,release]",
 ]
 
 [project.scripts]
