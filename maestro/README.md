@@ -12,7 +12,7 @@ pip install maestro-cli
 
 ```bash
 maestro create "Explain what a vector database is in 20 seconds"
-maestro create "Product demo" --aspect 16:9 --quality premium
+maestro create "Product demo" --aspect 16:9 --quality pro
 maestro create "Continue the story" --action extend --ref-task-id <task-id>
 maestro task <task-id>
 maestro wait <task-id>

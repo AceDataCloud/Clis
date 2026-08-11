@@ -31,9 +31,9 @@ DEFAULT_ASPECT_RATIO = "9:16"
 
 # Available quality tiers
 QUALITY_TIERS = [
-    "draft",
+    "lite",
     "standard",
-    "premium",
+    "pro",
 ]
 
 DEFAULT_QUALITY = "standard"
@@ -42,21 +42,9 @@ DEFAULT_QUALITY = "standard"
 SCENARIOS = [
     "auto",
     "narrated",
-    "drama",
-    "avatar",
-    "motion",
-    "slideshow",
-]
-
-SCENARIO_CHOICES = [
-    *SCENARIOS,
-    "general",
-    "explainer",
-    "product",
-    "website",
-    "changelog",
     "captions",
-    "slides",
+    "avatar",
+    "drama",
 ]
 
 DEFAULT_SCENARIO = "auto"
@@ -203,10 +191,9 @@ def print_models() -> None:
     scenario_notes = {
         "auto": "AI director chooses from your brief (default)",
         "narrated": "Multi-scene narrated video with real photos + voiceover",
-        "drama": "Acted short drama with characters + dialogue (1.35×)",
+        "captions": "Caption an existing source video",
         "avatar": "Talking-head / digital human (1.15×)",
-        "motion": "Abstract kinetic-typography / data / logo motion graphic",
-        "slideshow": "Presentation deck / pitch",
+        "drama": "Acted short drama with characters + dialogue (1.35×)",
     }
     for scenario, note in scenario_notes.items():
         table.add_row(scenario, note)

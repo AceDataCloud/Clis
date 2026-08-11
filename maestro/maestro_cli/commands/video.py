@@ -15,7 +15,7 @@ from maestro_cli.core.output import (
     DEFAULT_VOICE,
     MAESTRO_ACTIONS,
     QUALITY_TIERS,
-    SCENARIO_CHOICES,
+    SCENARIOS,
     print_error,
     print_json,
     print_video_result,
@@ -60,24 +60,24 @@ from maestro_cli.core.output import (
 )
 @click.option(
     "--duration",
-    type=click.IntRange(1, 600),
+    type=click.IntRange(5, 300),
     default=DEFAULT_DURATION,
     show_default=True,
-    help="Target video length in seconds (1-600).",
+    help="Target video length in seconds (5-300).",
 )
 @click.option(
     "--quality",
     type=click.Choice(QUALITY_TIERS),
     default=DEFAULT_QUALITY,
     show_default=True,
-    help="Production tier: draft (fast preview, ~0.5×), standard (default), premium (~2×).",
+    help="Production tier: lite (720p), standard (1080p), or pro (advanced production).",
 )
 @click.option(
     "--scenario",
-    type=click.Choice(SCENARIO_CHOICES),
+    type=click.Choice(SCENARIOS),
     default=DEFAULT_SCENARIO,
     show_default=True,
-    help="How to route the video: auto/narrated/drama/avatar/motion/slideshow.",
+    help="Production route: auto, narrated, captions, avatar, or drama.",
 )
 @click.option(
     "--style",
@@ -119,10 +119,15 @@ def create(
     \b
     Examples:
       maestro create "Explain what a vector database is in 20 seconds"
-      maestro create "Product demo" --aspect 16:9 --quality premium
+      maestro create "Product demo" --aspect 16:9 --quality pro
       maestro create "Continue the story" --action extend --ref-task-id abc123
       maestro create "Same video in English" --action remix --ref-task-id abc123 --lang en
     """
+    if action != "generate" and not ref_task_id:
+        raise click.UsageError("--ref-task-id is required for remix, edit, and extend actions.")
+    if len(langs) > 4:
+        raise click.UsageError("At most four --lang options may be specified.")
+
     client = get_client(ctx.obj.get("token"))
 
     payload: dict[str, object] = {
