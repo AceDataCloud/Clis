@@ -27,7 +27,7 @@ load_dotenv()
 def get_version() -> str:
     """Get the package version."""
     try:
-        return metadata.version("openai-cli")
+        return metadata.version("openai-pro-cli")
     except metadata.PackageNotFoundError:
         return "dev"
 
