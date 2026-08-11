@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from aichat_cli.main import cli
+from aichat_cli.main import cli, get_version
 
 
 @pytest.fixture
@@ -25,6 +25,14 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
         assert "aichat-cli" in result.output
+
+    def test_version_uses_distribution_name(self, monkeypatch):
+        monkeypatch.setattr(
+            "aichat_cli.main.metadata.version",
+            lambda name: "1.2.3" if name == "aichat-pro-cli" else None,
+        )
+
+        assert get_version() == "1.2.3"
 
     def test_help(self, runner):
         result = runner.invoke(cli, ["--help"])
