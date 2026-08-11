@@ -69,9 +69,7 @@ class TestCreateCommand:
         respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "create", "A product demo video"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "create", "A product demo video"])
         assert result.exit_code == 0
         assert "maestro-task-123" in result.output
 
@@ -154,6 +152,30 @@ class TestCreateCommand:
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["scenario"] == "captions"
+
+    @respx.mock
+    def test_sku_limits_fail_before_api_call(self, runner):
+        route = respx.post("https://api.acedata.cloud/maestro/videos")
+        lite = runner.invoke(
+            cli,
+            ["--token", "test-token", "create", "test", "--quality", "lite", "--duration", "31"],
+        )
+        drama = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "create",
+                "test",
+                "--quality",
+                "standard",
+                "--scenario",
+                "drama",
+            ],
+        )
+        assert lite.exit_code != 0 and "at most 30 seconds" in lite.output
+        assert drama.exit_code != 0 and "higher Maestro SKU" in drama.output
+        assert not route.called
 
     @respx.mock
     def test_create_with_style(self, runner, mock_video_response):
@@ -269,6 +291,8 @@ class TestCreateCommand:
                 "continue the story",
                 "--action",
                 "extend",
+                "--quality",
+                "pro",
                 "--ref-task-id",
                 "prev-task-id",
                 "--json",
@@ -389,7 +413,7 @@ class TestCreateCommand:
             ],
         )
         assert result.exit_code != 0
-        assert "At most four --lang" in result.output
+        assert "standard supports at most 2 language(s)" in result.output
 
     @respx.mock
     def test_create_api_error(self, runner, mock_error_response):

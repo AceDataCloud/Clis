@@ -16,6 +16,7 @@ from maestro_cli.core.output import (
     MAESTRO_ACTIONS,
     QUALITY_TIERS,
     SCENARIOS,
+    SKU_LIMITS,
     print_error,
     print_json,
     print_video_result,
@@ -63,21 +64,21 @@ from maestro_cli.core.output import (
     type=click.IntRange(5, 300),
     default=DEFAULT_DURATION,
     show_default=True,
-    help="Target video length in seconds (5-300).",
+    help="Target video length in seconds (5-300; SKU-specific maximums apply).",
 )
 @click.option(
     "--quality",
     type=click.Choice(QUALITY_TIERS),
     default=DEFAULT_QUALITY,
     show_default=True,
-    help="Production tier: lite (720p), standard (1080p), or pro (advanced production).",
+    help="Production SKU: lite (720p, up to 30s), standard (1080p, up to 120s), pro (up to 300s).",
 )
 @click.option(
     "--scenario",
     type=click.Choice(SCENARIOS),
     default=DEFAULT_SCENARIO,
     show_default=True,
-    help="Production route: auto, narrated, captions, avatar, or drama.",
+    help="Production workflow: auto/narrated/captions/avatar/drama (SKU-specific availability applies).",
 )
 @click.option(
     "--style",
@@ -125,8 +126,15 @@ def create(
     """
     if action != "generate" and not ref_task_id:
         raise click.UsageError("--ref-task-id is required for remix, edit, and extend actions.")
-    if len(langs) > 4:
-        raise click.UsageError("At most four --lang options may be specified.")
+    limits = SKU_LIMITS[quality]
+    if duration > limits["duration"]:
+        raise click.UsageError(f"{quality} supports at most {limits['duration']} seconds")
+    if langs and len(langs) > limits["languages"]:
+        raise click.UsageError(f"{quality} supports at most {limits['languages']} language(s)")
+    if action not in limits["actions"]:
+        raise click.UsageError(f"action={action} requires a higher Maestro SKU")
+    if scenario not in limits["scenarios"]:
+        raise click.UsageError(f"scenario={scenario} requires a higher Maestro SKU")
 
     client = get_client(ctx.obj.get("token"))
 
