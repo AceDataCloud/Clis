@@ -5,7 +5,7 @@ A command-line tool for GLM chat completions via [AceDataCloud](https://platform
 ## Installation
 
 ```bash
-pip install glm-cli
+pip install glm-pro-cli
 ```
 
 ## Quick Start
