@@ -130,7 +130,9 @@ from glm_cli.core.output import (
     default=False,
     help="Enable parallel function calling during tool use.",
 )
-@click.option("--stream", is_flag=True, default=False, help="Stream partial chat completion events.")
+@click.option(
+    "--stream", is_flag=True, default=False, help="Stream partial chat completion events."
+)
 @click.option(
     "--response-format",
     default=None,
@@ -149,7 +151,7 @@ from glm_cli.core.output import (
 @click.option(
     "--stream-options",
     default=None,
-    help='Streaming options as a JSON object (e.g. \'{"include_usage": true}\').',
+    help="Streaming options as a JSON object (e.g. '{\"include_usage\": true}').",
 )
 @click.option("--metadata", default=None, help="Metadata as a JSON object.")
 @click.option("--logit-bias", default=None, help="Logit bias map as a JSON object.")
@@ -220,9 +222,7 @@ def chat(
         parsed_modalities = parse_json_array(modalities, "--modalities")
         parsed_audio = parse_json_object(audio, "--audio")
         parsed_prediction = parse_json_object(prediction, "--prediction")
-        parsed_web_search_options = parse_json_object(
-            web_search_options, "--web-search-options"
-        )
+        parsed_web_search_options = parse_json_object(web_search_options, "--web-search-options")
     except click.BadParameter as e:
         print_error(e.format_message())
         raise SystemExit(1) from None
