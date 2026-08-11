@@ -5,7 +5,7 @@ A command-line tool for OpenAI-compatible APIs via [AceDataCloud](https://platfo
 ## Installation
 
 ```bash
-pip install openai-cli
+pip install openai-pro-cli
 ```
 
 ## Quick Start

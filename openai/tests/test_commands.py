@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from openai_cli.main import cli
+from openai_cli.main import cli, get_version
 
 
 @pytest.fixture
@@ -25,6 +25,14 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
         assert "openai-cli" in result.output
+
+    def test_version_uses_distribution_name(self, monkeypatch):
+        monkeypatch.setattr(
+            "openai_cli.main.metadata.version",
+            lambda name: "1.2.3" if name == "openai-pro-cli" else None,
+        )
+
+        assert get_version() == "1.2.3"
 
     def test_help(self, runner):
         result = runner.invoke(cli, ["--help"])
@@ -715,8 +723,7 @@ class TestSpeechAndRealtimeCommands:
         assert data["model"] == "gpt-realtime-2.1"
         assert data["voice"] == "alloy"
         assert (
-            data["url"]
-            == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2.1&voice=alloy"
+            data["url"] == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2.1&voice=alloy"
         )
 
     def test_realtime_accepts_new_mini_model(self, runner):
@@ -887,8 +894,18 @@ class TestInfoCommands:
                 json={
                     "object": "list",
                     "data": [
-                        {"id": "gpt-5.4", "object": "model", "created": 1714500000, "owned_by": "system"},
-                        {"id": "gpt-4o", "object": "model", "created": 1714500000, "owned_by": "system"},
+                        {
+                            "id": "gpt-5.4",
+                            "object": "model",
+                            "created": 1714500000,
+                            "owned_by": "system",
+                        },
+                        {
+                            "id": "gpt-4o",
+                            "object": "model",
+                            "created": 1714500000,
+                            "owned_by": "system",
+                        },
                     ],
                 },
             )
@@ -906,7 +923,12 @@ class TestInfoCommands:
                 json={
                     "object": "list",
                     "data": [
-                        {"id": "gpt-5.4", "object": "model", "created": 1714500000, "owned_by": "system"}
+                        {
+                            "id": "gpt-5.4",
+                            "object": "model",
+                            "created": 1714500000,
+                            "owned_by": "system",
+                        }
                     ],
                 },
             )

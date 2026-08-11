@@ -103,7 +103,9 @@ def transcribe(
         "keywords": list(keywords) if keywords else None,
         "response_format": response_format,
         "temperature": temperature,
-        "timestamp_granularities": list(timestamp_granularities) if timestamp_granularities else None,
+        "timestamp_granularities": list(timestamp_granularities)
+        if timestamp_granularities
+        else None,
         "stream": stream or None,
     }
 

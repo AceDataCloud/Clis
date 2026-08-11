@@ -121,13 +121,22 @@ class TestOpenAIClient:
                 messages=[{"role": "user", "content": "Hi"}],
             )
 
-
     @respx.mock
     def test_models_request(self):
         route = respx.get("https://api.acedata.cloud/openai/models").mock(
             return_value=Response(
                 200,
-                json={"object": "list", "data": [{"id": "gpt-4o", "object": "model", "created": 1714500000, "owned_by": "system"}]},
+                json={
+                    "object": "list",
+                    "data": [
+                        {
+                            "id": "gpt-4o",
+                            "object": "model",
+                            "created": 1714500000,
+                            "owned_by": "system",
+                        }
+                    ],
+                },
             )
         )
         client = OpenAIClient(api_token="test-token")
