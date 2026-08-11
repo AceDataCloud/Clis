@@ -723,8 +723,7 @@ class TestSpeechAndRealtimeCommands:
         assert data["model"] == "gpt-realtime-2.1"
         assert data["voice"] == "alloy"
         assert (
-            data["url"]
-            == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2.1&voice=alloy"
+            data["url"] == "wss://api.acedata.cloud/v1/realtime?model=gpt-realtime-2.1&voice=alloy"
         )
 
     def test_realtime_accepts_new_mini_model(self, runner):
@@ -895,8 +894,18 @@ class TestInfoCommands:
                 json={
                     "object": "list",
                     "data": [
-                        {"id": "gpt-5.4", "object": "model", "created": 1714500000, "owned_by": "system"},
-                        {"id": "gpt-4o", "object": "model", "created": 1714500000, "owned_by": "system"},
+                        {
+                            "id": "gpt-5.4",
+                            "object": "model",
+                            "created": 1714500000,
+                            "owned_by": "system",
+                        },
+                        {
+                            "id": "gpt-4o",
+                            "object": "model",
+                            "created": 1714500000,
+                            "owned_by": "system",
+                        },
                     ],
                 },
             )
@@ -914,7 +923,12 @@ class TestInfoCommands:
                 json={
                     "object": "list",
                     "data": [
-                        {"id": "gpt-5.4", "object": "model", "created": 1714500000, "owned_by": "system"}
+                        {
+                            "id": "gpt-5.4",
+                            "object": "model",
+                            "created": 1714500000,
+                            "owned_by": "system",
+                        }
                     ],
                 },
             )
