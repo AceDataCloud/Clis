@@ -20,12 +20,12 @@ class FluxClient:
         self.base_url = base_url or settings.api_base_url
         self.timeout = settings.request_timeout
 
-    def _get_headers(self) -> dict[str, str]:
+    def _get_headers(self, accept: str = "application/json") -> dict[str, str]:
         """Get request headers with authentication."""
         if not self.api_token:
             raise FluxAuthError("API token not configured")
         return {
-            "accept": "application/json",
+            "accept": accept,
             "authorization": f"Bearer {self.api_token}",
             "content-type": "application/json",
         }
@@ -42,6 +42,7 @@ class FluxClient:
         endpoint: str,
         payload: dict[str, Any],
         timeout: float | None = None,
+        accept: str = "application/json",
     ) -> dict[str, Any]:
         """Make a POST request to the Flux API."""
         url = f"{self.base_url}{endpoint}"
@@ -55,7 +56,7 @@ class FluxClient:
                 response = http_client.post(
                     url,
                     json=payload,
-                    headers=self._get_headers(),
+                    headers=self._get_headers(accept),
                     timeout=request_timeout,
                 )
 
@@ -89,13 +90,21 @@ class FluxClient:
                 raise FluxAPIError(message=str(e)) from e
 
     # Convenience methods
-    def generate_image(self, **kwargs: Any) -> dict[str, Any]:
+    def generate_image(
+        self, accept: str = "application/json", **kwargs: Any
+    ) -> dict[str, Any]:
         """Generate image using the images endpoint."""
-        return self.request("/flux/images", self._with_async_callback(kwargs))
+        return self.request(
+            "/flux/images", self._with_async_callback(kwargs), accept=accept
+        )
 
-    def edit_image(self, **kwargs: Any) -> dict[str, Any]:
+    def edit_image(
+        self, accept: str = "application/json", **kwargs: Any
+    ) -> dict[str, Any]:
         """Edit image using the images endpoint."""
-        return self.request("/flux/images", self._with_async_callback(kwargs))
+        return self.request(
+            "/flux/images", self._with_async_callback(kwargs), accept=accept
+        )
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""

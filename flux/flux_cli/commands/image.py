@@ -33,10 +33,17 @@ from flux_cli.core.output import (
     "-n",
     "--count",
     default=None,
-    type=int,
+    type=float,
     help="Number of images to generate.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--accept",
+    type=click.Choice(["application/json", "application/x-ndjson"]),
+    default="application/json",
+    show_default=True,
+    help="Response content type to accept.",
+)
 @click.option(
     "--async",
     "async_mode",
@@ -51,8 +58,9 @@ def generate(
     prompt: str,
     model: str,
     size: str | None,
-    count: int | None,
+    count: float | None,
     callback_url: str | None,
+    accept: str,
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -79,7 +87,7 @@ def generate(
         if async_mode:
             payload["async"] = True
 
-        result = client.generate_image(**payload)  # type: ignore[arg-type]
+        result = client.generate_image(accept=accept, **payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:
@@ -93,7 +101,6 @@ def generate(
 @click.argument("prompt")
 @click.option(
     "--image-url",
-    required=True,
     help="URL of the image to edit.",
 )
 @click.option(
@@ -111,6 +118,13 @@ def generate(
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--accept",
+    type=click.Choice(["application/json", "application/x-ndjson"]),
+    default="application/json",
+    show_default=True,
+    help="Response content type to accept.",
+)
+@click.option(
     "--async",
     "async_mode",
     is_flag=True,
@@ -126,6 +140,7 @@ def edit(
     model: str,
     size: str | None,
     callback_url: str | None,
+    accept: str,
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -151,7 +166,7 @@ def edit(
         if async_mode:
             payload["async"] = True
 
-        result = client.edit_image(**payload)  # type: ignore[arg-type]
+        result = client.edit_image(accept=accept, **payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:
