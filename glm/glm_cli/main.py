@@ -19,7 +19,7 @@ load_dotenv()
 def get_version() -> str:
     """Get the package version."""
     try:
-        return metadata.version("glm-cli")
+        return metadata.version("glm-pro-cli")
     except metadata.PackageNotFoundError:
         return "dev"
 
