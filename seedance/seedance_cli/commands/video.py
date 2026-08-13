@@ -1,5 +1,7 @@
 """Video generation commands."""
 
+import json
+
 import click
 
 from seedance_cli.core.client import get_client
@@ -44,7 +46,7 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             "--duration",
             type=int,
             default=None,
-            help="Duration in seconds (-1 for default, or an integer up to 15). Mutually exclusive with --frames.",
+            help="Duration in seconds (-1 for auto, up to 15 for 2.0 or 30 for 2.5). Mutually exclusive with --frames.",
         ),
         click.option(
             "--frames",
@@ -74,13 +76,31 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             "--generate-audio",
             type=click.BOOL,
             default=None,
-            help="Generate audio for the video (true/false). Supported by doubao-seedance-1-5-pro-251215 and the doubao-seedance-2-0 series.",
+            help="Generate audio for the video (true/false). Supported by Seedance 1.5 Pro and 2.x.",
         ),
         click.option(
             "--return-last-frame",
             type=click.BOOL,
             default=None,
             help="Return the last frame of the generated video (true/false).",
+        ),
+        click.option(
+            "--task-type",
+            type=click.Choice(["auto", "edit", "extend"]),
+            default=None,
+            help="Seedance 2.5 task type.",
+        ),
+        click.option(
+            "--output-format",
+            type=click.Choice(["mp4", "mov"]),
+            default=None,
+            help="Seedance 2.5 output format.",
+        ),
+        click.option(
+            "--tool-json",
+            "tool_jsons",
+            multiple=True,
+            help="Seedance 2.5 tool object as JSON; repeat as needed.",
         ),
         click.option(
             "--execution-expires-after",
@@ -140,6 +160,9 @@ def _build_common_payload(
     watermark: bool | None,
     generate_audio: bool | None,
     return_last_frame: bool | None,
+    task_type: str | None,
+    output_format: str | None,
+    tool_jsons: tuple[str, ...],
     execution_expires_after: int | None,
     callback_url: str | None,
     async_mode: bool,
@@ -165,6 +188,21 @@ def _build_common_payload(
         payload["generate_audio"] = generate_audio
     if return_last_frame is not None:
         payload["return_last_frame"] = return_last_frame
+    if task_type is not None:
+        payload["omni_reference_task_type"] = task_type
+    if output_format is not None:
+        payload["output_format"] = output_format
+    if tool_jsons:
+        tools: list[dict[str, object]] = []
+        for value in tool_jsons:
+            try:
+                tool = json.loads(value)
+            except json.JSONDecodeError as exc:
+                raise click.UsageError(f"Invalid --tool-json: {exc.msg}") from exc
+            if not isinstance(tool, dict):
+                raise click.UsageError("--tool-json must decode to a JSON object.")
+            tools.append(tool)
+        payload["tools"] = tools
     if execution_expires_after is not None:
         payload["execution_expires_after"] = execution_expires_after
     if callback_url is not None:
@@ -228,6 +266,9 @@ def generate(
     watermark: bool | None,
     generate_audio: bool | None,
     return_last_frame: bool | None,
+    task_type: str | None,
+    output_format: str | None,
+    tool_jsons: tuple[str, ...],
     execution_expires_after: int | None,
     callback_url: str | None,
     first_frame_url: str | None,
@@ -264,6 +305,9 @@ def generate(
             watermark=watermark,
             generate_audio=generate_audio,
             return_last_frame=return_last_frame,
+            task_type=task_type,
+            output_format=output_format,
+            tool_jsons=tool_jsons,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
             async_mode=async_mode,
@@ -313,6 +357,9 @@ def image_to_video(
     watermark: bool | None,
     generate_audio: bool | None,
     return_last_frame: bool | None,
+    task_type: str | None,
+    output_format: str | None,
+    tool_jsons: tuple[str, ...],
     execution_expires_after: int | None,
     callback_url: str | None,
     first_frame_url: str | None,
@@ -349,6 +396,9 @@ def image_to_video(
             watermark=watermark,
             generate_audio=generate_audio,
             return_last_frame=return_last_frame,
+            task_type=task_type,
+            output_format=output_format,
+            tool_jsons=tool_jsons,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
             async_mode=async_mode,

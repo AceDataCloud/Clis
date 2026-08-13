@@ -95,7 +95,7 @@ AUDIO_ROLE_CHOICES = ["reference_audio"]
     "async_mode",
     is_flag=True,
     default=False,
-    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+    help="Deprecated compatibility flag; MiniMax creation is always asynchronous.",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -125,6 +125,7 @@ def generate(
       minimax generate "A cat playing in the snow"
       minimax generate "Ocean waves at sunset" --model MiniMax-H3
     """
+    del async_mode  # retained only for CLI compatibility
     client = get_client(ctx.obj.get("token"))
     try:
         if not prompt and not image_urls and not video_urls and not audio_urls:
@@ -159,7 +160,7 @@ def generate(
             "ratio": ratio,
             "duration": duration,
             "callback_url": callback_url,
-            "async": async_mode,
+            "async": True,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
@@ -209,7 +210,7 @@ def generate(
     "async_mode",
     is_flag=True,
     default=False,
-    help="Submit asynchronously; returns a task_id to poll instead of waiting.",
+    help="Deprecated compatibility flag; MiniMax creation is always asynchronous.",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -234,6 +235,7 @@ def image_to_video(
       minimax image-to-video "Animate this scene" --image-url https://example.com/photo.jpg
       minimax image-to-video "Cinematic pan" --image-url img.jpg --model MiniMax-H3
     """
+    del async_mode  # retained only for CLI compatibility
     client = get_client(ctx.obj.get("token"))
     try:
         payload: dict[str, object] = {
@@ -250,7 +252,7 @@ def image_to_video(
             "ratio": ratio,
             "duration": duration,
             "callback_url": callback_url,
-            "async": async_mode,
+            "async": True,
         }
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
