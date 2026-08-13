@@ -129,9 +129,7 @@ def generate(
     client = get_client(ctx.obj.get("token"))
     try:
         if not prompt and not image_urls and not video_urls and not audio_urls:
-            raise click.UsageError(
-                "Provide PROMPT or at least one media URL input."
-            )
+            raise click.UsageError("Provide PROMPT or at least one media URL input.")
         if prompt and len(prompt) > 7000:
             raise click.UsageError("PROMPT must be at most 7000 characters.")
         content: list[dict[str, object]] = []
