@@ -672,6 +672,51 @@ class TestResponseCommands:
         assert body["tools"] == [{"type": "web_search_preview"}]
         assert body["stream"] is True
 
+    @respx.mock
+    def test_response_with_extended_openapi_options(self, runner, mock_response_api_response):
+        route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(200, json=mock_response_api_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "response",
+                "Hello",
+                "--tool-choice",
+                '{"type":"function","function":{"name":"lookup"}}',
+                "--include",
+                "reasoning.encrypted_content",
+                "--include",
+                "web_search_call.action.sources",
+                "--max-output-tokens",
+                "256",
+                "--parallel-tool-calls",
+                "--reasoning",
+                '{"effort":"high"}',
+                "--text",
+                '{"format":{"type":"text"}}',
+                "--stream-options",
+                '{"include_usage":true}',
+                "--store",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["tool_choice"] == {"type": "function", "function": {"name": "lookup"}}
+        assert body["include"] == [
+            "reasoning.encrypted_content",
+            "web_search_call.action.sources",
+        ]
+        assert body["max_output_tokens"] == 256
+        assert body["parallel_tool_calls"] is True
+        assert body["reasoning"] == {"effort": "high"}
+        assert body["text"] == {"format": {"type": "text"}}
+        assert body["stream_options"] == {"include_usage": True}
+        assert body["store"] is True
+
 
 class TestSpeechAndRealtimeCommands:
     """Tests for speech and realtime commands."""

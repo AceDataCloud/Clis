@@ -2,7 +2,7 @@
 
 import click
 
-from openai_cli.commands._json import parse_json_array, parse_json_object
+from openai_cli.commands._json import parse_json_array, parse_json_object, parse_json_or_string
 from openai_cli.core.client import get_client
 from openai_cli.core.exceptions import OpenAIError
 from openai_cli.core.output import (
@@ -53,12 +53,63 @@ from openai_cli.core.output import (
     default=None,
     help='Tool definitions as a JSON array (e.g. \'[{"type":"web_search_preview"}]\').',
 )
+@click.option(
+    "--tool-choice",
+    default=None,
+    help='Tool choice mode or JSON object (e.g. "auto" or \'{"type":"function","function":{"name":"lookup"}}\').',
+)
+@click.option(
+    "--include",
+    "include_fields",
+    multiple=True,
+    help="Additional output fields to include (repeatable).",
+)
 @click.option("--stream", is_flag=True, default=False, help="Stream partial response events.")
 @click.option(
     "--background",
     is_flag=True,
     default=False,
     help="Run the response in the background.",
+)
+@click.option(
+    "--max-output-tokens",
+    default=None,
+    type=int,
+    help="Maximum number of output tokens to generate.",
+)
+@click.option(
+    "--parallel-tool-calls",
+    "parallel_tool_calls",
+    flag_value=True,
+    default=None,
+    help="Enable parallel function calling during tool use.",
+)
+@click.option(
+    "--no-parallel-tool-calls",
+    "parallel_tool_calls",
+    flag_value=False,
+    help="Disable parallel function calling during tool use.",
+)
+@click.option(
+    "--reasoning",
+    default=None,
+    help="Reasoning settings as a JSON object.",
+)
+@click.option(
+    "--text",
+    default=None,
+    help="Text generation settings as a JSON object.",
+)
+@click.option(
+    "--stream-options",
+    default=None,
+    help="Streaming options as a JSON object.",
+)
+@click.option(
+    "--store",
+    is_flag=True,
+    default=False,
+    help="Store the output for use in OpenAI's model distillation or evals products.",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -71,8 +122,16 @@ def response(
     count: int | None,
     response_format: str | None,
     tools: str | None,
+    tool_choice: str | None,
+    include_fields: tuple[str, ...],
     stream: bool,
     background: bool,
+    max_output_tokens: int | None,
+    parallel_tool_calls: bool | None,
+    reasoning: str | None,
+    text: str | None,
+    stream_options: str | None,
+    store: bool,
     output_json: bool,
 ) -> None:
     """Send a request to the Responses API.
@@ -89,6 +148,10 @@ def response(
     try:
         parsed_response_format = parse_json_object(response_format, "--response-format")
         parsed_tools = parse_json_array(tools, "--tools")
+        parsed_tool_choice = parse_json_or_string(tool_choice, "--tool-choice")
+        parsed_reasoning = parse_json_object(reasoning, "--reasoning")
+        parsed_text = parse_json_object(text, "--text")
+        parsed_stream_options = parse_json_object(stream_options, "--stream-options")
     except click.BadParameter as e:
         print_error(e.format_message())
         raise SystemExit(1) from None
@@ -97,11 +160,19 @@ def response(
         "input": [{"role": "user", "content": prompt}],
         "stream": stream or None,
         "tools": parsed_tools,
+        "tool_choice": parsed_tool_choice,
+        "include": list(include_fields) if include_fields else None,
         "temperature": temperature,
         "max_tokens": max_tokens,
+        "max_output_tokens": max_output_tokens,
         "n": count,
         "response_format": parsed_response_format,
         "background": background if background else None,
+        "parallel_tool_calls": parallel_tool_calls,
+        "reasoning": parsed_reasoning,
+        "text": parsed_text,
+        "stream_options": parsed_stream_options,
+        "store": store if store else None,
     }
 
     try:
