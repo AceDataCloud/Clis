@@ -22,7 +22,7 @@ SEEDANCE_MODELS = [
     "doubao-seedance-2-0-mini-260615",
 ]
 
-DEFAULT_MODEL = "doubao-seedance-2-5-260628"
+DEFAULT_MODEL = "doubao-seedance-2-0-260128"
 
 # Available aspect ratios
 ASPECT_RATIOS = [
@@ -140,7 +140,7 @@ def print_models() -> None:
     table.add_row(
         "doubao-seedance-2-5-260628",
         "V2.5",
-        "Latest flagship, up to 30s, multimodal edit and extend (default)",
+        "Latest flagship, up to 30s, multimodal edit and extend",
     )
     table.add_row(
         "doubao-seedance-1-5-pro-251215",

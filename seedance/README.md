@@ -101,7 +101,7 @@ Most commands support:
 
 ```
 --json                       Output raw JSON (for piping/scripting)
---model TEXT                 Seedance model version (default: doubao-seedance-2-5-260628)
+--model TEXT                 Seedance model version (default: doubao-seedance-2-0-260128)
 --aspect-ratio TEXT          Aspect ratio (16:9, 9:16, 1:1, 4:3, 3:4, 21:9, adaptive)
 --resolution TEXT            Output resolution (480p, 720p, 1080p, 4k)
 --duration INT               Duration in seconds (-1 for default, or an up to 15 for 2.0 or 30 for 2.5). Mutually exclusive with --frames.
@@ -130,7 +130,7 @@ Most commands support:
 | `doubao-seedance-1-0-pro-fast-251015` | V1.0 Fast | Faster generation |
 | `doubao-seedance-1-0-lite-t2v-250428` | V1.0 Lite T2V | Lightweight text-to-video |
 | `doubao-seedance-1-0-lite-i2v-250428` | V1.0 Lite I2V | Lightweight image-to-video |
-| `doubao-seedance-2-5-260628` | V2.0 | Next-generation general model (default) |
+| `doubao-seedance-2-5-260628` | V2.5 | Latest flagship, up to 30s, edit/extend |
 | `doubao-seedance-2-0-fast-260128` | V2.0 Fast | Faster next-generation generation |
 | `doubao-seedance-2-0-mini-260615` | V2.0 Mini | Compact next-generation model |
 
@@ -143,7 +143,7 @@ Most commands support:
 |----------|-------------|---------|
 | `ACEDATACLOUD_API_TOKEN` | API token from AceDataCloud | *Required* |
 | `ACEDATACLOUD_API_BASE_URL` | API base URL | `https://api.acedata.cloud` |
-| `SEEDANCE_DEFAULT_MODEL` | Default model | `doubao-seedance-2-5-260628` |
+| `SEEDANCE_DEFAULT_MODEL` | Default model | `doubao-seedance-2-0-260128` |
 | `SEEDANCE_REQUEST_TIMEOUT` | Timeout in seconds | `1800` |
 
 ## Development

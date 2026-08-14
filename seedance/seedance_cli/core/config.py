@@ -23,7 +23,7 @@ class Settings:
     )
     default_model: str = field(
         default_factory=lambda: os.environ.get(
-            "SEEDANCE_DEFAULT_MODEL", "doubao-seedance-2-5-260628"
+            "SEEDANCE_DEFAULT_MODEL", "doubao-seedance-2-0-260128"
         )
     )
 

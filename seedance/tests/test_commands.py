@@ -175,6 +175,8 @@ class TestGenerateCommands:
                 "test-token",
                 "generate",
                 "test",
+                "--model",
+                "doubao-seedance-2-5-260628",
                 "--duration",
                 "30",
                 "--task-type",
