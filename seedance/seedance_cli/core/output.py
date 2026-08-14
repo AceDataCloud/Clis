@@ -11,6 +11,7 @@ console = Console()
 
 # Available models
 SEEDANCE_MODELS = [
+    "doubao-seedance-2-5-260628",
     "doubao-seedance-1-5-pro-251215",
     "doubao-seedance-1-0-pro-250528",
     "doubao-seedance-1-0-pro-fast-251015",
@@ -80,22 +81,25 @@ def print_video_result(data: dict[str, Any]) -> None:
         console.print("[yellow]No data available yet. Use 'task' to check status.[/yellow]")
         return
 
-    if isinstance(items, list):
-        for i, item in enumerate(items, 1):
-            table = Table(show_header=False, box=None, padding=(0, 2))
-            table.add_column("Field", style="bold cyan", width=15)
-            table.add_column("Value")
-            table.add_row("Video", f"#{i}")
-            if item.get("video_url"):
-                table.add_row("URL", item["video_url"])
-            if item.get("state"):
-                table.add_row("State", item["state"])
-            if item.get("model_name"):
-                table.add_row("Model", item["model_name"])
-            if item.get("created_at"):
-                table.add_row("Created", item["created_at"])
-            console.print(table)
-            console.print()
+    normalized = items if isinstance(items, list) else [items] if isinstance(items, dict) else []
+    for i, item in enumerate(normalized, 1):
+        table = Table(show_header=False, box=None, padding=(0, 2))
+        table.add_column("Field", style="bold cyan", width=15)
+        table.add_column("Value")
+        table.add_row("Video", f"#{i}")
+        video_url = item.get("video_url") or (item.get("content") or {}).get("video_url")
+        if video_url:
+            table.add_row("URL", video_url)
+        status = item.get("status") or item.get("state")
+        if status:
+            table.add_row("Status", status)
+        model = item.get("model") or item.get("model_name")
+        if model:
+            table.add_row("Model", model)
+        if item.get("created_at"):
+            table.add_row("Created", item["created_at"])
+        console.print(table)
+        console.print()
 
 
 def print_task_result(data: dict[str, Any]) -> None:
@@ -134,6 +138,11 @@ def print_models() -> None:
     table.add_column("Notes")
 
     table.add_row(
+        "doubao-seedance-2-5-260628",
+        "V2.5",
+        "Latest flagship, up to 30s, multimodal edit and extend",
+    )
+    table.add_row(
         "doubao-seedance-1-5-pro-251215",
         "V1.5 Pro",
         "Newest 1.x, supports audio generation",
@@ -161,7 +170,7 @@ def print_models() -> None:
     table.add_row(
         "doubao-seedance-2-0-260128",
         "V2.0",
-        "Next-generation general model (default)",
+        "Highest resolution, up to 4k",
     )
     table.add_row(
         "doubao-seedance-2-0-fast-260128",

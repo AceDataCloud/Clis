@@ -16,6 +16,8 @@ export ACEDATACLOUD_API_TOKEN=your_token
 
 Or copy `.env.example` to `.env` and fill in your token.
 
+Creation is always asynchronous: generation returns a task ID, then `minimax task` / `minimax wait` retrieves the result. The legacy `--async` flag remains accepted but no longer changes behavior.
+
 ## Commands
 
 ### Video Generation

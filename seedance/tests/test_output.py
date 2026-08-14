@@ -18,13 +18,14 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(SEEDANCE_MODELS) == 8
+        assert len(SEEDANCE_MODELS) == 9
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in SEEDANCE_MODELS
 
     def test_models_include_all(self):
         for model in [
+            "doubao-seedance-2-5-260628",
             "doubao-seedance-1-5-pro-251215",
             "doubao-seedance-1-0-pro-250528",
             "doubao-seedance-1-0-pro-fast-251015",
@@ -97,6 +98,22 @@ class TestPrintVideoResult:
         print_video_result(data)
         captured = capsys.readouterr()
         assert "task-123" in captured.out
+
+    def test_print_video_result_object_envelope(self, capsys):
+        data = {
+            "task_id": "task-25",
+            "trace_id": "trace-25",
+            "data": {
+                "model": "doubao-seedance-2-5-260628",
+                "status": "succeeded",
+                "content": {"video_url": "https://cdn.example.com/video.mov"},
+            },
+        }
+        print_video_result(data)
+        captured = capsys.readouterr()
+        assert "video.mov" in captured.out
+        assert "doubao-seedance-2-5-260628" in captured.out
+        assert "succeeded" in captured.out
 
     def test_print_video_result_empty_data(self, capsys):
         data = {"task_id": "t-123", "trace_id": "tr-456", "data": []}

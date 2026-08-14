@@ -55,6 +55,7 @@ def print_video_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
+
     def print_task(task_data: dict[str, Any]) -> None:
         table = Table(show_header=False, box=None, padding=(0, 2))
         table.add_column("Field", style="bold cyan", width=15)

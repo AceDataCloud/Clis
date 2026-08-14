@@ -164,6 +164,47 @@ class TestGenerateCommands:
         assert sent["execution_expires_after"] == 7200
 
     @respx.mock
+    def test_generate_with_seedance_25_options(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/seedance/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--model",
+                "doubao-seedance-2-5-260628",
+                "--duration",
+                "30",
+                "--task-type",
+                "auto",
+                "--output-format",
+                "mov",
+                "--tool-json",
+                '{"type":"web_search"}',
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["model"] == "doubao-seedance-2-5-260628"
+        assert sent["duration"] == 30
+        assert sent["omni_reference_task_type"] == "auto"
+        assert sent["output_format"] == "mov"
+        assert sent["tools"] == [{"type": "web_search"}]
+
+    def test_generate_rejects_invalid_tool_json(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "test", "--tool-json", "[]"],
+        )
+        assert result.exit_code != 0
+        assert "JSON object" in result.output
+
+    @respx.mock
     def test_generate_with_frames(self, runner, mock_video_response):
         route = respx.post("https://api.acedata.cloud/seedance/videos").mock(
             return_value=Response(200, json=mock_video_response)
