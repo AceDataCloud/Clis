@@ -60,6 +60,14 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["config", "--help"])
         assert result.exit_code == 0
 
+    @pytest.mark.parametrize("command", ["chat", "messages", "count-tokens"])
+    def test_commands_reject_removed_model(self, runner, command):
+        result = runner.invoke(
+            cli,
+            [command, "Hello", "--model", "claude-3-opus-20240229"],
+        )
+        assert result.exit_code != 0
+
 
 # ─── Chat Commands ────────────────────────────────────────────────────────
 

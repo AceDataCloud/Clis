@@ -384,6 +384,13 @@ class TestChat2Commands:
         )
         assert result.exit_code != 0
 
+    def test_chat2_rejects_removed_claude_model(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "-m", "claude-3-opus-20240229"],
+        )
+        assert result.exit_code != 0
+
     @respx.mock
     def test_chat2_with_application_id(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
