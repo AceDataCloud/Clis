@@ -21,6 +21,11 @@ from discord_bot_cli.core.output import (
     default=None,
     help="Message ID to reply to.",
 )
+@click.option(
+    "--idempotency-key",
+    default=None,
+    help="Unique operation ID used for retry-safe message sending.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def send(
@@ -28,6 +33,7 @@ def send(
     channel_id: str,
     content: str,
     reply_to: str | None,
+    idempotency_key: str | None,
     output_json: bool,
 ) -> None:
     """Send a message to a channel.
@@ -39,11 +45,17 @@ def send(
     Examples:
       discord-bot send 1234567890 "Hello!"
       discord-bot send 1234567890 "Got it" --reply-to 9876543210
+      discord-bot send 1234567890 "Hi" --idempotency-key msg-20260816-001
       discord-bot send 1234567890 "Hi" --json
     """
     client = get_client(base_url=ctx.obj.get("base_url"), token=ctx.obj.get("token"))
     try:
-        result = client.send_message(channel_id, content, reply_to=reply_to)
+        result = client.send_message(
+            channel_id,
+            content,
+            reply_to=reply_to,
+            idempotency_key=idempotency_key,
+        )
         if output_json:
             print_json(result)
         else:

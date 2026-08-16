@@ -54,6 +54,9 @@ discord-bot send 1234567890 "Hello!"
 # Reply to a message
 discord-bot send 1234567890 "Got it" --reply-to 9876543210
 
+# Send with idempotency key (safe retries)
+discord-bot send 1234567890 "Hello!" --idempotency-key msg-20260816-001
+
 # Read recent messages
 discord-bot messages 1234567890 --limit 20
 
