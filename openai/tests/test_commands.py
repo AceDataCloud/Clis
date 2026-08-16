@@ -589,6 +589,24 @@ class TestResponseCommands:
         assert "42" in result.output
 
     @respx.mock
+    def test_response_rich_output_uses_output_text_fallback(self, runner):
+        respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(
+                200,
+                json={
+                    "id": "resp-abc123",
+                    "object": "response",
+                    "model": "gpt-5.6-sol",
+                    "output": [],
+                    "output_text": "Fallback answer from the Responses API.",
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "response", "Hello"])
+        assert result.exit_code == 0
+        assert "Fallback answer" in result.output
+
+    @respx.mock
     def test_response_with_model(self, runner, mock_response_api_response):
         route = respx.post("https://api.acedata.cloud/openai/responses").mock(
             return_value=Response(200, json=mock_response_api_response)
@@ -952,6 +970,19 @@ class TestInfoCommands:
                             "owned_by": "system",
                         },
                     ],
+                    "models": [
+                        {
+                            "slug": "gpt-5.6-sol",
+                            "display_name": "gpt-5.6-sol",
+                            "description": "gpt-5.6-sol via AceDataCloud",
+                            "supported_reasoning_levels": [
+                                {"effort": "low", "description": "Fast responses"},
+                                {"effort": "medium", "description": "Balanced reasoning"},
+                            ],
+                            "supported_in_api": True,
+                            "input_modalities": ["text", "image"],
+                        }
+                    ],
                 },
             )
         )
@@ -959,6 +990,8 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "gpt-5.4" in result.output
         assert "gpt-4o" in result.output
+        assert "gpt-5.6-sol" in result.output
+        assert "text, image" in result.output
 
     @respx.mock
     def test_models_json(self, runner):

@@ -292,6 +292,7 @@ def print_image_result(data: dict[str, Any]) -> None:
 def print_response_result(data: dict[str, Any]) -> None:
     """Print a Responses API result."""
     output = data.get("output", [])
+    output_text = data.get("output_text", "")
     if output:
         for item in output:
             item_type = item.get("type", "")
@@ -306,6 +307,14 @@ def print_response_result(data: dict[str, Any]) -> None:
                             border_style="green",
                         )
                     )
+    elif output_text:
+        console.print(
+            Panel(
+                output_text,
+                title="[bold green]Response[/bold green]",
+                border_style="green",
+            )
+        )
     else:
         task_id = data.get("task_id", "")
         if task_id:
@@ -455,6 +464,7 @@ def print_models() -> None:
 def print_api_models(data: dict[str, Any]) -> None:
     """Print models returned by /openai/models."""
     models = data.get("data", [])
+    model_metadata = data.get("models", [])
 
     table = Table(title="Available Models")
     table.add_column("Model", style="bold cyan")
@@ -464,3 +474,26 @@ def print_api_models(data: dict[str, Any]) -> None:
         table.add_row(model.get("id", ""), model.get("owned_by", ""))
 
     console.print(table)
+
+    if model_metadata:
+        metadata_table = Table(title="Model Metadata")
+        metadata_table.add_column("Slug", style="bold cyan")
+        metadata_table.add_column("Display Name")
+        metadata_table.add_column("Reasoning", style="dim")
+        metadata_table.add_column("Input", style="dim")
+        metadata_table.add_column("API", style="dim")
+
+        for model in model_metadata:
+            levels = model.get("supported_reasoning_levels") or []
+            reasoning = ", ".join(level.get("effort", "") for level in levels if level.get("effort"))
+            modalities = ", ".join(model.get("input_modalities") or [])
+            supported_in_api = model.get("supported_in_api")
+            metadata_table.add_row(
+                model.get("slug", ""),
+                model.get("display_name", ""),
+                reasoning,
+                modalities,
+                "" if supported_in_api is None else str(supported_in_api),
+            )
+
+        console.print(metadata_table)
