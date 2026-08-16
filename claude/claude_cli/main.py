@@ -45,7 +45,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
     \b
     Quick start:
       claude chat "What is the capital of France?"
-      claude chat "Explain AI" -m claude-3-5-sonnet-20241022
+      claude chat "Explain AI" -m claude-sonnet-5
       claude messages "Tell me a joke" --max-tokens 1024
       claude count-tokens "Hello, how are you?"
       claude models

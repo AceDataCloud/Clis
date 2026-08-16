@@ -137,7 +137,9 @@ from claude_cli.core.output import (
     flag_value=False,
     help="Disable parallel function calling during tool use.",
 )
-@click.option("--stream", is_flag=True, default=False, help="Stream partial chat completion events.")
+@click.option(
+    "--stream", is_flag=True, default=False, help="Stream partial chat completion events."
+)
 @click.option(
     "--response-format",
     default=None,
@@ -156,7 +158,7 @@ from claude_cli.core.output import (
 @click.option(
     "--stream-options",
     default=None,
-    help='Streaming options as a JSON object (e.g. \'{"include_usage": true}\').',
+    help="Streaming options as a JSON object (e.g. '{\"include_usage\": true}').",
 )
 @click.option("--metadata", default=None, help="Metadata as a JSON object.")
 @click.option("--logit-bias", default=None, help="Logit bias map as a JSON object.")
@@ -207,7 +209,7 @@ def chat(
     \b
     Examples:
       claude chat "What is the capital of France?"
-      claude chat "Explain quantum computing" -m claude-3-5-sonnet-20241022
+      claude chat "Explain quantum computing" -m claude-sonnet-5
       claude chat "Write a poem" --temperature 0.9
       claude chat "Summarize this" -s "You are a concise summarizer"
     """

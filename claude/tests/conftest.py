@@ -33,7 +33,7 @@ def mock_chat_response():
     return {
         "id": "chatcmpl-abc123",
         "object": "chat.completion",
-        "model": "claude-3-5-haiku-20241022",
+        "model": "claude-haiku-4-5-20251001",
         "choices": [
             {
                 "index": 0,
@@ -59,7 +59,7 @@ def mock_messages_response():
         "id": "msg-abc123",
         "type": "message",
         "role": "assistant",
-        "model": "claude-3-5-haiku-20241022",
+        "model": "claude-haiku-4-5-20251001",
         "content": [
             {
                 "type": "text",

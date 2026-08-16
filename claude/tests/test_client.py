@@ -38,7 +38,7 @@ class TestClaudeClient:
             return_value=Response(200, json=mock_response)
         )
         client = ClaudeClient(api_token="test-token")
-        result = client.chat_completions(model="claude-3-5-haiku-20241022", messages=[])
+        result = client.chat_completions(model="claude-haiku-4-5-20251001", messages=[])
         assert result == mock_response
 
     @respx.mock
@@ -49,7 +49,7 @@ class TestClaudeClient:
         )
         client = ClaudeClient(api_token="test-token")
         result = client.messages(
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5-20251001",
             messages=[{"role": "user", "content": "Hi"}],
             max_tokens=1024,
         )
@@ -63,7 +63,7 @@ class TestClaudeClient:
         )
         client = ClaudeClient(api_token="test-token")
         result = client.count_tokens(
-            model="claude-3-5-haiku-20241022",
+            model="claude-haiku-4-5-20251001",
             messages=[{"role": "user", "content": "Hi"}],
         )
         assert result == mock_response
@@ -75,7 +75,7 @@ class TestClaudeClient:
         )
         client = ClaudeClient(api_token="bad-token")
         with pytest.raises(ClaudeAuthError):
-            client.chat_completions(model="claude-3-5-haiku-20241022", messages=[])
+            client.chat_completions(model="claude-haiku-4-5-20251001", messages=[])
 
     @respx.mock
     def test_403_raises_auth_error(self):
@@ -84,7 +84,7 @@ class TestClaudeClient:
         )
         client = ClaudeClient(api_token="test-token")
         with pytest.raises(ClaudeAuthError):
-            client.chat_completions(model="claude-3-5-haiku-20241022", messages=[])
+            client.chat_completions(model="claude-haiku-4-5-20251001", messages=[])
 
     @respx.mock
     def test_500_raises_api_error(self):
@@ -93,11 +93,11 @@ class TestClaudeClient:
         )
         client = ClaudeClient(api_token="test-token")
         with pytest.raises(ClaudeAPIError):
-            client.chat_completions(model="claude-3-5-haiku-20241022", messages=[])
+            client.chat_completions(model="claude-haiku-4-5-20251001", messages=[])
 
     def test_none_values_removed_from_payload(self):
         """Verify None values are stripped from request payload."""
-        payload = {"model": "claude-3-5-haiku-20241022", "temperature": None, "top_p": None}
+        payload = {"model": "claude-haiku-4-5-20251001", "temperature": None, "top_p": None}
         cleaned = {k: v for k, v in payload.items() if v is not None}
         assert "temperature" not in cleaned
         assert "top_p" not in cleaned

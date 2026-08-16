@@ -21,7 +21,7 @@ claude chat "What is the capital of France?"
 claude messages "Tell me a joke" --max-tokens 1024
 
 # Count tokens for a prompt
-claude count-tokens "Hello, how are you?" --model claude-3-5-haiku-20241022
+claude count-tokens "Hello, how are you?" --model claude-haiku-4-5-20251001
 
 # List available models
 claude models
