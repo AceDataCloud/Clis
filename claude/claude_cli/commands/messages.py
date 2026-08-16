@@ -80,7 +80,9 @@ from claude_cli.core.output import (
     default=None,
     help="Display mode for enabled or adaptive thinking.",
 )
-@click.option("--metadata", default=None, help='Metadata as a JSON object (e.g. \'{"user_id":"u1"}\').')
+@click.option(
+    "--metadata", default=None, help='Metadata as a JSON object (e.g. \'{"user_id":"u1"}\').'
+)
 @click.option("--stream", is_flag=True, default=False, help="Stream incremental events.")
 @click.option("--tools", default=None, help="Tool definitions as a JSON array.")
 @click.option("--tool-choice", default=None, help="Tool choice as a JSON object.")
@@ -124,13 +126,17 @@ def messages(
     if thinking_type is not None:
         if thinking_type == "enabled":
             if thinking_budget_tokens is None:
-                raise click.UsageError("--thinking-budget-tokens is required when --thinking-type=enabled")
+                raise click.UsageError(
+                    "--thinking-budget-tokens is required when --thinking-type=enabled"
+                )
             thinking = {"type": thinking_type, "budget_tokens": thinking_budget_tokens}
         else:
             thinking = {"type": thinking_type}
         if thinking_display is not None:
             if thinking_type == "disabled":
-                raise click.UsageError("--thinking-display is only valid with enabled or adaptive thinking")
+                raise click.UsageError(
+                    "--thinking-display is only valid with enabled or adaptive thinking"
+                )
             thinking["display"] = thinking_display
     elif thinking_display is not None:
         raise click.UsageError("--thinking-display requires --thinking-type")
