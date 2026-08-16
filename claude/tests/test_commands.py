@@ -7,6 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
+from claude_cli.core.output import CHAT_MODELS
 from claude_cli.main import cli
 
 
@@ -20,6 +21,10 @@ def runner() -> CliRunner:
 
 class TestGlobalCommands:
     """Tests for global CLI options."""
+
+    def test_model_inventory_excludes_retired_opus_3(self):
+        assert "claude-opus-5" in CHAT_MODELS
+        assert "claude-3-opus-20240229" not in CHAT_MODELS
 
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])

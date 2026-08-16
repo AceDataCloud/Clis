@@ -7,6 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
+from aichat_cli.core.output import MODELS2
 from aichat_cli.main import cli, get_version
 
 
@@ -20,6 +21,10 @@ def runner() -> CliRunner:
 
 class TestGlobalCommands:
     """Tests for global CLI options."""
+
+    def test_model_inventory_excludes_retired_opus_3(self):
+        assert "claude-opus-5" in MODELS2
+        assert "claude-3-opus-20240229" not in MODELS2
 
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
