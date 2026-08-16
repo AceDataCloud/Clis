@@ -17,6 +17,13 @@ Monorepo for all AceDataCloud command-line interface tools.
 | `serp/` | [SerpCli](https://github.com/AceDataCloud/SerpCli) | Google SERP (Search) CLI |
 | `wan/` | [WanCli](https://github.com/AceDataCloud/WanCli) | Tongyi Wansiang video generation CLI |
 | `adc/` | [AceDataCloudCli](https://github.com/AceDataCloud/AceDataCloudCli) | Unified AceDataCloud CLI (all services) |
+| `aichat/` | [AiChatCli](https://github.com/AceDataCloud/AiChatCli) | AI Dialogue CLI |
+| `glm/` | [GLMCli](https://github.com/AceDataCloud/GLMCli) | GLM chat completions CLI |
+| `hailuo/` | [HailuoCli](https://github.com/AceDataCloud/HailuoCli) | Hailuo video generation CLI |
+| `kling/` | [KlingCli](https://github.com/AceDataCloud/KlingCli) | Kling video generation CLI |
+| `openai/` | [OpenAICli](https://github.com/AceDataCloud/OpenAICli) | OpenAI-compatible API CLI |
+| `producer/` | [ProducerCli](https://github.com/AceDataCloud/ProducerCli) | Producer music generation CLI |
+| `webextrator/` | [WebExtratorCli](https://github.com/AceDataCloud/WebExtratorCli) | Web extraction and rendering CLI |
 
 ## How It Works
 
