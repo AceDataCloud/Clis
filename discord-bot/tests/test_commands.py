@@ -202,6 +202,25 @@ class TestMessageCommands:
         assert sent["reply_to"] == "9876543210"
 
     @respx.mock
+    def test_send_with_idempotency_key(self, runner, mock_message_response):
+        route = respx.post(f"{BASE_URL}/api/messages").mock(
+            return_value=Response(200, json=mock_message_response)
+        )
+        result = invoke(
+            runner,
+            [
+                "send",
+                "1234567890",
+                "Hello!",
+                "--idempotency-key",
+                "msg-20260816-001",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert route.calls[0].request.headers["idempotency-key"] == "msg-20260816-001"
+
+    @respx.mock
     def test_messages_json(self, runner, mock_messages_response):
         respx.get(f"{BASE_URL}/api/channels/1234567890/messages").mock(
             return_value=Response(200, json=mock_messages_response)

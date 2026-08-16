@@ -66,6 +66,7 @@ class DiscordBotClient:
         path: str,
         params: dict[str, Any] | None = None,
         json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> dict[str, Any]:
         """Make an HTTP request to the Discord Bot API."""
         url = f"{self.base_url}{path}"
@@ -83,7 +84,7 @@ class DiscordBotClient:
                     url,
                     params=params or None,
                     json=json or None,
-                    headers=self._get_headers(),
+                    headers=self._get_headers() | (headers or {}),
                     timeout=self.timeout,
                 )
                 return self._handle_response(response)
@@ -152,12 +153,14 @@ class DiscordBotClient:
         channel_id: str,
         content: str,
         reply_to: str | None = None,
+        idempotency_key: str | None = None,
     ) -> dict[str, Any]:
         """Send a message to a channel."""
         return self._request(
             "POST",
             "/api/messages",
             json={"channel_id": channel_id, "content": content, "reply_to": reply_to},
+            headers={"idempotency-key": idempotency_key} if idempotency_key else None,
         )
 
     def read_messages(self, channel_id: str, limit: int | None = None) -> dict[str, Any]:
