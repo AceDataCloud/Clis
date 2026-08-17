@@ -1,6 +1,5 @@
 """Tests for configuration."""
 
-
 import pytest
 
 from claude_cli.core.config import Settings

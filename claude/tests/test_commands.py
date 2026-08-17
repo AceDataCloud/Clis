@@ -7,6 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
+from claude_cli.core.output import CHAT_MODELS
 from claude_cli.main import cli
 
 
@@ -20,6 +21,10 @@ def runner() -> CliRunner:
 
 class TestGlobalCommands:
     """Tests for global CLI options."""
+
+    def test_model_inventory_excludes_retired_opus_3(self):
+        assert "claude-opus-5" in CHAT_MODELS
+        assert "claude-3-opus-20240229" not in CHAT_MODELS
 
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
@@ -222,9 +227,7 @@ class TestChatCommands:
         respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
             return_value=Response(401, json={"error": "Unauthorized"})
         )
-        result = runner.invoke(
-            cli, ["--token", "bad-token", "chat", "Hello"]
-        )
+        result = runner.invoke(cli, ["--token", "bad-token", "chat", "Hello"])
         assert result.exit_code != 0
 
     def test_chat_no_token(self, runner, monkeypatch):
@@ -348,9 +351,7 @@ class TestMessagesCommands:
         respx.post("https://api.acedata.cloud/v1/messages").mock(
             return_value=Response(401, json={"error": "Unauthorized"})
         )
-        result = runner.invoke(
-            cli, ["--token", "bad-token", "messages", "Hello"]
-        )
+        result = runner.invoke(cli, ["--token", "bad-token", "messages", "Hello"])
         assert result.exit_code != 0
 
 
@@ -378,9 +379,7 @@ class TestCountTokensCommands:
         respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
             return_value=Response(200, json=mock_count_tokens_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "count-tokens", "Hello world"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "count-tokens", "Hello world"])
         assert result.exit_code == 0
         assert "15" in result.output
 
@@ -553,9 +552,7 @@ class TestMessagesThinking:
         route = respx.post("https://api.acedata.cloud/v1/messages").mock(
             return_value=Response(200, json=mock_messages_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "messages", "Hello"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "messages", "Hello"])
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
         assert request_body.get("thinking") is None
@@ -618,9 +615,7 @@ class TestMessagesThinking:
         route = respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
             return_value=Response(200, json=mock_count_tokens_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "count-tokens", "Hello"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "count-tokens", "Hello"])
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
         assert request_body.get("thinking") is None
