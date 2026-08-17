@@ -141,7 +141,7 @@ class TestPrintTaskResult:
         print_task_result(data)
         captured = capsys.readouterr()
         assert "task-1" in captured.out
-        assert "cdn.example.com" in captured.out
+        assert "https://cdn.example.com/img1.png" in captured.out
 
     def test_print_task_result_empty(self, capsys):
         data = {"data": [], "items": []}
