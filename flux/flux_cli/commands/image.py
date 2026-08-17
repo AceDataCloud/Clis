@@ -26,7 +26,8 @@ from flux_cli.core.output import (
 @click.option(
     "-s",
     "--size",
-    default=None,
+    default="1024x1024",
+    show_default=True,
     help="Image size: pixels (e.g. 1024x1024) or aspect ratio (e.g. 16:9).",
 )
 @click.option(
@@ -113,8 +114,16 @@ def generate(
 @click.option(
     "-s",
     "--size",
-    default=None,
+    default="1024x1024",
+    show_default=True,
     help="Output size: pixels or aspect ratio.",
+)
+@click.option(
+    "-n",
+    "--count",
+    default=None,
+    type=float,
+    help="Number of images to generate.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
@@ -139,6 +148,7 @@ def edit(
     image_url: str,
     model: str,
     size: str | None,
+    count: float | None,
     callback_url: str | None,
     accept: str,
     async_mode: bool,
@@ -161,6 +171,7 @@ def edit(
             "image_url": image_url,
             "model": model,
             "size": size,
+            "count": count,
             "callback_url": callback_url,
         }
         if async_mode:

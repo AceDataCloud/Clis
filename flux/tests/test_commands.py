@@ -118,6 +118,16 @@ class TestGenerateCommands:
         assert body["size"] == "1024x768"
 
     @respx.mock
+    def test_generate_uses_default_size(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/flux/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "generate", "test", "--json"])
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["size"] == "1024x1024"
+
+    @respx.mock
     def test_generate_with_count(self, runner, mock_image_response):
         route = respx.post("https://api.acedata.cloud/flux/images").mock(
             return_value=Response(200, json=mock_image_response)
@@ -139,9 +149,7 @@ class TestGenerateCommands:
         assert body["count"] == 3
 
     @respx.mock
-    def test_generate_with_fractional_count_and_ndjson_accept(
-        self, runner, mock_image_response
-    ):
+    def test_generate_with_fractional_count_and_ndjson_accept(self, runner, mock_image_response):
         route = respx.post("https://api.acedata.cloud/flux/images").mock(
             return_value=Response(200, json=mock_image_response)
         )
@@ -261,11 +269,33 @@ class TestEditCommands:
         route = respx.post("https://api.acedata.cloud/flux/images").mock(
             return_value=Response(200, json=mock_image_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "edit", "test prompt", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "edit", "test prompt", "--json"])
         assert result.exit_code == 0
         assert "image_url" not in json.loads(route.calls.last.request.content)
+
+    @respx.mock
+    def test_edit_with_count_and_default_size(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/flux/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "test prompt",
+                "--image-url",
+                "https://example.com/img.png",
+                "--count",
+                "2",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["count"] == 2.0
+        assert body["size"] == "1024x1024"
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────

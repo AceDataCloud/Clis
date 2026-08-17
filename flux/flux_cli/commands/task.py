@@ -107,16 +107,20 @@ def wait(
     try:
         while elapsed < max_timeout:
             result = client.query_task(id=task_id, action="retrieve")
-            data = result.get("data", {})
+            data = result.get("data", result)
 
             if isinstance(data, list) and data:
                 item = data[0]
+            elif isinstance(data, dict) and isinstance(data.get("items"), list):
+                item = data["items"][0] if data["items"] else {}
             elif isinstance(data, dict):
                 item = data
             else:
                 item = {}
 
             state = item.get("state", item.get("status", ""))
+            if not state and (item.get("finished_at") or item.get("response")):
+                state = "completed"
             if state in ("succeeded", "completed", "complete", "failed", "error"):
                 if output_json:
                     print_json(result)

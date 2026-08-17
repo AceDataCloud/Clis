@@ -129,6 +129,20 @@ class TestPrintTaskResult:
         captured = capsys.readouterr()
         assert "task-1" in captured.out
 
+    def test_print_task_result_task_record(self, capsys):
+        data = {
+            "id": "task-1",
+            "type": "image",
+            "trace_id": "trace-1",
+            "created_at": 1763142637.404,
+            "request": {"prompt": "test"},
+            "response": {"data": [{"image_url": "https://cdn.example.com/img1.png"}]},
+        }
+        print_task_result(data)
+        captured = capsys.readouterr()
+        assert "task-1" in captured.out
+        assert "cdn.example.com" in captured.out
+
     def test_print_task_result_empty(self, capsys):
         data = {"data": [], "items": []}
         print_task_result(data)

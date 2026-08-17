@@ -87,6 +87,23 @@ def print_image_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
+    if data.get("id") or data.get("response"):
+        table = Table(show_header=False, box=None, padding=(0, 2))
+        table.add_column("Field", style="bold cyan", width=15)
+        table.add_column("Value")
+        for key in ["id", "type", "trace_id", "created_at", "started_at", "finished_at", "elapsed"]:
+            if data.get(key) is not None:
+                table.add_row(key.replace("_", " ").title(), str(data[key]))
+        resp = data.get("response", {})
+        resp_data = resp.get("data", []) if isinstance(resp, dict) else []
+        if isinstance(resp_data, list):
+            for img in resp_data:
+                if img.get("image_url"):
+                    table.add_row("Image URL", img["image_url"])
+        console.print(table)
+        console.print()
+        return
+
     # Handle data array response
     items = data.get("data", [])
     if isinstance(items, list) and items:
