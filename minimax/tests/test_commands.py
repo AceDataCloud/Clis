@@ -67,7 +67,7 @@ class TestGenerateCommands:
         sent = json.loads(route.calls[0].request.content)
         assert sent["content"] == [{"type": "text", "text": "A test prompt"}]
         assert sent["model"] == "MiniMax-H3"
-        assert sent["async"] is True
+        assert sent["async"] is False
 
     @respx.mock
     def test_generate_rich_output(self, mock_video_response):
@@ -286,6 +286,7 @@ class TestGenerateCommands:
             "image_url": {"url": "https://example.com/photo.jpg"},
             "role": "first_frame",
         }
+        assert sent["async"] is False
 
     @respx.mock
     def test_image_to_video_with_model(self, mock_video_response):
