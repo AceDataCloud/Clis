@@ -31,6 +31,9 @@ flux generate "Cyberpunk city with neon lights" -m flux-2-pro
 # Generate with aspect ratio (ultra/kontext models)
 flux generate "Minimalist logo of a phoenix" -m flux-2-max -s 16:9
 
+# Generate multiple images
+flux generate "A red car" --count 2
+
 # Edit an existing image
 flux edit "Add sunglasses to the person" --image-url https://example.com/photo.jpg
 
