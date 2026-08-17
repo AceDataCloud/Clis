@@ -34,7 +34,9 @@ def print_success(message: str) -> None:
 
 def print_video_result(data: dict[str, Any]) -> None:
     """Print video generation result in a rich format."""
-    task_id = data.get("task_id", "N/A")
+    task = data.get("task")
+    task = task if isinstance(task, dict) else {}
+    task_id = data.get("task_id") or task.get("id", "N/A")
 
     console.print(
         Panel(
@@ -44,10 +46,13 @@ def print_video_result(data: dict[str, Any]) -> None:
         )
     )
 
+    content = task.get("content")
     video_url = data.get("video_url")
+    if not video_url and isinstance(content, dict):
+        video_url = content.get("url")
     if video_url:
         console.print(f"[bold]Video URL:[/bold] {video_url}")
-    elif not data.get("task_id"):
+    elif task_id == "N/A":
         console.print("[yellow]No video available yet. Use 'task' to check status.[/yellow]")
     else:
         console.print("[yellow]Video is being generated. Use 'task' to check status.[/yellow]")

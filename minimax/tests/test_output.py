@@ -45,6 +45,19 @@ class TestOutputFunctions:
         captured = capsys.readouterr()
         assert "task-123" in captured.out
 
+    def test_print_video_result_synchronous(self, capsys):
+        print_video_result(
+            {
+                "task": {
+                    "id": "task-123",
+                    "content": {"url": "https://cdn.example.com/video.mp4"},
+                }
+            }
+        )
+        captured = capsys.readouterr()
+        assert "task-123" in captured.out
+        assert "https://cdn.example.com/video.mp4" in captured.out
+
     def test_print_task_result_single(self, capsys):
         print_task_result(
             {
