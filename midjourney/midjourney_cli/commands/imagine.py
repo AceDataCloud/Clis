@@ -7,6 +7,7 @@ from midjourney_cli.core.exceptions import MidjourneyError
 from midjourney_cli.core.output import (
     DEFAULT_IMAGINE_MODE,
     IMAGINE_MODES,
+    IMAGINE_VERSIONS,
     print_error,
     print_json,
     print_result,
@@ -42,7 +43,12 @@ from midjourney_cli.core.output import (
     default=False,
     help="Split generated images into individual files.",
 )
-@click.option("--version", default=None, help="Midjourney version to use.")
+@click.option(
+    "--version",
+    type=click.Choice(IMAGINE_VERSIONS),
+    default=None,
+    help="Midjourney version to use.",
+)
 @click.option("--hd/--no-hd", default=False, help="Enable HD generation.")
 @click.option("--quality", default=None, help="Quality setting.")
 @click.option(
