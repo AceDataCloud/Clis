@@ -180,11 +180,16 @@ class TestImagineCommand:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "imagine", "test", "--version", "6.1", "--json"],
+            ["--token", "test-token", "imagine", "test", "--version", "8.2", "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["version"] == "6.1"
+        assert body["version"] == "8.2"
+
+    def test_imagine_rejects_unsupported_version(self, runner):
+        result = runner.invoke(cli, ["imagine", "test", "--version", "invalid"])
+        assert result.exit_code != 0
+        assert "Invalid value for '--version'" in result.output
 
     def test_imagine_no_token(self, runner):
         result = runner.invoke(cli, ["imagine", "test"])

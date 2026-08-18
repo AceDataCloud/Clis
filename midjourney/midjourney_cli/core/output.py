@@ -12,6 +12,7 @@ console = Console()
 # Available modes for imagine/edits
 IMAGINE_MODES = ["fast", "relax", "turbo"]
 DEFAULT_IMAGINE_MODE = "fast"
+IMAGINE_VERSIONS = ["8.2", "8.1", "8", "7", "6.1", "6", "5.2"]
 
 # Available modes for videos
 VIDEO_MODES = ["fast", "turbo"]
