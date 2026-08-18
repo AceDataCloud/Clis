@@ -104,11 +104,11 @@ class TestChatCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "-m", "gpt-5.4-mini", "--json"],
+            ["--token", "test-token", "chat", "Hello", "-m", "deepseek-v4-pro", "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "gpt-5.4-mini"
+        assert body["model"] == "deepseek-v4-pro"
 
     @respx.mock
     def test_chat_with_conversation_id(self, runner, mock_chat_response):
@@ -202,6 +202,7 @@ class TestInfoCommands:
         assert "glm-5-turbo" in result.output
         assert "gpt-4o" in result.output
         assert "deepseek" in result.output.lower()
+        assert "deepseek-v4-pro" in result.output
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
@@ -221,6 +222,7 @@ class TestInfoCommands:
         assert "kimi-k2-instruct-0905" not in result.output
         assert "kimi-k2-turbo-preview" not in result.output
         assert "grok-4" in result.output
+        assert "deepseek-v4-pro" in result.output
 
 
 # ─── Chat2 Commands ──────────────────────────────────────────────────────────
@@ -250,11 +252,11 @@ class TestChat2Commands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat2", "Hello", "-m", "claude-opus-5", "--json"],
+            ["--token", "test-token", "chat2", "Hello", "-m", "deepseek-v4-pro", "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "claude-opus-5"
+        assert body["model"] == "deepseek-v4-pro"
 
     @respx.mock
     def test_chat2_with_model_group(self, runner, mock_chat_response):
