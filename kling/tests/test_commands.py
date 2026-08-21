@@ -435,6 +435,28 @@ class TestGenerateCommands:
             {"video_url": "https://example.com/ref.mp4", "refer_type": "feature"}
         ]
 
+    @respx.mock
+    def test_image_to_video_with_generate_audio(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "image-to-video",
+                "Animate this",
+                "--start-image-url",
+                "https://example.com/photo.jpg",
+                "--generate-audio",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["generate_audio"] is True
+
     def test_extend_no_video_id(self, runner):
         result = runner.invoke(cli, ["--token", "test-token", "extend"])
         assert result.exit_code != 0
