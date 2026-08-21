@@ -215,6 +215,11 @@ def generate(
     default=None,
     help="Negative prompt (max 200 characters).",
 )
+@click.option(
+    "--generate-audio/--no-generate-audio",
+    default=None,
+    help="Generate audio along with the video.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -256,6 +261,7 @@ def image_to_video(
     duration: float | None,
     cfg_scale: float | None,
     negative_prompt: str | None,
+    generate_audio: bool | None,
     callback_url: str | None,
     async_mode: bool,
     camera_control: str | None,
@@ -288,6 +294,7 @@ def image_to_video(
             duration=duration,
             cfg_scale=cfg_scale,
             negative_prompt=negative_prompt,
+            generate_audio=generate_audio,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
             camera_control=_parse_json_option(camera_control, "--camera-control"),
