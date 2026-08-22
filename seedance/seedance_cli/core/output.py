@@ -104,30 +104,49 @@ def print_video_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
-    tasks = data.get("data", [])
-
-    if isinstance(tasks, list):
-        for task_data in tasks:
-            table = Table(show_header=False, box=None, padding=(0, 2))
-            table.add_column("Field", style="bold cyan", width=15)
-            table.add_column("Value")
-
-            for key in ["id", "status", "state", "video_url", "model_name", "created_at"]:
-                if task_data.get(key):
-                    table.add_row(key.replace("_", " ").title(), str(task_data[key]))
-
-            console.print(table)
-            console.print()
-    elif isinstance(tasks, dict):
+    for task_data in normalize_task_records(data):
+        response = task_data.get("response")
+        response_data = response.get("data") if isinstance(response, dict) else None
+        display_data = {
+            **task_data,
+            **(response_data if isinstance(response_data, dict) else {}),
+        }
         table = Table(show_header=False, box=None, padding=(0, 2))
         table.add_column("Field", style="bold cyan", width=15)
         table.add_column("Value")
 
-        for key in ["id", "status", "state", "video_url", "model_name", "created_at"]:
-            if tasks.get(key):
-                table.add_row(key.replace("_", " ").title(), str(tasks[key]))
+        for key in ["id", "status", "state", "video_url", "model", "model_name", "created_at"]:
+            if display_data.get(key) is not None:
+                table.add_row(key.replace("_", " ").title(), str(display_data[key]))
 
         console.print(table)
+        console.print()
+
+
+def normalize_task_records(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Normalize single, batch, and legacy task query responses."""
+    if isinstance(data.get("items"), list):
+        return [item for item in data["items"] if isinstance(item, dict)]
+    if "id" in data:
+        return [data]
+    legacy_data = data.get("data")
+    if isinstance(legacy_data, list):
+        return [item for item in legacy_data if isinstance(item, dict)]
+    if isinstance(legacy_data, dict):
+        return [legacy_data]
+    return []
+
+
+def get_task_state(task_data: dict[str, Any]) -> str:
+    """Extract task state from a task record's captured API response."""
+    response = task_data.get("response")
+    response_data = response.get("data") if isinstance(response, dict) else None
+    if isinstance(response_data, dict):
+        state = response_data.get("status") or response_data.get("state")
+        if isinstance(state, str):
+            return state
+    state = task_data.get("state") or task_data.get("status")
+    return state if isinstance(state, str) else ""
 
 
 def print_models() -> None:

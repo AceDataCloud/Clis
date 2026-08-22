@@ -50,17 +50,18 @@ def mock_video_response():
 def mock_task_response():
     """Mock task query response."""
     return {
-        "success": True,
-        "data": [
-            {
-                "id": "task-123",
-                "status": "completed",
-                "state": "succeeded",
+        "id": "task-123",
+        "type": "seedance.videos",
+        "trace_id": "test-trace-456",
+        "request": {"model": "doubao-seedance-1-0-pro-250528"},
+        "response": {
+            "data": {
+                "status": "succeeded",
                 "video_url": "https://cdn.example.com/test-video.mp4",
-                "model_name": "doubao-seedance-1-0-pro-250528",
-                "created_at": "2025-01-21T00:00:00.000Z",
+                "model": "doubao-seedance-1-0-pro-250528",
             }
-        ],
+        },
+        "created_at": 1787400000.0,
     }
 
 

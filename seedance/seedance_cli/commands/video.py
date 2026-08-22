@@ -44,19 +44,19 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
         ),
         click.option(
             "--duration",
-            type=int,
+            type=click.IntRange(-1, 30),
             default=None,
             help="Duration in seconds (-1 for auto, up to 15 for 2.0 or 30 for 2.5). Mutually exclusive with --frames.",
         ),
         click.option(
             "--frames",
-            type=int,
+            type=click.IntRange(29, 289),
             default=None,
             help="Frame count (29-289, must satisfy 25+4n). Mutually exclusive with --duration.",
         ),
         click.option(
             "--seed",
-            type=int,
+            type=click.IntRange(-1, 4294967295),
             default=None,
             help="Random seed for reproducible generation (-1 for random).",
         ),
@@ -100,11 +100,22 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
             "--tool-json",
             "tool_jsons",
             multiple=True,
-            help="Seedance 2.5 tool object as JSON; repeat as needed.",
+            help="Seedance 2.5 web_search tool object as JSON.",
+        ),
+        click.option(
+            "--priority",
+            type=click.IntRange(0, 9),
+            default=None,
+            help="Seedance 2.5 task priority (0-9).",
+        ),
+        click.option(
+            "--safety-identifier",
+            default=None,
+            help="Stable anonymous end-user identifier (maximum 64 characters).",
         ),
         click.option(
             "--execution-expires-after",
-            type=int,
+            type=click.IntRange(3600, 259200),
             default=None,
             help="Task timeout threshold in seconds (3600-259200).",
         ),
@@ -163,6 +174,8 @@ def _build_common_payload(
     task_type: str | None,
     output_format: str | None,
     tool_jsons: tuple[str, ...],
+    priority: int | None,
+    safety_identifier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
     async_mode: bool,
@@ -193,16 +206,13 @@ def _build_common_payload(
     if output_format is not None:
         payload["output_format"] = output_format
     if tool_jsons:
-        tools: list[dict[str, object]] = []
-        for value in tool_jsons:
-            try:
-                tool = json.loads(value)
-            except json.JSONDecodeError as exc:
-                raise click.UsageError(f"Invalid --tool-json: {exc.msg}") from exc
-            if not isinstance(tool, dict):
-                raise click.UsageError("--tool-json must decode to a JSON object.")
-            tools.append(tool)
-        payload["tools"] = tools
+        payload["tools"] = _parse_tools(tool_jsons)
+    if priority is not None:
+        payload["priority"] = priority
+    if safety_identifier is not None:
+        if len(safety_identifier) > 64:
+            raise click.UsageError("--safety-identifier must be at most 64 characters.")
+        payload["safety_identifier"] = safety_identifier
     if execution_expires_after is not None:
         payload["execution_expires_after"] = execution_expires_after
     if callback_url is not None:
@@ -210,6 +220,40 @@ def _build_common_payload(
     if async_mode:
         payload["async"] = True
     return payload
+
+
+def _parse_tools(tool_jsons: tuple[str, ...]) -> list[dict[str, object]]:
+    """Parse and validate the Seedance web search tool."""
+    if len(tool_jsons) > 1:
+        raise click.UsageError("--tool-json may only be specified once.")
+    try:
+        tool = json.loads(tool_jsons[0])
+    except json.JSONDecodeError as exc:
+        raise click.UsageError(f"Invalid --tool-json: {exc.msg}") from exc
+    if not isinstance(tool, dict):
+        raise click.UsageError("--tool-json must decode to a JSON object.")
+
+    allowed_keys = {"type", "limit", "max_keyword", "sources"}
+    if unknown_keys := tool.keys() - allowed_keys:
+        raise click.UsageError(f"Invalid --tool-json field(s): {', '.join(sorted(unknown_keys))}.")
+    if tool.get("type") != "web_search":
+        raise click.UsageError('--tool-json requires "type": "web_search".')
+    for field in ("limit", "max_keyword"):
+        value = tool.get(field)
+        if field in tool and (
+            not isinstance(value, int) or isinstance(value, bool) or not 1 <= value <= 50
+        ):
+            raise click.UsageError(f'--tool-json "{field}" must be an integer from 1 to 50.')
+    sources = tool.get("sources")
+    allowed_sources = {"toutiao", "douyin", "moji", "search_engine"}
+    if "sources" in tool and (
+        not isinstance(sources, list)
+        or any(not isinstance(source, str) or source not in allowed_sources for source in sources)
+    ):
+        raise click.UsageError(
+            '--tool-json "sources" must contain only toutiao, douyin, moji, or search_engine.'
+        )
+    return [tool]
 
 
 def _build_content(
@@ -269,6 +313,8 @@ def generate(
     task_type: str | None,
     output_format: str | None,
     tool_jsons: tuple[str, ...],
+    priority: int | None,
+    safety_identifier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
     first_frame_url: str | None,
@@ -291,6 +337,8 @@ def generate(
     """
     if duration is not None and frames is not None:
         raise click.UsageError("--duration and --frames are mutually exclusive.")
+    if len(prompt) > 1000:
+        raise click.UsageError("PROMPT must be at most 1000 characters.")
 
     client = get_client(ctx.obj.get("token"))
     try:
@@ -308,6 +356,8 @@ def generate(
             task_type=task_type,
             output_format=output_format,
             tool_jsons=tool_jsons,
+            priority=priority,
+            safety_identifier=safety_identifier,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
             async_mode=async_mode,
@@ -360,6 +410,8 @@ def image_to_video(
     task_type: str | None,
     output_format: str | None,
     tool_jsons: tuple[str, ...],
+    priority: int | None,
+    safety_identifier: str | None,
     execution_expires_after: int | None,
     callback_url: str | None,
     first_frame_url: str | None,
@@ -382,6 +434,8 @@ def image_to_video(
     """
     if duration is not None and frames is not None:
         raise click.UsageError("--duration and --frames are mutually exclusive.")
+    if len(prompt) > 1000:
+        raise click.UsageError("PROMPT must be at most 1000 characters.")
 
     client = get_client(ctx.obj.get("token"))
     try:
@@ -399,6 +453,8 @@ def image_to_video(
             task_type=task_type,
             output_format=output_format,
             tool_jsons=tool_jsons,
+            priority=priority,
+            safety_identifier=safety_identifier,
             execution_expires_after=execution_expires_after,
             callback_url=callback_url,
             async_mode=async_mode,

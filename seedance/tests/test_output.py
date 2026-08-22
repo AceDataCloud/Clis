@@ -127,17 +127,26 @@ class TestPrintTaskResult:
 
     def test_print_task_result(self, capsys):
         data = {
-            "data": [
-                {
-                    "id": "task-123",
-                    "status": "completed",
+            "id": "task-123",
+            "created_at": 1787400000.0,
+            "response": {
+                "data": {
+                    "status": "succeeded",
                     "video_url": "https://cdn.example.com/result.mp4",
                 }
-            ]
+            },
         }
         print_task_result(data)
         captured = capsys.readouterr()
         assert "task-123" in captured.out
+        assert "succeeded" in captured.out
+        assert "result.mp4" in captured.out
+
+    def test_print_task_batch_result(self, capsys):
+        print_task_result({"items": [{"id": "task-123"}, {"id": "task-456"}], "count": 2})
+        captured = capsys.readouterr()
+        assert "task-123" in captured.out
+        assert "task-456" in captured.out
 
 
 class TestPrintModels:
