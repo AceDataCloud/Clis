@@ -138,13 +138,15 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
         ),
         click.option(
             "--audio-url",
-            default=None,
-            help="Reference audio URL.",
+            "audio_urls",
+            multiple=True,
+            help="Reference audio URL; repeat for multiple references.",
         ),
         click.option(
             "--video-url",
-            default=None,
-            help="Reference video URL.",
+            "video_urls",
+            multiple=True,
+            help="Reference video URL; repeat for multiple references.",
         ),
         click.option(
             "--async",
@@ -210,8 +212,8 @@ def _build_common_payload(
     if priority is not None:
         payload["priority"] = priority
     if safety_identifier is not None:
-        if len(safety_identifier) > 64:
-            raise click.UsageError("--safety-identifier must be at most 64 characters.")
+        if not safety_identifier or len(safety_identifier) > 64:
+            raise click.UsageError("--safety-identifier must contain 1-64 characters.")
         payload["safety_identifier"] = safety_identifier
     if execution_expires_after is not None:
         payload["execution_expires_after"] = execution_expires_after
@@ -261,8 +263,8 @@ def _build_content(
     first_frame_url: str | None,
     last_frame_url: str | None,
     reference_image_urls: tuple[str, ...],
-    audio_url: str | None,
-    video_url: str | None,
+    audio_urls: tuple[str, ...],
+    video_urls: tuple[str, ...],
 ) -> list[dict[str, object]]:
     """Build request content items from the supported reference media inputs."""
     content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
@@ -274,21 +276,13 @@ def _build_content(
     for url, role in image_sources:
         if url is not None:
             content.append({"type": "image_url", "role": role, "image_url": {"url": url}})
-    if audio_url is not None:
+    for audio_url in audio_urls:
         content.append(
-            {
-                "type": "audio_url",
-                "role": "reference_audio",
-                "audio_url": {"url": audio_url},
-            }
+            {"type": "audio_url", "role": "reference_audio", "audio_url": {"url": audio_url}}
         )
-    if video_url is not None:
+    for video_url in video_urls:
         content.append(
-            {
-                "type": "video_url",
-                "role": "reference_video",
-                "video_url": {"url": video_url},
-            }
+            {"type": "video_url", "role": "reference_video", "video_url": {"url": video_url}}
         )
     return content
 
@@ -320,8 +314,8 @@ def generate(
     first_frame_url: str | None,
     last_frame_url: str | None,
     reference_image_urls: tuple[str, ...],
-    audio_url: str | None,
-    video_url: str | None,
+    audio_urls: tuple[str, ...],
+    video_urls: tuple[str, ...],
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -367,8 +361,8 @@ def generate(
             first_frame_url=first_frame_url,
             last_frame_url=last_frame_url,
             reference_image_urls=reference_image_urls,
-            audio_url=audio_url,
-            video_url=video_url,
+            audio_urls=audio_urls,
+            video_urls=video_urls,
         )
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]
@@ -417,8 +411,8 @@ def image_to_video(
     first_frame_url: str | None,
     last_frame_url: str | None,
     reference_image_urls: tuple[str, ...],
-    audio_url: str | None,
-    video_url: str | None,
+    audio_urls: tuple[str, ...],
+    video_urls: tuple[str, ...],
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -464,8 +458,8 @@ def image_to_video(
             first_frame_url=first_frame_url,
             last_frame_url=last_frame_url,
             reference_image_urls=image_urls + reference_image_urls,
-            audio_url=audio_url,
-            video_url=video_url,
+            audio_urls=audio_urls,
+            video_urls=video_urls,
         )
 
         result = client.generate_video(**payload)  # type: ignore[arg-type]

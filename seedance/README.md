@@ -14,7 +14,7 @@ Generate AI videos directly from your terminal — no MCP client required.
 
 - **Video Generation** — Generate videos from text prompts with multiple models
 - **Image-to-Video** — Create videos from reference images
-- **Multiple Models** — Seedance 2.0 series (doubao-seedance-2-5-260628, doubao-seedance-2-0-fast-260128, doubao-seedance-2-0-mini-260615) plus doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-0-lite-t2v-250428, doubao-seedance-1-0-lite-i2v-250428
+- **Multiple Models** — Seedance 2.5 plus the Seedance 2.0 series ( doubao-seedance-2-0-fast-260128, doubao-seedance-2-0-mini-260615) plus doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-0-lite-t2v-250428, doubao-seedance-1-0-lite-i2v-250428
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -104,7 +104,7 @@ Most commands support:
 --model TEXT                 Seedance model version (default: doubao-seedance-2-0-260128)
 --aspect-ratio TEXT          Aspect ratio (16:9, 9:16, 1:1, 4:3, 3:4, 21:9, adaptive)
 --resolution TEXT            Output resolution (480p, 720p, 1080p, 4k)
---duration INT               Duration in seconds (-1 for auto, up to 30). Mutually exclusive with --frames.
+--duration INT               Duration in seconds (-1 for auto, up to 15 for 2.0 or 30 for 2.5). Mutually exclusive with --frames.
 --frames INT                 Frame count (29–289, must satisfy 25+4n). Mutually exclusive with --duration.
 --seed INT                   Random seed for reproducible generation (-1 for random).
 --camerafixed BOOL           Fix the camera position (true/false).
