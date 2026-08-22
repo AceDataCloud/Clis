@@ -277,9 +277,13 @@ def _build_content(
         if url is not None:
             content.append({"type": "image_url", "role": role, "image_url": {"url": url}})
     for audio_url in audio_urls:
-        content.append({"type": "audio_url", "role": "reference_audio", "audio_url": {"url": audio_url}})
+        content.append(
+            {"type": "audio_url", "role": "reference_audio", "audio_url": {"url": audio_url}}
+        )
     for video_url in video_urls:
-        content.append({"type": "video_url", "role": "reference_video", "video_url": {"url": video_url}})
+        content.append(
+            {"type": "video_url", "role": "reference_video", "video_url": {"url": video_url}}
+        )
     return content
 
 
