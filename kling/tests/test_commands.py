@@ -122,6 +122,7 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert "prompt" not in body
+        assert body["duration"] == 5
 
     @respx.mock
     def test_generate_with_decimal_duration(self, runner, mock_video_response):
