@@ -104,14 +104,16 @@ Most commands support:
 --model TEXT                 Seedance model version (default: doubao-seedance-2-0-260128)
 --aspect-ratio TEXT          Aspect ratio (16:9, 9:16, 1:1, 4:3, 3:4, 21:9, adaptive)
 --resolution TEXT            Output resolution (480p, 720p, 1080p, 4k)
---duration INT               Duration in seconds (-1 for default, or an up to 15 for 2.0 or 30 for 2.5). Mutually exclusive with --frames.
---frames INT                 Frame count (29–361, must satisfy 25+4n). Mutually exclusive with --duration.
+--duration INT               Duration in seconds (-1 for auto, up to 30). Mutually exclusive with --frames.
+--frames INT                 Frame count (29–289, must satisfy 25+4n). Mutually exclusive with --duration.
 --seed INT                   Random seed for reproducible generation (-1 for random).
 --camerafixed BOOL           Fix the camera position (true/false).
 --watermark BOOL             Add a watermark to the output (true/false).
 --generate-audio BOOL        Generate audio (true/false). Supported by doubao-seedance-1-5-pro-251215 and Seedance 2.x.
 --return-last-frame BOOL     Return the last frame of the video (true/false).
---service-tier TEXT          Service level (default/flex).
+--tool-json TEXT             Seedance 2.5 web_search tool object as JSON (one maximum).
+--priority INT               Seedance 2.5 task priority (0–9).
+--safety-identifier TEXT     Stable anonymous end-user identifier (maximum 64 characters).
 --execution-expires-after INT  Task timeout in seconds (3600–259200).
 --callback-url TEXT          Webhook callback URL.
 --first-frame-url TEXT       Reference image URL for the first frame.

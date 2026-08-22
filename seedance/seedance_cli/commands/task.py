@@ -6,7 +6,14 @@ import click
 
 from seedance_cli.core.client import get_client
 from seedance_cli.core.exceptions import SeedanceError
-from seedance_cli.core.output import print_error, print_json, print_success, print_task_result
+from seedance_cli.core.output import (
+    get_task_state,
+    normalize_task_records,
+    print_error,
+    print_json,
+    print_success,
+    print_task_result,
+)
 
 
 @click.command()
@@ -107,17 +114,8 @@ def wait(
     try:
         while elapsed < max_timeout:
             result = client.query_task(id=task_id, action="retrieve")
-            data = result.get("data", {})
-
-            # Check completion - handle both list and dict responses
-            if isinstance(data, list) and data:
-                item = data[0]
-            elif isinstance(data, dict):
-                item = data
-            else:
-                item = {}
-
-            state = item.get("state", item.get("status", ""))
+            records = normalize_task_records(result)
+            state = get_task_state(records[0]) if records else ""
             if state in ("succeeded", "completed", "complete", "failed", "error"):
                 if output_json:
                     print_json(result)

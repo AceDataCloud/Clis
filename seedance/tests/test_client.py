@@ -109,8 +109,8 @@ class TestSeedanceClient:
     @respx.mock
     def test_query_task(self):
         respx.post("https://api.acedata.cloud/seedance/tasks").mock(
-            return_value=Response(200, json={"success": True, "data": [{"id": "t-1"}]})
+            return_value=Response(200, json={"id": "t-1"})
         )
         client = SeedanceClient(api_token="test-token")
         result = client.query_task(id="t-1", action="retrieve")
-        assert result["data"][0]["id"] == "t-1"
+        assert result["id"] == "t-1"

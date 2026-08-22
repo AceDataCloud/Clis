@@ -184,7 +184,14 @@ class TestGenerateCommands:
                 "--output-format",
                 "mov",
                 "--tool-json",
-                '{"type":"web_search"}',
+                (
+                    '{"type":"web_search","limit":5,"max_keyword":3,'
+                    '"sources":["toutiao","search_engine"]}'
+                ),
+                "--priority",
+                "4",
+                "--safety-identifier",
+                "anonymous-user-123",
                 "--json",
             ],
         )
@@ -194,15 +201,71 @@ class TestGenerateCommands:
         assert sent["duration"] == 30
         assert sent["omni_reference_task_type"] == "auto"
         assert sent["output_format"] == "mov"
-        assert sent["tools"] == [{"type": "web_search"}]
+        assert sent["tools"] == [
+            {
+                "type": "web_search",
+                "limit": 5,
+                "max_keyword": 3,
+                "sources": ["toutiao", "search_engine"],
+            }
+        ]
+        assert sent["priority"] == 4
+        assert sent["safety_identifier"] == "anonymous-user-123"
 
-    def test_generate_rejects_invalid_tool_json(self, runner):
+    @pytest.mark.parametrize(
+        "tool_json",
+        [
+            "[]",
+            "{}",
+            '{"type":"other"}',
+            '{"type":"web_search","limit":51}',
+            '{"type":"web_search","limit":null}',
+            '{"type":"web_search","sources":["invalid"]}',
+            '{"type":"web_search","unknown":true}',
+        ],
+    )
+    def test_generate_rejects_invalid_tool_json(self, runner, tool_json):
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate", "test", "--tool-json", "[]"],
+            ["--token", "test-token", "generate", "test", "--tool-json", tool_json],
         )
         assert result.exit_code != 0
-        assert "JSON object" in result.output
+        assert "--tool-json" in result.output
+
+    def test_generate_rejects_multiple_tools(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--tool-json",
+                '{"type":"web_search"}',
+                "--tool-json",
+                '{"type":"web_search"}',
+            ],
+        )
+        assert result.exit_code != 0
+        assert "only be specified once" in result.output
+
+    @pytest.mark.parametrize(
+        "options",
+        [
+            ["--priority", "10"],
+            ["--safety-identifier", "x" * 65],
+            ["--duration", "31"],
+            ["--frames", "290"],
+            ["--seed", "4294967296"],
+            ["--execution-expires-after", "3599"],
+        ],
+    )
+    def test_generate_rejects_out_of_range_options(self, runner, options):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "test", *options],
+        )
+        assert result.exit_code != 0
 
     @respx.mock
     def test_generate_with_frames(self, runner, mock_video_response):
@@ -387,7 +450,7 @@ class TestTaskCommands:
         result = runner.invoke(cli, ["--token", "test-token", "task", "task-123", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["data"][0]["id"] == "task-123"
+        assert data["id"] == "task-123"
 
     @respx.mock
     def test_task_rich_output(self, runner, mock_task_response):
@@ -400,10 +463,20 @@ class TestTaskCommands:
     @respx.mock
     def test_tasks_batch(self, runner, mock_task_response):
         respx.post("https://api.acedata.cloud/seedance/tasks").mock(
-            return_value=Response(200, json=mock_task_response)
+            return_value=Response(200, json={"items": [mock_task_response], "count": 1})
         )
         result = runner.invoke(cli, ["--token", "test-token", "tasks", "t-1", "t-2", "--json"])
         assert result.exit_code == 0
+        assert json.loads(result.output)["count"] == 1
+
+    @respx.mock
+    def test_wait_reads_recorded_response_status(self, runner, mock_task_response):
+        respx.post("https://api.acedata.cloud/seedance/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "wait", "task-123"])
+        assert result.exit_code == 0
+        assert "completed" in result.output
 
 
 # ─── Info Commands ─────────────────────────────────────────────────────────
