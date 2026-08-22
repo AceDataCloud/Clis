@@ -54,7 +54,8 @@ def _parse_json_option(value: str | None, param_hint: str) -> Any:
 )
 @click.option(
     "--duration",
-    default=None,
+    default=5,
+    show_default=True,
     type=float,
     help="Video duration in seconds (5 or 10 for most models; 3-15 for kling-v3/kling-v3-omni).",
 )
@@ -200,7 +201,8 @@ def generate(
 )
 @click.option(
     "--duration",
-    default=None,
+    default=5,
+    show_default=True,
     type=float,
     help="Video duration in seconds.",
 )
@@ -334,7 +336,8 @@ def image_to_video(
 )
 @click.option(
     "--duration",
-    default=None,
+    default=5,
+    show_default=True,
     type=float,
     help="Video duration in seconds.",
 )
