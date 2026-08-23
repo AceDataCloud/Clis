@@ -1,0 +1,7 @@
+version: "3"
+services:
+  qwen-image-cli:
+    platform: linux/amd64
+    container_name: "qwen-image-cli"
+    build: ./
+    image: "ghcr.io/acedatacloud/qwen-image-cli:${BUILD_NUMBER}"

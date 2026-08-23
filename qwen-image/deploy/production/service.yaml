@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: qwen-image-cli
+  name: qwen-image-cli
+  namespace: acedatacloud
+spec:
+  selector:
+    app: qwen-image-cli

@@ -15,6 +15,7 @@ WAN_MODELS = [
     "wan2.6-i2v",
     "wan2.6-i2v-flash",
     "wan2.6-r2v",
+    "wan3.0-video",
 ]
 
 DEFAULT_MODEL = "wan2.6-t2v"

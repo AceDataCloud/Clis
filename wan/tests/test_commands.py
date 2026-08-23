@@ -332,3 +332,30 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["config"])
         assert result.exit_code == 0
         assert "api.acedata.cloud" in result.output
+
+
+def test_wan3_media_payload():
+    runner = CliRunner()
+    with respx.mock:
+        route = respx.post("https://api.acedata.cloud/wan/videos").mock(
+            return_value=Response(200, json={"task_id": "t"})
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test",
+                "wan3",
+                "Use image 1",
+                "--media",
+                "reference_image=https://example.com/ref.png",
+                "--duration",
+                "-1",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls[0].request.content)
+        assert body["model"] == "wan3.0-video"
+        assert body["media"][0]["type"] == "reference_image"
+        assert body["duration"] == -1

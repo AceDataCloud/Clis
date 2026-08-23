@@ -272,3 +272,66 @@ def image_to_video(
     except WanError as e:
         print_error(e.message)
         raise SystemExit(1) from e
+
+
+@click.command("wan3")
+@click.argument("prompt", required=False, default="")
+@click.option("--media", "media_items", multiple=True, help="Repeatable TYPE=URL media item.")
+@click.option("--duration", type=click.IntRange(-1, 30), default=5)
+@click.option("--resolution", type=click.Choice(["480P", "720P", "1080P"]), default="1080P")
+@click.option(
+    "--ratio",
+    type=click.Choice(["adaptive", "16:9", "4:3", "1:1", "3:4", "9:16"]),
+    default="adaptive",
+)
+@click.option("--audio/--no-audio", default=True)
+@click.option("--seed", type=click.IntRange(0, 2147483647), default=None)
+@click.option("--watermark/--no-watermark", default=False)
+@click.option("--callback-url", default=None)
+@click.option("--async", "async_mode", is_flag=True)
+@click.option("--json", "output_json", is_flag=True)
+@click.pass_context
+def wan3(
+    ctx: click.Context,
+    prompt: str,
+    media_items: tuple[str, ...],
+    duration: int,
+    resolution: str,
+    ratio: str,
+    audio: bool,
+    seed: int | None,
+    watermark: bool,
+    callback_url: str | None,
+    async_mode: bool,
+    output_json: bool,
+) -> None:
+    """Generate a Wan 3 video from text and optional reference media."""
+    if duration in (0, 1):
+        raise click.BadParameter("duration must be -1 or 2-30")
+    media = []
+    for item in media_items:
+        if "=" not in item:
+            raise click.BadParameter("media must use TYPE=URL")
+        kind, url = item.split("=", 1)
+        media.append({"type": kind, "url": url})
+    if not prompt and not media:
+        raise click.BadParameter("prompt or media is required")
+    payload = {
+        "model": "wan3.0-video",
+        "prompt": prompt,
+        "media": media or None,
+        "duration": duration,
+        "resolution": resolution,
+        "ratio": ratio,
+        "audio": audio,
+        "seed": seed,
+        "watermark": watermark,
+        "callback_url": callback_url,
+        "async": async_mode,
+    }
+    try:
+        result = get_client(ctx.obj.get("token")).generate_video(**payload)
+        (print_json if output_json else print_video_result)(result)
+    except WanError as e:
+        print_error(e.message)
+        raise SystemExit(1) from e

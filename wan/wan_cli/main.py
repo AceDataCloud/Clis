@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 from wan_cli.commands.info import config, models, resolutions
 from wan_cli.commands.task import task, tasks_batch, wait
-from wan_cli.commands.video import generate, image_to_video
+from wan_cli.commands.video import generate, image_to_video, wan3
 
 load_dotenv()
 
@@ -58,6 +58,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
 # Register commands
 cli.add_command(generate)
 cli.add_command(image_to_video)
+cli.add_command(wan3)
 cli.add_command(task)
 cli.add_command(tasks_batch)
 cli.add_command(wait)

@@ -49,6 +49,11 @@ mappings:
     exclude:
       - .github
       - .gitbooks
+  qwen-image:
+    repo: AceDataCloud/QwenImageCli
+    exclude:
+      - .github
+      - .gitbooks
   adc:
     repo: AceDataCloud/AceDataCloudCli
     exclude:

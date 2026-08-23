@@ -12,6 +12,7 @@ Monorepo for all AceDataCloud command-line interface tools.
 | `veo/` | [VeoCli](https://github.com/AceDataCloud/VeoCli) | Veo video generation CLI |
 | `nanobanana/` | [NanoBananaCli](https://github.com/AceDataCloud/NanoBananaCli) | NanoBanana image generation CLI |
 | `seedance/` | [SeedanceCli](https://github.com/AceDataCloud/SeedanceCli) | Seedance video generation CLI |
+| `qwen-image/` | [QwenImageCli](https://github.com/AceDataCloud/QwenImageCli) | [qwen-image-cli](https://pypi.org/project/qwen-image-cli/) | Image |
 | `seedream/` | [SeedreamCli](https://github.com/AceDataCloud/SeedreamCli) | Seedream image generation CLI |
 | `flux/` | [FluxCli](https://github.com/AceDataCloud/FluxCli) | Flux image generation & editing CLI |
 | `serp/` | [SerpCli](https://github.com/AceDataCloud/SerpCli) | Google SERP (Search) CLI |
