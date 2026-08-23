@@ -337,6 +337,10 @@ class TestMessagesCommands:
                 '[{"name":"lookup"}]',
                 "--tool-choice",
                 '{"type":"auto"}',
+                "--output-config",
+                '{"effort":"high"}',
+                "--cache-control",
+                '{"type":"ephemeral","ttl":"1h"}',
             ],
         )
         assert result.exit_code == 0
@@ -345,6 +349,8 @@ class TestMessagesCommands:
         assert request_body["stream"] is True
         assert request_body["tools"] == [{"name": "lookup"}]
         assert request_body["tool_choice"] == {"type": "auto"}
+        assert request_body["output_config"] == {"effort": "high"}
+        assert request_body["cache_control"] == {"type": "ephemeral", "ttl": "1h"}
 
     @respx.mock
     def test_messages_auth_error(self, runner):
@@ -604,11 +610,68 @@ class TestMessagesThinking:
                 "enabled",
                 "--thinking-budget-tokens",
                 "1024",
+                "--thinking-display",
+                "summarized",
+                "--cache-control",
+                '{"type":"ephemeral","ttl":"5m"}',
             ],
         )
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
-        assert request_body["thinking"] == {"type": "enabled", "budget_tokens": 1024}
+        assert request_body["thinking"] == {
+            "type": "enabled",
+            "budget_tokens": 1024,
+            "display": "summarized",
+        }
+        assert request_body["cache_control"] == {"type": "ephemeral", "ttl": "5m"}
+
+    def test_count_tokens_thinking_budget_below_minimum(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "count-tokens",
+                "Hello",
+                "--thinking-type",
+                "enabled",
+                "--thinking-budget-tokens",
+                "512",
+            ],
+        )
+        assert result.exit_code != 0
+
+    def test_count_tokens_thinking_enabled_requires_budget(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "count-tokens",
+                "Hello",
+                "--thinking-type",
+                "enabled",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "thinking-budget-tokens" in result.output
+
+    def test_count_tokens_thinking_display_rejects_disabled(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "count-tokens",
+                "Hello",
+                "--thinking-type",
+                "disabled",
+                "--thinking-display",
+                "summarized",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "thinking-display" in result.output
 
     @respx.mock
     def test_count_tokens_without_thinking(self, runner, mock_count_tokens_response):
@@ -619,16 +682,3 @@ class TestMessagesThinking:
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
         assert request_body.get("thinking") is None
-
-    @respx.mock
-    def test_count_tokens_thinking_enabled_without_budget(self, runner, mock_count_tokens_response):
-        route = respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
-            return_value=Response(200, json=mock_count_tokens_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "count-tokens", "Hello", "--thinking-type", "enabled"],
-        )
-        assert result.exit_code == 0
-        request_body = json.loads(route.calls[0].request.content)
-        assert request_body["thinking"] == {"type": "enabled"}
