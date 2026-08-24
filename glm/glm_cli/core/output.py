@@ -12,6 +12,7 @@ console = Console()
 
 # Available GLM chat models
 GLM_MODELS = [
+    "glm-5.3",
     "glm-5.2",
     "glm-5",
     "glm-5-turbo",
@@ -88,7 +89,8 @@ def print_models() -> None:
     table.add_column("Model", style="bold cyan")
     table.add_column("Notes")
 
-    table.add_row("glm-5.2", "Latest GLM release")
+    table.add_row("glm-5.3", "Latest GLM release")
+    table.add_row("glm-5.2", "GLM-5 series")
     table.add_row("glm-5", "GLM-5 base model")
     table.add_row("glm-5-turbo", "GLM-5 Turbo")
     table.add_row("glm-5.1", "Earlier GLM-5 release")
