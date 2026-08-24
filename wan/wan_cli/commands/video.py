@@ -15,6 +15,44 @@ from wan_cli.core.output import (
     print_video_result,
 )
 
+MEDIA_TYPES = [
+    "first_frame",
+    "last_frame",
+    "reference_image",
+    "reference_video",
+    "reference_audio",
+    "file",
+    "link",
+]
+
+RATIOS = [
+    "adaptive",
+    "16:9",
+    "4:3",
+    "1:1",
+    "3:4",
+    "9:16",
+]
+
+
+def parse_media(
+    _ctx: click.Context, _param: click.Parameter, value: tuple[str, ...]
+) -> list[dict[str, str]] | None:
+    """Parse repeatable TYPE=URL media values."""
+    if not value:
+        return None
+
+    media = []
+    for item in value:
+        media_type, separator, url = item.partition("=")
+        if not separator or not media_type or not url:
+            raise click.BadParameter("Use TYPE=URL.")
+        if media_type not in MEDIA_TYPES:
+            raise click.BadParameter(f"TYPE must be one of: {', '.join(MEDIA_TYPES)}.")
+        media.append({"type": media_type, "url": url})
+
+    return media
+
 
 @click.command()
 @click.argument("prompt")
@@ -42,7 +80,7 @@ from wan_cli.core.output import (
     "--duration",
     type=click.Choice([str(d) for d in DURATIONS]),
     default=None,
-    help="Duration in seconds (5, 10, 15).",
+    help="Duration in seconds (2-30, or -1 for auto).",
 )
 @click.option(
     "--negative-prompt",
@@ -74,6 +112,30 @@ from wan_cli.core.output import (
     multiple=True,
     help="Reference video URL for character/timbre extraction (repeatable). Used with the wan2.6-r2v model.",
 )
+@click.option(
+    "--media",
+    multiple=True,
+    callback=parse_media,
+    metavar="TYPE=URL",
+    help="Media item for the video request (repeatable). TYPE: first_frame, last_frame, reference_image, reference_video, reference_audio, file, link.",
+)
+@click.option(
+    "--ratio",
+    type=click.Choice(RATIOS),
+    default=None,
+    help="Output aspect ratio.",
+)
+@click.option(
+    "--seed",
+    type=click.IntRange(0, 2147483647),
+    default=None,
+    help="Random seed (0-2147483647).",
+)
+@click.option(
+    "--watermark/--no-watermark",
+    default=None,
+    help="Whether to add a watermark.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -97,6 +159,10 @@ def generate(
     prompt_extend: bool | None,
     audio_url: str | None,
     reference_video_urls: tuple[str, ...],
+    media: list[dict[str, str]] | None,
+    ratio: str | None,
+    seed: int | None,
+    watermark: bool | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -128,6 +194,10 @@ def generate(
             "prompt_extend": prompt_extend,
             "audio_url": audio_url,
             "reference_video_urls": list(reference_video_urls) if reference_video_urls else None,
+            "media": media,
+            "ratio": ratio,
+            "seed": seed,
+            "watermark": watermark,
             "callback_url": callback_url,
             "async": async_mode,
         }
@@ -174,7 +244,7 @@ def generate(
     "--duration",
     type=click.Choice([str(d) for d in DURATIONS]),
     default=None,
-    help="Duration in seconds (5, 10, 15).",
+    help="Duration in seconds (2-30, or -1 for auto).",
 )
 @click.option(
     "--negative-prompt",
@@ -206,6 +276,30 @@ def generate(
     multiple=True,
     help="Reference video URL for character/timbre extraction (repeatable).",
 )
+@click.option(
+    "--media",
+    multiple=True,
+    callback=parse_media,
+    metavar="TYPE=URL",
+    help="Media item for the video request (repeatable). TYPE: first_frame, last_frame, reference_image, reference_video, reference_audio, file, link.",
+)
+@click.option(
+    "--ratio",
+    type=click.Choice(RATIOS),
+    default=None,
+    help="Output aspect ratio.",
+)
+@click.option(
+    "--seed",
+    type=click.IntRange(0, 2147483647),
+    default=None,
+    help="Random seed (0-2147483647).",
+)
+@click.option(
+    "--watermark/--no-watermark",
+    default=None,
+    help="Whether to add a watermark.",
+)
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
     "--async",
@@ -230,6 +324,10 @@ def image_to_video(
     prompt_extend: bool | None,
     audio_url: str | None,
     reference_video_urls: tuple[str, ...],
+    media: list[dict[str, str]] | None,
+    ratio: str | None,
+    seed: int | None,
+    watermark: bool | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -260,6 +358,10 @@ def image_to_video(
             "prompt_extend": prompt_extend,
             "audio_url": audio_url,
             "reference_video_urls": list(reference_video_urls) if reference_video_urls else None,
+            "media": media,
+            "ratio": ratio,
+            "seed": seed,
+            "watermark": watermark,
             "callback_url": callback_url,
             "async": async_mode,
         }

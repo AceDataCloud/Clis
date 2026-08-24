@@ -102,6 +102,43 @@ class TestGenerateCommands:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_generate_with_wan3_options(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/wan/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "-m",
+                "wan3.0-video",
+                "--duration",
+                "30",
+                "--media",
+                "first_frame=https://example.com/start.png",
+                "--ratio",
+                "16:9",
+                "--seed",
+                "123",
+                "--watermark",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "wan3.0-video"
+        assert body["duration"] == 30
+        assert body["media"] == [
+            {"type": "first_frame", "url": "https://example.com/start.png"}
+        ]
+        assert body["ratio"] == "16:9"
+        assert body["seed"] == 123
+        assert body["watermark"] is True
+
+    @respx.mock
     def test_generate_with_shot_type(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/wan/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -321,6 +358,7 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "wan2.6-t2v" in result.output
         assert "wan2.6-i2v" in result.output
+        assert "wan3.0-video" in result.output
 
     def test_resolutions(self, runner):
         result = runner.invoke(cli, ["resolutions"])

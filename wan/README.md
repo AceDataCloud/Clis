@@ -13,7 +13,7 @@ Generate AI videos directly from your terminal — no MCP client required.
 
 - **Video Generation** — Generate videos from text prompts with multiple models
 - **Image-to-Video** — Create videos from reference images
-- **Multiple Models** — wan2.6-t2v, wan2.6-i2v, wan2.6-i2v-flash, wan2.6-r2v
+- **Multiple Models** — wan2.6-t2v, wan2.6-i2v, wan2.6-i2v-flash, wan2.6-r2v, wan3.0-video
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -101,10 +101,14 @@ Most commands support:
 --json                        Output raw JSON (for piping/scripting)
 --model TEXT                  Wan model version (default: wan2.6-t2v)
 --resolution TEXT             Output resolution: 480P, 720P, 1080P
---duration TEXT               Duration in seconds: 5, 10, 15
+--duration TEXT               Duration in seconds: 2-30, or -1 for auto
 --shot-type TEXT              Shot type: single, multi
 --audio/--no-audio            Whether the video has sound
 --prompt-extend/--no-prompt-extend  Enable prompt intelligent rewriting
+--media TYPE=URL              Media item (repeatable)
+--ratio TEXT                  Aspect ratio: adaptive, 16:9, 4:3, 1:1, 3:4, 9:16
+--seed INTEGER                Random seed (0-2147483647)
+--watermark/--no-watermark    Whether to add a watermark
 ```
 
 ## Available Models
@@ -115,6 +119,7 @@ Most commands support:
 | `wan2.6-i2v` | Image-to-Video | Image-to-video generation |
 | `wan2.6-i2v-flash` | Image-to-Video Flash | Fast image-to-video generation |
 | `wan2.6-r2v` | Reference-to-Video | Reference video-to-video generation |
+| `wan3.0-video` | Video Generation | Wan 3.0 video generation |
 
 
 ## Configuration
