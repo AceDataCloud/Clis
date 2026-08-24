@@ -215,6 +215,32 @@ class TestGenerateCommands:
         assert body["start_image_url"] == "https://example.com/start.jpg"
         assert body["end_image_url"] == "https://example.com/end.jpg"
 
+    @respx.mock
+    def test_extend_default_enhancement_enabled(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/luma/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "extend", "video-123", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["enhancement"] is True
+
+    @respx.mock
+    def test_extend_can_disable_enhancement(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/luma/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "extend", "video-123", "--no-enhancement", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["enhancement"] is False
+
 
 # ─── Task Commands ─────────────────────────────────────────────────────────
 

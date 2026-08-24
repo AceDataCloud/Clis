@@ -107,9 +107,16 @@ from openai_cli.core.output import (
 )
 @click.option(
     "--store",
-    is_flag=True,
-    default=False,
+    "store",
+    flag_value=True,
+    default=None,
     help="Store the output for use in OpenAI's model distillation or evals products.",
+)
+@click.option(
+    "--no-store",
+    "store",
+    flag_value=False,
+    help="Do not store the output for use in OpenAI's model distillation or evals products.",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -131,7 +138,7 @@ def response(
     reasoning: str | None,
     text: str | None,
     stream_options: str | None,
-    store: bool,
+    store: bool | None,
     output_json: bool,
 ) -> None:
     """Send a request to the Responses API.
@@ -172,7 +179,7 @@ def response(
         "reasoning": parsed_reasoning,
         "text": parsed_text,
         "stream_options": parsed_stream_options,
-        "store": store if store else None,
+        "store": store,
     }
 
     try:

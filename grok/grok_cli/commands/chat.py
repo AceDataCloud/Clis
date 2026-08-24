@@ -122,9 +122,15 @@ from grok_cli.core.output import (
 @click.option(
     "--parallel-tool-calls",
     "parallel_tool_calls",
-    is_flag=True,
-    default=False,
+    flag_value=True,
+    default=None,
     help="Enable parallel function calling during tool use.",
+)
+@click.option(
+    "--no-parallel-tool-calls",
+    "parallel_tool_calls",
+    flag_value=False,
+    help="Disable parallel function calling during tool use.",
 )
 @click.option(
     "--store",
@@ -204,7 +210,7 @@ def chat(
     logprobs: bool,
     top_logprobs: int | None,
     max_completion_tokens: int | None,
-    parallel_tool_calls: bool,
+    parallel_tool_calls: bool | None,
     store: bool,
     stream: bool,
     response_format: str | None,
@@ -273,7 +279,7 @@ def chat(
         "logprobs": logprobs or None,
         "top_logprobs": top_logprobs,
         "max_completion_tokens": max_completion_tokens,
-        "parallel_tool_calls": parallel_tool_calls or None,
+        "parallel_tool_calls": parallel_tool_calls,
         "store": store or None,
         "metadata": parsed_metadata,
         "logit_bias": parsed_logit_bias,
