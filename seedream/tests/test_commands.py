@@ -110,6 +110,13 @@ class TestGenerateCommands:
         result = runner.invoke(cli, ["--token", "", "generate", "test"])
         assert result.exit_code != 0
 
+    def test_generate_rejects_removed_adaptive_resolution(self, runner):
+        result = runner.invoke(
+            cli, ["--token", "test-token", "generate", "test", "--resolution", "adaptive"]
+        )
+        assert result.exit_code != 0
+        assert "'adaptive' is not one of '1K', '2K', '3K', '4K'" in result.output
+
     def test_generate_help_excludes_removed_options(self, runner):
         result = runner.invoke(cli, ["generate", "--help"])
         assert result.exit_code == 0
