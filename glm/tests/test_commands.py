@@ -7,6 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
+from glm_cli.core.output import GLM_MODELS
 from glm_cli.main import cli, get_version
 
 
@@ -41,6 +42,9 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "PROMPT" in result.output
         assert "--model" in result.output
+
+    def test_model_inventory_includes_latest_glm_model(self):
+        assert GLM_MODELS[0] == "glm-5.3"
 
 
 class TestChatCommand:
@@ -213,6 +217,7 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
+        assert "glm-5.3" in result.output
         assert "glm-5.2" in result.output
         assert "glm-5" in result.output
         assert "glm-5-turbo" in result.output

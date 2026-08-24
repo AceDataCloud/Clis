@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from aichat_cli.core.output import MODELS2
+from aichat_cli.core.output import MODELS, MODELS2
 from aichat_cli.main import cli, get_version
 
 
@@ -25,6 +25,12 @@ class TestGlobalCommands:
     def test_model_inventory_excludes_retired_opus_3(self):
         assert "claude-opus-5" in MODELS2
         assert "claude-3-opus-20240229" not in MODELS2
+
+    def test_model_inventory_includes_latest_glm_models(self):
+        assert "glm-5.3" in MODELS
+        assert "glm-5.3" in MODELS2
+        assert MODELS.count("deepseek-v4-pro") == 1
+        assert MODELS2.count("deepseek-v4-pro") == 1
 
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
@@ -198,6 +204,7 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "gpt-5.4-mini" in result.output
         assert "gpt-5.4-nano" in result.output
+        assert "glm-5.3" in result.output
         assert "glm-5" in result.output
         assert "glm-5-turbo" in result.output
         assert "gpt-4o" in result.output
@@ -223,6 +230,7 @@ class TestInfoCommands:
         assert "kimi-k2-turbo-preview" not in result.output
         assert "grok-4" in result.output
         assert "deepseek-v4-pro" in result.output
+        assert "glm-5.3" in result.output
 
 
 # ─── Chat2 Commands ──────────────────────────────────────────────────────────
