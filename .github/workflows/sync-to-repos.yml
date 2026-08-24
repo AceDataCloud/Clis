@@ -40,7 +40,7 @@ jobs:
           CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
 
           # Read sync.yaml to get mapping keys
-          DIRS=$(grep -E '^\s+\w+:$' sync.yaml | sed 's/://;s/^\s*//' | grep -v '^repo$\|^exclude$\|^mappings$')
+          DIRS=$(grep -E '^\s+[A-Za-z0-9_-]+:$' sync.yaml | sed 's/://;s/^\s*//' | grep -v '^repo$\|^exclude$\|^mappings$')
 
           MATRIX="[]"
           HAS_CHANGES="false"
@@ -111,7 +111,7 @@ jobs:
               fi
             fi
             # Reset if we hit a new top-level dir mapping
-            if echo "$line" | grep -qE '^\s+\w+:$' && [ "$IN_DIR" = true ]; then
+            if echo "$line" | grep -qE '^\s+[A-Za-z0-9_-]+:$' && [ "$IN_DIR" = true ]; then
               break
             fi
           done < "$GITHUB_WORKSPACE/sync.yaml"
