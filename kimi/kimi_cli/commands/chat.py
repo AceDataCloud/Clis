@@ -94,7 +94,7 @@ from kimi_cli.core.output import (
     "--reasoning-effort",
     default=None,
     type=click.Choice(REASONING_EFFORTS),
-    help="Reasoning effort level (currently only max is supported).",
+    help="Reasoning effort level (low/high/max).",
 )
 @click.option(
     "--service-tier",
@@ -123,9 +123,15 @@ from kimi_cli.core.output import (
 @click.option(
     "--parallel-tool-calls",
     "parallel_tool_calls",
-    is_flag=True,
-    default=False,
+    flag_value=True,
+    default=None,
     help="Enable parallel function calling during tool use.",
+)
+@click.option(
+    "--no-parallel-tool-calls",
+    "parallel_tool_calls",
+    flag_value=False,
+    help="Disable parallel function calling during tool use.",
 )
 @click.option(
     "--store",
@@ -160,6 +166,7 @@ from kimi_cli.core.output import (
 @click.option("--audio", default=None, help="Audio output settings as a JSON object.")
 @click.option("--prediction", default=None, help="Prediction settings as a JSON object.")
 @click.option("--web-search-options", default=None, help="Web search settings as a JSON object.")
+@click.option("--thinking", default=None, help="Thinking settings as a JSON object.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def chat(
@@ -181,7 +188,7 @@ def chat(
     logprobs: bool,
     top_logprobs: int | None,
     max_completion_tokens: int | None,
-    parallel_tool_calls: bool,
+    parallel_tool_calls: bool | None,
     store: bool,
     stream: bool,
     response_format: str | None,
@@ -194,6 +201,7 @@ def chat(
     audio: str | None,
     prediction: str | None,
     web_search_options: str | None,
+    thinking: str | None,
     output_json: bool,
 ) -> None:
     """Chat with a Kimi model.
@@ -226,6 +234,7 @@ def chat(
         parsed_web_search_options = parse_json_object(
             web_search_options, "--web-search-options"
         )
+        parsed_thinking = parse_json_object(thinking, "--thinking")
     except click.BadParameter as e:
         print_error(e.format_message())
         raise SystemExit(1) from None
@@ -254,12 +263,13 @@ def chat(
         "logprobs": logprobs or None,
         "top_logprobs": top_logprobs,
         "max_completion_tokens": max_completion_tokens,
-        "parallel_tool_calls": parallel_tool_calls or None,
+        "parallel_tool_calls": parallel_tool_calls,
         "store": store or None,
         "modalities": parsed_modalities,
         "audio": parsed_audio,
         "prediction": parsed_prediction,
         "web_search_options": parsed_web_search_options,
+        "thinking": parsed_thinking,
     }
 
     try:

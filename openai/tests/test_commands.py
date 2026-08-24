@@ -735,6 +735,19 @@ class TestResponseCommands:
         assert body["stream_options"] == {"include_usage": True}
         assert body["store"] is True
 
+    @respx.mock
+    def test_response_with_no_store(self, runner, mock_response_api_response):
+        route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(200, json=mock_response_api_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "response", "Hello", "--no-store", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["store"] is False
+
 
 class TestSpeechAndRealtimeCommands:
     """Tests for speech and realtime commands."""

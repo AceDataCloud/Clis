@@ -30,13 +30,6 @@ class FluxClient:
             "content-type": "application/json",
         }
 
-    def _with_async_callback(self, payload: dict[str, Any]) -> dict[str, Any]:
-        """Ensure long-running operations are submitted asynchronously."""
-        request_payload = dict(payload)
-        if not request_payload.get("callback_url"):
-            request_payload["async"] = True
-        return request_payload
-
     def request(
         self,
         endpoint: str,
@@ -94,17 +87,13 @@ class FluxClient:
         self, accept: str = "application/json", **kwargs: Any
     ) -> dict[str, Any]:
         """Generate image using the images endpoint."""
-        return self.request(
-            "/flux/images", self._with_async_callback(kwargs), accept=accept
-        )
+        return self.request("/flux/images", kwargs, accept=accept)
 
     def edit_image(
         self, accept: str = "application/json", **kwargs: Any
     ) -> dict[str, Any]:
         """Edit image using the images endpoint."""
-        return self.request(
-            "/flux/images", self._with_async_callback(kwargs), accept=accept
-        )
+        return self.request("/flux/images", kwargs, accept=accept)
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status using the tasks endpoint."""

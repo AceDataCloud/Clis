@@ -196,6 +196,32 @@ class TestChatCommand:
         assert sent["parallel_tool_calls"] is True
 
     @respx.mock
+    def test_chat_with_no_parallel_tool_calls(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--no-parallel-tool-calls", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["parallel_tool_calls"] is False
+
+    @respx.mock
+    def test_chat_with_reasoning_effort_low(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--reasoning-effort", "low", "--json"],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["reasoning_effort"] == "low"
+
+    @respx.mock
     def test_chat_with_store(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
@@ -256,6 +282,8 @@ class TestChatCommand:
                 '{"type": "content", "content": "Hello"}',
                 "--web-search-options",
                 '{"search_context_size": "low"}',
+                "--thinking",
+                '{"type": "enabled", "keep": "all"}',
                 "--json",
             ],
         )
@@ -272,6 +300,7 @@ class TestChatCommand:
         assert sent["audio"] == {"voice": "alloy"}
         assert sent["prediction"] == {"type": "content", "content": "Hello"}
         assert sent["web_search_options"] == {"search_context_size": "low"}
+        assert sent["thinking"] == {"type": "enabled", "keep": "all"}
 
     def test_chat_rejects_invalid_json_option(self, runner):
         result = runner.invoke(

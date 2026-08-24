@@ -181,7 +181,11 @@ def image_to_video(
     help="Aspect ratio.",
 )
 @click.option("--loop/--no-loop", default=False, help="Create a looping video.")
-@click.option("--enhancement/--no-enhancement", default=False, help="Enable prompt enhancement.")
+@click.option(
+    "--enhancement/--no-enhancement",
+    default=True,
+    help="Enable prompt enhancement (default: enabled).",
+)
 @click.option("--start-image-url", default=None, help="URL of the start image.")
 @click.option("--end-image-url", default=None, help="URL of the end image.")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")

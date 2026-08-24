@@ -128,7 +128,7 @@ class TestFluxClient:
         assert result["data"][0]["id"] == "t-1"
 
     @respx.mock
-    def test_with_async_callback(self):
+    def test_generate_image_does_not_force_async(self):
         route = respx.post("https://api.acedata.cloud/flux/images").mock(
             return_value=Response(200, json={"success": True})
         )
@@ -137,10 +137,10 @@ class TestFluxClient:
         import json
 
         body = json.loads(route.calls.last.request.content)
-        assert body["async"] is True
+        assert "async" not in body
 
     @respx.mock
-    def test_with_async_callback_preserves_custom(self):
+    def test_generate_image_preserves_callback_url(self):
         route = respx.post("https://api.acedata.cloud/flux/images").mock(
             return_value=Response(200, json={"success": True})
         )
