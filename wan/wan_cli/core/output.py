@@ -15,6 +15,7 @@ WAN_MODELS = [
     "wan2.6-i2v",
     "wan2.6-i2v-flash",
     "wan2.6-r2v",
+    "wan3.0-video",
 ]
 
 DEFAULT_MODEL = "wan2.6-t2v"
@@ -33,7 +34,7 @@ SHOT_TYPES = [
 ]
 
 # Available durations (seconds)
-DURATIONS = [5, 10, 15]
+DURATIONS = [-1, *range(2, 31)]
 
 
 def print_json(data: Any) -> None:
@@ -141,6 +142,11 @@ def print_models() -> None:
         "wan2.6-r2v",
         "Reference-to-Video",
         "Reference video-to-video generation",
+    )
+    table.add_row(
+        "wan3.0-video",
+        "Video Generation",
+        "Wan 3.0 video generation",
     )
 
     console.print(table)
