@@ -25,7 +25,6 @@ RESOLUTIONS = [
     "2K",
     "3K",
     "4K",
-    "adaptive",
 ]
 
 DEFAULT_RESOLUTION = "1K"

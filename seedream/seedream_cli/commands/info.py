@@ -29,7 +29,6 @@ def resolutions() -> None:
         "2K": "High resolution",
         "3K": "High resolution",
         "4K": "Ultra-high resolution",
-        "adaptive": "Adaptive resolution",
     }
     for r in RESOLUTIONS:
         table.add_row(r, desc_map.get(r, r))
