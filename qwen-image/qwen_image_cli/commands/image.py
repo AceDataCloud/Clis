@@ -138,6 +138,7 @@ def generate(
     "--image-url",
     "image_urls",
     multiple=True,
+    required=True,
     help="Image URL(s) to edit. Can be specified multiple times.",
 )
 @click.option(
@@ -235,6 +236,10 @@ def edit(
     """
     client = get_client(ctx.obj.get("token"))
     try:
+        if len(image_urls) > 3:
+            print_error("A maximum of 3 image URLs can be provided.")
+            raise SystemExit(1)
+
         payload: dict[str, object] = {
             "prompt": prompt,
             "image_urls": list(image_urls),
