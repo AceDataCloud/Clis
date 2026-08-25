@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/AceDataCloud/QwenImageCli/actions/workflows/ci.yaml/badge.svg)](https://github.com/AceDataCloud/QwenImageCli/actions/workflows/ci.yaml)
 
-A command-line tool for AI image generation and editing using [QwenImage](https://platform.acedata.cloud/) (Gemini-powered) through the [AceDataCloud API](https://platform.acedata.cloud/).
+A command-line tool for AI image generation and editing using [QwenImage](https://platform.acedata.cloud/) through the [AceDataCloud API](https://platform.acedata.cloud/).
 
 Generate and edit AI images directly from your terminal — no MCP client required.
 
@@ -14,8 +14,8 @@ Generate and edit AI images directly from your terminal — no MCP client requir
 
 - **Image Generation** — Generate images from text prompts with multiple models
 - **Image Editing** — Edit, combine, and transform images with AI
-- **Multiple Models** — qwen-image (fast), qwen-image-2 (improved), qwen-image (best, 4K)
-- **Flexible Output** — Aspect ratios (1:1, 16:9, 9:16, etc.) and resolutions (1K/2K/4K)
+- **Multiple Models** — qwen-image-3.0 and qwen-image-3.0-pro
+- **Flexible Output** — Size control such as `1024*1024` and multiple image outputs
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -62,8 +62,8 @@ cp .env.example .env
 # Generate an image from a prompt
 qwen-image generate "A cat sitting on a windowsill at sunset, warm lighting"
 
-# Generate with specific model and aspect ratio
-qwen-image generate "Product photo of a watch" -m qwen-image -a 16:9 -r 4K
+# Generate with specific model and output size
+qwen-image generate "Product photo of a watch" -m qwen-image-3.0-pro --size 1024*1536
 
 # Edit an image
 qwen-image edit "Make it look like an oil painting" -i https://example.com/photo.jpg
@@ -103,8 +103,7 @@ qwen-image models
 | Command | Description |
 |---------|-------------|
 | `qwen-image models` | List available QwenImage models |
-| `qwen-image aspect-ratios` | List available aspect ratios |
-| `qwen-image resolutions` | List available output resolutions |
+| `qwen-image prompt-extend-modes` | List available prompt extension modes |
 | `qwen-image config` | Show current configuration |
 
 ## Global Options
@@ -119,7 +118,7 @@ Most commands support:
 
 ```
 --json          Output raw JSON (for piping/scripting)
---model TEXT    QwenImage model version (default: qwen-image)
+--model TEXT    QwenImage model version (default: qwen-image-3.0)
 ```
 
 ## Scripting & Piping
@@ -143,18 +142,8 @@ done < prompts.txt
 
 | Model | Engine | Notes |
 |-------|--------|-------|
-| `qwen-image` | Gemini 2.5 Flash | Fast, good quality (default) |
-| `qwen-image-2` | Improved | Better quality, balanced speed |
-| `qwen-image` | Gemini 3 Pro | Best quality, supports resolution control (1K/2K/4K) |
-
-## Aspect Ratios
-
-| Ratio | Orientation |
-|-------|-------------|
-| `1:1` | Square (default) |
-| `3:2` / `2:3` | Classic photo |
-| `16:9` / `9:16` | Widescreen / Portrait |
-| `4:3` / `3:4` | Standard |
+| `qwen-image-3.0` | Standard | Qwen Image 3 model (default) |
+| `qwen-image-3.0-pro` | Pro | Qwen Image 3 model |
 
 ## Configuration
 
@@ -164,7 +153,7 @@ done < prompts.txt
 |----------|-------------|---------|
 | `ACEDATACLOUD_API_TOKEN` | API token from AceDataCloud | *Required* |
 | `ACEDATACLOUD_API_BASE_URL` | API base URL | `https://api.acedata.cloud` |
-| `QWEN_IMAGE_DEFAULT_MODEL` | Default model | `qwen-image` |
+| `QWEN_IMAGE_DEFAULT_MODEL` | Default model | `qwen-image-3.0` |
 | `QWEN_IMAGE_REQUEST_TIMEOUT` | Timeout in seconds | `1800` |
 
 ## Development

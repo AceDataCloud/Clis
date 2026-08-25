@@ -211,6 +211,8 @@ class TestImageCommands:
                 "test-token",
                 "edit",
                 "Make it blue",
+                "-i",
+                "https://example.com/photo.jpg",
                 "--size",
                 "1024*1536",
                 "--prompt-extend-mode",
@@ -222,8 +224,36 @@ class TestImageCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["size"] == "1024*1536"
         assert body["prompt_extend_mode"] == "agent"
+        assert body["image_urls"] == ["https://example.com/photo.jpg"]
         data = json.loads(result.output)
         assert data["success"] is True
+
+    def test_edit_requires_image_url(self, runner):
+        result = runner.invoke(cli, ["--token", "test-token", "edit", "Make it blue", "--json"])
+        assert result.exit_code != 0
+        assert "Missing option" in result.output
+
+    def test_edit_rejects_more_than_three_images(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Combine these images",
+                "-i",
+                "https://example.com/a.jpg",
+                "-i",
+                "https://example.com/b.jpg",
+                "-i",
+                "https://example.com/c.jpg",
+                "-i",
+                "https://example.com/d.jpg",
+                "--json",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "maximum of 3 image URLs" in result.output
 
     @respx.mock
     def test_edit_multiple_images(self, runner, mock_image_response):
