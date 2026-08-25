@@ -126,9 +126,16 @@ from glm_cli.core.output import (
 )
 @click.option(
     "--parallel-tool-calls",
-    is_flag=True,
-    default=False,
+    "parallel_tool_calls",
+    flag_value=True,
+    default=None,
     help="Enable parallel function calling during tool use.",
+)
+@click.option(
+    "--no-parallel-tool-calls",
+    "parallel_tool_calls",
+    flag_value=False,
+    help="Disable parallel function calling during tool use.",
 )
 @click.option(
     "--stream", is_flag=True, default=False, help="Stream partial chat completion events."
@@ -181,7 +188,7 @@ def chat(
     store: bool,
     logprobs: bool,
     top_logprobs: int | None,
-    parallel_tool_calls: bool,
+    parallel_tool_calls: bool | None,
     stream: bool,
     response_format: str | None,
     tools: str | None,
@@ -252,7 +259,7 @@ def chat(
         "logit_bias": parsed_logit_bias,
         "logprobs": logprobs if logprobs else None,
         "top_logprobs": top_logprobs,
-        "parallel_tool_calls": parallel_tool_calls if parallel_tool_calls else None,
+        "parallel_tool_calls": parallel_tool_calls,
         "modalities": parsed_modalities,
         "audio": parsed_audio,
         "prediction": parsed_prediction,

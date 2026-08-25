@@ -23,7 +23,7 @@ def tasks() -> None:
     Examples:
       openai-cli tasks retrieve --id 7489df4c-ef03-4de0-b598-e9a590793434
       openai-cli tasks retrieve --trace-id my-custom-trace-001
-      openai-cli tasks batch --trace-ids trace-001 trace-002
+      openai-cli tasks batch --trace-ids trace-001 --trace-ids trace-002
       openai-cli tasks batch --application-id 9dec7b2a-1cad-41ff-8536-d4ddaf2525d4
     """
 
@@ -107,9 +107,9 @@ def batch(
 
     \b
     Examples:
-      openai-cli tasks batch --trace-ids trace-001 trace-002
+      openai-cli tasks batch --trace-ids trace-001 --trace-ids trace-002
       openai-cli tasks batch --application-id 9dec7b2a-1cad-41ff-8536-d4ddaf2525d4
-      openai-cli tasks batch --ids id1 id2 --limit 5
+      openai-cli tasks batch --ids id1 --ids id2 --limit 5
     """
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
