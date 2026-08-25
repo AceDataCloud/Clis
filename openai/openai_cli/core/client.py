@@ -158,6 +158,17 @@ class OpenAIClient:
         """Edit images."""
         return self.request("/openai/images/edits", kwargs)
 
+    def image_edits_multipart(
+        self,
+        fields: dict[str, Any],
+        files: list[tuple[str, Any]],
+    ) -> dict[str, Any]:
+        """Edit uploaded images using multipart/form-data."""
+        result = self.request_multipart("/openai/images/edits", fields=fields, files=files)
+        if isinstance(result, str):
+            raise OpenAIAPIError(message=result)
+        return result
+
     def responses(self, **kwargs: Any) -> dict[str, Any]:
         """Send a Responses API request."""
         return self.request("/openai/responses", kwargs)
@@ -166,7 +177,7 @@ class OpenAIClient:
         self,
         endpoint: str,
         fields: dict[str, Any] | None = None,
-        files: dict[str, Any] | None = None,
+        files: dict[str, Any] | list[tuple[str, Any]] | None = None,
         timeout: float | None = None,
     ) -> dict[str, Any] | str:
         """Make a multipart/form-data request."""
@@ -193,8 +204,11 @@ class OpenAIClient:
                     multipart.append((key, (None, str(item))))
             else:
                 multipart.append((key, (None, str(value))))
-        for key, value in (files or {}).items():
-            multipart.append((key, value))
+        if isinstance(files, list):
+            multipart.extend(files)
+        else:
+            for key, value in (files or {}).items():
+                multipart.append((key, value))
 
         with httpx.Client() as http_client:
             try:

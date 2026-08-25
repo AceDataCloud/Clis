@@ -198,6 +198,26 @@ class TestChatCommand:
         assert body["prediction"] == {"type": "content", "content": "Hello"}
         assert body["web_search_options"] == {"search_context_size": "low"}
 
+    @respx.mock
+    def test_chat_can_disable_parallel_tool_calls(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--no-parallel-tool-calls",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["parallel_tool_calls"] is False
+
     def test_chat_rejects_invalid_json_option(self, runner):
         result = runner.invoke(
             cli,

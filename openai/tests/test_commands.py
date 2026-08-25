@@ -532,9 +532,43 @@ class TestImageCommands:
             "https://example.com/reference.png",
         ]
 
+    @respx.mock
+    def test_edit_sends_multipart_image_file(self, runner, tmp_path, mock_image_response):
+        image_file = tmp_path / "base.png"
+        image_file.write_bytes(b"fake-image")
+        mask_file = tmp_path / "mask.png"
+        mask_file.write_bytes(b"fake-mask")
+        route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Remove the background",
+                "--image-file",
+                str(image_file),
+                "--mask-file",
+                str(mask_file),
+                "--partial-images",
+                "2",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert "multipart/form-data" in route.calls.last.request.headers["content-type"]
+        content = route.calls.last.request.content.decode()
+        assert 'name="image"; filename="base.png"' in content
+        assert 'name="mask"; filename="mask.png"' in content
+        assert 'name="partial_images"' in content
+        assert "2" in content
+
     def test_edit_help_excludes_mask_url(self, runner):
         result = runner.invoke(cli, ["edit", "--help"])
         assert result.exit_code == 0
+        assert "--mask-file" in result.output
         assert "--mask-url" not in result.output
 
     def test_edit_requires_image_url(self, runner):
@@ -543,6 +577,7 @@ class TestImageCommands:
             ["--token", "test-token", "edit", "Add a rainbow"],
         )
         assert result.exit_code != 0
+        assert "Provide at least one of --image-url or --image-file" in result.output
 
     def test_edit_rejects_more_than_sixteen_image_urls(self, runner):
         result = runner.invoke(
