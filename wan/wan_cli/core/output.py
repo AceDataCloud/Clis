@@ -56,7 +56,9 @@ def print_video_result(data: dict[str, Any]) -> None:
     """Print video generation result in a rich format."""
     task_id = data.get("task_id", "N/A")
     trace_id = data.get("trace_id", "N/A")
-    items = data.get("data", [])
+    items = data.get("data")
+    if items is None:
+        items = [data]
 
     console.print(
         Panel(
@@ -90,7 +92,9 @@ def print_video_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
-    tasks = data.get("data", [])
+    tasks = data.get("data", data)
+    if isinstance(tasks, dict) and isinstance(tasks.get("items"), list):
+        tasks = tasks["items"]
 
     if isinstance(tasks, list):
         for task_data in tasks:

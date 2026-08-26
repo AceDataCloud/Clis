@@ -107,13 +107,14 @@ def wait(
     try:
         while elapsed < max_timeout:
             result = client.query_task(id=task_id, action="retrieve")
-            data = result.get("data", {})
+            data = result.get("data", result)
 
             # Check completion - handle both list and dict responses
             if isinstance(data, list) and data:
                 item = data[0]
             elif isinstance(data, dict):
-                item = data
+                items = data.get("items")
+                item = items[0] if isinstance(items, list) and items else data
             else:
                 item = {}
 

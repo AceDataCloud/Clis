@@ -69,6 +69,22 @@ class TestGenerateCommands:
         assert "test-task-123" in result.output
 
     @respx.mock
+    def test_generate_handles_top_level_video_response(self, runner):
+        respx.post("https://api.acedata.cloud/wan/videos").mock(
+            return_value=Response(
+                200,
+                json={
+                    "task_id": "test-task-123",
+                    "state": "completed",
+                    "video_url": "https://cdn.example.com/test-video.mp4",
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "generate", "A test prompt"])
+        assert result.exit_code == 0
+        assert "https://cdn.example.com/test-video.mp4" in result.output
+
+    @respx.mock
     def test_generate_with_model(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/wan/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -331,12 +347,13 @@ class TestTaskCommands:
         assert data["data"][0]["id"] == "task-123"
 
     @respx.mock
-    def test_task_rich_output(self, runner, mock_task_response):
+    def test_task_rich_output_handles_top_level_response(self, runner):
         respx.post("https://api.acedata.cloud/wan/tasks").mock(
-            return_value=Response(200, json=mock_task_response)
+            return_value=Response(200, json={"id": "task-123", "state": "completed"})
         )
         result = runner.invoke(cli, ["--token", "test-token", "task", "task-123"])
         assert result.exit_code == 0
+        assert "task-123" in result.output
 
     @respx.mock
     def test_tasks_batch(self, runner, mock_task_response):
