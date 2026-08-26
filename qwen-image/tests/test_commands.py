@@ -233,6 +233,17 @@ class TestImageCommands:
         assert result.exit_code != 0
         assert "Missing option" in result.output
 
+    @respx.mock
+    def test_wait_handles_top_level_task_response(self, runner):
+        respx.post("https://api.acedata.cloud/qwen-image/tasks").mock(
+            return_value=Response(200, json={"id": "task-123", "state": "completed"})
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "wait", "task-123", "--interval", "0"]
+        )
+        assert result.exit_code == 0
+        assert "completed" in result.output
+
     def test_edit_rejects_more_than_three_images(self, runner):
         result = runner.invoke(
             cli,
