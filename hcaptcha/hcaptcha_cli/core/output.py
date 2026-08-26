@@ -39,7 +39,7 @@ def print_recognition_result(data: dict[str, Any]) -> None:
                 border_style="green",
             )
         )
-        console.print("[dim]Poll POST /captcha/tasks with the task_id to retrieve the result.[/dim]")
+        console.print("[dim]Read POST /captcha/tasks with the task_id to retrieve the result.[/dim]")
         return
 
     if not solution:
@@ -68,7 +68,7 @@ def print_recognition_result(data: dict[str, Any]) -> None:
 
 
 def print_task_result(data: dict[str, Any]) -> None:
-    """Print hCaptcha task poll result."""
+    """Print hCaptcha task status."""
     task_id = data.get("task_id")
     status = data.get("status")
     trace_id = data.get("trace_id")
@@ -87,7 +87,7 @@ def print_task_result(data: dict[str, Any]) -> None:
                 border_style="yellow",
             )
         )
-        console.print("[dim]The task is still being processed. Poll again shortly.[/dim]")
+        console.print("[dim]The task is still being processed. Read its status again shortly.[/dim]")
         return
 
     content_parts = [f"[bold]Task ID:[/bold] {task_id}", f"[bold]Status:[/bold] {status}"]
@@ -125,7 +125,7 @@ def print_token_result(data: dict[str, Any]) -> None:
                 border_style="green",
             )
         )
-        console.print("[dim]Poll POST /captcha/tasks with the task_id to retrieve the token.[/dim]")
+        console.print("[dim]Read POST /captcha/tasks with the task_id to retrieve the token.[/dim]")
     elif token:
         table = Table(title="hCaptcha Token Result", show_header=False, box=None, padding=(0, 2))
         table.add_column("Field", style="bold cyan", width=15)

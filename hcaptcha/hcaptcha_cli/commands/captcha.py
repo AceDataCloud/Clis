@@ -5,7 +5,7 @@ import json
 import click
 
 from hcaptcha_cli.core.client import get_client
-from hcaptcha_cli.core.exceptions import HcaptchaError
+from hcaptcha_cli.core.exceptions import HcaptchaAPIError, HcaptchaError
 from hcaptcha_cli.core.output import (
     print_error,
     print_json,
@@ -159,7 +159,7 @@ def task(
     task_id: str,
     output_json: bool,
 ) -> None:
-    """Poll the result of an asynchronous captcha task.
+    """Read the persisted status of an asynchronous captcha task.
 
     TASK_ID is the task identifier returned when calling recognize or token with --async.
 
@@ -179,5 +179,11 @@ def task(
         else:
             print_task_result(result)
     except HcaptchaError as e:
-        print_error(e.message)
+        if output_json and isinstance(e, HcaptchaAPIError) and e.status_code == 504:
+            try:
+                print_json(json.loads(e.message))
+            except json.JSONDecodeError:
+                print_error(e.message)
+        else:
+            print_error(e.message)
         raise SystemExit(1) from e
