@@ -158,6 +158,7 @@ class TestRecognizeCommand:
         assert result.exit_code == 0
         assert "Recognition Task Submitted" in result.output
         assert "3a8b1c2d" in result.output
+        assert "Read POST /captcha/tasks" in result.output
 
     def test_recognize_invalid_queries_json(self, runner):
         result = runner.invoke(
@@ -335,6 +336,7 @@ class TestTokenCommand:
         )
         assert result.exit_code == 0
         assert "3a8b1c2d" in result.output
+        assert "Read POST /captcha/tasks" in result.output
 
     def test_token_no_token(self, runner):
         result = runner.invoke(
@@ -370,6 +372,7 @@ class TestTaskCommand:
         result = runner.invoke(cli, ["task", "--help"])
         assert result.exit_code == 0
         assert "TASK_ID" in result.output
+        assert "persisted status" in result.output
 
     @respx.mock
     def test_task_processing_json(self, runner, mock_task_processing_response):
@@ -408,6 +411,7 @@ class TestTaskCommand:
         assert "Task Processing" in result.output
         assert "Trace ID" in result.output
         assert "trace-hcaptcha-processing-123" in result.output
+        assert "Read its status again shortly" in result.output
 
     @respx.mock
     def test_task_ready_token_json(self, runner, mock_task_ready_token_response):
@@ -465,6 +469,31 @@ class TestTaskCommand:
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["task_id"] == "3a8b1c2d-4e5f-6789-abcd-ef0123456789"
+
+    @respx.mock
+    def test_task_timeout_json(self, runner):
+        timeout_response = {
+            "detail": "The captcha task timed out.",
+            "code": "timeout",
+            "success": False,
+            "task_id": "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+            "status": "failed",
+        }
+        respx.post("https://api.acedata.cloud/captcha/tasks").mock(
+            return_value=Response(504, json=timeout_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "task",
+                "3a8b1c2d-4e5f-6789-abcd-ef0123456789",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 1
+        assert json.loads(result.output) == timeout_response
 
     def test_task_missing_task_id(self, runner):
         result = runner.invoke(cli, ["--token", "test-token", "task"])
