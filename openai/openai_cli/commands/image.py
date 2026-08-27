@@ -45,7 +45,7 @@ def _validate_size_format(
     "-n",
     "--count",
     default=None,
-    type=int,
+    type=click.IntRange(1, 10),
     help="Number of images to generate (1-10).",
 )
 @click.option(
@@ -211,7 +211,7 @@ def image(
     "-n",
     "--count",
     default=None,
-    type=int,
+    type=click.IntRange(1, 10),
     help="Number of images to generate (1-10).",
 )
 @click.option(
@@ -326,6 +326,11 @@ def edit(
 
     client = get_client(ctx.obj.get("token"))
     if image_file:
+        if model == "nano-banana-2-lite":
+            raise click.UsageError(
+                "--model nano-banana-2-lite is not supported with --image-file uploads. "
+                "Use --image-url or choose a different model."
+            )
         fields: dict[str, object] = {
             "prompt": prompt,
             "model": model,

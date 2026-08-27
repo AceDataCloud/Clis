@@ -27,7 +27,7 @@ from openai_cli.core.output import (
 @click.option(
     "--temperature",
     default=None,
-    type=float,
+    type=click.FloatRange(0, 2),
     help="Sampling temperature (0-2).",
 )
 @click.option(
@@ -40,7 +40,7 @@ from openai_cli.core.output import (
     "-n",
     "--count",
     default=None,
-    type=int,
+    type=click.IntRange(1, 128),
     help="Number of completion choices to generate.",
 )
 @click.option(
@@ -74,7 +74,7 @@ from openai_cli.core.output import (
 @click.option(
     "--max-output-tokens",
     default=None,
-    type=int,
+    type=click.IntRange(min=1),
     help="Maximum number of output tokens to generate.",
 )
 @click.option(
