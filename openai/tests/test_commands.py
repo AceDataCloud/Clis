@@ -164,6 +164,14 @@ class TestChatCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["temperature"] == 0.5
 
+    def test_chat_rejects_temperature_above_openapi_max(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "--temperature", "2.1"],
+        )
+        assert result.exit_code != 0
+        assert "2.1 is not in the range 0<=x<=2" in result.output
+
     @respx.mock
     def test_chat_with_top_p(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
@@ -425,6 +433,14 @@ class TestEmbedCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["input"] == ["First text", "Second text", "Third text"]
 
+    def test_embed_rejects_non_positive_dimensions(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "embed", "Hello world", "--dimensions", "0"],
+        )
+        assert result.exit_code != 0
+        assert "0 is not in the range x>=1" in result.output
+
 
 # ─── Image Commands ────────────────────────────────────────────────────────
 
@@ -463,6 +479,14 @@ class TestImageCommands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-image-1"
+
+    def test_image_rejects_count_above_openapi_max(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "image", "A cat", "--count", "11"],
+        )
+        assert result.exit_code != 0
+        assert "11 is not in the range 1<=x<=10" in result.output
 
     @respx.mock
     def test_edit_json(self, runner, mock_image_response):
@@ -597,6 +621,25 @@ class TestImageCommands:
         assert result.exit_code != 0
         assert "at most 16" in result.output
 
+    def test_edit_rejects_nano_banana_2_lite_for_image_file(self, runner, tmp_path):
+        image_file = tmp_path / "base.png"
+        image_file.write_bytes(b"fake-image")
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "Remove the background",
+                "--image-file",
+                str(image_file),
+                "--model",
+                "nano-banana-2-lite",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "not supported with --image-file uploads" in result.output
+
 
 # ─── Response Commands ─────────────────────────────────────────────────────
 
@@ -666,6 +709,14 @@ class TestResponseCommands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["n"] == 2
+
+    def test_response_rejects_non_positive_max_output_tokens(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "response", "Hello", "--max-output-tokens", "0"],
+        )
+        assert result.exit_code != 0
+        assert "0 is not in the range x>=1" in result.output
 
     @respx.mock
     def test_response_with_response_format(self, runner, mock_response_api_response):

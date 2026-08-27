@@ -33,7 +33,7 @@ from openai_cli.core.output import (
 @click.option(
     "--dimensions",
     default=None,
-    type=int,
+    type=click.IntRange(min=1),
     help="Output embedding size (when supported by the model).",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")

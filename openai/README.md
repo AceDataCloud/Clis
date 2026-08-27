@@ -78,6 +78,7 @@ openai-cli config
 | `edit` | Image editing (`/openai/images/edits`) |
 | `response` | Responses API (`/openai/responses`) |
 | `speech` | Speech synthesis (`/v1/audio/speech`) |
+| `transcribe` | Audio transcription (`/v1/audio/transcriptions`) |
 | `realtime` | Realtime WebSocket connection info (`/v1/realtime`) |
 | `tasks retrieve` | Retrieve a single async task result (`/openai/tasks`) |
 | `tasks batch` | Retrieve multiple async task results (`/openai/tasks`) |
