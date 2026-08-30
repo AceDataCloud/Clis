@@ -7,7 +7,7 @@ import click
 from dotenv import load_dotenv
 
 from tw_cli.commands.info import config
-from tw_cli.commands.twitter import posts, retweets, users
+from tw_cli.commands.twitter import comments, posts, retweets, search, users
 
 load_dotenv()
 
@@ -38,6 +38,8 @@ def cli(ctx: click.Context, api_token: str | None) -> None:
 cli.add_command(posts)
 cli.add_command(users)
 cli.add_command(retweets)
+cli.add_command(comments)
+cli.add_command(search)
 cli.add_command(config)
 
 

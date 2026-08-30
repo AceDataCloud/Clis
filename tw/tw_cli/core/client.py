@@ -86,6 +86,14 @@ class TwClient:
         """Find retweets using /x/retweets."""
         return self.request("/x/retweets", kwargs)
 
+    def comments(self, **kwargs: Any) -> dict[str, Any]:
+        """Get X comments using /x/comments."""
+        return self.request("/x/comments", kwargs)
+
+    def search(self, **kwargs: Any) -> dict[str, Any]:
+        """Search X posts using /x/search."""
+        return self.request("/x/search", kwargs)
+
 
 def get_client(token: str | None = None) -> TwClient:
     """Get a TwClient instance, optionally overriding the token."""
