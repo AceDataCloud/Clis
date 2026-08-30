@@ -51,3 +51,25 @@ def retweets(ctx: click.Context, post_id: str, cursor: str | None, output_json: 
     """Find retweets of a tweet."""
     payload: dict[str, object] = {"post_id": post_id, "cursor": cursor}
     _emit(get_client(ctx.obj.get("token")).retweets, payload, output_json, "Retweets Result")
+
+
+@click.command()
+@click.argument("note_id")
+@click.option("--cursor", default=None, help="Pagination cursor.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def comments(ctx: click.Context, note_id: str, cursor: str | None, output_json: bool) -> None:
+    """Get all the comment information for a tweet by entering the id of the tweet."""
+    payload: dict[str, object] = {"note_id": note_id, "cursor": cursor}
+    _emit(get_client(ctx.obj.get("token")).comments, payload, output_json, "Comments Result")
+
+
+@click.command()
+@click.argument("keyword")
+@click.option("--cursor", default=None, help="Pagination cursor.")
+@click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.pass_context
+def search(ctx: click.Context, keyword: str, cursor: str | None, output_json: bool) -> None:
+    """Find chronological tweets by keyword."""
+    payload: dict[str, object] = {"keyword": keyword, "cursor": cursor}
+    _emit(get_client(ctx.obj.get("token")).search, payload, output_json, "Search Result")

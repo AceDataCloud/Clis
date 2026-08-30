@@ -22,7 +22,7 @@ def ok() -> dict[str, object]:
 def test_help(runner):
     result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
-    for command in ["posts", "users", "retweets"]:
+    for command in ["posts", "users", "retweets", "comments", "search"]:
         assert command in result.output
 
 
@@ -51,3 +51,23 @@ def test_retweets_payload(runner):
     assert result.exit_code == 0
     sent = json.loads(route.calls[0].request.content)
     assert sent == {"post_id": "1894625520991547884", "cursor": "abc"}
+
+
+@respx.mock
+def test_comments_payload(runner):
+    route = respx.post("https://api.acedata.cloud/x/comments").mock(return_value=Response(200, json=ok()))
+    result = runner.invoke(
+        cli, ["--token", "test-token", "comments", "1894625520991547884", "--cursor", "abc", "--json"]
+    )
+    assert result.exit_code == 0
+    sent = json.loads(route.calls[0].request.content)
+    assert sent == {"note_id": "1894625520991547884", "cursor": "abc"}
+
+
+@respx.mock
+def test_search_payload(runner):
+    route = respx.post("https://api.acedata.cloud/x/search").mock(return_value=Response(200, json=ok()))
+    result = runner.invoke(cli, ["--token", "test-token", "search", "acedata", "--cursor", "abc", "--json"])
+    assert result.exit_code == 0
+    sent = json.loads(route.calls[0].request.content)
+    assert sent == {"keyword": "acedata", "cursor": "abc"}
