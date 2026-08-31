@@ -37,38 +37,38 @@ from gemini_cli.core.output import (
 @click.option(
     "--temperature",
     default=None,
-    type=float,
+    type=click.FloatRange(0, 2),
     help="Sampling temperature (0-2). Higher values = more random.",
 )
 @click.option(
     "--max-tokens",
     default=None,
-    type=int,
+    type=click.IntRange(min=1),
     help="Maximum number of tokens to generate.",
 )
 @click.option(
     "-n",
     "--count",
     default=None,
-    type=int,
+    type=click.IntRange(min=1, max=128),
     help="Number of completion choices to generate.",
 )
 @click.option(
     "--top-p",
     default=None,
-    type=float,
+    type=click.FloatRange(0, 1),
     help="Nucleus sampling probability mass (0-1).",
 )
 @click.option(
     "--frequency-penalty",
     default=None,
-    type=float,
+    type=click.FloatRange(-2, 2),
     help="Penalize tokens by their frequency in the text so far (-2.0 to 2.0).",
 )
 @click.option(
     "--presence-penalty",
     default=None,
-    type=float,
+    type=click.FloatRange(-2, 2),
     help="Penalize tokens that have already appeared in the text (-2.0 to 2.0).",
 )
 @click.option(
@@ -92,7 +92,7 @@ from gemini_cli.core.output import (
 @click.option(
     "--max-completion-tokens",
     default=None,
-    type=int,
+    type=click.IntRange(min=1),
     help="Maximum number of tokens to generate (alternative to --max-tokens).",
 )
 @click.option(

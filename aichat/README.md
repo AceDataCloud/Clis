@@ -48,7 +48,9 @@ aichat chat "Hello" --json | jq '.answer'
 | Command | Description |
 |---------|-------------|
 | `chat` | Send a question to an AI model (`/aichat/conversations`) |
+| `chat2` | Send a conversation request with structured messages and tool results (`/aichat2/conversations`) |
 | `models` | List all available models |
+| `models2` | List models available to `chat2` |
 | `config` | Show current configuration |
 
 ## Chat Options
