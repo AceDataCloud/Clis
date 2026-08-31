@@ -12,16 +12,16 @@ console = Console()
 
 # Available Gemini chat models
 GEMINI_CHAT_MODELS = [
-    "gemini-3.1-pro",
-    "gemini-3.0-pro",
+    "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
+    "gemini-3.5-flash-lite",
     "gemini-3-flash-preview",
-    "gemini-3.1-flash-lite-preview",
+    "gemini-3.1-flash-lite",
+    "gemini-3.1-pro-preview",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
-    "gemini-2.0-flash",
 ]
 
 GEMINI_NATIVE_MODELS = [
@@ -159,19 +159,16 @@ def print_models() -> None:
     table.add_column("Model", style="bold cyan")
     table.add_column("Notes")
 
-    table.add_row("gemini-3.1-pro", "Latest Gemini Pro model")
-    table.add_row("gemini-3.0-pro", "Gemini 3.0 Pro")
+    table.add_row("gemini-3.7-flash", "Gemini 3.7 Flash")
     table.add_row("gemini-3.6-flash", "Gemini 3.6 Flash")
     table.add_row("gemini-3.5-flash", "Gemini 3.5 Flash")
+    table.add_row("gemini-3.5-flash-lite", "Gemini 3.5 Flash Lite")
     table.add_row("gemini-3-flash-preview", "Gemini 3 Flash Preview")
-    table.add_row("gemini-3.1-flash-lite-preview", "Gemini 3.1 Flash Lite Preview")
-    table.add_row("gemini-3.1-flash-image", "Gemini 3.1 Flash Image")
-    table.add_row("gemini-3-pro-image", "Gemini 3 Pro Image")
+    table.add_row("gemini-3.1-flash-lite", "Gemini 3.1 Flash Lite")
+    table.add_row("gemini-3.1-pro-preview", "Gemini 3.1 Pro Preview")
     table.add_row("gemini-2.5-pro", "Gemini 2.5 Pro")
     table.add_row("gemini-2.5-flash", "Gemini 2.5 Flash (default)")
     table.add_row("gemini-2.5-flash-lite", "Gemini 2.5 Flash Lite")
-    table.add_row("gemini-2.5-flash-image", "Gemini 2.5 Flash Image")
-    table.add_row("gemini-2.0-flash", "Gemini 2.0 Flash")
 
     console.print(table)
     console.print(f"\n[dim]Default chat model: {DEFAULT_CHAT_MODEL}[/dim]")

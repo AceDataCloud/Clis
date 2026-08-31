@@ -32,6 +32,15 @@ class TestGlobalCommands:
         assert MODELS.count("deepseek-v4-pro") == 1
         assert MODELS2.count("deepseek-v4-pro") == 1
 
+    def test_chat2_model_inventory_matches_gemini_models(self):
+        assert "gemini-3.7-flash" in MODELS2
+        assert "gemini-3.5-flash-lite" in MODELS2
+        assert "gemini-2.5-pro" in MODELS2
+        assert "gemini-3.1-flash-lite" in MODELS2
+        assert "gemini-3.1-flash-lite-preview" not in MODELS2
+        assert "gemini-3.1-pro" not in MODELS2
+        assert "gemini-3-pro-preview" not in MODELS2
+
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
@@ -522,7 +531,7 @@ class TestChat2Commands:
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
         )
-        msg = json.dumps({"role": "user", "content": "Hello"})
+        msg = json.dumps("Hello")
         result = runner.invoke(
             cli,
             [
@@ -537,7 +546,7 @@ class TestChat2Commands:
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["message"] == {"role": "user", "content": "Hello"}
+        assert body["message"] == "Hello"
 
     @respx.mock
     def test_chat2_with_tool_results(self, runner, mock_chat_response):
@@ -604,5 +613,21 @@ class TestChat2Commands:
                 "--messages",
                 "not-valid-json",
             ],
+        )
+        assert result.exit_code != 0
+
+    @pytest.mark.parametrize(
+        ("option", "value"),
+        [
+            ("--message", '{"role":"user"}'),
+            ("--messages", '{"role":"user"}'),
+            ("--tool-results", '[{"tool_use_id":"id"}]'),
+            ("--unattended-policy", "[]"),
+        ],
+    )
+    def test_chat2_rejects_invalid_structured_options(self, runner, option, value):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", option, value],
         )
         assert result.exit_code != 0

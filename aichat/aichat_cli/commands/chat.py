@@ -19,14 +19,41 @@ from aichat_cli.core.output import (
 )
 
 
-def _parse_json_option(value: str | None, param_hint: str) -> dict | list | None:
+def _parse_json_option(
+    value: str | None,
+    param_hint: str,
+    expected_types: tuple[type, ...],
+) -> object | None:
     """Parse a JSON string option, raising BadParameter on invalid JSON."""
     if value is None:
         return None
     try:
-        return json.loads(value)
+        parsed_value = json.loads(value)
     except json.JSONDecodeError as exc:
         raise click.BadParameter("Must be a valid JSON string.", param_hint=param_hint) from exc
+    if not isinstance(parsed_value, expected_types):
+        expected = " or ".join(type_.__name__ for type_ in expected_types)
+        raise click.BadParameter(f"Must be a JSON {expected}.", param_hint=param_hint)
+    return parsed_value
+
+
+def _parse_tool_results(value: str | None) -> object | None:
+    tool_results = _parse_json_option(value, "--tool-results", (list,))
+    if tool_results is None:
+        return None
+    assert isinstance(tool_results, list)
+    for tool_result in tool_results:
+        if not isinstance(tool_result, dict) or not all(
+            isinstance(tool_result.get(field), str) for field in ("tool_use_id", "output")
+        ) or (
+            "is_error" in tool_result and not isinstance(tool_result["is_error"], bool)
+        ):
+            raise click.BadParameter(
+                "Must be an array of objects with string tool_use_id and output, "
+                "and optional boolean is_error.",
+                param_hint="--tool-results",
+            )
+    return tool_results
 
 
 @click.command()
@@ -296,10 +323,12 @@ def chat2(
             "allowed_mcp_servers": list(allowed_mcp_servers) if allowed_mcp_servers else None,
             "offset": offset,
             "limit": limit,
-            "message": _parse_json_option(message, "--message"),
-            "messages": _parse_json_option(messages, "--messages"),
-            "tool_results": _parse_json_option(tool_results, "--tool-results"),
-            "unattended_policy": _parse_json_option(unattended_policy, "--unattended-policy"),
+            "message": _parse_json_option(message, "--message", (str, list)),
+            "messages": _parse_json_option(messages, "--messages", (list,)),
+            "tool_results": _parse_tool_results(tool_results),
+            "unattended_policy": _parse_json_option(
+                unattended_policy, "--unattended-policy", (dict,)
+            ),
         }
 
         result = client.converse2(**payload)  # type: ignore[arg-type]
