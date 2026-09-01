@@ -69,6 +69,11 @@ def print_tts_result(data: dict[str, Any]) -> None:
         latency_ms = data.get("latency_ms")
         if latency_ms:
             content += f"\n[bold]Latency:[/bold] {latency_ms}ms"
+        cost = data.get("cost")
+        if isinstance(cost, dict) and cost.get("amount") is not None:
+            content += f"\n[bold]Cost:[/bold] {cost['amount']} {cost.get('currency', '')}".rstrip()
+            if cost.get("list_amount") is not None:
+                content += f" (list: {cost['list_amount']})"
         console.print(
             Panel(
                 content,

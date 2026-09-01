@@ -76,6 +76,7 @@ class TestTTSCommand:
         result = runner.invoke(cli, ["--token", "test-token", "tts", "Hello"])
         assert result.exit_code == 0
         assert "fish.audio" in result.output
+        assert "1.5 credits" in result.output
 
     @respx.mock
     def test_tts_with_reference_id(self, runner, mock_tts_response):

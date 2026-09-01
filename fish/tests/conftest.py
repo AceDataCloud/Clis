@@ -31,6 +31,7 @@ def mock_tts_response():
     return {
         "audio_url": "https://platform.r2.fish.audio/task/8a72ff9840234006a9f74cb2fa04f978.mp3",
         "latency_ms": 1234,
+        "cost": {"amount": 1.5, "currency": "credits", "list_amount": 2},
     }
 
 

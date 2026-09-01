@@ -406,6 +406,17 @@ class TestUtilityCommands:
         assert data["success"] is True
 
     @respx.mock
+    def test_translate_rich_output_includes_cost(self, runner, mock_translate_response):
+        respx.post("https://api.acedata.cloud/midjourney/translate").mock(
+            return_value=Response(200, json=mock_translate_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "translate", "Una hermosa puesta de sol"]
+        )
+        assert result.exit_code == 0
+        assert "1 credits" in result.output
+
+    @respx.mock
     def test_seed_json(self, runner, mock_seed_response):
         respx.post("https://api.acedata.cloud/midjourney/seed").mock(
             return_value=Response(200, json=mock_seed_response)
