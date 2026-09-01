@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from gemini_cli.core.output import GEMINI_CHAT_MODELS
+from gemini_cli.core.output import GEMINI_CHAT_MODELS, GEMINI_NATIVE_MODELS
 from gemini_cli.main import cli
 
 
@@ -86,6 +86,23 @@ class TestGlobalCommands:
             "gemini-2.5-flash-lite",
         ]
 
+    def test_native_model_inventory_matches_api(self):
+        assert GEMINI_NATIVE_MODELS == [
+            "gemini-3.7-flash",
+            "gemini-3.6-flash",
+            "gemini-3.5-flash",
+            "gemini-3.5-flash-lite",
+            "gemini-3-flash-preview",
+            "gemini-3.1-flash-lite",
+            "gemini-3.1-pro-preview",
+            "gemini-2.5-pro",
+            "gemini-2.5-flash",
+            "gemini-2.5-flash-lite",
+            "gemini-3.1-flash-image",
+            "gemini-2.5-flash-image",
+            "gemini-3-pro-image",
+        ]
+
 
 class TestChatCommand:
     """Tests for chat commands."""
@@ -149,7 +166,11 @@ class TestChatCommand:
             )
             assert result.exit_code != 0, f"Model {model} should be rejected"
 
-    def test_generate_content_rejects_chat_only_models(self, runner):
+    @respx.mock
+    def test_generate_content_accepts_new_native_models(self, runner, mock_chat_response):
+        respx.post(
+            "https://api.acedata.cloud/v1beta/models/gemini-3.6-flash:generateContent"
+        ).mock(return_value=Response(200, json=mock_chat_response))
         result = runner.invoke(
             cli,
             [
@@ -163,7 +184,7 @@ class TestChatCommand:
                 "--json",
             ],
         )
-        assert result.exit_code != 0
+        assert result.exit_code == 0
 
     @respx.mock
     def test_chat_with_max_completion_tokens(self, runner, mock_chat_response):
