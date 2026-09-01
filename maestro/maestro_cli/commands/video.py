@@ -9,14 +9,11 @@ from maestro_cli.core.output import (
     DEFAULT_ACTION,
     DEFAULT_ASPECT_RATIO,
     DEFAULT_DURATION,
-    DEFAULT_QUALITY,
     DEFAULT_SCENARIO,
     DEFAULT_STYLE,
     DEFAULT_VOICE,
     MAESTRO_ACTIONS,
-    QUALITY_TIERS,
     SCENARIOS,
-    SKU_LIMITS,
     print_error,
     print_json,
     print_video_result,
@@ -64,21 +61,14 @@ from maestro_cli.core.output import (
     type=click.IntRange(5, 300),
     default=DEFAULT_DURATION,
     show_default=True,
-    help="Target video length in seconds (5-300; SKU-specific maximums apply).",
-)
-@click.option(
-    "--quality",
-    type=click.Choice(QUALITY_TIERS),
-    default=DEFAULT_QUALITY,
-    show_default=True,
-    help="Production SKU: lite (720p, up to 30s), standard (1080p, up to 120s), pro (up to 300s).",
+    help="Target video length in seconds (5-300).",
 )
 @click.option(
     "--scenario",
     type=click.Choice(SCENARIOS),
     default=DEFAULT_SCENARIO,
     show_default=True,
-    help="Production workflow: auto/narrated/captions/avatar/drama (SKU-specific availability applies).",
+    help="Production workflow: auto/narrated/captions/avatar/drama.",
 )
 @click.option(
     "--style",
@@ -106,7 +96,6 @@ def create(
     langs: tuple[str, ...],
     aspect: str,
     duration: int,
-    quality: str,
     scenario: str,
     style: str,
     voice: str,
@@ -120,21 +109,16 @@ def create(
     \b
     Examples:
       maestro create "Explain what a vector database is in 20 seconds"
-      maestro create "Product demo" --aspect 16:9 --quality pro
+      maestro create "Product demo" --aspect 16:9
       maestro create "Continue the story" --action extend --ref-task-id abc123
       maestro create "Same video in English" --action remix --ref-task-id abc123 --lang en
     """
     if action != "generate" and not ref_task_id:
         raise click.UsageError("--ref-task-id is required for remix, edit, and extend actions.")
-    limits = SKU_LIMITS[quality]
-    if duration > limits["duration"]:
-        raise click.UsageError(f"{quality} supports at most {limits['duration']} seconds")
-    if langs and len(langs) > limits["languages"]:
-        raise click.UsageError(f"{quality} supports at most {limits['languages']} language(s)")
-    if action not in limits["actions"]:
-        raise click.UsageError(f"action={action} requires a higher Maestro SKU")
-    if scenario not in limits["scenarios"]:
-        raise click.UsageError(f"scenario={scenario} requires a higher Maestro SKU")
+    if len(file_urls) > 20:
+        raise click.UsageError("At most 20 reference media URLs are allowed.")
+    if len(langs) > 4:
+        raise click.UsageError("At most 4 output languages are allowed.")
 
     client = get_client(ctx.obj.get("token"))
 
@@ -143,7 +127,6 @@ def create(
         "action": action,
         "aspect": aspect,
         "duration": duration,
-        "quality": quality,
         "scenario": scenario,
         "style": style,
         "voice": voice,
