@@ -118,6 +118,7 @@ def mock_translate_response():
     """Mock successful translate response."""
     return {
         "success": True,
+        "cost": {"amount": 1, "currency": "credits", "list_amount": 1.5},
         "data": {
             "content": "A beautiful sunset over the ocean",
         },

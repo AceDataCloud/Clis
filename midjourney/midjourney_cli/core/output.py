@@ -53,6 +53,12 @@ def print_result(data: dict[str, Any], title: str = "Result") -> None:
         info_lines.append(f"[bold]Task ID:[/bold] {task_id}")
     if trace_id != "N/A":
         info_lines.append(f"[bold]Trace ID:[/bold] {trace_id}")
+    cost = data.get("cost")
+    if isinstance(cost, dict) and cost.get("amount") is not None:
+        cost_line = f"[bold]Cost:[/bold] {cost['amount']} {cost.get('currency', '')}".rstrip()
+        if cost.get("list_amount") is not None:
+            cost_line += f" (list: {cost['list_amount']})"
+        info_lines.append(cost_line)
 
     if info_lines:
         console.print(
