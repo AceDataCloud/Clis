@@ -180,7 +180,7 @@ class TestGenerateCommands:
                 "--duration",
                 "30",
                 "--task-type",
-                "auto",
+                "reference",
                 "--output-format",
                 "mov",
                 "--tool-json",
@@ -199,7 +199,7 @@ class TestGenerateCommands:
         sent = json.loads(route.calls[0].request.content)
         assert sent["model"] == "doubao-seedance-2-5-260628"
         assert sent["duration"] == 30
-        assert sent["omni_reference_task_type"] == "auto"
+        assert sent["omni_reference_task_type"] == "reference"
         assert sent["output_format"] == "mov"
         assert sent["tools"] == [
             {

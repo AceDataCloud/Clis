@@ -86,7 +86,7 @@ def _shared_video_options(f):  # type: ignore[no-untyped-def]
         ),
         click.option(
             "--task-type",
-            type=click.Choice(["auto", "edit", "extend"]),
+            type=click.Choice(["auto", "reference", "edit", "extend"]),
             default=None,
             help="Seedance 2.5 task type.",
         ),
