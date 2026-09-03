@@ -236,6 +236,9 @@ def chat(
       gemini chat "Summarize this" -s "You are a concise summarizer"
     """
     client = get_client(ctx.obj.get("token"))
+    if len(stop) > 4:
+        print_error("Invalid value for '--stop': at most 4 values are allowed.")
+        raise SystemExit(1)
     messages = []
     if system:
         messages.append({"role": "system", "content": system})

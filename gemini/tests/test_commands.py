@@ -46,18 +46,21 @@ class TestGlobalCommands:
         assert "--model" in result.output
         assert "--aspect-ratio" in result.output
         assert "--resolution" in result.output
+        assert "--accept" in result.output
 
     def test_help_image_to_video(self, runner):
         result = runner.invoke(cli, ["image-to-video", "--help"])
         assert result.exit_code == 0
         assert "--image-url" in result.output
         assert "--resolution" in result.output
+        assert "--accept" in result.output
 
     def test_help_video_to_video(self, runner):
         result = runner.invoke(cli, ["video-to-video", "--help"])
         assert result.exit_code == 0
         assert "--video-url" in result.output
         assert "--resolution" in result.output
+        assert "--accept" in result.output
 
     def test_help_generate_content(self, runner):
         result = runner.invoke(cli, ["generate-content", "--help"])
@@ -236,6 +239,29 @@ class TestChatCommand:
         result = runner.invoke(cli, ["--token", "", "chat", "Hello"])
         assert result.exit_code != 0
 
+    def test_chat_stop_limit(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--stop",
+                "1",
+                "--stop",
+                "2",
+                "--stop",
+                "3",
+                "--stop",
+                "4",
+                "--stop",
+                "5",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "at most 4 values are allowed" in result.output
+
     @respx.mock
     def test_chat_streams_server_sent_events(self, runner):
         route = respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
@@ -333,6 +359,26 @@ class TestVideoCommand:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_generate_with_ndjson_accept(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/gemini/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "A sunset over the ocean",
+                "--accept",
+                "application/x-ndjson",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert route.calls.last.request.headers["accept"] == "application/x-ndjson"
+
+    @respx.mock
     def test_image_to_video(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/gemini/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -395,6 +441,28 @@ class TestVideoCommand:
         assert data["data"]["id"] == "task-video-123"
         request_body = json.loads(route.calls[0].request.content)
         assert request_body["video_urls"] == ["https://example.com/video.mp4"]
+
+    @respx.mock
+    def test_video_to_video_with_ndjson_accept(self, runner, mock_video_response):
+        route = respx.post("https://api.acedata.cloud/gemini/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "video-to-video",
+                "Transform this",
+                "-v",
+                "https://example.com/video.mp4",
+                "--accept",
+                "application/x-ndjson",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert route.calls.last.request.headers["accept"] == "application/x-ndjson"
 
     def test_video_to_video_rejects_multiple_urls(self, runner):
         result = runner.invoke(

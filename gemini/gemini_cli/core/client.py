@@ -21,7 +21,7 @@ class GeminiClient:
         self.base_url = base_url or settings.api_base_url
         self.timeout = settings.request_timeout
 
-    def _get_headers(self) -> dict[str, str]:
+    def _get_headers(self, accept: str = "application/json") -> dict[str, str]:
         """Get request headers with authentication."""
         if not self.api_token:
             raise GeminiAuthError(
@@ -29,7 +29,7 @@ class GeminiClient:
                 "Set ACEDATACLOUD_API_TOKEN or use --token option."
             )
         return {
-            "accept": "application/json",
+            "accept": accept,
             "authorization": f"Bearer {self.api_token}",
             "content-type": "application/json",
         }
@@ -39,6 +39,7 @@ class GeminiClient:
         endpoint: str,
         payload: dict[str, Any],
         timeout: float | None = None,
+        accept: str = "application/json",
     ) -> dict[str, Any]:
         """Make a POST request to the Gemini API."""
         url = f"{self.base_url}{endpoint}"
@@ -52,7 +53,7 @@ class GeminiClient:
                 response = http_client.post(
                     url,
                     json=payload,
-                    headers=self._get_headers(),
+                    headers=self._get_headers(accept),
                     timeout=request_timeout,
                 )
 
@@ -94,8 +95,7 @@ class GeminiClient:
         payload = {k: v for k, v in kwargs.items() if v is not None}
         endpoint = "/gemini/chat/completions"
         url = f"{self.base_url}{endpoint}"
-        headers = self._get_headers()
-        headers["accept"] = "text/event-stream"
+        headers = self._get_headers("text/event-stream")
 
         try:
             with httpx.Client() as http_client, http_client.stream(
@@ -145,8 +145,7 @@ class GeminiClient:
             endpoint = f"{endpoint}?alt={alt}"
         url = f"{self.base_url}{endpoint}"
         payload = {k: v for k, v in kwargs.items() if v is not None}
-        headers = self._get_headers()
-        headers["accept"] = "text/event-stream"
+        headers = self._get_headers("text/event-stream")
 
         try:
             with httpx.Client() as http_client, http_client.stream(
@@ -181,9 +180,11 @@ class GeminiClient:
                 raise
             raise GeminiAPIError(message=str(e)) from e
 
-    def generate_video(self, **kwargs: Any) -> dict[str, Any]:
+    def generate_video(
+        self, accept: str = "application/json", **kwargs: Any
+    ) -> dict[str, Any]:
         """Generate a video."""
-        return self.request("/gemini/videos", kwargs)
+        return self.request("/gemini/videos", kwargs, accept=accept)
 
     def query_task(self, **kwargs: Any) -> dict[str, Any]:
         """Query task status."""

@@ -45,6 +45,13 @@ from gemini_cli.core.output import (
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--accept",
+    type=click.Choice(["application/json", "application/x-ndjson"]),
+    default="application/json",
+    show_default=True,
+    help="Response content type to accept.",
+)
+@click.option(
     "--async",
     "async_mode",
     is_flag=True,
@@ -60,6 +67,7 @@ def generate(
     aspect_ratio: str,
     resolution: str,
     callback_url: str | None,
+    accept: str,
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -85,7 +93,7 @@ def generate(
             **({"async": True} if async_mode else {}),
         }
 
-        result = client.generate_video(**payload)  # type: ignore[arg-type]
+        result = client.generate_video(accept=accept, **payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:
@@ -131,6 +139,13 @@ def generate(
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--accept",
+    type=click.Choice(["application/json", "application/x-ndjson"]),
+    default="application/json",
+    show_default=True,
+    help="Response content type to accept.",
+)
+@click.option(
     "--async",
     "async_mode",
     is_flag=True,
@@ -147,6 +162,7 @@ def image_to_video(
     aspect_ratio: str,
     resolution: str,
     callback_url: str | None,
+    accept: str,
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -163,6 +179,7 @@ def image_to_video(
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.generate_video(
+            accept=accept,
             prompt=prompt,
             image_urls=list(image_urls),
             model=model,
@@ -215,6 +232,13 @@ def image_to_video(
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
+    "--accept",
+    type=click.Choice(["application/json", "application/x-ndjson"]),
+    default="application/json",
+    show_default=True,
+    help="Response content type to accept.",
+)
+@click.option(
     "--async",
     "async_mode",
     is_flag=True,
@@ -231,6 +255,7 @@ def video_to_video(
     aspect_ratio: str,
     resolution: str,
     callback_url: str | None,
+    accept: str,
     async_mode: bool,
     output_json: bool,
 ) -> None:
@@ -246,6 +271,7 @@ def video_to_video(
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.generate_video(
+            accept=accept,
             prompt=prompt,
             video_urls=[video_url],
             model=model,
