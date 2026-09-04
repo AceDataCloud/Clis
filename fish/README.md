@@ -17,6 +17,11 @@ fish tts "Hello, world!"
 # Use a specific voice model
 fish tts "Hello" --reference-id d7900c21663f485ab63ebdb7e5905036
 
+# One-shot voice clone (does not create a saved model)
+fish tts "New speech" \
+  --reference-audio-url https://cdn.acedata.cloud/reference.mp3 \
+  --reference-text "The exact reference transcript"
+
 # Generate in WAV format
 fish tts "Hello" --format wav
 
@@ -55,3 +60,10 @@ Get your API token at [https://platform.acedata.cloud](https://platform.acedata.
 ## License
 
 MIT
+
+
+## Voice cloning modes
+
+- Use `--reference-id` for a saved or public voice that will be reused.
+- Use `--reference-audio-url` with `--reference-text` for a one-shot clone. The HTTPS MP3/WAV reference should be 10–270 seconds.
+- Do not combine the two modes. Billing remains based on the target text's UTF-8 byte count.

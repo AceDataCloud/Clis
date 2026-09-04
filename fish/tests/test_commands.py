@@ -40,6 +40,8 @@ class TestGlobalCommands:
         assert "--format" in result.output
         assert "--prosody" in result.output
         assert "--references" in result.output
+        assert "--reference-audio-url" in result.output
+        assert "--reference-text" in result.output
 
     def test_help_models(self, runner):
         result = runner.invoke(cli, ["models", "--help"])
@@ -177,7 +179,7 @@ class TestTTSCommand:
                 "--prosody",
                 '{"speed": 1.1}',
                 "--references",
-                '[{"audio":"https://example.com/ref.wav"}]',
+                '[{"audio":"https://example.com/ref.wav","text":"Reference transcript"}]',
                 "--json",
             ],
         )
@@ -186,7 +188,61 @@ class TestTTSCommand:
         assert sent["chunk_length"] == 120
         assert sent["min_chunk_length"] == 30
         assert sent["prosody"] == {"speed": 1.1}
-        assert sent["references"] == [{"audio": "https://example.com/ref.wav"}]
+        assert sent["references"] == [
+            {"audio": "https://example.com/ref.wav", "text": "Reference transcript"}
+        ]
+
+    @respx.mock
+    def test_tts_with_one_shot_reference_options(self, runner, mock_tts_response):
+        route = respx.post("https://api.acedata.cloud/fish/tts").mock(
+            return_value=Response(200, json=mock_tts_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tts",
+                "New speech",
+                "--reference-audio-url",
+                "https://cdn.acedata.cloud/reference.mp3",
+                "--reference-text",
+                "Reference transcript",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["references"] == [
+            {"audio": "https://cdn.acedata.cloud/reference.mp3", "text": "Reference transcript"}
+        ]
+
+    @pytest.mark.parametrize(
+        "args,message",
+        [
+            (["--reference-audio-url", "https://cdn.example/ref.mp3"], "must be provided together"),
+            (["--reference-text", "transcript"], "must be provided together"),
+            (
+                ["--reference-audio-url", "http://example.com/ref.mp3", "--reference-text", "text"],
+                "HTTPS URL",
+            ),
+            (
+                [
+                    "--reference-id",
+                    "saved",
+                    "--reference-audio-url",
+                    "https://cdn.example/ref.mp3",
+                    "--reference-text",
+                    "text",
+                ],
+                "cannot be combined",
+            ),
+        ],
+    )
+    def test_tts_rejects_invalid_one_shot_reference_options(self, runner, args, message):
+        result = runner.invoke(cli, ["--token", "test-token", "tts", "Hello", *args])
+        assert result.exit_code != 0
+        assert message in result.output
 
     def test_tts_with_invalid_prosody_json(self, runner):
         result = runner.invoke(
