@@ -16,9 +16,9 @@ GEMINI_CHAT_MODELS = [
     "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-3.5-flash-lite",
-    "gemini-3-flash-preview",
     "gemini-3.1-flash-lite",
     "gemini-3.1-pro-preview",
+    "gemini-3-flash-preview",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -29,9 +29,9 @@ GEMINI_NATIVE_MODELS = [
     "gemini-3.6-flash",
     "gemini-3.5-flash",
     "gemini-3.5-flash-lite",
-    "gemini-3-flash-preview",
     "gemini-3.1-flash-lite",
     "gemini-3.1-pro-preview",
+    "gemini-3-flash-preview",
     "gemini-2.5-pro",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
@@ -164,9 +164,9 @@ def print_models() -> None:
     table.add_row("gemini-3.6-flash", "Gemini 3.6 Flash")
     table.add_row("gemini-3.5-flash", "Gemini 3.5 Flash")
     table.add_row("gemini-3.5-flash-lite", "Gemini 3.5 Flash Lite")
-    table.add_row("gemini-3-flash-preview", "Gemini 3 Flash Preview")
     table.add_row("gemini-3.1-flash-lite", "Gemini 3.1 Flash Lite")
     table.add_row("gemini-3.1-pro-preview", "Gemini 3.1 Pro Preview")
+    table.add_row("gemini-3-flash-preview", "Gemini 3 Flash Preview")
     table.add_row("gemini-2.5-pro", "Gemini 2.5 Pro")
     table.add_row("gemini-2.5-flash", "Gemini 2.5 Flash (default)")
     table.add_row("gemini-2.5-flash-lite", "Gemini 2.5 Flash Lite")
