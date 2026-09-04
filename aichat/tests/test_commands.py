@@ -23,6 +23,7 @@ class TestGlobalCommands:
     """Tests for global CLI options."""
 
     def test_model_inventory_excludes_retired_opus_3(self):
+        assert "claude-fable-5-1" in MODELS2
         assert "claude-opus-5" in MODELS2
         assert "claude-3-opus-20240229" not in MODELS2
 

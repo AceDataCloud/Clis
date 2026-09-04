@@ -463,6 +463,7 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         assert "claude" in result.output.lower()
+        assert "claude-fable-5-1" in result.output
         assert "claude-fable-5" in result.output
         assert "claude-opus-5" in result.output
 
@@ -470,7 +471,7 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         lines = [line for line in result.output.splitlines() if "claude-" in line]
-        assert "claude-fable-5" in lines[0]
+        assert "claude-fable-5-1" in lines[0]
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
