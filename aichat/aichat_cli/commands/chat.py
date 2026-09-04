@@ -43,10 +43,12 @@ def _parse_tool_results(value: str | None) -> object | None:
         return None
     assert isinstance(tool_results, list)
     for tool_result in tool_results:
-        if not isinstance(tool_result, dict) or not all(
-            isinstance(tool_result.get(field), str) for field in ("tool_use_id", "output")
-        ) or (
-            "is_error" in tool_result and not isinstance(tool_result["is_error"], bool)
+        if (
+            not isinstance(tool_result, dict)
+            or not all(
+                isinstance(tool_result.get(field), str) for field in ("tool_use_id", "output")
+            )
+            or ("is_error" in tool_result and not isinstance(tool_result["is_error"], bool))
         ):
             raise click.BadParameter(
                 "Must be an array of objects with string tool_use_id and output, "
