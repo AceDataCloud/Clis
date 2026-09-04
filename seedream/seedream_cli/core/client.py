@@ -1,5 +1,7 @@
 """HTTP client for Seedream API."""
 
+import json
+from collections.abc import Iterator
 from typing import Any
 
 import httpx
@@ -89,6 +91,45 @@ class SeedreamClient:
                 if isinstance(e, SeedreamAPIError | SeedreamTimeoutError):
                     raise
                 raise SeedreamAPIError(message=str(e)) from e
+
+    def stream_images(self, **kwargs: Any) -> Iterator[dict[str, Any]]:
+        """Stream normalized NDJSON image events."""
+        url = f"{self.base_url}/seedream/images"
+        payload = {key: value for key, value in kwargs.items() if value is not None}
+        headers = self._get_headers()
+        headers["accept"] = "application/x-ndjson"
+        try:
+            with httpx.stream(
+                "POST",
+                url,
+                json=payload,
+                headers=headers,
+                timeout=self.timeout,
+            ) as response:
+                if response.status_code == 401:
+                    raise SeedreamAuthError("Invalid API token")
+                if response.status_code == 403:
+                    raise SeedreamAuthError("Access denied. Check your API permissions.")
+                response.raise_for_status()
+                for line in response.iter_lines():
+                    if line.strip():
+                        yield json.loads(line)
+        except httpx.TimeoutException as error:
+            raise SeedreamTimeoutError(
+                f"Request to /seedream/images timed out after {self.timeout}s"
+            ) from error
+        except SeedreamAuthError:
+            raise
+        except httpx.HTTPStatusError as error:
+            raise SeedreamAPIError(
+                message=error.response.text,
+                code=f"http_{error.response.status_code}",
+                status_code=error.response.status_code,
+            ) from error
+        except Exception as error:
+            if isinstance(error, SeedreamAPIError | SeedreamTimeoutError):
+                raise
+            raise SeedreamAPIError(message=str(error)) from error
 
     # Convenience methods
     def generate_image(self, **kwargs: Any) -> dict[str, Any]:

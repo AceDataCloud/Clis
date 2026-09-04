@@ -114,3 +114,27 @@ class TestSeedreamClient:
         client = SeedreamClient(api_token="test-token")
         result = client.query_task(id="t-1", action="retrieve")
         assert result["data"][0]["id"] == "t-1"
+
+
+@respx.mock
+def test_stream_images_parses_normalized_ndjson():
+    route = respx.post("https://api.acedata.cloud/seedream/images").mock(
+        return_value=Response(
+            200,
+            text=(
+                '{"type":"image_generation.partial_succeeded","data":[{"image_url":"https://cdn.example/1.png"}]}\n'
+                '{"type":"image_generation.completed","usage":{"generated_images":1}}\n'
+            ),
+            headers={"content-type": "application/x-ndjson"},
+        )
+    )
+    client = SeedreamClient(api_token="test-token")
+    events = list(
+        client.stream_images(prompt="test", model="doubao-seedream-5-0-260128", stream=True)
+    )
+    assert [event["type"] for event in events] == [
+        "image_generation.partial_succeeded",
+        "image_generation.completed",
+    ]
+    assert route.calls[0].request.headers["accept"] == "application/x-ndjson"
+    assert route.calls[0].request.read().decode().find('"stream":true') >= 0

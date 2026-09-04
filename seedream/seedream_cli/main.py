@@ -11,7 +11,7 @@ from importlib import metadata
 import click
 from dotenv import load_dotenv
 
-from seedream_cli.commands.image import edit, generate
+from seedream_cli.commands.image import decompose, edit, generate
 from seedream_cli.commands.info import config, models, resolutions
 from seedream_cli.commands.task import task, tasks_batch, wait
 
@@ -58,6 +58,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
 # Register commands
 cli.add_command(generate)
 cli.add_command(edit)
+cli.add_command(decompose)
 cli.add_command(task)
 cli.add_command(tasks_batch)
 cli.add_command(wait)

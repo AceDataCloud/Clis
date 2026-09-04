@@ -64,6 +64,13 @@ seedream generate "A test image"
 # Edit an image
 seedream edit "Make it look like a painting" -i https://example.com/photo.jpg
 
+# Decompose a poster into editable layers
+seedream decompose https://example.com/poster.png --resolution 1.5K --json
+
+# Stream Lite image events as NDJSON
+seedream generate "A four-panel storyboard" --sequential-image-generation auto \
+  --sequential-max-images 4 --stream --json
+
 # Check task status
 seedream task <task-id>
 
@@ -79,7 +86,8 @@ seedream models
 | Command | Description |
 |---------|-------------|
 | `seedream generate <prompt>` | Generate an image from a text prompt |
-| `seedream edit <prompt> -i <url>...` | Edit or combine images using AI |
+| `seedream edit <prompt> -i <url>...` | Edit images, including Pro transparent backgrounds |
+| `seedream decompose <url>` | Split one image into a base and editable transparent layers |
 | `seedream task <task_id>` | Query a single task status |
 | `seedream tasks <id1> <id2>...` | Query multiple tasks at once |
 | `seedream wait <task_id>` | Wait for task completion with polling |
@@ -107,8 +115,8 @@ Most commands support:
 
 | Model | Version | Notes |
 |-------|---------|-------|
-| `doubao-seedream-5-0-pro-260628` | V5.0 Pro | Flagship single image (no image sets/streaming/web search) |
-| `doubao-seedream-5-0-260128` | V5.0 | Latest model (default) |
+| `doubao-seedream-5-0-pro-260628` | V5.0 Pro | Single image, 1K/1.5K/2K, transparent background, layer decomposition |
+| `doubao-seedream-5-0-260128` / `doubao-seedream-5-0-lite-260128` | V5.0 Lite | Sequential images, streaming, web search (default) |
 | `doubao-seedream-4-5-251128` | V4.5 | Flagship model, best quality |
 | `doubao-seedream-4-0-250828` | V4.0 | Standard quality |
 
@@ -151,6 +159,13 @@ ruff format .
 ruff check .
 mypy seedream_cli
 ```
+
+## Seedream 5.0 constraints
+
+- Pro supports 1K/1.5K/2K, prompt optimization standard/fast, transparent-background editing, and layer decomposition. It does not support sequential generation, streaming, or web search.
+- Lite supports 2K/3K/4K, sequential generation, streaming, web search, and standard prompt optimization. It does not support layer decomposition or transparent-background mode.
+- `--stream` uses AceDataCloud normalized NDJSON and cannot be combined with `--async` or `--callback-url`.
+- Layer results include `z_index`, `name`, `description`, and absolute/normalized bounding boxes. JSON output preserves every field.
 
 ## Docker
 
