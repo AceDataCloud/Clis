@@ -139,9 +139,13 @@ def print_models() -> None:
     )
     table.add_row(
         "doubao-seedream-5-0-260128",
+        "V5.0",
+        "Sequential images, streaming, web search (default)",
+    )
+    table.add_row(
         "doubao-seedream-5-0-lite-260128",
         "V5.0 Lite",
-        "Sequential images, streaming, web search (default)",
+        "Same capability profile as Seedream 5.0",
     )
     table.add_row(
         "doubao-seedream-4-5-251128",
