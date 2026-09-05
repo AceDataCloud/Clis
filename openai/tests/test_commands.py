@@ -306,6 +306,19 @@ class TestChatCommands:
         assert body["model"] == "gpt-5.4-pro"
 
     @respx.mock
+    def test_chat_gpt6_astra_model(self, runner, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat", "Hello", "-m", "gpt-6-astra", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "gpt-6-astra"
+
+    @respx.mock
     def test_chat_free_model(self, runner, mock_chat_response):
         """Verify newly synced free chat models are accepted."""
         route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
@@ -696,6 +709,19 @@ class TestResponseCommands:
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-5.4-nano"
+
+    @respx.mock
+    def test_response_gpt6_astra_model(self, runner, mock_response_api_response):
+        route = respx.post("https://api.acedata.cloud/openai/responses").mock(
+            return_value=Response(200, json=mock_response_api_response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "response", "Hello", "-m", "gpt-6-astra", "--json"],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "gpt-6-astra"
 
     @respx.mock
     def test_response_with_count(self, runner, mock_response_api_response):
