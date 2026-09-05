@@ -22,10 +22,9 @@ def resolutions() -> None:
     table.add_column("Description")
 
     desc_map = {
-        "480p": "Standard",
-        "720p": "HD",
-        "1080p": "Full HD",
+        "auto": "Automatic",
         "1K": "Default",
+        "1.5K": "High resolution",
         "2K": "High resolution",
         "3K": "High resolution",
         "4K": "Ultra-high resolution",

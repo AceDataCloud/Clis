@@ -17,7 +17,7 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(SEEDREAM_MODELS) == 4
+        assert len(SEEDREAM_MODELS) == 5
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in SEEDREAM_MODELS
@@ -26,6 +26,7 @@ class TestConstants:
         for model in [
             "doubao-seedream-5-0-pro-260628",
             "doubao-seedream-5-0-260128",
+            "doubao-seedream-5-0-lite-260128",
             "doubao-seedream-4-5-251128",
             "doubao-seedream-4-0-250828",
         ]:
@@ -36,7 +37,7 @@ class TestConstants:
         assert "doubao-seededit-3-0-i2i-250628" not in SEEDREAM_MODELS
 
     def test_resolutions(self):
-        assert len(RESOLUTIONS) == 5
+        assert len(RESOLUTIONS) == 6
 
 
 class TestPrintJson:

@@ -14,7 +14,7 @@ Generate AI images directly from your terminal — no MCP client required.
 
 - **Image Generation** — Generate images from text prompts with multiple models
 - **Image Editing** — Edit, combine, and transform images with AI
-- **Multiple Models** — doubao-seedream-5-0-pro-260628, doubao-seedream-5-0-260128, doubao-seedream-4-5-251128, doubao-seedream-4-0-250828
+- **Multiple Models** — doubao-seedream-5-0-pro-260628, doubao-seedream-5-0-260128, doubao-seedream-5-0-lite-260128, doubao-seedream-4-5-251128, doubao-seedream-4-0-250828
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -79,7 +79,7 @@ seedream models
 | Command | Description |
 |---------|-------------|
 | `seedream generate <prompt>` | Generate an image from a text prompt |
-| `seedream edit <prompt> -i <url>...` | Edit or combine images using AI |
+| `seedream edit [prompt] -i <url>...` | Edit, combine, or decompose images using AI |
 | `seedream task <task_id>` | Query a single task status |
 | `seedream tasks <id1> <id2>...` | Query multiple tasks at once |
 | `seedream wait <task_id>` | Wait for task completion with polling |
@@ -109,6 +109,7 @@ Most commands support:
 |-------|---------|-------|
 | `doubao-seedream-5-0-pro-260628` | V5.0 Pro | Flagship single image (no image sets/streaming/web search) |
 | `doubao-seedream-5-0-260128` | V5.0 | Latest model (default) |
+| `doubao-seedream-5-0-lite-260128` | V5.0 Lite | Lightweight model |
 | `doubao-seedream-4-5-251128` | V4.5 | Flagship model, best quality |
 | `doubao-seedream-4-0-250828` | V4.0 | Standard quality |
 

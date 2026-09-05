@@ -1,17 +1,27 @@
 """Image generation commands."""
 
+import re
+
 import click
 
 from seedream_cli.core.client import get_client
 from seedream_cli.core.exceptions import SeedreamError
 from seedream_cli.core.output import (
     DEFAULT_MODEL,
-    RESOLUTIONS,
     SEEDREAM_MODELS,
     print_error,
     print_image_result,
     print_json,
 )
+
+SIZE_PATTERN = re.compile(r"^(1K|1\.5K|2K|3K|4K|auto|[0-9]+x[0-9]+)$")
+
+
+def validate_size(_ctx: click.Context, _param: click.Parameter, value: str | None) -> str | None:
+    """Validate Seedream size values from the OpenAPI pattern."""
+    if value is not None and not SIZE_PATTERN.fullmatch(value):
+        raise click.BadParameter("must be 1K, 1.5K, 2K, 3K, 4K, auto, or WIDTHxHEIGHT")
+    return value
 
 
 @click.command()
@@ -26,9 +36,9 @@ from seedream_cli.core.output import (
 @click.option(
     "-r",
     "--resolution",
-    type=click.Choice(RESOLUTIONS),
+    callback=validate_size,
     default=None,
-    help="Output resolution.",
+    help="Output resolution (1K, 1.5K, 2K, 3K, 4K, auto, or WIDTHxHEIGHT).",
 )
 @click.option(
     "--sequential-image-generation",
@@ -39,7 +49,7 @@ from seedream_cli.core.output import (
 @click.option("--stream", is_flag=True, default=False, help="Stream image generation progress.")
 @click.option(
     "--response-format",
-    type=str,
+    type=click.Choice(["url", "b64_json"]),
     default=None,
     help="Response format: url (default) or b64_json.",
 )
@@ -51,6 +61,12 @@ from seedream_cli.core.output import (
     type=click.Choice(["jpeg", "png"]),
     default=None,
     help="Output image file format: jpeg (default) or png. Only supported for doubao-seedream-5-0-pro-260628 and doubao-seedream-5-0-260128.",
+)
+@click.option(
+    "--background",
+    type=click.Choice(["transparent", "opaque"]),
+    default=None,
+    help="Background mode for supported models.",
 )
 @click.option(
     "--sequential-max-images",
@@ -92,6 +108,7 @@ def generate(
     response_format: str | None,
     watermark: bool | None,
     output_format: str | None,
+    background: str | None,
     web_search: bool,
     callback_url: str | None,
     async_mode: bool,
@@ -123,6 +140,7 @@ def generate(
             "response_format": response_format,
             "watermark": watermark,
             "output_format": output_format,
+            "background": background,
             "tools": [{"type": "web_search"}] if web_search else None,
             "callback_url": callback_url,
             "async": async_mode,
@@ -141,7 +159,7 @@ def generate(
 
 
 @click.command()
-@click.argument("prompt")
+@click.argument("prompt", required=False)
 @click.option(
     "-i",
     "--image-url",
@@ -159,12 +177,37 @@ def generate(
 )
 @click.option(
     "--response-format",
-    type=str,
+    type=click.Choice(["url", "b64_json"]),
     default=None,
     help="Response format: url (default) or b64_json.",
 )
 @click.option(
+    "-r",
+    "--resolution",
+    callback=validate_size,
+    default=None,
+    help="Output resolution (1K, 1.5K, 2K, 3K, 4K, auto, or WIDTHxHEIGHT).",
+)
+@click.option(
     "--watermark/--no-watermark", default=None, help="Add AI-generated watermark (default: true)."
+)
+@click.option(
+    "--output-format",
+    type=click.Choice(["jpeg", "png"]),
+    default=None,
+    help="Output image file format: jpeg (default) or png.",
+)
+@click.option(
+    "--background",
+    type=click.Choice(["transparent", "opaque"]),
+    default=None,
+    help="Background mode for supported models.",
+)
+@click.option(
+    "--layer-decomposition",
+    is_flag=True,
+    default=False,
+    help="Enable layer decomposition for supported image inputs.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
 @click.option(
@@ -178,11 +221,15 @@ def generate(
 @click.pass_context
 def edit(
     ctx: click.Context,
-    prompt: str,
+    prompt: str | None,
     image_urls: tuple[str, ...],
     model: str,
     response_format: str | None,
+    resolution: str | None,
     watermark: bool | None,
+    output_format: str | None,
+    background: str | None,
+    layer_decomposition: bool,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -190,6 +237,7 @@ def edit(
     """Edit or combine images using AI.
 
     PROMPT describes the desired edit. Use with one or more image URLs.
+    PROMPT may be omitted when using --layer-decomposition.
 
     Examples:
 
@@ -198,13 +246,21 @@ def edit(
       seedream edit "Virtual try-on" -i person.jpg -i shirt.jpg
     """
     client = get_client(ctx.obj.get("token"))
+    if not prompt and not layer_decomposition:
+        raise click.UsageError("PROMPT is required unless --layer-decomposition is used")
+    if layer_decomposition and background is not None:
+        raise click.UsageError("--background cannot be used with --layer-decomposition")
     try:
         result = client.edit_image(
             prompt=prompt,
             image=list(image_urls),
             model=model,
+            size=resolution,
             response_format=response_format,
             watermark=watermark,
+            output_format=output_format,
+            background=background,
+            layer_decomposition=layer_decomposition or None,
             callback_url=callback_url,
             **({"async": True} if async_mode else {}),
         )

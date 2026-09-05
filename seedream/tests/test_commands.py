@@ -115,7 +115,7 @@ class TestGenerateCommands:
             cli, ["--token", "test-token", "generate", "test", "--resolution", "adaptive"]
         )
         assert result.exit_code != 0
-        assert "'adaptive' is not one of '1K', '2K', '3K', '4K'" in result.output
+        assert "must be 1K, 1.5K, 2K, 3K, 4K, auto, or WIDTHxHEIGHT" in result.output
 
     def test_generate_help_excludes_removed_options(self, runner):
         result = runner.invoke(cli, ["generate", "--help"])
@@ -156,6 +156,46 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         assert route.called
         assert json.loads(route.calls[0].request.content)["response_format"] == "b64_json"
+
+    def test_generate_rejects_invalid_response_format(self, runner):
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--response-format",
+                "json",
+            ],
+        )
+        assert result.exit_code != 0
+        assert "'json' is not one of 'url', 'b64_json'" in result.output
+
+    @respx.mock
+    def test_generate_with_custom_resolution_and_background(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "test",
+                "--resolution",
+                "1024x1024",
+                "--background",
+                "transparent",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert route.called
+        body = json.loads(route.calls[0].request.content)
+        assert body["size"] == "1024x1024"
+        assert body["background"] == "transparent"
 
     @respx.mock
     def test_generate_with_sequential_image_generation(self, runner, mock_image_response):
@@ -285,6 +325,43 @@ class TestGenerateCommands:
         assert "image_urls" not in body
         assert "action" not in body
 
+    @respx.mock
+    def test_edit_with_layer_decomposition(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "edit",
+                "-i",
+                "https://example.com/photo.png",
+                "-m",
+                "doubao-seedream-5-0-pro-260628",
+                "--layer-decomposition",
+                "--resolution",
+                "auto",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert route.called
+        body = json.loads(route.calls[0].request.content)
+        assert body["image"] == ["https://example.com/photo.png"]
+        assert body["layer_decomposition"] is True
+        assert body["size"] == "auto"
+        assert "prompt" not in body
+
+    def test_edit_requires_prompt_without_layer_decomposition(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "edit", "-i", "https://example.com/photo.png"],
+        )
+        assert result.exit_code != 0
+        assert "PROMPT is required unless --layer-decomposition is used" in result.output
+
     def test_edit_help_excludes_removed_options(self, runner):
         result = runner.invoke(cli, ["edit", "--help"])
         assert result.exit_code == 0
@@ -335,12 +412,14 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         assert "doubao-seedream-5-0-pro-260628" in result.output
+        assert "doubao-seedream-5-0-lite-260128" in result.output
         assert "doubao-seedream-4-5-251128" in result.output
 
     def test_resolutions(self, runner):
         result = runner.invoke(cli, ["resolutions"])
         assert result.exit_code == 0
         assert "1K" in result.output
+        assert "1.5K" in result.output
         assert "3K" in result.output
 
     def test_config(self, runner):
