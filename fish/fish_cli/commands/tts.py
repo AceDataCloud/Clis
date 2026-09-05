@@ -1,6 +1,7 @@
 """TTS generation command."""
 
 import json
+from urllib.parse import urlparse
 
 import click
 
@@ -33,7 +34,7 @@ def _parse_json_object_option(value: str | None, option_name: str) -> dict[str, 
 
 
 def _parse_json_array_option(value: str | None, option_name: str) -> list[object] | None:
-    """Parse a JSON array option."""
+    """Parse and validate a one-shot reference array."""
     if value is None:
         return None
     try:
@@ -42,7 +43,24 @@ def _parse_json_array_option(value: str | None, option_name: str) -> list[object
         raise click.BadParameter(f"{option_name} must be valid JSON.") from exc
     if not isinstance(parsed, list):
         raise click.BadParameter(f"{option_name} must be a JSON array.")
+    if len(parsed) != 1 or not isinstance(parsed[0], dict):
+        raise click.BadParameter(f"{option_name} must contain exactly one object.")
+    reference = parsed[0]
+    if set(reference) != {"audio", "text"}:
+        raise click.BadParameter(f"{option_name} items must contain only audio and text.")
+    _validate_reference_url(reference["audio"], option_name)
+    if not isinstance(reference["text"], str) or not reference["text"].strip():
+        raise click.BadParameter(f"{option_name} text must be non-empty.")
     return parsed
+
+
+def _validate_reference_url(value: object, option_name: str) -> str:
+    if not isinstance(value, str):
+        raise click.BadParameter(f"{option_name} audio must be an HTTPS URL.")
+    parsed = urlparse(value)
+    if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
+        raise click.BadParameter(f"{option_name} audio must be an HTTPS URL without credentials.")
+    return value
 
 
 @click.command()
@@ -136,7 +154,17 @@ def _parse_json_array_option(value: str | None, option_name: str) -> list[object
 @click.option(
     "--references",
     default=None,
-    help="Reference clips as a JSON array.",
+    help='Advanced one-shot reference JSON: [{"audio":"https://...","text":"exact transcript"}].',
+)
+@click.option(
+    "--reference-audio-url",
+    default=None,
+    help="Public HTTPS MP3/WAV URL for a one-shot voice clone.",
+)
+@click.option(
+    "--reference-text",
+    default=None,
+    help="Exact transcript of --reference-audio-url.",
 )
 @click.option(
     "--callback-url",
@@ -170,6 +198,8 @@ def tts(
     normalize: bool | None,
     prosody: str | None,
     references: str | None,
+    reference_audio_url: str | None,
+    reference_text: str | None,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -183,6 +213,7 @@ def tts(
       fish tts "Hello, world!"
       fish tts "Hello" --reference-id d7900c21663f485ab63ebdb7e5905036
       fish tts "Hello" --format wav --latency balanced --async
+      fish tts "Hello" --reference-audio-url https://cdn.example/ref.mp3 --reference-text "Exact transcript"
     """
     client = get_client(ctx.obj.get("token"))
 
@@ -215,6 +246,25 @@ def tts(
     if parsed_prosody is not None:
         payload["prosody"] = parsed_prosody
     parsed_references = _parse_json_array_option(references, "--references")
+    if (reference_audio_url is None) != (reference_text is None):
+        raise click.BadParameter(
+            "--reference-audio-url and --reference-text must be provided together."
+        )
+    if parsed_references is not None and reference_audio_url is not None:
+        raise click.BadParameter("Use --references or the convenience reference options, not both.")
+    if reference_id is not None and (
+        parsed_references is not None or reference_audio_url is not None
+    ):
+        raise click.BadParameter("--reference-id cannot be combined with one-shot references.")
+    if reference_audio_url is not None and reference_text is not None:
+        parsed_references = [
+            {
+                "audio": _validate_reference_url(reference_audio_url, "--reference-audio-url"),
+                "text": reference_text.strip(),
+            }
+        ]
+        if not parsed_references[0]["text"]:
+            raise click.BadParameter("--reference-text must be non-empty.")
     if parsed_references is not None:
         payload["references"] = parsed_references
     if callback_url is not None:
