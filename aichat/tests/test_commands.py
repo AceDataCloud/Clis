@@ -29,6 +29,7 @@ class TestGlobalCommands:
         assert "claude-3-opus-20240229" not in MODELS2
 
     def test_model_inventory_includes_latest_glm_models(self):
+        assert "gpt-6-astra" in MODELS
         assert "glm-5.3" in MODELS
         assert "glm-5.3" in MODELS2
         assert MODELS.count("deepseek-v4-pro") == 1
