@@ -115,7 +115,7 @@ class TestGenerateCommands:
             cli, ["--token", "test-token", "generate", "test", "--resolution", "adaptive"]
         )
         assert result.exit_code != 0
-        assert "'adaptive' is not one of '1K', '2K', '3K', '4K'" in result.output
+        assert "not a supported preset or WIDTHxHEIGHT size" in result.output
 
     def test_generate_help_excludes_removed_options(self, runner):
         result = runner.invoke(cli, ["generate", "--help"])
@@ -290,6 +290,39 @@ class TestGenerateCommands:
         assert result.exit_code == 0
         assert "--seed" not in result.output
         assert "--guidance-scale" not in result.output
+
+    @respx.mock
+    def test_decompose_builds_pro_layer_request(self, runner, mock_image_response):
+        route = respx.post("https://api.acedata.cloud/seedream/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "decompose",
+                "https://example.com/poster.png",
+                "--resolution",
+                "1.5K",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls[0].request.content)
+        assert body["model"] == "doubao-seedream-5-0-pro-260628"
+        assert body["image"] == "https://example.com/poster.png"
+        assert body["layer_decomposition"] is True
+        assert body["size"] == "1.5K"
+        assert "prompt" not in body
+
+    def test_stream_rejects_async_combination(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "generate", "test", "--stream", "--async"],
+        )
+        assert result.exit_code != 0
+        assert "cannot be combined" in result.output
 
 
 # ─── Task Commands ─────────────────────────────────────────────────────────

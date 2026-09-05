@@ -13,6 +13,7 @@ console = Console()
 SEEDREAM_MODELS = [
     "doubao-seedream-5-0-pro-260628",
     "doubao-seedream-5-0-260128",
+    "doubao-seedream-5-0-lite-260128",
     "doubao-seedream-4-5-251128",
     "doubao-seedream-4-0-250828",
 ]
@@ -22,6 +23,7 @@ DEFAULT_MODEL = "doubao-seedream-5-0-260128"
 # Available resolutions
 RESOLUTIONS = [
     "1K",
+    "1.5K",
     "2K",
     "3K",
     "4K",
@@ -77,6 +79,20 @@ def print_image_result(data: dict[str, Any]) -> None:
                 table.add_row("Model", item["model_name"])
             if item.get("created_at"):
                 table.add_row("Created", item["created_at"])
+            if item.get("size"):
+                table.add_row("Size", str(item["size"]))
+            if item.get("output_format"):
+                table.add_row("Format", str(item["output_format"]))
+            if item.get("z_index") is not None:
+                table.add_row("Z-index", str(item["z_index"]))
+            if item.get("name"):
+                table.add_row("Layer", str(item["name"]))
+            if item.get("description"):
+                table.add_row("Description", str(item["description"]))
+            if item.get("bounding_box"):
+                table.add_row("Bounding box", json.dumps(item["bounding_box"], ensure_ascii=False))
+            if item.get("error"):
+                table.add_row("Error", json.dumps(item["error"], ensure_ascii=False))
             console.print(table)
             console.print()
 
@@ -112,19 +128,20 @@ def print_task_result(data: dict[str, Any]) -> None:
 def print_models() -> None:
     """Print available Seedream models."""
     table = Table(title="Available Seedream Models")
-    table.add_column("Model", style="bold cyan")
+    table.add_column("Model", style="bold cyan", no_wrap=True)
     table.add_column("Version", style="bold")
     table.add_column("Notes")
 
     table.add_row(
         "doubao-seedream-5-0-pro-260628",
         "V5.0 Pro",
-        "Latest Pro model",
+        "Single image, transparent background, layer decomposition",
     )
     table.add_row(
         "doubao-seedream-5-0-260128",
-        "V5.0",
-        "Latest model (default)",
+        "doubao-seedream-5-0-lite-260128",
+        "V5.0 Lite",
+        "Sequential images, streaming, web search (default)",
     )
     table.add_row(
         "doubao-seedream-4-5-251128",

@@ -17,7 +17,7 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(SEEDREAM_MODELS) == 4
+        assert len(SEEDREAM_MODELS) == 5
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in SEEDREAM_MODELS
@@ -124,3 +124,26 @@ class TestPrintModels:
         captured = capsys.readouterr()
         assert "doubao-seedream-5-0-pro-260628" in captured.out
         assert "doubao-seedream-4-5-251128" in captured.out
+
+
+def test_print_image_result_shows_layer_metadata(capsys):
+    print_image_result(
+        {
+            "task_id": "layer-task",
+            "data": [
+                {
+                    "image_url": "https://cdn.example/layer.png",
+                    "size": "512x512",
+                    "output_format": "png",
+                    "z_index": 2,
+                    "name": "Title",
+                    "description": "White title text",
+                    "bounding_box": {"absolute": [10, 20, 100, 200]},
+                }
+            ],
+        }
+    )
+    output = capsys.readouterr().out
+    assert "Z-index" in output
+    assert "Title" in output
+    assert "absolute" in output
