@@ -333,12 +333,77 @@ class TestTaskCommands:
         assert result.exit_code == 0
 
     @respx.mock
+    def test_task_direct_record_rich_output(self, runner):
+        respx.post("https://api.acedata.cloud/nano-banana/tasks").mock(
+            return_value=Response(
+                200,
+                json={
+                    "id": "task-123",
+                    "type": "nano-banana",
+                    "trace_id": "trace-123",
+                    "request": {"prompt": "test"},
+                    "response": {"image_url": "https://cdn.example.com/result.png"},
+                    "created_at": 1760000000.0,
+                    "finished_at": 1760000001.0,
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "task", "task-123"])
+        assert result.exit_code == 0
+        assert "task-123" in result.output
+
+    @respx.mock
     def test_tasks_batch(self, runner, mock_task_response):
         respx.post("https://api.acedata.cloud/nano-banana/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
         result = runner.invoke(cli, ["--token", "test-token", "tasks", "t-1", "t-2", "--json"])
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_tasks_batch_items_rich_output(self, runner):
+        respx.post("https://api.acedata.cloud/nano-banana/tasks").mock(
+            return_value=Response(
+                200,
+                json={
+                    "items": [
+                        {
+                            "id": "t-1",
+                            "type": "nano-banana",
+                            "trace_id": "trace-1",
+                            "request": {"prompt": "test"},
+                            "created_at": 1760000000.0,
+                        }
+                    ],
+                    "count": 1,
+                },
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "tasks", "t-1"])
+        assert result.exit_code == 0
+        assert "t-1" in result.output
+
+    @respx.mock
+    def test_wait_accepts_finished_direct_record(self, runner):
+        respx.post("https://api.acedata.cloud/nano-banana/tasks").mock(
+            return_value=Response(
+                200,
+                json={
+                    "id": "task-123",
+                    "type": "nano-banana",
+                    "trace_id": "trace-123",
+                    "request": {"prompt": "test"},
+                    "created_at": 1760000000.0,
+                    "finished_at": 1760000001.0,
+                },
+            )
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "wait", "task-123", "--interval", "1", "--timeout", "1"],
+        )
+        assert result.exit_code == 0
+        assert "completed" in result.output
 
 
 # ─── Info Commands ─────────────────────────────────────────────────────────
