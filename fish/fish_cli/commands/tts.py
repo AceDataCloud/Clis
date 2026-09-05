@@ -252,9 +252,7 @@ def tts(
         )
     if parsed_references is not None and reference_audio_url is not None:
         raise click.BadParameter("Use --references or the convenience reference options, not both.")
-    if reference_id and (
-        parsed_references is not None or reference_audio_url is not None
-    ):
+    if reference_id and (parsed_references is not None or reference_audio_url is not None):
         raise click.BadParameter("--reference-id cannot be combined with one-shot references.")
     if reference_audio_url is not None and reference_text is not None:
         parsed_references = [
