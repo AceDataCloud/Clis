@@ -75,8 +75,8 @@ def _validate_reference_url(value: object, option_name: str) -> str:
 )
 @click.option(
     "--reference-id",
-    default=None,
-    help="Reference voice model ID for cloned voice.",
+    multiple=True,
+    help="Reference voice model ID for cloned voice; repeat to provide multiple IDs.",
 )
 @click.option(
     "--format",
@@ -184,7 +184,7 @@ def tts(
     ctx: click.Context,
     text: str,
     model: str,
-    reference_id: str | None,
+    reference_id: tuple[str, ...],
     audio_format: str,
     sample_rate: int | None,
     mp3_bitrate: str | None,
@@ -222,8 +222,8 @@ def tts(
         "format": audio_format,
         "latency": latency,
     }
-    if reference_id is not None:
-        payload["reference_id"] = reference_id
+    if reference_id:
+        payload["reference_id"] = reference_id[0] if len(reference_id) == 1 else list(reference_id)
     if sample_rate is not None:
         payload["sample_rate"] = sample_rate
     if mp3_bitrate is not None:
@@ -252,7 +252,7 @@ def tts(
         )
     if parsed_references is not None and reference_audio_url is not None:
         raise click.BadParameter("Use --references or the convenience reference options, not both.")
-    if reference_id is not None and (
+    if reference_id and (
         parsed_references is not None or reference_audio_url is not None
     ):
         raise click.BadParameter("--reference-id cannot be combined with one-shot references.")

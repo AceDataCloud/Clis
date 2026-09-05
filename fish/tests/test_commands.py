@@ -102,6 +102,29 @@ class TestTTSCommand:
         assert sent["reference_id"] == "d7900c21663f485ab63ebdb7e5905036"
 
     @respx.mock
+    def test_tts_with_multiple_reference_ids(self, runner, mock_tts_response):
+        route = respx.post("https://api.acedata.cloud/fish/tts").mock(
+            return_value=Response(200, json=mock_tts_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "tts",
+                "Hello",
+                "--reference-id",
+                "first",
+                "--reference-id",
+                "second",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["reference_id"] == ["first", "second"]
+
+    @respx.mock
     def test_tts_with_format(self, runner, mock_tts_response):
         route = respx.post("https://api.acedata.cloud/fish/tts").mock(
             return_value=Response(200, json=mock_tts_response)
