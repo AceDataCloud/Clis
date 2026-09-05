@@ -6,7 +6,13 @@ import click
 
 from nanobanana_cli.core.client import get_client
 from nanobanana_cli.core.exceptions import NanoBananaError
-from nanobanana_cli.core.output import print_error, print_json, print_success, print_task_result
+from nanobanana_cli.core.output import (
+    get_task_items,
+    print_error,
+    print_json,
+    print_success,
+    print_task_result,
+)
 
 
 @click.command()
@@ -107,17 +113,12 @@ def wait(
     try:
         while elapsed < max_timeout:
             result = client.query_task(id=task_id, action="retrieve")
-            data = result.get("data", {})
-
-            # Check completion - handle both list and dict responses
-            if isinstance(data, list) and data:
-                item = data[0]
-            elif isinstance(data, dict):
-                item = data
-            else:
-                item = {}
+            items = get_task_items(result)
+            item = items[0] if items else {}
 
             state = item.get("state", item.get("status", ""))
+            if not state and item.get("finished_at") is not None:
+                state = "completed"
             if state in ("succeeded", "completed", "complete", "failed", "error"):
                 if output_json:
                     print_json(result)

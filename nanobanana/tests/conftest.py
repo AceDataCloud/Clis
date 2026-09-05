@@ -39,6 +39,7 @@ def mock_image_response():
                 "id": "image-id-1",
                 "state": "succeeded",
                 "model_name": "nano-banana",
+                "prompt": "A beautiful sunset",
                 "image_url": "https://cdn.example.com/test-image.png",
                 "created_at": "2025-01-21T00:00:00.000Z",
             }

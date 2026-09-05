@@ -44,6 +44,21 @@ RESOLUTIONS = [
 ]
 
 
+def get_task_items(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return task records from supported task response shapes."""
+    tasks = data.get("data")
+    if tasks is None:
+        tasks = data.get("items")
+    if tasks is None and data.get("id"):
+        tasks = data
+
+    if isinstance(tasks, list):
+        return [task for task in tasks if isinstance(task, dict)]
+    if isinstance(tasks, dict):
+        return [tasks]
+    return []
+
+
 def print_json(data: Any) -> None:
     """Print data as formatted JSON."""
     console.print(json.dumps(data, indent=2, ensure_ascii=False))
@@ -97,30 +112,28 @@ def print_image_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
-    tasks = data.get("data", [])
-
-    if isinstance(tasks, list):
-        for task_data in tasks:
-            table = Table(show_header=False, box=None, padding=(0, 2))
-            table.add_column("Field", style="bold cyan", width=15)
-            table.add_column("Value")
-
-            for key in ["id", "status", "state", "image_url", "model_name", "created_at"]:
-                if task_data.get(key):
-                    table.add_row(key.replace("_", " ").title(), str(task_data[key]))
-
-            console.print(table)
-            console.print()
-    elif isinstance(tasks, dict):
+    for task_data in get_task_items(data):
         table = Table(show_header=False, box=None, padding=(0, 2))
         table.add_column("Field", style="bold cyan", width=15)
         table.add_column("Value")
 
-        for key in ["id", "status", "state", "image_url", "model_name", "created_at"]:
-            if tasks.get(key):
-                table.add_row(key.replace("_", " ").title(), str(tasks[key]))
+        for key in [
+            "id",
+            "type",
+            "status",
+            "state",
+            "trace_id",
+            "image_url",
+            "model_name",
+            "created_at",
+            "finished_at",
+            "elapsed",
+        ]:
+            if task_data.get(key):
+                table.add_row(key.replace("_", " ").title(), str(task_data[key]))
 
         console.print(table)
+        console.print()
 
 
 def print_models() -> None:
