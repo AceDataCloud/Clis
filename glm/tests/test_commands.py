@@ -112,6 +112,21 @@ class TestChatCommand:
         )
         assert result.exit_code == 0
 
+    @pytest.mark.parametrize(
+        ("option", "value"),
+        [
+            ("--temperature", "3"),
+            ("--count", "0"),
+            ("--top-p", "2"),
+            ("--frequency-penalty", "-3"),
+            ("--presence-penalty", "3"),
+        ],
+    )
+    def test_chat_rejects_out_of_range_openapi_options(self, runner, option, value):
+        result = runner.invoke(cli, ["--token", "test-token", "chat", "Hello", option, value])
+
+        assert result.exit_code != 0
+
     @respx.mock
     def test_chat_with_openai_compatible_options(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/glm/chat/completions").mock(
