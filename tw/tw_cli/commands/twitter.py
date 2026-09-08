@@ -43,13 +43,13 @@ def users(ctx: click.Context, username: str, output_json: bool) -> None:
 
 
 @click.command()
-@click.argument("post_id")
+@click.argument("note_id")
 @click.option("--cursor", default=None, help="Pagination cursor.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
-def retweets(ctx: click.Context, post_id: str, cursor: str | None, output_json: bool) -> None:
+def retweets(ctx: click.Context, note_id: str, cursor: str | None, output_json: bool) -> None:
     """Find retweets of a tweet."""
-    payload: dict[str, object] = {"post_id": post_id, "cursor": cursor}
+    payload: dict[str, object] = {"note_id": note_id, "cursor": cursor}
     _emit(get_client(ctx.obj.get("token")).retweets, payload, output_json, "Retweets Result")
 
 
