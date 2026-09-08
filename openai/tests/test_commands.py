@@ -634,9 +634,15 @@ class TestImageCommands:
         assert result.exit_code != 0
         assert "at most 16" in result.output
 
-    def test_edit_rejects_nano_banana_2_lite_for_image_file(self, runner, tmp_path):
+    @respx.mock
+    def test_edit_supports_nano_banana_2_lite_for_image_file(
+        self, runner, tmp_path, mock_image_response
+    ):
         image_file = tmp_path / "base.png"
         image_file.write_bytes(b"fake-image")
+        route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
         result = runner.invoke(
             cli,
             [
@@ -648,10 +654,13 @@ class TestImageCommands:
                 str(image_file),
                 "--model",
                 "nano-banana-2-lite",
+                "--json",
             ],
         )
-        assert result.exit_code != 0
-        assert "not supported with --image-file uploads" in result.output
+        assert result.exit_code == 0
+        content = route.calls.last.request.content.decode()
+        assert 'name="model"' in content
+        assert "nano-banana-2-lite" in content
 
 
 # ─── Response Commands ─────────────────────────────────────────────────────
