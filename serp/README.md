@@ -2,6 +2,9 @@
 
 A command-line tool for Google Search (SERP) via the [AceDataCloud](https://platform.acedata.cloud) platform.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-serp)
+
 ## Features
 
 - **Web Search** — Search Google and get structured results (organic, knowledge graph, answer box)

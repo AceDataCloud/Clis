@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - run: python3 scripts/test_check_readme_inventory.py
       - run: python3 scripts/check_readme_inventory.py
 
   detect-changes:

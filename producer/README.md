@@ -2,6 +2,9 @@
 
 A command-line tool for AI music generation using the Producer service via AceDataCloud API.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-producer)
+
 ## Installation
 
 ```bash
