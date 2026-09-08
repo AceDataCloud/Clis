@@ -326,11 +326,6 @@ def edit(
 
     client = get_client(ctx.obj.get("token"))
     if image_file:
-        if model == "nano-banana-2-lite":
-            raise click.UsageError(
-                "--model nano-banana-2-lite is not supported with --image-file uploads. "
-                "Use --image-url or choose a different model."
-            )
         fields: dict[str, object] = {
             "prompt": prompt,
             "model": model,
