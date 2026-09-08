@@ -50,7 +50,7 @@ def test_retweets_payload(runner):
     result = runner.invoke(cli, ["--token", "test-token", "retweets", "1894625520991547884", "--cursor", "abc", "--json"])
     assert result.exit_code == 0
     sent = json.loads(route.calls[0].request.content)
-    assert sent == {"post_id": "1894625520991547884", "cursor": "abc"}
+    assert sent == {"note_id": "1894625520991547884", "cursor": "abc"}
 
 
 @respx.mock
