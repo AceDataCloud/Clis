@@ -1367,3 +1367,45 @@ class TestTasksCommands:
             ],
         )
         assert result.exit_code != 0
+
+
+@pytest.mark.parametrize("model", ["gpt-image-2.5-flare", "gpt-image-2.5-sunburst"])
+@respx.mock
+def test_image_commands_accept_exact_gpt_image_2_5_models(runner, mock_image_response, model):
+    generation = respx.post("https://api.acedata.cloud/openai/images/generations").mock(
+        return_value=Response(200, json=mock_image_response)
+    )
+    result = runner.invoke(
+        cli, ["--token", "test-token", "image", "a circle", "--model", model, "--json"]
+    )
+    assert result.exit_code == 0
+    assert json.loads(generation.calls.last.request.content)["model"] == model
+
+    editing = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
+        return_value=Response(200, json=mock_image_response)
+    )
+    result = runner.invoke(
+        cli,
+        [
+            "--token",
+            "test-token",
+            "edit",
+            "make it red",
+            "--image-url",
+            "https://example.com/source.png",
+            "--model",
+            model,
+            "--json",
+        ],
+    )
+    assert result.exit_code == 0
+    assert json.loads(editing.calls.last.request.content)["model"] == model
+
+
+@pytest.mark.parametrize(
+    "model", ["gpt-image-2.5", "gpt-image-2.5:official", "gpt-image-2.5:reverse"]
+)
+def test_image_command_rejects_unsupported_gpt_image_2_5_aliases(runner, model):
+    result = runner.invoke(cli, ["--token", "test-token", "image", "a circle", "--model", model])
+    assert result.exit_code == 2
+    assert "Invalid value for '-m' / '--model'" in result.output

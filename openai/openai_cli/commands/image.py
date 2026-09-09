@@ -56,7 +56,8 @@ def _validate_size_format(
     is_eager=False,
     help=(
         "Size of the generated image as WIDTHxHEIGHT or 'auto'. "
-        "gpt-image-2 accepts any WIDTHxHEIGHT (multiples of 16, max 3840 on each side). "
+        "GPT Image 2/2.5 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, "
+        "655360–8294400 pixels, and aspect ratio up to 3:1. "
         "dall-e-3: 1024x1024, 1792x1024, 1024x1792. "
         "dall-e-2: 256x256, 512x512, 1024x1024."
     ),
@@ -222,7 +223,8 @@ def image(
     is_eager=False,
     help=(
         "Size of the output image as WIDTHxHEIGHT or 'auto'. "
-        "gpt-image-2 accepts any WIDTHxHEIGHT (multiples of 16, max 3840 on each side). "
+        "GPT Image 2/2.5 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, "
+        "655360–8294400 pixels, and aspect ratio up to 3:1. "
         "dall-e-3: 1024x1024, 1792x1024, 1024x1792. "
         "dall-e-2: 256x256, 512x512, 1024x1024."
     ),
