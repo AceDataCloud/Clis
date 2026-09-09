@@ -67,6 +67,8 @@ IMAGE_MODELS = [
     "gpt-image-1",
     "gpt-image-1.5",
     "gpt-image-2",
+    "gpt-image-2.5-flare",
+    "gpt-image-2.5-sunburst",
     "gpt-image-2:reverse",
     "gpt-image-2:official",
     "nano-banana",
@@ -487,7 +489,9 @@ def print_api_models(data: dict[str, Any]) -> None:
 
         for model in model_metadata:
             levels = model.get("supported_reasoning_levels") or []
-            reasoning = ", ".join(level.get("effort", "") for level in levels if level.get("effort"))
+            reasoning = ", ".join(
+                level.get("effort", "") for level in levels if level.get("effort")
+            )
             modalities = ", ".join(model.get("input_modalities") or [])
             supported_in_api = model.get("supported_in_api")
             metadata_table.add_row(
