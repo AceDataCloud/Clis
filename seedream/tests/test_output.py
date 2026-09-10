@@ -104,17 +104,15 @@ class TestPrintTaskResult:
 
     def test_print_task_result(self, capsys):
         data = {
-            "data": [
-                {
-                    "id": "task-123",
-                    "status": "completed",
-                    "image_url": "https://cdn.example.com/result.png",
-                }
-            ]
+            "id": "task-123",
+            "type": "seedream.images",
+            "request": {"prompt": "test"},
+            "response": {"data": [{"image_url": "https://cdn.example.com/result.png"}]},
         }
         print_task_result(data)
         captured = capsys.readouterr()
         assert "task-123" in captured.out
+        assert "result.png" in captured.out
 
 
 class TestPrintModels:

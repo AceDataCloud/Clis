@@ -339,7 +339,7 @@ class TestTaskCommands:
         result = runner.invoke(cli, ["--token", "test-token", "task", "task-123", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["data"][0]["id"] == "task-123"
+        assert data["id"] == "task-123"
 
     @respx.mock
     def test_task_rich_output(self, runner, mock_task_response):
@@ -352,10 +352,22 @@ class TestTaskCommands:
     @respx.mock
     def test_tasks_batch(self, runner, mock_task_response):
         respx.post("https://api.acedata.cloud/seedream/tasks").mock(
-            return_value=Response(200, json=mock_task_response)
+            return_value=Response(
+                200,
+                json={"items": [mock_task_response], "count": 1},
+            )
         )
         result = runner.invoke(cli, ["--token", "test-token", "tasks", "t-1", "t-2", "--json"])
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_wait_completes_from_finished_task_record(self, runner, mock_task_response):
+        respx.post("https://api.acedata.cloud/seedream/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "wait", "task-123", "--json"])
+        assert result.exit_code == 0
+        assert json.loads(result.output)["id"] == "task-123"
 
 
 # ─── Info Commands ─────────────────────────────────────────────────────────

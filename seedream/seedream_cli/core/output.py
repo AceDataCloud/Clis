@@ -98,7 +98,10 @@ def print_image_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
-    tasks = data.get("data", [])
+    if "id" in data:
+        tasks = [data]
+    else:
+        tasks = data.get("items", data.get("data", []))
 
     if isinstance(tasks, list):
         for task_data in tasks:
@@ -106,9 +109,24 @@ def print_task_result(data: dict[str, Any]) -> None:
             table.add_column("Field", style="bold cyan", width=15)
             table.add_column("Value")
 
-            for key in ["id", "status", "state", "image_url", "model_name", "created_at"]:
+            for key in [
+                "id",
+                "type",
+                "trace_id",
+                "status",
+                "state",
+                "image_url",
+                "model_name",
+                "created_at",
+                "started_at",
+                "finished_at",
+                "elapsed",
+            ]:
                 if task_data.get(key):
                     table.add_row(key.replace("_", " ").title(), str(task_data[key]))
+            for key in ["request", "response"]:
+                if task_data.get(key) is not None:
+                    table.add_row(key.title(), json.dumps(task_data[key], ensure_ascii=False))
 
             console.print(table)
             console.print()
@@ -117,9 +135,24 @@ def print_task_result(data: dict[str, Any]) -> None:
         table.add_column("Field", style="bold cyan", width=15)
         table.add_column("Value")
 
-        for key in ["id", "status", "state", "image_url", "model_name", "created_at"]:
+        for key in [
+            "id",
+            "type",
+            "trace_id",
+            "status",
+            "state",
+            "image_url",
+            "model_name",
+            "created_at",
+            "started_at",
+            "finished_at",
+            "elapsed",
+        ]:
             if tasks.get(key):
                 table.add_row(key.replace("_", " ").title(), str(tasks[key]))
+        for key in ["request", "response"]:
+            if tasks.get(key) is not None:
+                table.add_row(key.title(), json.dumps(tasks[key], ensure_ascii=False))
 
         console.print(table)
 
