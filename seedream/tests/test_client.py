@@ -130,7 +130,7 @@ def test_stream_images_parses_normalized_ndjson():
     )
     client = SeedreamClient(api_token="test-token")
     events = list(
-        client.stream_images(prompt="test", model="doubao-seedream-5-0-260128", stream=True)
+        client.stream_images(prompt="test", model="doubao-seedream-5-0-lite-260128", stream=True)
     )
     assert [event["type"] for event in events] == [
         "image_generation.partial_succeeded",

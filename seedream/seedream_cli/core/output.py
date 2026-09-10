@@ -12,13 +12,12 @@ console = Console()
 # Available models
 SEEDREAM_MODELS = [
     "doubao-seedream-5-0-pro-260628",
-    "doubao-seedream-5-0-260128",
     "doubao-seedream-5-0-lite-260128",
     "doubao-seedream-4-5-251128",
     "doubao-seedream-4-0-250828",
 ]
 
-DEFAULT_MODEL = "doubao-seedream-5-0-260128"
+DEFAULT_MODEL = "doubao-seedream-5-0-lite-260128"
 
 # Available resolutions
 RESOLUTIONS = [
@@ -138,14 +137,9 @@ def print_models() -> None:
         "Single image, transparent background, layer decomposition",
     )
     table.add_row(
-        "doubao-seedream-5-0-260128",
-        "V5.0",
-        "Sequential images, streaming, web search (default)",
-    )
-    table.add_row(
         "doubao-seedream-5-0-lite-260128",
         "V5.0 Lite",
-        "Same capability profile as Seedream 5.0",
+        "Sequential images, streaming, web search (default)",
     )
     table.add_row(
         "doubao-seedream-4-5-251128",
