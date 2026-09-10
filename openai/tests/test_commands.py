@@ -1369,7 +1369,15 @@ class TestTasksCommands:
         assert result.exit_code != 0
 
 
-@pytest.mark.parametrize("model", ["gpt-image-2.5-flare", "gpt-image-2.5-sunburst"])
+@pytest.mark.parametrize(
+    "model",
+    [
+        "gpt-image-2.5-flare",
+        "gpt-image-2.5-sunburst",
+        "gpt-image-2.5-flare:official",
+        "gpt-image-2.5-sunburst:official",
+    ],
+)
 @respx.mock
 def test_image_commands_accept_exact_gpt_image_2_5_models(runner, mock_image_response, model):
     generation = respx.post("https://api.acedata.cloud/openai/images/generations").mock(
