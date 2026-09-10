@@ -369,6 +369,7 @@ class TestInfoCommands:
         assert result.exit_code == 0
         assert "doubao-seedream-5-0-pro-260628" in result.output
         assert "doubao-seedream-5-0-lite-260128" in result.output
+        assert "doubao-seedream-5-0-260128" not in result.output
         assert "doubao-seedream-4-5-251128" in result.output
 
     def test_resolutions(self, runner):

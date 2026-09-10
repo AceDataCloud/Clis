@@ -14,7 +14,7 @@ Generate AI images directly from your terminal — no MCP client required.
 
 - **Image Generation** — Generate images from text prompts with multiple models
 - **Image Editing** — Edit, combine, and transform images with AI
-- **Multiple Models** — doubao-seedream-5-0-pro-260628, doubao-seedream-5-0-260128, doubao-seedream-4-5-251128, doubao-seedream-4-0-250828
+- **Multiple Models** — doubao-seedream-5-0-pro-260628, doubao-seedream-5-0-lite-260128, doubao-seedream-4-5-251128, doubao-seedream-4-0-250828
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
 - **JSON Mode** — Machine-readable output with `--json` for piping
@@ -108,7 +108,7 @@ Most commands support:
 
 ```
 --json          Output raw JSON (for piping/scripting)
---model TEXT    Seedream model version (default: doubao-seedream-5-0-260128)
+--model TEXT    Seedream model version (default: doubao-seedream-5-0-lite-260128)
 ```
 
 ## Available Models
@@ -116,7 +116,7 @@ Most commands support:
 | Model | Version | Notes |
 |-------|---------|-------|
 | `doubao-seedream-5-0-pro-260628` | V5.0 Pro | Single image, 1K/1.5K/2K, transparent background, layer decomposition |
-| `doubao-seedream-5-0-260128` / `doubao-seedream-5-0-lite-260128` | V5.0 Lite | Sequential images, streaming, web search (default) |
+| `doubao-seedream-5-0-lite-260128` | V5.0 Lite | Sequential images, streaming, web search (default) |
 | `doubao-seedream-4-5-251128` | V4.5 | Flagship model, best quality |
 | `doubao-seedream-4-0-250828` | V4.0 | Standard quality |
 
@@ -129,7 +129,7 @@ Most commands support:
 |----------|-------------|---------|
 | `ACEDATACLOUD_API_TOKEN` | API token from AceDataCloud | *Required* |
 | `ACEDATACLOUD_API_BASE_URL` | API base URL | `https://api.acedata.cloud` |
-| `SEEDREAM_DEFAULT_MODEL` | Default model | `doubao-seedream-5-0-260128` |
+| `SEEDREAM_DEFAULT_MODEL` | Default model | `doubao-seedream-5-0-lite-260128` |
 | `SEEDREAM_REQUEST_TIMEOUT` | Timeout in seconds | `1800` |
 
 ## Development
