@@ -9,6 +9,16 @@ from seedream_cli.core.exceptions import SeedreamError
 from seedream_cli.core.output import print_error, print_json, print_success, print_task_result
 
 
+def _task_record(result: dict) -> dict:
+    """Extract a task record from a task endpoint response."""
+    if "id" in result:
+        return result
+    items = result.get("items")
+    if isinstance(items, list) and items and isinstance(items[0], dict):
+        return items[0]
+    return {}
+
+
 @click.command()
 @click.argument("task_id")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
@@ -107,18 +117,14 @@ def wait(
     try:
         while elapsed < max_timeout:
             result = client.query_task(id=task_id, action="retrieve")
-            data = result.get("data", {})
-
-            # Check completion - handle both list and dict responses
-            if isinstance(data, list) and data:
-                item = data[0]
-            elif isinstance(data, dict):
-                item = data
-            else:
-                item = {}
+            item = _task_record(result)
 
             state = item.get("state", item.get("status", ""))
-            if state in ("succeeded", "completed", "complete", "failed", "error"):
+            if (
+                item.get("finished_at") is not None
+                or item.get("response") is not None
+                or state in ("succeeded", "completed", "complete", "failed", "error")
+            ):
                 if output_json:
                     print_json(result)
                 else:

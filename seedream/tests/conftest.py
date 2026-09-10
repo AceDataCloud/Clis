@@ -50,17 +50,13 @@ def mock_image_response():
 def mock_task_response():
     """Mock task query response."""
     return {
-        "success": True,
-        "data": [
-            {
-                "id": "task-123",
-                "status": "completed",
-                "state": "succeeded",
-                "image_url": "https://cdn.example.com/test-image.png",
-                "model_name": "doubao-seedream-4-0-250828",
-                "created_at": "2025-01-21T00:00:00.000Z",
-            }
-        ],
+        "id": "task-123",
+        "type": "seedream.images",
+        "trace_id": "trace-123",
+        "request": {"prompt": "test"},
+        "response": {"data": [{"image_url": "https://cdn.example.com/test-image.png"}]},
+        "created_at": 1737417600,
+        "finished_at": 1737417601,
     }
 
 
