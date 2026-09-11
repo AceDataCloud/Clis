@@ -39,7 +39,7 @@ def _validate_size_format(
     type=click.Choice(IMAGE_MODELS),
     default=DEFAULT_IMAGE_MODEL,
     show_default=True,
-    help="Image generation model to use.",
+    help="Image generation model to use; :official GPT Image variants use actual-token billing.",
 )
 @click.option(
     "-n",
@@ -205,7 +205,7 @@ def image(
     type=click.Choice(IMAGE_MODELS),
     default=DEFAULT_IMAGE_MODEL,
     show_default=True,
-    help="Image editing model to use.",
+    help="Image editing model to use; :official GPT Image variants use actual-token billing.",
 )
 @click.option(
     "-n",
