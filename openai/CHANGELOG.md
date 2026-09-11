@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
-- GPT Image 2.5 Flare and Sunburst generation and editing models
+- GPT Image 2.5 Flare and Sunburst generation and editing models, including token-metered official variants
 
 ## [0.2.0] - 2026-04-30
 

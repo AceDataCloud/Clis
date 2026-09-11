@@ -59,12 +59,18 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["image", "--help"])
         assert result.exit_code == 0
         assert "PROMPT" in result.output
+        assert ":official GPT Image variants use actual-token billing" in " ".join(
+            result.output.split()
+        )
 
     def test_edit_help(self, runner):
         result = runner.invoke(cli, ["edit", "--help"])
         assert result.exit_code == 0
         assert "PROMPT" in result.output
         assert "--image-url" in result.output
+        assert ":official GPT Image variants use actual-token billing" in " ".join(
+            result.output.split()
+        )
 
     def test_response_help(self, runner):
         result = runner.invoke(cli, ["response", "--help"])
