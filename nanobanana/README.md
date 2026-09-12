@@ -10,6 +10,9 @@ A command-line tool for AI image generation and editing using [NanoBanana](https
 
 Generate and edit AI images directly from your terminal — no MCP client required.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-nanobanana)
+
 ## Features
 
 - **Image Generation** — Generate images from text prompts with multiple models

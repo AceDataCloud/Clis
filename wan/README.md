@@ -9,6 +9,9 @@ A command-line tool for AI video generation using [Tongyi Wansiang](https://plat
 
 Generate AI videos directly from your terminal — no MCP client required.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-wan)
+
 ## Features
 
 - **Video Generation** — Generate videos from text prompts with multiple models

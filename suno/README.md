@@ -10,6 +10,9 @@ A command-line tool for AI music generation using [Suno](https://suno.ai/) throu
 
 Generate AI music, lyrics, and manage audio projects directly from your terminal — no MCP client required.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-suno)
+
 ## Features
 
 - **Music Generation** — Generate from prompts, custom lyrics, extend, cover, remaster, concat

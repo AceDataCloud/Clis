@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - run: python3 scripts/test_check_readme_inventory.py
       - run: python3 scripts/check_readme_inventory.py
 
   detect-changes:
@@ -38,7 +39,9 @@ jobs:
           HAS_CHANGES="false"
 
           for dir in $DIRS; do
-            if [ -f "$dir/pyproject.toml" ] && echo "$CHANGED" | grep -q "^${dir}/"; then
+            # README-only changes are covered by the inventory job and do not
+            # need to rerun package lint/test/build against unchanged code.
+            if [ -f "$dir/pyproject.toml" ] && echo "$CHANGED" | grep "^${dir}/" | grep -qv "^${dir}/README\\.md$"; then
               MATRIX=$(echo "$MATRIX" | jq -c --arg d "$dir" '. + [$d]')
               HAS_CHANGES="true"
             fi

@@ -2,6 +2,9 @@
 
 A command-line tool for generating AI videos using [Hailuo (MiniMax)](https://platform.acedata.cloud) through the AceDataCloud platform.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-hailuo)
+
 ## Installation
 
 ```bash
