@@ -30,13 +30,12 @@ class TestGlobalCommands:
 
     def test_model_inventory_includes_latest_glm_models(self):
         assert "gpt-6-astra" in MODELS
-        assert {"gpt-6-sol", "gpt-6-luna", "grok-4.7", "mai-code-1.1-flash"} <= set(MODELS)
+        assert {"gpt-6-sol", "gpt-6-luna", "grok-4.7"} <= set(MODELS)
         assert {
             "gpt-6-sol",
             "gpt-6-luna",
             "grok-4.7",
             "gemini-3.8-flash",
-            "mai-code-1.1-flash",
         } <= set(MODELS2)
         assert "claude-opus-5-5" not in MODELS2
         assert "glm-5.3" in MODELS
@@ -46,7 +45,6 @@ class TestGlobalCommands:
 
     def test_new_model_families_render_without_misbranding(self):
         assert _get_model_family("gpt-6-sol") == "GPT-6"
-        assert _get_model_family("mai-code-1.1-flash") == "Other"
 
     def test_chat2_model_inventory_matches_gemini_models(self):
         assert "gemini-3.7-flash" in MODELS2

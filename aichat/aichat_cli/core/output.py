@@ -15,7 +15,6 @@ MODELS = [
     "gpt-6-astra",
     "gpt-6-sol",
     "gpt-6-luna",
-    "mai-code-1.1-flash",
     "gpt-5.6-luna",
     "gpt-5.6-terra",
     "gpt-5.6-sol",
@@ -113,7 +112,6 @@ DEFAULT_MODEL = "gpt-4o"
 MODELS2 = [
     "gpt-6-sol",
     "gpt-6-luna",
-    "mai-code-1.1-flash",
     "gpt-4",
     "gpt-4.1",
     "gpt-4.1-mini",
