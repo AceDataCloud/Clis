@@ -35,7 +35,7 @@ CHAT_MODELS = [
 ]
 
 # Claude Messages API models
-MESSAGES_MODELS = CHAT_MODELS
+MESSAGES_MODELS = ["claude-opus-5-5", *CHAT_MODELS]
 
 DEFAULT_CHAT_MODEL = "claude-3-5-haiku-20241022"
 DEFAULT_MESSAGES_MODEL = "claude-3-5-haiku-20241022"
@@ -185,6 +185,8 @@ def print_models() -> None:
     """Print available Claude models."""
     table = Table(title="Available Claude Models")
     table.add_column("Model", style="bold cyan")
-    for model in CHAT_MODELS:
-        table.add_row(model)
+    table.add_column("Protocol", style="dim")
+    for model in MESSAGES_MODELS:
+        protocol = "Messages only" if model not in CHAT_MODELS else "Chat / Messages"
+        table.add_row(model, protocol)
     console.print(table)

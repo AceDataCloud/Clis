@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from claude_cli.core.output import CHAT_MODELS
+from claude_cli.core.output import CHAT_MODELS, MESSAGES_MODELS
 from claude_cli.main import cli
 
 
@@ -25,6 +25,8 @@ class TestGlobalCommands:
     def test_model_inventory_excludes_retired_opus_3(self):
         assert CHAT_MODELS[:2] == ["claude-fable-5-1", "claude-fable-5"]
         assert "claude-opus-5" in CHAT_MODELS
+        assert "claude-opus-5-5" not in CHAT_MODELS
+        assert MESSAGES_MODELS[0] == "claude-opus-5-5"
         assert "claude-3-opus-20240229" not in CHAT_MODELS
 
     def test_version(self, runner):
@@ -467,12 +469,14 @@ class TestInfoCommands:
         assert "claude-fable-5-1" in result.output
         assert "claude-fable-5" in result.output
         assert "claude-opus-5" in result.output
+        assert "claude-opus-5-5" in result.output
+        assert "Messages only" in result.output
 
     def test_models_first_entry(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         lines = [line for line in result.output.splitlines() if "claude-" in line]
-        assert "claude-fable-5-1" in lines[0]
+        assert "claude-opus-5-5" in lines[0]
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])
