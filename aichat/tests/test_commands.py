@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from aichat_cli.core.output import MODELS, MODELS2
+from aichat_cli.core.output import MODELS, MODELS2, _get_model_family
 from aichat_cli.main import cli, get_version
 
 
@@ -30,10 +30,21 @@ class TestGlobalCommands:
 
     def test_model_inventory_includes_latest_glm_models(self):
         assert "gpt-6-astra" in MODELS
+        assert {"gpt-6-sol", "gpt-6-luna", "grok-4.7"} <= set(MODELS)
+        assert {
+            "gpt-6-sol",
+            "gpt-6-luna",
+            "grok-4.7",
+            "gemini-3.8-flash",
+        } <= set(MODELS2)
+        assert "claude-opus-5-5" not in MODELS2
         assert "glm-5.3" in MODELS
         assert "glm-5.3" in MODELS2
         assert MODELS.count("deepseek-v4-pro") == 1
         assert MODELS2.count("deepseek-v4-pro") == 1
+
+    def test_new_model_families_render_without_misbranding(self):
+        assert _get_model_family("gpt-6-sol") == "GPT-6"
 
     def test_chat2_model_inventory_matches_gemini_models(self):
         assert "gemini-3.7-flash" in MODELS2

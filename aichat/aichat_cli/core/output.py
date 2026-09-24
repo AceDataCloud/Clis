@@ -13,6 +13,8 @@ console = Console()
 # Available models from OpenAPI spec
 MODELS = [
     "gpt-6-astra",
+    "gpt-6-sol",
+    "gpt-6-luna",
     "gpt-5.6-luna",
     "gpt-5.6-terra",
     "gpt-5.6-sol",
@@ -91,6 +93,7 @@ MODELS = [
     "deepseek-v3-250324",
     "deepseek-v4-flash",
     "deepseek-v4-pro",
+    "grok-4.7",
     "grok-4.5",
     "grok-3",
     "glm-5.3",
@@ -107,6 +110,8 @@ DEFAULT_MODEL = "gpt-4o"
 
 # Available models for /aichat2/conversations endpoint
 MODELS2 = [
+    "gpt-6-sol",
+    "gpt-6-luna",
     "gpt-4",
     "gpt-4.1",
     "gpt-4.1-mini",
@@ -142,6 +147,7 @@ MODELS2 = [
     "claude-sonnet-4-5-20250929",
     "claude-sonnet-4-6",
     "claude-sonnet-5",
+    "gemini-3.8-flash",
     "gemini-3.7-flash",
     "gemini-3.6-flash",
     "gemini-3.5-flash",
@@ -155,6 +161,7 @@ MODELS2 = [
     "grok-3",
     "grok-3-fast",
     "grok-4",
+    "grok-4.7",
     "grok-4.5",
     "grok-4-0709",
     "deepseek-chat",
@@ -248,7 +255,9 @@ def print_models() -> None:
 
 def _get_model_family(model: str) -> str:
     """Get the model family for display purposes."""
-    if model.startswith("gpt-5"):
+    if model.startswith("gpt-6"):
+        return "GPT-6"
+    elif model.startswith("gpt-5"):
         return "GPT-5"
     elif model.startswith("gpt-image"):
         return "GPT-Image"
