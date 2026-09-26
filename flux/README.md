@@ -2,6 +2,9 @@
 
 A command-line tool for AI image generation and editing using [Flux](https://blackforestlabs.ai/) through the [AceDataCloud](https://platform.acedata.cloud) platform.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-flux)
+
 ## Features
 
 - **Text-to-Image Generation** — Generate images from text prompts with multiple Flux models

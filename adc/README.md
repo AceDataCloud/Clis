@@ -2,6 +2,9 @@
 
 Unified command-line interface for all AceDataCloud AI services — images, videos, music, and search.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-adc)
+
 ## Installation
 
 ```bash

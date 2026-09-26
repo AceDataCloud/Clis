@@ -10,6 +10,9 @@ A command-line tool for AI image generation using [Seedream](https://platform.ac
 
 Generate AI images directly from your terminal — no MCP client required.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-seedream)
+
 ## Features
 
 - **Image Generation** — Generate images from text prompts with multiple models

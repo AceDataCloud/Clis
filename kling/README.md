@@ -2,6 +2,9 @@
 
 A command-line tool for Kling AI Video Generation via [AceDataCloud](https://platform.acedata.cloud).
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-kling)
+
 ## Installation
 
 ```bash

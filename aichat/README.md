@@ -2,6 +2,9 @@
 
 A command-line tool for AI Dialogue via the [AceDataCloud](https://platform.acedata.cloud) platform.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-aichat)
+
 ## Features
 
 - **Chat with AI** — Send questions to GPT, DeepSeek, Grok, GLM, and more models

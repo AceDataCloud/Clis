@@ -10,6 +10,9 @@ A command-line tool for AI video generation using [Luma](https://platform.acedat
 
 Generate AI videos directly from your terminal — no MCP client required.
 
+<!-- canonical-acquisition -->
+[Get an API token](https://platform.acedata.cloud/?utm_source=github&utm_medium=repo&utm_campaign=cli-luma)
+
 ## Features
 
 - **Video Generation** — Generate videos from text prompts with multiple models
