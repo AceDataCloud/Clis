@@ -7,14 +7,15 @@ Each subdirectory contains a standalone Python CLI package.
 
 ## Source of Truth
 
-The **AceDataCloud/Docs** repo is the source of truth:
-
-- `openapi/<service>.json` — OpenAPI specs for each service
-- `guides/<service>.md` — Usage guides (optional reference)
+**AceDataCloud/PlatformBackend** is the contract source of truth. Use the exact
+commit and allowed package directories in the sync issue. Compile and verify
+its bundle with `scripts/ecosystem_contracts.py`; the consumer's
+`scripts/platform_contract.py` resolves service aliases to package directories.
+Docs is a published reference, not a second contract input.
 
 ## What to Sync
 
-When the Docs repo changes, compare the OpenAPI specs against the CLI code and update:
+When a PlatformBackend contract changes, compare its compiled OpenAPI against the CLI code and update:
 
 1. **Commands and subcommands** — ensure all API operations have corresponding CLI commands
 2. **Command parameters/options** — match request body schemas from OpenAPI specs
