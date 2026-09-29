@@ -32,3 +32,11 @@ This is the source-of-truth monorepo. Changes pushed to `main` are automatically
 The mapping between subdirectories and standalone repos is defined in [`sync.yaml`](sync.yaml).
 
 **Do not edit standalone repos directly** — all changes should be made here.
+
+## Contract updates
+
+`sync-from-platformbackend.yml` consumes `platform-contracts-updated` at an exact
+PlatformBackend commit, verifies its compiled bundle, and opens a scoped parity
+issue for mapped CLI packages. Hand-written commands are updated through normal
+PRs and CI. Docs is a published reference; it no longer triggers a parallel code
+sync. Sync jobs do not close other PRs, poll for agent completion, or force merges.
