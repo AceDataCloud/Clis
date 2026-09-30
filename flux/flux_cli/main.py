@@ -56,7 +56,6 @@ def cli(ctx: click.Context, token: str | None) -> None:
     ctx.obj["token"] = token
 
 
-
 # Register commands
 cli.add_command(video)
 cli.add_command(video_edit)
