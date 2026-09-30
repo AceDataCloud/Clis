@@ -12,6 +12,7 @@ import click
 from dotenv import load_dotenv
 
 from minimax_cli.commands.info import config, models
+from minimax_cli.commands.native import enhance_prompt, max_video, regenerate
 from minimax_cli.commands.task import delete, task, tasks_batch, wait
 from minimax_cli.commands.video import generate, image_to_video
 
@@ -66,7 +67,6 @@ cli.add_command(models)
 cli.add_command(config)
 
 
-from minimax_cli.commands.native import enhance_prompt, max_video, regenerate
 
 cli.add_command(max_video)
 cli.add_command(enhance_prompt)
