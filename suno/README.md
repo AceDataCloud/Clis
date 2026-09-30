@@ -367,3 +367,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 ---
 
 Made with ❤️ by [AceDataCloud](https://platform.acedata.cloud/)
+
+For `generate` and `custom`, use `--personalization` to apply account music preferences or `--no-personalization` to disable them. Omitting the flag keeps the service default.

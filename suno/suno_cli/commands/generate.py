@@ -48,7 +48,9 @@ UNIT_FLOAT = click.FloatRange(0, 1)
     type=str,
     help="Variation category (v5+ only).",
 )
-@click.option("--weirdness", type=UNIT_FLOAT, default=None, help="Weirdness level (custom mode only).")
+@click.option(
+    "--weirdness", type=UNIT_FLOAT, default=None, help="Weirdness level (custom mode only)."
+)
 @click.option(
     "--lyric-prompt",
     default=None,
@@ -89,9 +91,15 @@ UNIT_FLOAT = click.FloatRange(0, 1)
     help="Submit asynchronously; returns a task_id to poll instead of waiting.",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.option(
+    "--personalization/--no-personalization",
+    default=None,
+    help="Apply account music preferences; omitted keeps the service default.",
+)
 @click.pass_context
 def generate(
     ctx: click.Context,
+    personalization: bool | None,
     prompt: str,
     title: str | None,
     style: str | None,
@@ -127,6 +135,7 @@ def generate(
     try:
         result = client.generate_audio(
             action="generate",
+            personalization=personalization,
             prompt=prompt,
             title=title,
             style=style,
@@ -206,9 +215,15 @@ def generate(
     help="Submit asynchronously; returns a task_id to poll instead of waiting.",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
+@click.option(
+    "--personalization/--no-personalization",
+    default=None,
+    help="Apply account music preferences; omitted keeps the service default.",
+)
 @click.pass_context
 def custom(
     ctx: click.Context,
+    personalization: bool | None,
     lyric: str,
     title: str,
     style: str,
@@ -245,6 +260,7 @@ def custom(
     try:
         result = client.generate_audio(
             action="generate",
+            personalization=personalization,
             custom=True,
             lyric=lyric,
             title=title,
