@@ -101,6 +101,7 @@ check_untyped_defs = true
 # Pytest Configuration
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not integration'"
 asyncio_mode = "auto"
 markers = [
     "integration: marks tests that require real API access",

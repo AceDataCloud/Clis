@@ -9,6 +9,6 @@ COPY tests/ ./tests/
 RUN pip install --no-cache-dir -e ".[all]"
 
 RUN ruff check . && ruff format --check .
-RUN pytest tests/ -v -m "not integration"
+RUN pytest
 
 ENTRYPOINT ["adc"]

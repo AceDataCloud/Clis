@@ -43,7 +43,7 @@ sync. Sync jobs do not close other PRs, poll for agent completion, or force merg
 
 ## Test discovery
 
-The ADC Docker build runs `pytest tests/ -v -m "not integration"`.
+The ADC Docker build runs `pytest`.
 Tests requiring real API credentials must use `pytest.mark.integration`;
 their filenames do not need to be listed in the Dockerfile. Other CLI packages
 continue to use their existing automatic pytest discovery.
