@@ -115,3 +115,9 @@ MiniMaxCli/
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
+
+## Native capabilities
+
+Use `minimax max-video --request-file request.json` with `{"content":[{"type":"text","text":"Waves at sunset"}],"resolution":"768P","duration":5}`. H3 Max supports 480P/768P and integer durations 5–15 seconds.
+
+`minimax enhance-prompt --request-file request.json` accepts H3 content, duration and ratio. `minimax regenerate --request-file request.json` takes an owned completed H3 768P `source_task_id` for 2K output, or the exact original content plus one video item with `role="base_video"`. Missing source materials are rejected. Commands output JSON, submit asynchronously by default, and reuse `task`/`wait` for final delivery. Set `async=false` in the request to wait synchronously.

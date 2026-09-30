@@ -66,5 +66,11 @@ cli.add_command(models)
 cli.add_command(config)
 
 
+from minimax_cli.commands.native import enhance_prompt, max_video, regenerate
+
+cli.add_command(max_video)
+cli.add_command(enhance_prompt)
+cli.add_command(regenerate)
+
 if __name__ == "__main__":
     cli()
