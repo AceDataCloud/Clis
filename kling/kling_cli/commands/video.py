@@ -346,7 +346,9 @@ def image_to_video(
     default=None,
     help="Generate audio along with the video.",
 )
-@click.option("--cfg-scale", default=None, type=float, help="Degree of freedom to generate video [0,1].")
+@click.option(
+    "--cfg-scale", default=None, type=float, help="Degree of freedom to generate video [0,1]."
+)
 @click.option(
     "--camera-control",
     default=None,

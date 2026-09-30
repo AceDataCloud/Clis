@@ -57,7 +57,7 @@ DEFAULT_MOTION_MODE = "std"
 @click.option(
     "--watermark-info",
     default=None,
-    help='Watermark configuration as a JSON string, e.g. \'{"enabled": true}\'.',
+    help="Watermark configuration as a JSON string, e.g. '{\"enabled\": true}'.",
 )
 @click.option("--prompt", default=None, help="Text prompt (positive and/or negative descriptions).")
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
