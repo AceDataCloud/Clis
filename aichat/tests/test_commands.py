@@ -30,8 +30,9 @@ class TestGlobalCommands:
 
     def test_model_inventory_includes_latest_glm_models(self):
         assert "gpt-6-astra" in MODELS
-        assert {"gpt-6-sol", "gpt-6-luna", "grok-4.7"} <= set(MODELS)
+        assert {"gpt-6.1-sol", "gpt-6-sol", "gpt-6-luna", "grok-4.7"} <= set(MODELS)
         assert {
+            "gpt-6.1-sol",
             "gpt-6-sol",
             "gpt-6-luna",
             "grok-4.7",
