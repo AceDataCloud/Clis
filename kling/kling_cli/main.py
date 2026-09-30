@@ -73,5 +73,14 @@ cli.add_command(aspect_ratios)
 cli.add_command(config)
 
 
+from kling_cli.commands.native import turbo,storyboard,apparel,goods_studio,video_commerce,virtual_try_on
+
+cli.add_command(turbo)
+cli.add_command(storyboard)
+cli.add_command(apparel)
+cli.add_command(goods_studio)
+cli.add_command(video_commerce)
+cli.add_command(virtual_try_on)
+
 if __name__ == "__main__":
     cli()
