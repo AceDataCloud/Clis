@@ -11,6 +11,7 @@ from importlib import metadata
 import click
 from dotenv import load_dotenv
 
+from kling_cli.commands.assets import asset_video, elements, voices
 from kling_cli.commands.info import aspect_ratios, config, models
 from kling_cli.commands.lipsync import lip_sync, talking_photo
 from kling_cli.commands.motion import motion
@@ -87,6 +88,10 @@ cli.add_command(apparel)
 cli.add_command(goods_studio)
 cli.add_command(video_commerce)
 cli.add_command(virtual_try_on)
+
+cli.add_command(elements)
+cli.add_command(voices)
+cli.add_command(asset_video)
 
 if __name__ == "__main__":
     cli()
