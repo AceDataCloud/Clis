@@ -40,3 +40,10 @@ PlatformBackend commit, verifies its compiled bundle, and opens a scoped parity
 issue for mapped CLI packages. Hand-written commands are updated through normal
 PRs and CI. Docs is a published reference; it no longer triggers a parallel code
 sync. Sync jobs do not close other PRs, poll for agent completion, or force merges.
+
+## Test discovery
+
+The ADC Docker build runs `pytest tests/ -v -m "not integration"`.
+Tests requiring real API credentials must use `pytest.mark.integration`;
+their filenames do not need to be listed in the Dockerfile. Other CLI packages
+continue to use their existing automatic pytest discovery.
