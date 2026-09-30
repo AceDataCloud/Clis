@@ -16,6 +16,7 @@ from flux_cli.main import cli
             "/flux/videos",
             {
                 "mode": "t2v",
+                "model": "flux-3",
                 "prompt": "ocean",
                 "generate_audio": False,
                 "draft": False,
