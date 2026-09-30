@@ -58,7 +58,7 @@ release = [
     "twine>=6.1.0",
 ]
 all = [
-    "kling-cli[dev,test,release]",
+    "kling-pro-cli[dev,test,release]",
 ]
 
 [project.scripts]
