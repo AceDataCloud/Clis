@@ -16,3 +16,7 @@ All notable changes to this project will be documented in this file.
 - `kling models` — List available Kling models
 - `kling config` — Show current configuration
 - `--json` flag on all commands for machine-readable output
+
+## Unreleased
+
+- Add validated platform-owned voice/element management and asset reference generation commands. Custom element creation stays unavailable until pricing is confirmed.
