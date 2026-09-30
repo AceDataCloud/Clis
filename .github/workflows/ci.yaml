@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - run: python3 -m unittest scripts.test_platform_contract -v
+      - run: python3 -m unittest
 
   detect-changes:
     runs-on: ubuntu-latest
