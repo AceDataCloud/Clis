@@ -13,6 +13,7 @@ console = Console()
 # Available models from OpenAPI spec
 MODELS = [
     "gpt-6-astra",
+    "gpt-6.1-sol",
     "gpt-6-sol",
     "gpt-6-luna",
     "gpt-5.6-luna",
@@ -110,6 +111,7 @@ DEFAULT_MODEL = "gpt-4o"
 
 # Available models for /aichat2/conversations endpoint
 MODELS2 = [
+    "gpt-6.1-sol",
     "gpt-6-sol",
     "gpt-6-luna",
     "gpt-4",
