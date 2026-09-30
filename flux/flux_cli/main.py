@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from flux_cli.commands.image import aspect_ratios, edit, generate
 from flux_cli.commands.info import config, models
 from flux_cli.commands.task import task, tasks_batch, wait
+from flux_cli.commands.video import video, video_edit, video_upscale
 
 load_dotenv()
 
@@ -55,7 +56,6 @@ def cli(ctx: click.Context, token: str | None) -> None:
     ctx.obj["token"] = token
 
 
-from flux_cli.commands.video import video, video_edit, video_upscale
 
 # Register commands
 cli.add_command(video)
