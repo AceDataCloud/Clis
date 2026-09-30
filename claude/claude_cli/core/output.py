@@ -35,7 +35,7 @@ CHAT_MODELS = [
 ]
 
 # Claude Messages API models
-MESSAGES_MODELS = ["claude-opus-5-5", *CHAT_MODELS]
+MESSAGES_MODELS = ["claude-opus-5-5", "claude-sonnet-5-5", *CHAT_MODELS]
 
 DEFAULT_CHAT_MODEL = "claude-3-5-haiku-20241022"
 DEFAULT_MESSAGES_MODEL = "claude-3-5-haiku-20241022"
