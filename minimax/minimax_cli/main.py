@@ -67,7 +67,6 @@ cli.add_command(models)
 cli.add_command(config)
 
 
-
 cli.add_command(max_video)
 cli.add_command(enhance_prompt)
 cli.add_command(regenerate)
