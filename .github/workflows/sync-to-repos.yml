@@ -75,7 +75,7 @@ jobs:
           # Prefer the org-maintained admin/bot tokens (rotated centrally) and fall back to
           # the repo SYNC_TOKEN. SYNC_TOKEN silently expired once (Apr 2026) and froze every
           # mirror for months — don't depend on a single manually-maintained secret alone.
-          GH_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN || secrets.BOT_GITHUB_TOKEN || secrets.SYNC_TOKEN }}
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN || secrets.ADMIN_GITHUB_TOKEN || secrets.SYNC_TOKEN }}
         run: |
           set -e
 
