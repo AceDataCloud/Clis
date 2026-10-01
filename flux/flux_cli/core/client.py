@@ -83,15 +83,11 @@ class FluxClient:
                 raise FluxAPIError(message=str(e)) from e
 
     # Convenience methods
-    def generate_image(
-        self, accept: str = "application/json", **kwargs: Any
-    ) -> dict[str, Any]:
+    def generate_image(self, accept: str = "application/json", **kwargs: Any) -> dict[str, Any]:
         """Generate image using the images endpoint."""
         return self.request("/flux/images", kwargs, accept=accept)
 
-    def edit_image(
-        self, accept: str = "application/json", **kwargs: Any
-    ) -> dict[str, Any]:
+    def edit_image(self, accept: str = "application/json", **kwargs: Any) -> dict[str, Any]:
         """Edit image using the images endpoint."""
         return self.request("/flux/images", kwargs, accept=accept)
 
