@@ -3,6 +3,7 @@
 import json
 from typing import Any
 
+import click
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -36,7 +37,7 @@ DEFAULT_ASPECT_RATIO = "16:9"
 
 def print_json(data: Any) -> None:
     """Print data as formatted JSON."""
-    console.print(json.dumps(data, indent=2, ensure_ascii=False))
+    click.echo(json.dumps(data, indent=2, ensure_ascii=False))
 
 
 def print_error(message: str) -> None:
