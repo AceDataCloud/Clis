@@ -53,6 +53,53 @@ class TestCreateCommand:
     """Tests for the create command."""
 
     @respx.mock
+    def test_launch_inputs_and_edit_inheritance(self, runner, mock_video_response, tmp_path):
+        route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        assets = tmp_path / "assets.json"
+        assets.write_text(
+            json.dumps(
+                [{"id": "hero", "role": "ui_screenshot", "url": "https://example.com/ui.png"}]
+            )
+        )
+        brand = tmp_path / "brand.json"
+        brand.write_text("null")
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "create",
+                "Launch",
+                "--action",
+                "edit",
+                "--ref-task-id",
+                "source",
+                "--style",
+                "apple-launch",
+                "--audio-mode",
+                "music",
+                "--assets-file",
+                str(assets),
+                "--brand-file",
+                str(brand),
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0, result.output
+        sent = json.loads(route.calls[0].request.content)
+        assert sent["assets"][0]["role"] == "ui_screenshot"
+        assert sent["brand"] is None and sent["audio_mode"] == "music"
+        assert "aspect" not in sent and "duration" not in sent and "voice" not in sent
+
+    def test_music_and_voice_conflict_fails_before_submission(self, runner):
+        result = runner.invoke(
+            cli, ["create", "Launch", "--audio-mode", "music", "--voice", "warm-female"]
+        )
+        assert result.exit_code == 2 and "cannot pin" in result.output
+
+    @respx.mock
     def test_create_json(self, runner, mock_video_response):
         respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
@@ -397,7 +444,11 @@ class TestCreateCommand:
                 "test-token",
                 "create",
                 "test",
-                *[option for _ in range(21) for option in ("--file-url", "https://example.com/ref")],
+                *[
+                    option
+                    for _ in range(21)
+                    for option in ("--file-url", "https://example.com/ref")
+                ],
             ],
         )
         assert result.exit_code != 0

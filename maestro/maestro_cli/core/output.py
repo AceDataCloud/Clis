@@ -43,6 +43,7 @@ DEFAULT_SCENARIO = "auto"
 # Available styles
 STYLES = [
     "auto",
+    "apple-launch",
     "cinematic",
     "glass",
     "luxury",

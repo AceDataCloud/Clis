@@ -41,7 +41,11 @@ class MaestroClient:
         request_timeout = timeout or self.timeout
 
         # Remove None values from payload
-        payload = {k: v for k, v in payload.items() if v is not None}
+        payload = {
+            k: v
+            for k, v in payload.items()
+            if v is not None or (endpoint == "/maestro/videos" and k in {"brand", "website_url"})
+        }
 
         with httpx.Client() as http_client:
             try:

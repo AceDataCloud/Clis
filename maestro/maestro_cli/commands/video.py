@@ -1,5 +1,8 @@
 """Video creation commands."""
 
+import json
+from pathlib import Path
+
 import click
 
 from maestro_cli.core.client import get_client
@@ -7,11 +10,6 @@ from maestro_cli.core.exceptions import MaestroError
 from maestro_cli.core.output import (
     ASPECT_RATIOS,
     DEFAULT_ACTION,
-    DEFAULT_ASPECT_RATIO,
-    DEFAULT_DURATION,
-    DEFAULT_SCENARIO,
-    DEFAULT_STYLE,
-    DEFAULT_VOICE,
     MAESTRO_ACTIONS,
     SCENARIOS,
     print_error,
@@ -52,39 +50,55 @@ from maestro_cli.core.output import (
 @click.option(
     "--aspect",
     type=click.Choice(ASPECT_RATIOS),
-    default=DEFAULT_ASPECT_RATIO,
-    show_default=True,
-    help="Output aspect ratio.",
+    default=None,
+    help="Output aspect ratio (new videos default to 9:16; edits inherit).",
 )
 @click.option(
     "--duration",
     type=click.IntRange(5, 300),
-    default=DEFAULT_DURATION,
-    show_default=True,
-    help="Target video length in seconds (5-300).",
+    default=None,
+    help="Target length in seconds, 5-300 (new videos default to 30; edits inherit).",
 )
 @click.option(
     "--scenario",
     type=click.Choice(SCENARIOS),
-    default=DEFAULT_SCENARIO,
-    show_default=True,
+    default=None,
     help="Production workflow: auto/narrated/captions/avatar/drama.",
 )
 @click.option(
     "--style",
     type=str,
-    default=DEFAULT_STYLE,
-    show_default=True,
-    help="Visual-style preset or custom style hint.",
+    default=None,
+    help="Visual style, including apple-launch, or a custom hint (edits inherit).",
 )
 @click.option(
     "--voice",
     type=str,
-    default=DEFAULT_VOICE,
-    show_default=True,
+    default=None,
     help="Narration voice timbre preset or a 32-char Fish reference_id.",
 )
 @click.option("--callback-url", default=None, help="Webhook callback URL.")
+@click.option(
+    "--audio-mode",
+    type=click.Choice(["auto", "narration", "music", "silent"]),
+    default=None,
+    help="Audio intent; music has no narration. Omit to inherit on edit.",
+)
+@click.option(
+    "--website-url", default=None, help="Public website source. An empty string clears it on edit."
+)
+@click.option(
+    "--assets-file",
+    type=click.Path(exists=True, dir_okay=False),
+    default=None,
+    help="JSON array of role-labeled assets; [] clears them on edit.",
+)
+@click.option(
+    "--brand-file",
+    type=click.Path(exists=True, dir_okay=False),
+    default=None,
+    help="JSON brand overrides; null clears them on edit.",
+)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def create(
@@ -94,12 +108,16 @@ def create(
     ref_task_id: str | None,
     file_urls: tuple[str, ...],
     langs: tuple[str, ...],
-    aspect: str,
-    duration: int,
-    scenario: str,
-    style: str,
-    voice: str,
+    aspect: str | None,
+    duration: int | None,
+    scenario: str | None,
+    style: str | None,
+    voice: str | None,
     callback_url: str | None,
+    audio_mode: str | None,
+    website_url: str | None,
+    assets_file: str | None,
+    brand_file: str | None,
     output_json: bool,
 ) -> None:
     """Create a Maestro AI video from a prompt.
@@ -125,12 +143,35 @@ def create(
     payload: dict[str, object] = {
         "prompt": prompt,
         "action": action,
+    }
+    for key, value in {
         "aspect": aspect,
         "duration": duration,
         "scenario": scenario,
         "style": style,
         "voice": voice,
-    }
+        "audio_mode": audio_mode,
+    }.items():
+        if value is not None:
+            payload[key] = value
+    if website_url is not None:
+        payload["website_url"] = website_url or None
+    for field, path in (("assets", assets_file), ("brand", brand_file)):
+        if path is None:
+            continue
+        try:
+            value = json.loads(Path(path).read_text(encoding="utf-8"))
+        except (ValueError, OSError) as exc:
+            raise click.UsageError(f"Cannot read {field} JSON: {exc}") from exc
+        if field == "assets" and (not isinstance(value, list) or len(value) + len(file_urls) > 20):
+            raise click.UsageError(
+                "assets must be an array; assets and file URLs support at most 20 combined items."
+            )
+        if field == "brand" and value is not None and not isinstance(value, dict):
+            raise click.UsageError("brand must be a JSON object or null.")
+        payload[field] = value
+    if audio_mode in {"music", "silent"} and voice not in (None, "auto"):
+        raise click.UsageError("music/silent modes cannot pin a narration voice.")
 
     if ref_task_id:
         payload["ref_task_id"] = ref_task_id
