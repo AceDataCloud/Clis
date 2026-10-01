@@ -100,6 +100,8 @@ def print_task_result(data: dict[str, Any]) -> None:
             for img in resp_data:
                 if img.get("image_url"):
                     table.add_row("Image URL", img["image_url"])
+                if img.get("video_url"):
+                    table.add_row("Video URL", img["video_url"])
         console.print(table)
         console.print()
         return
@@ -111,7 +113,7 @@ def print_task_result(data: dict[str, Any]) -> None:
             table = Table(show_header=False, box=None, padding=(0, 2))
             table.add_column("Field", style="bold cyan", width=15)
             table.add_column("Value")
-            for key in ["image_url", "model", "created_at"]:
+            for key in ["image_url", "video_url", "model", "created_at"]:
                 if item.get(key):
                     table.add_row(key.replace("_", " ").title(), str(item[key]))
             console.print(table)
@@ -134,6 +136,8 @@ def print_task_result(data: dict[str, Any]) -> None:
                 for img in resp_data:
                     if img.get("image_url"):
                         table.add_row("Image URL", img["image_url"])
+                    if img.get("video_url"):
+                        table.add_row("Video URL", img["video_url"])
             console.print(table)
             console.print()
         return

@@ -1,5 +1,7 @@
 """Tests for output formatting."""
 
+import pytest
+
 from flux_cli.core.output import (
     ASPECT_RATIOS,
     FLUX_MODELS,
@@ -148,3 +150,26 @@ class TestPrintTaskResult:
         print_task_result(data)
         captured = capsys.readouterr()
         assert "No data" in captured.out
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {
+            "id": "video-task",
+            "response": {"data": [{"video_url": "https://cdn.example/video.mp4"}]},
+        },
+        {"data": [{"video_url": "https://cdn.example/video.mp4"}]},
+        {
+            "items": [
+                {
+                    "id": "video-task",
+                    "response": {"data": [{"video_url": "https://cdn.example/video.mp4"}]},
+                }
+            ]
+        },
+    ],
+)
+def test_task_output_exposes_video_delivery_url(data, capsys):
+    print_task_result(data)
+    assert "https://cdn.example/video.mp4" in capsys.readouterr().out
