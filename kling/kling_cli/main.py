@@ -14,6 +14,14 @@ from dotenv import load_dotenv
 from kling_cli.commands.info import aspect_ratios, config, models
 from kling_cli.commands.lipsync import lip_sync, talking_photo
 from kling_cli.commands.motion import motion
+from kling_cli.commands.native import (
+    apparel,
+    goods_studio,
+    storyboard,
+    turbo,
+    video_commerce,
+    virtual_try_on,
+)
 from kling_cli.commands.task import task, tasks_batch, wait
 from kling_cli.commands.video import extend, generate, image_to_video
 
@@ -72,6 +80,13 @@ cli.add_command(models)
 cli.add_command(aspect_ratios)
 cli.add_command(config)
 
+
+cli.add_command(turbo)
+cli.add_command(storyboard)
+cli.add_command(apparel)
+cli.add_command(goods_studio)
+cli.add_command(video_commerce)
+cli.add_command(virtual_try_on)
 
 if __name__ == "__main__":
     cli()
