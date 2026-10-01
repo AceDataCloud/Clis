@@ -127,6 +127,10 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## FLUX 3 video
 
-Save a JSON request such as `{"mode":"t2v","prompt":"Waves at sunset","duration":5,"generate_audio":false}` in `request.json`, then run `flux video --request-file request.json`. The request is validated before submission. Use `i2v` with `keyframes`, `v2v` with `start_video`, or `draft_enhance` with an owned platform `draft_task_id`. Draft availability is temporary.
+Save a JSON request such as `{"action":"generate","mode":"t2v","prompt":"Waves at sunset","duration":5,"generate_audio":false}` in `request.json`, then run `flux video --request-file request.json`. The request is validated before submission. Use `i2v` with `keyframes`, `v2v` with `start_video`, or `draft_enhance` with an owned platform `draft_task_id`. Draft availability is temporary.
 
 Use `flux video-edit --request-file edit.json` with `video` and `prompt`, or `flux video-upscale --request-file upscale.json` with `input_video`, optional `upscale_factor` (1.5–3) and `creativity` (0/1). Upscale charges depend on actual output MP-seconds and frame rate. Commands output JSON and default to asynchronous submission; use `flux task`/`flux wait` to retrieve final video delivery. Set `async=false` in the request to wait synchronously.
+
+All video operations use `POST /flux/videos`: `action=generate` (default), `action=edit`, or `action=upscale`. Generation additionally uses `mode=t2v/i2v/v2v/draft_enhance`. Each operation accepts only its own fields. The CLI utility commands and MCP utility tools set their matching action automatically.
+
+The unified `flux video --request-file request.json` command also accepts editing and upscaling JSON when `action` is set explicitly. The `video-edit` and `video-upscale` commands remain convenient ways to submit those actions to the same endpoint.

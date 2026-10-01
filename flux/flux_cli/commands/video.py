@@ -13,15 +13,27 @@ from flux_cli.core.output import print_error, print_json
 from flux_cli.core.video_types import FluxVideoRequest, VideoEditRequest, VideoUpscaleRequest
 
 
-def _request(ctx: click.Context, request_file: Path, schema: Any, endpoint: str) -> None:
+def _request(ctx: click.Context, request_file: Path, schema: Any) -> None:
     try:
         body = json.loads(request_file.read_text(encoding="utf-8"))
+        if schema is None:
+            if not isinstance(body, dict):
+                raise ValueError("request must be an object")
+            action = body.get("action", "generate")
+            schemas = {
+                "generate": FluxVideoRequest,
+                "edit": VideoEditRequest,
+                "upscale": VideoUpscaleRequest,
+            }
+            if not isinstance(action, str) or action not in schemas:
+                raise ValueError("action must be generate, edit or upscale")
+            schema = schemas[action]
         request = TypeAdapter(schema).validate_python(body)
     except (OSError, ValueError, ValidationError) as error:
         raise click.BadParameter(str(error), param_hint="--request-file") from error
     try:
         result = get_client(ctx.obj.get("token")).request(
-            endpoint, request.model_dump(mode="json", by_alias=True, exclude_none=True)
+            "/flux/videos", request.model_dump(mode="json", by_alias=True, exclude_none=True)
         )
         print_json(result)
     except FluxError as error:
@@ -35,8 +47,8 @@ def _request(ctx: click.Context, request_file: Path, schema: Any, endpoint: str)
 )
 @click.pass_context
 def video(ctx: click.Context, request_file: Path) -> None:
-    """Generate FLUX 3 video from a JSON request: t2v, i2v, v2v or draft_enhance. Poll with task/wait."""
-    _request(ctx, request_file, FluxVideoRequest, "/flux/videos")
+    """Process FLUX video JSON: action=generate (default), edit or upscale. Poll with task/wait."""
+    _request(ctx, request_file, None)
 
 
 @click.command()
@@ -46,7 +58,7 @@ def video(ctx: click.Context, request_file: Path) -> None:
 @click.pass_context
 def video_edit(ctx: click.Context, request_file: Path) -> None:
     """Edit a video using a JSON request with video and prompt. Poll with task/wait."""
-    _request(ctx, request_file, VideoEditRequest, "/flux/video-edit")
+    _request(ctx, request_file, VideoEditRequest)
 
 
 @click.command()
@@ -56,4 +68,4 @@ def video_edit(ctx: click.Context, request_file: Path) -> None:
 @click.pass_context
 def video_upscale(ctx: click.Context, request_file: Path) -> None:
     """Upscale a video from JSON. Billing uses output MP-seconds and FPS. Poll with task/wait."""
-    _request(ctx, request_file, VideoUpscaleRequest, "/flux/video-upscale")
+    _request(ctx, request_file, VideoUpscaleRequest)
