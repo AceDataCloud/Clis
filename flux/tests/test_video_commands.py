@@ -24,18 +24,6 @@ from flux_cli.main import cli
             },
         ),
         ("video", "generate", {"mode": "draft_enhance", "draft_task_id": "owned-platform-id"}),
-        (
-            "video-edit",
-            "edit",
-            {"video": "https://example.com/v.mp4", "prompt": "edit"},
-        ),
-        (
-            "video-upscale",
-            "upscale",
-            {"input_video": "https://example.com/v.mp4", "creativity": 0},
-        ),
-        ("video", "edit", {"action": "edit", "video": "v", "prompt": "edit"}),
-        ("video", "upscale", {"action": "upscale", "input_video": "v", "creativity": 0}),
     ],
 )
 @respx.mock
@@ -71,6 +59,8 @@ def test_invalid_private_draft_never_dispatches(tmp_path):
     "body",
     [
         {"action": "upsale", "input_video": "v"},
+        {"action": "edit", "video": "v", "prompt": "edit"},
+        {"action": "upscale", "input_video": "v", "creativity": 0},
         {"action": "edit", "video": "v", "prompt": "edit", "mode": "t2v"},
         {"video": "v", "prompt": "edit"},
         {"action": [], "input_video": "v"},
@@ -84,4 +74,13 @@ def test_invalid_action_or_mixed_parameters_never_dispatch(body, tmp_path):
         cli, ["--token", "test", "video", "--request-file", str(request_file)]
     )
     assert result.exit_code != 0
+    assert len(respx.calls) == 0
+
+
+@pytest.mark.parametrize("command", ["video-edit", "video-upscale"])
+@respx.mock
+def test_unpublished_commands_are_not_available(command):
+    result = CliRunner().invoke(cli, [command, "--help"])
+    assert result.exit_code != 0
+    assert "No such command" in result.output
     assert len(respx.calls) == 0

@@ -10,25 +10,13 @@ from pydantic import TypeAdapter, ValidationError
 from flux_cli.core.client import get_client
 from flux_cli.core.exceptions import FluxError
 from flux_cli.core.output import print_error, print_json
-from flux_cli.core.video_types import FluxVideoRequest, VideoEditRequest, VideoUpscaleRequest
+from flux_cli.core.video_types import FluxVideoRequest
 
 
-def _request(ctx: click.Context, request_file: Path, schema: Any) -> None:
+def _request(ctx: click.Context, request_file: Path) -> None:
     try:
         body = json.loads(request_file.read_text(encoding="utf-8"))
-        if schema is None:
-            if not isinstance(body, dict):
-                raise ValueError("request must be an object")
-            action = body.get("action", "generate")
-            schemas = {
-                "generate": FluxVideoRequest,
-                "edit": VideoEditRequest,
-                "upscale": VideoUpscaleRequest,
-            }
-            if not isinstance(action, str) or action not in schemas:
-                raise ValueError("action must be generate, edit or upscale")
-            schema = schemas[action]
-        request = TypeAdapter(schema).validate_python(body)
+        request: Any = TypeAdapter(FluxVideoRequest).validate_python(body)
     except (OSError, ValueError, ValidationError) as error:
         raise click.BadParameter(str(error), param_hint="--request-file") from error
     try:
@@ -47,25 +35,5 @@ def _request(ctx: click.Context, request_file: Path, schema: Any) -> None:
 )
 @click.pass_context
 def video(ctx: click.Context, request_file: Path) -> None:
-    """Process FLUX video JSON: action=generate (default), edit or upscale. Poll with task/wait."""
-    _request(ctx, request_file, None)
-
-
-@click.command()
-@click.option(
-    "--request-file", type=click.Path(exists=True, dir_okay=False, path_type=Path), required=True
-)
-@click.pass_context
-def video_edit(ctx: click.Context, request_file: Path) -> None:
-    """Edit a video using a JSON request with video and prompt. Poll with task/wait."""
-    _request(ctx, request_file, VideoEditRequest)
-
-
-@click.command()
-@click.option(
-    "--request-file", type=click.Path(exists=True, dir_okay=False, path_type=Path), required=True
-)
-@click.pass_context
-def video_upscale(ctx: click.Context, request_file: Path) -> None:
-    """Upscale a video from JSON. Billing uses output MP-seconds and FPS. Poll with task/wait."""
-    _request(ctx, request_file, VideoUpscaleRequest)
+    """Generate FLUX videos from JSON. Poll with task/wait."""
+    _request(ctx, request_file)
