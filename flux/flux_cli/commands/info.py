@@ -10,7 +10,7 @@ from flux_cli.core.output import console, print_models
 def models() -> None:
     """List available Flux models."""
     print_models()
-    console.print("Video: flux-3 — use video, video-edit or video-upscale with --request-file.")
+    console.print("Video: flux-3 — use video with --request-file.")
 
 
 @click.command()
