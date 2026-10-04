@@ -137,7 +137,16 @@ class TestChatCommand:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "--logprobs", "--top-logprobs", "5", "--json"],
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "--logprobs",
+                "--top-logprobs",
+                "5",
+                "--json",
+            ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
@@ -269,9 +278,7 @@ class TestVideoCommand:
         respx.post("https://api.acedata.cloud/grok/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "video", "A sunset"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "video", "A sunset"])
         assert result.exit_code == 0
         assert "test-task-123" in result.output
 
@@ -283,9 +290,12 @@ class TestVideoCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
-                "video", "test",
-                "-m", "grok-imagine-video:official",
+                "--token",
+                "test-token",
+                "video",
+                "test",
+                "-m",
+                "grok-imagine-video:official",
                 "--json",
             ],
         )
@@ -301,9 +311,11 @@ class TestVideoCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "video",
-                "--image-url", "https://example.com/photo.jpg",
+                "--image-url",
+                "https://example.com/photo.jpg",
                 "--json",
             ],
         )
@@ -329,9 +341,7 @@ class TestVideoCommand:
         route = respx.post("https://api.acedata.cloud/grok/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "video", "test", "--async", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "video", "test", "--async", "--json"])
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["async"] is True
@@ -349,9 +359,7 @@ class TestTaskCommands:
         respx.post("https://api.acedata.cloud/grok/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "task", "test-task-123", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "task", "test-task-123", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["id"] == "test-task-123"
@@ -361,9 +369,7 @@ class TestTaskCommands:
         respx.post("https://api.acedata.cloud/grok/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "task", "test-task-123"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "task", "test-task-123"])
         assert result.exit_code == 0
         assert "test-task-123" in result.output
 

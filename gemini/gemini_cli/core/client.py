@@ -25,8 +25,7 @@ class GeminiClient:
         """Get request headers with authentication."""
         if not self.api_token:
             raise GeminiAuthError(
-                "API token not configured. "
-                "Set ACEDATACLOUD_API_TOKEN or use --token option."
+                "API token not configured. Set ACEDATACLOUD_API_TOKEN or use --token option."
             )
         return {
             "accept": accept,
@@ -98,20 +97,21 @@ class GeminiClient:
         headers = self._get_headers("text/event-stream")
 
         try:
-            with httpx.Client() as http_client, http_client.stream(
-                "POST",
-                url,
-                json=payload,
-                headers=headers,
-                timeout=self.timeout,
-            ) as response:
+            with (
+                httpx.Client() as http_client,
+                http_client.stream(
+                    "POST",
+                    url,
+                    json=payload,
+                    headers=headers,
+                    timeout=self.timeout,
+                ) as response,
+            ):
                 if response.status_code == 401:
                     raise GeminiAuthError("Invalid API token")
 
                 if response.status_code == 403:
-                    raise GeminiAuthError(
-                        "Access denied. Check your API permissions."
-                    )
+                    raise GeminiAuthError("Access denied. Check your API permissions.")
 
                 response.raise_for_status()
                 yield from response.iter_lines()
@@ -148,13 +148,16 @@ class GeminiClient:
         headers = self._get_headers("text/event-stream")
 
         try:
-            with httpx.Client() as http_client, http_client.stream(
-                "POST",
-                url,
-                json=payload,
-                headers=headers,
-                timeout=self.timeout,
-            ) as response:
+            with (
+                httpx.Client() as http_client,
+                http_client.stream(
+                    "POST",
+                    url,
+                    json=payload,
+                    headers=headers,
+                    timeout=self.timeout,
+                ) as response,
+            ):
                 if response.status_code == 401:
                     raise GeminiAuthError("Invalid API token")
 
@@ -180,9 +183,7 @@ class GeminiClient:
                 raise
             raise GeminiAPIError(message=str(e)) from e
 
-    def generate_video(
-        self, accept: str = "application/json", **kwargs: Any
-    ) -> dict[str, Any]:
+    def generate_video(self, accept: str = "application/json", **kwargs: Any) -> dict[str, Any]:
         """Generate a video."""
         return self.request("/gemini/videos", kwargs, accept=accept)
 

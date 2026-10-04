@@ -138,7 +138,9 @@ from grok_cli.core.output import (
     default=False,
     help="Whether to store the output of this completion request.",
 )
-@click.option("--stream", is_flag=True, default=False, help="Stream partial chat completion events.")
+@click.option(
+    "--stream", is_flag=True, default=False, help="Stream partial chat completion events."
+)
 @click.option(
     "--response-format",
     default=None,
@@ -157,7 +159,7 @@ from grok_cli.core.output import (
 @click.option(
     "--stream-options",
     default=None,
-    help='Streaming options as a JSON object (e.g. \'{"include_usage": true}\').',
+    help="Streaming options as a JSON object (e.g. '{\"include_usage\": true}').",
 )
 @click.option(
     "--metadata",

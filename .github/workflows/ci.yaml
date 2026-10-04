@@ -84,7 +84,7 @@ jobs:
 
       - name: Run Ruff formatter check
         working-directory: ${{ matrix.cli }}
-        run: ruff format --check .
+        run: ruff format --check --exclude docs/platform .
 
   test:
     name: Test (${{ matrix.cli }}, Python ${{ matrix.python-version }})

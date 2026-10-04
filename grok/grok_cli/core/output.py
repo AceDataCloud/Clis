@@ -200,7 +200,9 @@ def print_video_models() -> None:
     table.add_column("Model", style="bold cyan")
     table.add_column("Notes")
 
-    table.add_row("grok-imagine-video-1.5-fast:reverse", "Grok Imagine Video 1.5 Fast Reverse (default)")
+    table.add_row(
+        "grok-imagine-video-1.5-fast:reverse", "Grok Imagine Video 1.5 Fast Reverse (default)"
+    )
     table.add_row("grok-imagine-video:reverse", "Grok Imagine Video Reverse")
     table.add_row("grok-imagine-video:official", "Grok Imagine Video Official")
     table.add_row("grok-imagine-video-1.5:official", "Grok Imagine Video 1.5 Official")
