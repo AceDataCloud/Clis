@@ -1,9 +1,5 @@
 # Kling CLI
 
-<!-- platform-reference:start -->
-Read the [current API reference](docs/platform/README.md) for endpoints, request fields and the backend integration guides before using optional or recently added capabilities.
-<!-- platform-reference:end -->
-
 A command-line tool for Kling AI Video Generation via [AceDataCloud](https://platform.acedata.cloud).
 
 ## Installation

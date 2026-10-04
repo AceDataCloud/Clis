@@ -1,9 +1,5 @@
 # Producer CLI
 
-<!-- platform-reference:start -->
-Read the [current API reference](docs/platform/README.md) for endpoints, request fields and the backend integration guides before using optional or recently added capabilities.
-<!-- platform-reference:end -->
-
 A command-line tool for AI music generation using the Producer service via AceDataCloud API.
 
 ## Installation
