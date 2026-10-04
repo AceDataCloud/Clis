@@ -1,5 +1,9 @@
 # Kling CLI
 
+<!-- platform-reference:start -->
+Read the [current API reference](docs/platform/README.md) for endpoints, request fields and the backend integration guides before using optional or recently added capabilities.
+<!-- platform-reference:end -->
+
 A command-line tool for Kling AI Video Generation via [AceDataCloud](https://platform.acedata.cloud).
 
 ## Installation
@@ -70,8 +74,6 @@ MIT
 
 Use `apparel`, `goods-studio`, `video-commerce` and `virtual-try-on` with `--request-file` for structured contents/settings. Product studio requires ref_image and goods_title, an aspect ratio and duration 15/30/60. Try-on requires product_image and person_image URLs. Creator video needs one avatar and a speech_script. Commands output JSON and submit asynchronously by default; use existing task/wait commands for final delivery, or set `async=false` in the request. Billing follows the selected tier and actual output duration or image count.
 
-## Owned assets
+## Reference inputs
 
-`kling elements --request-file request.json` manages owned/verified preset platform IDs with action=list/presets/retrieve/delete. Custom element creation is unavailable. `kling voices --request-file request.json` also accepts `{"action":"create","voice_name":"Narrator","voice_url":"https://example.com/voice.mp3"}`; the recording must contain one clear voice for 5–30 seconds, and creation costs 0.07 Credits.
-
-`kling asset-video --request-file request.json` accepts platform `element_list` for V3/V3 Omni/O1 or `voice_list` for V2.6 pro with native audio enabled. Voice prompts cite the selected voices with `<<<voice_1>>>`/`<<<voice_2>>>`; specified voices cost 1.68 Credits/second. Server-side ownership checks apply; presets cannot be deleted. Existing task/wait commands retrieve asynchronous results.
+Use `element_list` and `voice_list` only with already valid platform references and the supported model combinations in the current backend guide. Standalone asset creation and management are not published.

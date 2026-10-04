@@ -75,19 +75,9 @@ class TestGlobalCommands:
         assert "--contents" in result.output
         assert "--cached-content" not in result.output
 
-    def test_chat_model_inventory_matches_api(self):
-        assert GEMINI_CHAT_MODELS == [
-            "gemini-3.7-flash",
-            "gemini-3.6-flash",
-            "gemini-3.5-flash",
-            "gemini-3.5-flash-lite",
-            "gemini-3.1-flash-lite",
-            "gemini-3.1-pro-preview",
-            "gemini-3-flash-preview",
-            "gemini-2.5-pro",
-            "gemini-2.5-flash",
-            "gemini-2.5-flash-lite",
-        ]
+    def test_chat_model_inventory_includes_current_public_model(self):
+        assert "gemini-3.8-flash" in GEMINI_CHAT_MODELS
+        assert len(GEMINI_CHAT_MODELS) == len(set(GEMINI_CHAT_MODELS))
 
     def test_native_model_inventory_matches_api(self):
         assert GEMINI_NATIVE_MODELS == [

@@ -11,16 +11,6 @@ from kling_cli.main import cli
 @pytest.mark.parametrize(
     "command,path,body",
     [
-        ("elements", "/kling/elements", {"action": "presets", "page_num": 2}),
-        (
-            "voices",
-            "/kling/voices",
-            {
-                "action": "create",
-                "voice_name": "Narrator",
-                "voice_url": "https://example.com/v.mp3",
-            },
-        ),
         (
             "asset-video",
             "/kling/videos",

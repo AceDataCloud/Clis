@@ -36,17 +36,6 @@ from kling_cli.main import cli
             },
         ),
         (
-            "apparel",
-            "/kling/apparel",
-            {
-                "contents": [
-                    {"type": "product_info", "text": "shirt"},
-                    {"type": "source_video", "url": "https://example.com/v.mp4"},
-                    {"type": "product_image", "url": "https://example.com/p.png"},
-                ]
-            },
-        ),
-        (
             "video-commerce",
             "/kling/video-commerce",
             {
@@ -55,17 +44,6 @@ from kling_cli.main import cli
                     {"type": "speech_script", "text": "Hello"},
                 ],
                 "settings": {"bgm_enabled": False},
-            },
-        ),
-        (
-            "virtual-try-on",
-            "/kling/virtual-try-on",
-            {
-                "contents": [
-                    {"type": "product_image", "url": "https://example.com/p.png"},
-                    {"type": "person_image", "url": "https://example.com/person.png"},
-                ],
-                "settings": {"keep_face": False},
             },
         ),
     ],
@@ -95,3 +73,10 @@ def test_turbo_audio_off_rejected_before_submission(tmp_path):
     result = CliRunner().invoke(cli, ["--token", "test", "turbo", "--request-file", str(p)])
     assert result.exit_code != 0
     assert len(respx.calls) == 0
+
+
+@pytest.mark.parametrize("command", ["apparel", "virtual-try-on", "elements", "voices"])
+def test_unpublished_commands_are_not_discoverable(command):
+    result = CliRunner().invoke(cli, ["--token", "test", command, "--help"])
+    assert result.exit_code != 0
+    assert "No such command" in result.output

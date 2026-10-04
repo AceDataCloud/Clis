@@ -1,5 +1,9 @@
 # Luma CLI
 
+<!-- platform-reference:start -->
+Read the [current API reference](docs/platform/README.md) for endpoints, request fields and the backend integration guides before using optional or recently added capabilities.
+<!-- platform-reference:end -->
+
 [![PyPI version](https://img.shields.io/pypi/v/luma-pro-cli.svg)](https://pypi.org/project/luma-pro-cli/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/luma-pro-cli.svg)](https://pypi.org/project/luma-pro-cli/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)

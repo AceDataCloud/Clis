@@ -12,6 +12,7 @@ console = Console()
 
 # Available Grok chat models
 GROK_CHAT_MODELS = [
+    "grok-4.7",
     "grok-4.5",
     "grok-4",
     "grok-3",

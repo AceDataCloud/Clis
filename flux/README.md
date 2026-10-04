@@ -1,5 +1,9 @@
 # Flux CLI
 
+<!-- platform-reference:start -->
+Read the [current API reference](docs/platform/README.md) for endpoints, request fields and the backend integration guides before using optional or recently added capabilities.
+<!-- platform-reference:end -->
+
 A command-line tool for AI image generation and editing using [Flux](https://blackforestlabs.ai/) through the [AceDataCloud](https://platform.acedata.cloud) platform.
 
 ## Features
