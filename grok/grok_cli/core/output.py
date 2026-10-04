@@ -12,6 +12,7 @@ console = Console()
 
 # Available Grok chat models
 GROK_CHAT_MODELS = [
+    "grok-4.7",
     "grok-4.5",
     "grok-4",
     "grok-3",
@@ -199,7 +200,9 @@ def print_video_models() -> None:
     table.add_column("Model", style="bold cyan")
     table.add_column("Notes")
 
-    table.add_row("grok-imagine-video-1.5-fast:reverse", "Grok Imagine Video 1.5 Fast Reverse (default)")
+    table.add_row(
+        "grok-imagine-video-1.5-fast:reverse", "Grok Imagine Video 1.5 Fast Reverse (default)"
+    )
     table.add_row("grok-imagine-video:reverse", "Grok Imagine Video Reverse")
     table.add_row("grok-imagine-video:official", "Grok Imagine Video Official")
     table.add_row("grok-imagine-video-1.5:official", "Grok Imagine Video 1.5 Official")

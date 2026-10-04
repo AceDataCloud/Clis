@@ -36,7 +36,7 @@ def mock_video_response() -> dict:
             "id": "task-video-123",
             "state": "succeeded",
             "video_url": "https://example.com/video.mp4",
-        }
+        },
     }
 
 
@@ -48,5 +48,5 @@ def mock_task_response() -> dict:
             "id": "task-video-123",
             "state": "succeeded",
             "video_url": "https://example.com/video.mp4",
-        }
+        },
     }

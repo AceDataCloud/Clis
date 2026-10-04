@@ -38,11 +38,15 @@ def _build_payload(
 
 
 def _content_options(command):
-    command = click.option("--safety-settings", default=None, help="Safety settings as a JSON array.")(
+    command = click.option(
+        "--safety-settings", default=None, help="Safety settings as a JSON array."
+    )(command)
+    command = click.option("--tool-config", default=None, help="Tool config as a JSON object.")(
         command
     )
-    command = click.option("--tool-config", default=None, help="Tool config as a JSON object.")(command)
-    command = click.option("--tools", default=None, help="Tool definitions as a JSON array.")(command)
+    command = click.option("--tools", default=None, help="Tool definitions as a JSON array.")(
+        command
+    )
     command = click.option(
         "--generation-config",
         default=None,

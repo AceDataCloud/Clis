@@ -137,7 +137,9 @@ from gemini_cli.core.output import (
     flag_value=False,
     help="Disable parallel function calling during tool use.",
 )
-@click.option("--stream", is_flag=True, default=False, help="Stream partial chat completion events.")
+@click.option(
+    "--stream", is_flag=True, default=False, help="Stream partial chat completion events."
+)
 @click.option(
     "--response-format",
     default=None,
@@ -156,7 +158,7 @@ from gemini_cli.core.output import (
 @click.option(
     "--stream-options",
     default=None,
-    help='Streaming options as a JSON object (e.g. \'{"include_usage": true}\').',
+    help="Streaming options as a JSON object (e.g. '{\"include_usage\": true}').",
 )
 @click.option(
     "--metadata",
