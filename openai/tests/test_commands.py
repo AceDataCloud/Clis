@@ -397,6 +397,13 @@ class TestChatCommands:
 class TestEmbedCommands:
     """Tests for the embed command."""
 
+    def test_retired_ada_model_is_not_offered(self, runner):
+        help_result = runner.invoke(cli, ["embed", "--help"])
+        assert "text-embedding-ada-002" not in help_result.output
+
+        result = runner.invoke(cli, ["--token", "test-token", "embed", "Hello", "--model", "text-embedding-ada-002"])
+        assert result.exit_code != 0
+
     @respx.mock
     def test_embed_json(self, runner, mock_embedding_response):
         respx.post("https://api.acedata.cloud/openai/embeddings").mock(
