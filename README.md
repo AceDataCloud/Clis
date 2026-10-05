@@ -35,11 +35,9 @@ The mapping between subdirectories and standalone repos is defined in [`sync.yam
 
 ## Contract updates
 
-`sync-from-platformbackend.yml` consumes `platform-contracts-updated` at an exact
-PlatformBackend commit, verifies its compiled bundle, and opens a scoped parity
-issue for mapped CLI packages. Hand-written commands are updated through normal
-PRs and CI. Docs is a published reference; it no longer triggers a parallel code
-sync. Sync jobs do not close other PRs, poll for agent completion, or force merges.
+PlatformBackend's daily ecosystem CronJob prepares incremental capability PRs
+using a pinned Backend source. Existing CI and human review gate each update.
+The previous dispatch/Copilot sync workflows are retired.
 
 ## Test discovery
 
@@ -47,3 +45,11 @@ The ADC Docker build runs `pytest`.
 Tests requiring real API credentials must use `pytest.mark.integration`;
 their filenames do not need to be listed in the Dockerfile. Other CLI packages
 continue to use their existing automatic pytest discovery.
+
+## Daily capability updates
+
+PlatformBackend `ecosystem.py` is the only scheduled coordinator.
+One daily Kubernetes Job reviews Backend docs and API changes with Claude Code,
+updates existing files, and creates or updates one reviewable PR per repository.
+It never merges PRs or duplicates the Backend guide tree. Normal CI and review
+remain required; publication and sub-repository mirroring run after merge.
