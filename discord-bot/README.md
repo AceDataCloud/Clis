@@ -16,9 +16,9 @@ pip install discord-bot-cli
 
 ## Setup
 
-1. Deploy your Discord Agent Proxy instance at [platform.acedata.cloud](https://platform.acedata.cloud/console/applications)
-2. Configure your Discord account credentials in the console
-3. Note your service URL and access token
+1. Create a Discord Agent Proxy application at [platform.acedata.cloud](https://platform.acedata.cloud/console/applications) and activate a subscription. Instance resources are configured automatically.
+2. Configure your Discord account credentials in the console and deploy.
+3. Copy your service URL and access token from the account card on the application's Overview tab. A running container does not guarantee that the Discord account is connected.
 
 ```bash
 export DISCORD_BOT_BASE_URL=https://discord-bot-xxxxxxxxxxxx.app.acedata.cloud
@@ -26,6 +26,8 @@ export DISCORD_BOT_TOKEN=your_access_token
 ```
 
 Or copy `.env.example` to `.env` and fill in the values.
+
+Then run `discord-bot whoami` to verify the connected account. The application's Documents tab also provides REST request schemas and an OpenAPI JSON download; the export contains the instance address but not the access token.
 
 ## Usage
 

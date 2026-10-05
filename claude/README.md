@@ -38,6 +38,28 @@ claude config
 - `models` — List available Claude models
 - `config` — Show current configuration
 
+## Thinking options
+
+`messages` and `count-tokens` pass thinking settings through to the selected model without fixed mode/display enums, a minimum budget, or model-specific combination rules. The model determines which values and combinations it supports; parameter errors are returned rather than silently rewriting the request.
+
+Use `--thinking` for a JSON object, including extension fields. The convenience flags `--thinking-type`, `--thinking-budget-tokens`, and `--thinking-display` override only their corresponding fields if supplied alongside `--thinking`. `messages --output-config` likewise preserves JSON fields and effort values.
+
+```bash
+claude messages "Explain the tradeoffs" --max-tokens 16000 \
+  --thinking '{"type":"adaptive","display":"summarized"}' \
+  --output-config '{"effort":"high"}'
+
+claude messages "Explain the tradeoffs" --max-tokens 16000 \
+  --thinking-type adaptive --thinking-display updates \
+  --anthropic-beta thinking-display-updates-2026-08-18
+
+claude count-tokens "Explain the tradeoffs" \
+  --thinking '{"type":"adaptive","display":"updates"}' \
+  --anthropic-beta thinking-display-updates-2026-08-18
+```
+
+`display=updates` is a beta mode that requires the `anthropic-beta: thinking-display-updates-2026-08-18` header. Supply it with `--anthropic-beta` (comma-separated values can be used for multiple betas); the CLI does not add it automatically. Actual support and output depend on the selected model. Thinking and final text share the `max_tokens` output budget, so allow enough tokens for both.
+
 ## Get API Token
 
 Visit [https://platform.acedata.cloud](https://platform.acedata.cloud) to get your API token.

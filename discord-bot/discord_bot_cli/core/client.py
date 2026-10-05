@@ -181,9 +181,7 @@ class DiscordBotClient:
             params={"q": query, "limit": limit},
         )
 
-    def edit_message(
-        self, channel_id: str, message_id: str, content: str
-    ) -> dict[str, Any]:
+    def edit_message(self, channel_id: str, message_id: str, content: str) -> dict[str, Any]:
         """Edit a message."""
         return self._request(
             "PATCH",
@@ -198,9 +196,7 @@ class DiscordBotClient:
             f"/api/channels/{channel_id}/messages/{message_id}",
         )
 
-    def add_reaction(
-        self, channel_id: str, message_id: str, emoji: str
-    ) -> dict[str, Any]:
+    def add_reaction(self, channel_id: str, message_id: str, emoji: str) -> dict[str, Any]:
         """Add a reaction to a message."""
         return self._request(
             "POST",

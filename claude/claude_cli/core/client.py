@@ -37,6 +37,8 @@ class ClaudeClient:
         endpoint: str,
         payload: dict[str, Any],
         timeout: float | None = None,
+        *,
+        anthropic_beta: str | None = None,
     ) -> dict[str, Any]:
         """Make a POST request to the AceDataCloud API."""
         url = f"{self.base_url}{endpoint}"
@@ -44,13 +46,16 @@ class ClaudeClient:
 
         # Remove None values from payload
         payload = {k: v for k, v in payload.items() if v is not None}
+        headers = self._get_headers()
+        if anthropic_beta is not None:
+            headers["anthropic-beta"] = anthropic_beta
 
         with httpx.Client() as http_client:
             try:
                 response = http_client.post(
                     url,
                     json=payload,
-                    headers=self._get_headers(),
+                    headers=headers,
                     timeout=request_timeout,
                 )
 
@@ -87,13 +92,13 @@ class ClaudeClient:
         """Send a chat completion request (OpenAI-compatible endpoint)."""
         return self.request("/v1/chat/completions", kwargs)
 
-    def messages(self, **kwargs: Any) -> dict[str, Any]:
+    def messages(self, *, anthropic_beta: str | None = None, **kwargs: Any) -> dict[str, Any]:
         """Send a messages request (Claude native API)."""
-        return self.request("/v1/messages", kwargs)
+        return self.request("/v1/messages", kwargs, anthropic_beta=anthropic_beta)
 
-    def count_tokens(self, **kwargs: Any) -> dict[str, Any]:
+    def count_tokens(self, *, anthropic_beta: str | None = None, **kwargs: Any) -> dict[str, Any]:
         """Count tokens for a messages request."""
-        return self.request("/v1/messages/count_tokens", kwargs)
+        return self.request("/v1/messages/count_tokens", kwargs, anthropic_beta=anthropic_beta)
 
 
 def get_client(token: str | None = None) -> ClaudeClient:

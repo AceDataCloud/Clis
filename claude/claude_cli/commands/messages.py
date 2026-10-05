@@ -64,21 +64,27 @@ from claude_cli.core.output import (
 )
 @click.option(
     "--thinking-type",
-    type=click.Choice(["enabled", "disabled", "adaptive"]),
+    type=str,
     default=None,
-    help="Extended thinking mode: enabled, disabled, or adaptive.",
+    help="Thinking mode passed through to the model (e.g. adaptive, enabled, disabled).",
 )
 @click.option(
     "--thinking-budget-tokens",
     default=None,
-    type=click.IntRange(min=1024),
-    help="Token budget for extended thinking (required when --thinking-type=enabled, min 1024).",
+    type=int,
+    help="Thinking token budget passed through to the model.",
 )
 @click.option(
     "--thinking-display",
-    type=click.Choice(["summarized", "omitted"]),
+    type=str,
     default=None,
-    help="Display mode for enabled or adaptive thinking.",
+    help="Thinking display mode passed through to the model (e.g. summarized, omitted, updates).",
+)
+@click.option("--thinking", default=None, help="Thinking configuration as a JSON object.")
+@click.option(
+    "--anthropic-beta",
+    default=None,
+    help="Anthropic beta header value (comma-separated for multiple betas).",
 )
 @click.option(
     "--metadata", default=None, help='Metadata as a JSON object (e.g. \'{"user_id":"u1"}\').'
@@ -103,6 +109,8 @@ def messages(
     thinking_type: str | None,
     thinking_budget_tokens: int | None,
     thinking_display: str | None,
+    thinking: str | None,
+    anthropic_beta: str | None,
     metadata: str | None,
     stream: bool,
     tools: str | None,
@@ -126,26 +134,18 @@ def messages(
     client = get_client(ctx.obj.get("token"))
     msg_list = [{"role": "user", "content": prompt}]
 
-    thinking: dict[str, str | int] | None = None
-    if thinking_type is not None:
-        if thinking_type == "enabled":
-            if thinking_budget_tokens is None:
-                raise click.UsageError(
-                    "--thinking-budget-tokens is required when --thinking-type=enabled"
-                )
-            thinking = {"type": thinking_type, "budget_tokens": thinking_budget_tokens}
-        else:
-            thinking = {"type": thinking_type}
-        if thinking_display is not None:
-            if thinking_type == "disabled":
-                raise click.UsageError(
-                    "--thinking-display is only valid with enabled or adaptive thinking"
-                )
-            thinking["display"] = thinking_display
-    elif thinking_display is not None:
-        raise click.UsageError("--thinking-display requires --thinking-type")
-
     try:
+        parsed_thinking = parse_json_object(thinking, "--thinking")
+        thinking_options = {
+            "type": thinking_type,
+            "budget_tokens": thinking_budget_tokens,
+            "display": thinking_display,
+        }
+        for key, value in thinking_options.items():
+            if value is not None:
+                if parsed_thinking is None:
+                    parsed_thinking = {}
+                parsed_thinking[key] = value
         parsed_metadata = parse_json_object(metadata, "--metadata")
         parsed_tools = parse_json_array(tools, "--tools")
         parsed_tool_choice = parse_json_object(tool_choice, "--tool-choice")
@@ -168,13 +168,13 @@ def messages(
         "top_p": top_p,
         "top_k": top_k,
         "stop_sequences": list(stop_sequences) if stop_sequences else None,
-        "thinking": thinking,
+        "thinking": parsed_thinking,
         "output_config": parsed_output_config,
         "cache_control": parsed_cache_control,
     }
 
     try:
-        result = client.messages(**payload)  # type: ignore[arg-type]
+        result = client.messages(anthropic_beta=anthropic_beta, **payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:
@@ -202,21 +202,27 @@ def messages(
 )
 @click.option(
     "--thinking-type",
-    type=click.Choice(["enabled", "disabled", "adaptive"]),
+    type=str,
     default=None,
-    help="Extended thinking mode: enabled, disabled, or adaptive.",
+    help="Thinking mode passed through to the model (e.g. adaptive, enabled, disabled).",
 )
 @click.option(
     "--thinking-budget-tokens",
     default=None,
-    type=click.IntRange(min=1024),
-    help="Token budget for extended thinking.",
+    type=int,
+    help="Thinking token budget passed through to the model.",
 )
 @click.option(
     "--thinking-display",
-    type=click.Choice(["summarized", "omitted"]),
+    type=str,
     default=None,
-    help="Display mode for enabled or adaptive thinking.",
+    help="Thinking display mode passed through to the model (e.g. summarized, omitted, updates).",
+)
+@click.option("--thinking", default=None, help="Thinking configuration as a JSON object.")
+@click.option(
+    "--anthropic-beta",
+    default=None,
+    help="Anthropic beta header value (comma-separated for multiple betas).",
 )
 @click.option("--tools", default=None, help="Tool definitions as a JSON array.")
 @click.option("--tool-choice", default=None, help="Tool choice as a JSON object.")
@@ -231,6 +237,8 @@ def count_tokens(
     thinking_type: str | None,
     thinking_budget_tokens: int | None,
     thinking_display: str | None,
+    thinking: str | None,
+    anthropic_beta: str | None,
     tools: str | None,
     tool_choice: str | None,
     cache_control: str | None,
@@ -249,26 +257,18 @@ def count_tokens(
     client = get_client(ctx.obj.get("token"))
     msg_list = [{"role": "user", "content": prompt}]
 
-    thinking: dict[str, str | int] | None = None
-    if thinking_type is not None:
-        if thinking_type == "enabled":
-            if thinking_budget_tokens is None:
-                raise click.UsageError(
-                    "--thinking-budget-tokens is required when --thinking-type=enabled"
-                )
-            thinking = {"type": thinking_type, "budget_tokens": thinking_budget_tokens}
-        else:
-            thinking = {"type": thinking_type}
-        if thinking_display is not None:
-            if thinking_type == "disabled":
-                raise click.UsageError(
-                    "--thinking-display is only valid with enabled or adaptive thinking"
-                )
-            thinking["display"] = thinking_display
-    elif thinking_display is not None:
-        raise click.UsageError("--thinking-display requires --thinking-type")
-
     try:
+        parsed_thinking = parse_json_object(thinking, "--thinking")
+        thinking_options = {
+            "type": thinking_type,
+            "budget_tokens": thinking_budget_tokens,
+            "display": thinking_display,
+        }
+        for key, value in thinking_options.items():
+            if value is not None:
+                if parsed_thinking is None:
+                    parsed_thinking = {}
+                parsed_thinking[key] = value
         parsed_tools = parse_json_array(tools, "--tools")
         parsed_tool_choice = parse_json_object(tool_choice, "--tool-choice")
         parsed_cache_control = parse_json_object(cache_control, "--cache-control")
@@ -280,14 +280,14 @@ def count_tokens(
         "model": model,
         "messages": msg_list,
         "system": system,
-        "thinking": thinking,
+        "thinking": parsed_thinking,
         "tool_choice": parsed_tool_choice,
         "tools": parsed_tools,
         "cache_control": parsed_cache_control,
     }
 
     try:
-        result = client.count_tokens(**payload)  # type: ignore[arg-type]
+        result = client.count_tokens(anthropic_beta=anthropic_beta, **payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:

@@ -12,9 +12,7 @@ load_dotenv()
 class Settings:
     """Application settings loaded from environment variables."""
 
-    base_url: str = field(
-        default_factory=lambda: os.environ.get("DISCORD_BOT_BASE_URL", "")
-    )
+    base_url: str = field(default_factory=lambda: os.environ.get("DISCORD_BOT_BASE_URL", ""))
     token: str = field(default_factory=lambda: os.environ.get("DISCORD_BOT_TOKEN", ""))
     request_timeout: float = field(
         default_factory=lambda: float(os.environ.get("DISCORD_BOT_REQUEST_TIMEOUT", "30"))
