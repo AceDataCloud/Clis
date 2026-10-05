@@ -401,7 +401,9 @@ class TestEmbedCommands:
         help_result = runner.invoke(cli, ["embed", "--help"])
         assert "text-embedding-ada-002" not in help_result.output
 
-        result = runner.invoke(cli, ["--token", "test-token", "embed", "Hello", "--model", "text-embedding-ada-002"])
+        result = runner.invoke(
+            cli, ["--token", "test-token", "embed", "Hello", "--model", "text-embedding-ada-002"]
+        )
         assert result.exit_code != 0
 
     @respx.mock
