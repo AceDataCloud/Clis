@@ -355,6 +355,39 @@ class TestMessagesCommands:
         assert request_body["output_config"] == {"effort": "high"}
         assert request_body["cache_control"] == {"type": "ephemeral", "ttl": "1h"}
 
+    @pytest.mark.parametrize("metadata", [None, {}, {"user_id": "example-user-001"}])
+    @respx.mock
+    def test_messages_metadata_is_separate_from_auth_and_conversation(
+        self, runner, mock_messages_response, metadata
+    ):
+        route = respx.post("https://api.acedata.cloud/v1/messages").mock(
+            return_value=Response(200, json=mock_messages_response)
+        )
+        options = [] if metadata is None else ["--metadata", json.dumps(metadata)]
+        result = runner.invoke(
+            cli, ["--token", "test-token", "messages", "Hello, Claude", *options]
+        )
+        assert result.exit_code == 0, result.output
+        sent = route.calls[0].request
+        body = json.loads(sent.content)
+        assert sent.headers["authorization"] == "Bearer test-token"
+        assert body["messages"] == [{"role": "user", "content": "Hello, Claude"}]
+        if metadata is None:
+            assert "metadata" not in body
+        else:
+            assert body["metadata"] == metadata
+
+    @pytest.mark.parametrize("metadata", ["not-json", "[]", "1", '"example-user-001"'])
+    @respx.mock
+    def test_messages_rejects_invalid_metadata_without_request(self, runner, metadata):
+        route = respx.post("https://api.acedata.cloud/v1/messages")
+        result = runner.invoke(
+            cli, ["--token", "test-token", "messages", "Hello", "--metadata", metadata]
+        )
+        assert result.exit_code != 0
+        assert "--metadata" in result.output
+        assert not route.called
+
     @respx.mock
     def test_messages_auth_error(self, runner):
         respx.post("https://api.acedata.cloud/v1/messages").mock(

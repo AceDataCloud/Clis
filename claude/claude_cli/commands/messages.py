@@ -87,7 +87,9 @@ from claude_cli.core.output import (
     help="Anthropic beta header value (comma-separated for multiple betas).",
 )
 @click.option(
-    "--metadata", default=None, help='Metadata as a JSON object (e.g. \'{"user_id":"u1"}\').'
+    "--metadata",
+    default=None,
+    help='Request metadata as a JSON object; user_id is a caller-defined string (e.g. \'{"user_id":"u1"}\').',
 )
 @click.option("--stream", is_flag=True, default=False, help="Stream incremental events.")
 @click.option("--tools", default=None, help="Tool definitions as a JSON array.")

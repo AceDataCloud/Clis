@@ -85,6 +85,10 @@ openai-cli config
 | `models` | List available models (`/openai/models`) |
 | `config` | Show current configuration |
 
+## Embedding models
+
+`embed` supports `text-embedding-3-small` (the default) and `text-embedding-3-large`. The legacy `text-embedding-ada-002` model is retired. When migrating an existing index, regenerate its vectors and rebuild the index; do not mix vectors from the old and new models.
+
 ## Environment Variables
 
 | Variable | Description | Default |
