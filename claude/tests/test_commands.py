@@ -53,6 +53,9 @@ class TestGlobalCommands:
         assert "PROMPT" in result.output
         assert "--model" in result.output
         assert "--max-tokens" in result.output
+        assert "--metadata" in result.output
+        assert "Request metadata as a JSON object." in result.output
+        assert "user_id" not in result.output
 
     def test_count_tokens_help(self, runner):
         result = runner.invoke(cli, ["count-tokens", "--help"])
