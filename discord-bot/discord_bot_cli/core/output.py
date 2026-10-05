@@ -144,6 +144,4 @@ def print_dm_channel(data: dict[str, Any]) -> None:
     for key in ["id", "type"]:
         if ch.get(key) is not None:
             table.add_row(key.replace("_", " ").title(), str(ch[key]))
-    console.print(
-        Panel(table, title="[bold green]DM Channel[/bold green]", border_style="green")
-    )
+    console.print(Panel(table, title="[bold green]DM Channel[/bold green]", border_style="green"))

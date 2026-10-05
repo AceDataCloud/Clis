@@ -1,5 +1,7 @@
 """Tests for the HTTP client."""
 
+import json
+
 import pytest
 import respx
 from httpx import Response
@@ -44,7 +46,7 @@ class TestClaudeClient:
     @respx.mock
     def test_messages(self):
         mock_response = {"content": [{"type": "text", "text": "Hello"}]}
-        respx.post("https://api.acedata.cloud/v1/messages").mock(
+        route = respx.post("https://api.acedata.cloud/v1/messages").mock(
             return_value=Response(200, json=mock_response)
         )
         client = ClaudeClient(api_token="test-token")
@@ -54,6 +56,7 @@ class TestClaudeClient:
             max_tokens=1024,
         )
         assert result == mock_response
+        assert "anthropic-beta" not in route.calls[0].request.headers
 
     @respx.mock
     def test_count_tokens(self):
@@ -67,6 +70,37 @@ class TestClaudeClient:
             messages=[{"role": "user", "content": "Hi"}],
         )
         assert result == mock_response
+
+    @pytest.mark.parametrize(
+        ("method", "endpoint", "response_fixture"),
+        [
+            ("messages", "/v1/messages", "mock_messages_response"),
+            ("count_tokens", "/v1/messages/count_tokens", "mock_count_tokens_response"),
+        ],
+    )
+    @respx.mock
+    def test_thinking_and_beta_passthrough(self, method, endpoint, response_fixture, request):
+        response = request.getfixturevalue(response_fixture)
+        route = respx.post(f"https://api.acedata.cloud{endpoint}").mock(
+            return_value=Response(200, json=response)
+        )
+        client = ClaudeClient(api_token="test-token")
+        thinking = {"type": "between_tools", "display": "updates", "extension": {"value": 1}}
+        beta = "thinking-display-updates-2026-08-18"
+        result = getattr(client, method)(
+            model="claude-opus-5",
+            messages=[{"role": "user", "content": "Hi"}],
+            thinking=thinking,
+            anthropic_beta=beta,
+        )
+        assert result == response
+        sent = route.calls[0].request
+        assert sent.headers["anthropic-beta"] == beta
+        assert sent.headers["authorization"] == "Bearer test-token"
+        body = json.loads(sent.content)
+        assert body["thinking"] == thinking
+        assert "anthropic_beta" not in body
+        assert "anthropic-beta" not in body
 
     @respx.mock
     def test_401_raises_auth_error(self):

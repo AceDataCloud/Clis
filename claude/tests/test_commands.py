@@ -488,8 +488,124 @@ class TestInfoCommands:
 # ─── Messages Thinking ────────────────────────────────────────────────────
 
 
+@pytest.mark.parametrize(
+    ("command", "endpoint"),
+    [
+        ("messages", "/v1/messages"),
+        ("count-tokens", "/v1/messages/count_tokens"),
+    ],
+)
+class TestThinkingPassthrough:
+    @pytest.mark.parametrize(
+        ("options", "thinking"),
+        [
+            (["--thinking-type", "enabled"], {"type": "enabled"}),
+            (
+                ["--thinking-type", "enabled", "--thinking-budget-tokens", "512"],
+                {"type": "enabled", "budget_tokens": 512},
+            ),
+            (
+                ["--thinking-type", "between_tools", "--thinking-display", "updates"],
+                {"type": "between_tools", "display": "updates"},
+            ),
+            (
+                ["--thinking-type", "disabled", "--thinking-display", "summarized"],
+                {"type": "disabled", "display": "summarized"},
+            ),
+            (["--thinking-budget-tokens", "0"], {"budget_tokens": 0}),
+            (["--thinking-display", "future-display"], {"display": "future-display"}),
+            (["--thinking", "{}"], {}),
+        ],
+    )
+    @respx.mock
+    def test_convenience_options(self, runner, request, command, endpoint, options, thinking):
+        route = respx.post(f"https://api.acedata.cloud{endpoint}").mock(
+            return_value=Response(
+                200,
+                json=request.getfixturevalue(
+                    "mock_messages_response"
+                    if command == "messages"
+                    else "mock_count_tokens_response"
+                ),
+            )
+        )
+        result = runner.invoke(cli, ["--token", "test-token", command, "Hello", *options])
+        assert result.exit_code == 0, result.output
+        sent = route.calls[0].request
+        assert json.loads(sent.content)["thinking"] == thinking
+        assert "anthropic-beta" not in sent.headers
+
+    @pytest.mark.parametrize("override", [False, True])
+    @respx.mock
+    def test_json_extensions_and_beta_header(self, runner, request, command, endpoint, override):
+        route = respx.post(f"https://api.acedata.cloud{endpoint}").mock(
+            return_value=Response(
+                200,
+                json=request.getfixturevalue(
+                    "mock_messages_response"
+                    if command == "messages"
+                    else "mock_count_tokens_response"
+                ),
+            )
+        )
+        thinking = {
+            "type": "between_tools",
+            "display": "updates",
+            "budget_tokens": 512,
+            "extension": {"enabled": False, "values": [1, None]},
+        }
+        beta = "thinking-display-updates-2026-08-18,another-beta"
+        options = ["--thinking", json.dumps(thinking), "--anthropic-beta", beta]
+        if override:
+            options += [
+                "--thinking-type",
+                "adaptive",
+                "--thinking-display",
+                "omitted",
+                "--thinking-budget-tokens",
+                "2048",
+            ]
+            thinking.update(type="adaptive", display="omitted", budget_tokens=2048)
+        output_config = {"effort": "future-effort", "extension": {"enabled": False}}
+        if command == "messages":
+            options += ["--output-config", json.dumps(output_config)]
+        result = runner.invoke(cli, ["--token", "test-token", command, "Hello", *options])
+        assert result.exit_code == 0, result.output
+        sent = route.calls[0].request
+        body = json.loads(sent.content)
+        assert body["thinking"] == thinking
+        assert sent.headers["anthropic-beta"] == beta
+        assert sent.headers["authorization"] == "Bearer test-token"
+        assert "anthropic_beta" not in body
+        if command == "messages":
+            assert body["output_config"] == output_config
+
+    @pytest.mark.parametrize("thinking", ["not-json", "[]", "1", '"adaptive"'])
+    @respx.mock
+    def test_invalid_thinking_json(self, runner, command, endpoint, thinking):
+        route = respx.post(f"https://api.acedata.cloud{endpoint}")
+        result = runner.invoke(
+            cli, ["--token", "test-token", command, "Hello", "--thinking", thinking]
+        )
+        assert result.exit_code != 0
+        assert "--thinking" in result.output
+        assert not route.called
+
+    @respx.mock
+    def test_model_parameter_error(self, runner, command, endpoint):
+        route = respx.post(f"https://api.acedata.cloud{endpoint}").mock(
+            return_value=Response(400, text="Invalid thinking parameters")
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", command, "Hello", "--thinking-type", "enabled"]
+        )
+        assert result.exit_code != 0
+        assert "Invalid thinking parameters" in result.output
+        assert json.loads(route.calls[0].request.content)["thinking"] == {"type": "enabled"}
+
+
 class TestMessagesThinking:
-    """Tests for the --thinking-type and --thinking-budget-tokens options."""
+    """Tests for thinking configuration passthrough."""
 
     @respx.mock
     def test_messages_with_thinking_enabled(self, runner, mock_messages_response):
@@ -569,37 +685,6 @@ class TestMessagesThinking:
         request_body = json.loads(route.calls[0].request.content)
         assert request_body.get("thinking") is None
 
-    def test_messages_thinking_budget_below_minimum(self, runner):
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "messages",
-                "Hello",
-                "--thinking-type",
-                "enabled",
-                "--thinking-budget-tokens",
-                "512",
-            ],
-        )
-        assert result.exit_code != 0
-
-    def test_messages_thinking_enabled_requires_budget(self, runner):
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "messages",
-                "Hello",
-                "--thinking-type",
-                "enabled",
-            ],
-        )
-        assert result.exit_code != 0
-        assert "thinking-budget-tokens" in result.output
-
     @respx.mock
     def test_count_tokens_with_thinking_enabled(self, runner, mock_count_tokens_response):
         route = respx.post("https://api.acedata.cloud/v1/messages/count_tokens").mock(
@@ -630,54 +715,6 @@ class TestMessagesThinking:
             "display": "summarized",
         }
         assert request_body["cache_control"] == {"type": "ephemeral", "ttl": "5m"}
-
-    def test_count_tokens_thinking_budget_below_minimum(self, runner):
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "count-tokens",
-                "Hello",
-                "--thinking-type",
-                "enabled",
-                "--thinking-budget-tokens",
-                "512",
-            ],
-        )
-        assert result.exit_code != 0
-
-    def test_count_tokens_thinking_enabled_requires_budget(self, runner):
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "count-tokens",
-                "Hello",
-                "--thinking-type",
-                "enabled",
-            ],
-        )
-        assert result.exit_code != 0
-        assert "thinking-budget-tokens" in result.output
-
-    def test_count_tokens_thinking_display_rejects_disabled(self, runner):
-        result = runner.invoke(
-            cli,
-            [
-                "--token",
-                "test-token",
-                "count-tokens",
-                "Hello",
-                "--thinking-type",
-                "disabled",
-                "--thinking-display",
-                "summarized",
-            ],
-        )
-        assert result.exit_code != 0
-        assert "thinking-display" in result.output
 
     @respx.mock
     def test_count_tokens_without_thinking(self, runner, mock_count_tokens_response):

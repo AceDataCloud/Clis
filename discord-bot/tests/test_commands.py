@@ -57,18 +57,14 @@ class TestHealthCommand:
 
     @respx.mock
     def test_health_ok(self, runner, mock_health_response):
-        respx.get(f"{BASE_URL}/health").mock(
-            return_value=Response(200, json=mock_health_response)
-        )
+        respx.get(f"{BASE_URL}/health").mock(return_value=Response(200, json=mock_health_response))
         result = invoke(runner, ["health"])
         assert result.exit_code == 0
         assert "ok" in result.output
 
     @respx.mock
     def test_health_json(self, runner, mock_health_response):
-        respx.get(f"{BASE_URL}/health").mock(
-            return_value=Response(200, json=mock_health_response)
-        )
+        respx.get(f"{BASE_URL}/health").mock(return_value=Response(200, json=mock_health_response))
         result = invoke(runner, ["health", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -196,7 +192,9 @@ class TestMessageCommands:
         route = respx.post(f"{BASE_URL}/api/messages").mock(
             return_value=Response(200, json=mock_message_response)
         )
-        result = invoke(runner, ["send", "1234567890", "Got it", "--reply-to", "9876543210", "--json"])
+        result = invoke(
+            runner, ["send", "1234567890", "Got it", "--reply-to", "9876543210", "--json"]
+        )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["reply_to"] == "9876543210"
@@ -280,9 +278,9 @@ class TestMessageCommands:
 
     @respx.mock
     def test_pin(self, runner):
-        respx.post(
-            f"{BASE_URL}/api/channels/1234567890/messages/9876543210/pin"
-        ).mock(return_value=Response(200, json={"data": {}}))
+        respx.post(f"{BASE_URL}/api/channels/1234567890/messages/9876543210/pin").mock(
+            return_value=Response(200, json={"data": {}})
+        )
         result = invoke(runner, ["pin", "1234567890", "9876543210"])
         assert result.exit_code == 0
 
