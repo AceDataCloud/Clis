@@ -38,15 +38,6 @@ claude config
 - `models` — List available Claude models
 - `config` — Show current configuration
 
-## Request metadata
-
-`messages --metadata` accepts an optional JSON object. Set `metadata.user_id` to a caller-defined string identifier; prefer a stable identifier without personal information. Metadata is sent separately from the conversation, not inside `messages`, and does not replace Bearer authentication with your API token.
-
-```bash
-claude messages "Hello, Claude" --max-tokens 1024 \
-  --metadata '{"user_id":"example-user-001"}'
-```
-
 ## Thinking options
 
 `messages` and `count-tokens` pass thinking settings through to the selected model without fixed mode/display enums, a minimum budget, or model-specific combination rules. The model determines which values and combinations it supports; parameter errors are returned rather than silently rewriting the request.
