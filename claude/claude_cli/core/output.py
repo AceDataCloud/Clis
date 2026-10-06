@@ -12,6 +12,7 @@ console = Console()
 
 # Claude chat completion models (OpenAI-compatible endpoint)
 CHAT_MODELS = [
+    "gpt-5.6-sol-fast",
     "claude-fable-5-1",
     "claude-fable-5",
     "claude-opus-5",
@@ -36,6 +37,7 @@ CHAT_MODELS = [
 
 # Claude Messages API models
 MESSAGES_MODELS = ["claude-opus-5-5", "claude-sonnet-5-5", *CHAT_MODELS]
+COUNT_TOKENS_MODELS = [model for model in MESSAGES_MODELS if model != "gpt-5.6-sol-fast"]
 
 DEFAULT_CHAT_MODEL = "claude-3-5-haiku-20241022"
 DEFAULT_MESSAGES_MODEL = "claude-3-5-haiku-20241022"
@@ -182,8 +184,8 @@ def print_count_tokens_result(data: dict[str, Any]) -> None:
 
 
 def print_models() -> None:
-    """Print available Claude models."""
-    table = Table(title="Available Claude Models")
+    """Print models available to chat and messages."""
+    table = Table(title="Available Chat / Messages Models")
     table.add_column("Model", style="bold cyan")
     table.add_column("Protocol", style="dim")
     for model in MESSAGES_MODELS:

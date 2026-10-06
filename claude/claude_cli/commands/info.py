@@ -8,7 +8,7 @@ from claude_cli.core.output import console, print_models
 
 @click.command()
 def models() -> None:
-    """List available Claude models."""
+    """List models available to chat and messages."""
     print_models()
 
 

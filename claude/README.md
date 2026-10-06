@@ -35,8 +35,17 @@ claude config
 - `chat` — Chat completions via the OpenAI-compatible endpoint
 - `messages` — Claude native Messages API
 - `count-tokens` — Count tokens for a given prompt
-- `models` — List available Claude models
+- `models` — List models available to Chat Completions and Messages
 - `config` — Show current configuration
+
+## Sol Fast
+
+The public alias `gpt-5.6-sol-fast` is available through both `chat` and `messages`. It is not supported by `count-tokens`; Claude model defaults are unchanged.
+
+```bash
+claude chat "Explain the tradeoffs" --model gpt-5.6-sol-fast
+claude messages "Explain the tradeoffs" --model gpt-5.6-sol-fast --max-tokens 1024
+```
 
 ## Thinking options
 

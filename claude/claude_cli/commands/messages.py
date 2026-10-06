@@ -6,6 +6,7 @@ from claude_cli.commands._json import parse_json_array, parse_json_object
 from claude_cli.core.client import get_client
 from claude_cli.core.exceptions import ClaudeError
 from claude_cli.core.output import (
+    COUNT_TOKENS_MODELS,
     DEFAULT_MESSAGES_MODEL,
     MESSAGES_MODELS,
     print_count_tokens_result,
@@ -187,7 +188,7 @@ def messages(
 @click.option(
     "-m",
     "--model",
-    type=click.Choice(MESSAGES_MODELS),
+    type=click.Choice(COUNT_TOKENS_MODELS),
     default=DEFAULT_MESSAGES_MODEL,
     show_default=True,
     help="Model to use for token counting.",
