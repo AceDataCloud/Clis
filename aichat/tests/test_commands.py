@@ -28,6 +28,10 @@ class TestGlobalCommands:
         assert "claude-opus-5" in MODELS2
         assert "claude-3-opus-20240229" not in MODELS2
 
+    def test_fast_sol_is_available_in_both_chat_commands(self):
+        assert "gpt-5.6-sol-fast" in MODELS
+        assert "gpt-5.6-sol-fast" in MODELS2
+
     def test_model_inventory_includes_latest_glm_models(self):
         assert "gpt-6-astra" in MODELS
         assert {"gpt-6.1-sol", "gpt-6-sol", "gpt-6-luna", "grok-4.7"} <= set(MODELS)
