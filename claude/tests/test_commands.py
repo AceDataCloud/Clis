@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from claude_cli.core.output import CHAT_MODELS, MESSAGES_MODELS
+from claude_cli.core.output import CHAT_MODELS, COUNT_TOKENS_MODELS, MESSAGES_MODELS
 from claude_cli.main import cli
 
 
@@ -23,11 +23,54 @@ class TestGlobalCommands:
     """Tests for global CLI options."""
 
     def test_model_inventory_excludes_retired_opus_3(self):
-        assert CHAT_MODELS[:2] == ["claude-fable-5-1", "claude-fable-5"]
+        assert CHAT_MODELS[1:3] == ["claude-fable-5-1", "claude-fable-5"]
         assert "claude-opus-5" in CHAT_MODELS
         assert "claude-opus-5-5" not in CHAT_MODELS
         assert MESSAGES_MODELS[0] == "claude-opus-5-5"
         assert "claude-3-opus-20240229" not in CHAT_MODELS
+
+    def test_fast_sol_inventory_is_scoped_to_generation(self):
+        assert CHAT_MODELS.count("gpt-5.6-sol-fast") == 1
+        assert MESSAGES_MODELS.count("gpt-5.6-sol-fast") == 1
+        assert "gpt-5.6-sol-fast" not in COUNT_TOKENS_MODELS
+        expected_count_tokens_models = [
+            "claude-opus-5-5",
+            "claude-sonnet-5-5",
+            *CHAT_MODELS[1:],
+        ]
+        assert expected_count_tokens_models == COUNT_TOKENS_MODELS
+
+    @pytest.mark.parametrize(
+        ("command", "endpoint"),
+        [("chat", "/v1/chat/completions"), ("messages", "/v1/messages")],
+    )
+    @respx.mock
+    def test_fast_sol_preserves_public_alias(
+        self, runner, mock_chat_response, mock_messages_response, command, endpoint
+    ):
+        response = mock_chat_response if command == "chat" else mock_messages_response
+        route = respx.post(f"https://api.acedata.cloud{endpoint}").mock(
+            return_value=Response(200, json=response)
+        )
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", command, "Hello", "-m", "gpt-5.6-sol-fast", "--json"],
+        )
+        assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content)["model"] == "gpt-5.6-sol-fast"
+
+    @respx.mock
+    def test_count_tokens_rejects_fast_sol_without_request(self, runner):
+        help_result = runner.invoke(cli, ["count-tokens", "--help"])
+        assert help_result.exit_code == 0
+        assert "gpt-5.6-sol-fast" not in help_result.output
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "count-tokens", "Hello", "-m", "gpt-5.6-sol-fast"],
+        )
+        assert result.exit_code == 2
+        assert "Invalid value for '-m' / '--model'" in result.output
+        assert not respx.calls
 
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
@@ -507,6 +550,10 @@ class TestInfoCommands:
         assert "claude-opus-5" in result.output
         assert "claude-opus-5-5" in result.output
         assert "Messages only" in result.output
+        sol_fast_line = next(
+            line for line in result.output.splitlines() if "gpt-5.6-sol-fast" in line
+        )
+        assert "Chat / Messages" in sol_fast_line
 
     def test_models_first_entry(self, runner):
         result = runner.invoke(cli, ["models"])
