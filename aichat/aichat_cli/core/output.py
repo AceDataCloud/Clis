@@ -18,6 +18,7 @@ MODELS = [
     "gpt-6-luna",
     "gpt-5.6-luna",
     "gpt-5.6-terra",
+    "gpt-5.6-sol-fast",
     "gpt-5.6-sol",
     "gpt-5.5",
     "gpt-5.5-pro",
@@ -112,6 +113,7 @@ DEFAULT_MODEL = "gpt-4o"
 
 # Available models for /aichat2/conversations endpoint
 MODELS2 = [
+    "gpt-5.6-sol-fast",
     "gpt-6.1-sol",
     "gpt-6-sol",
     "gpt-6-luna",
