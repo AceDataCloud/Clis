@@ -184,8 +184,8 @@ def chat(
 @click.option(
     "--max-turns",
     default=None,
-    type=click.IntRange(min=1),
-    help="Maximum number of conversation turns.",
+    type=click.IntRange(min=1, max=500),
+    help="Maximum number of agent iterations (1-500; omitted by default; server default: 500).",
 )
 @click.option(
     "--title",

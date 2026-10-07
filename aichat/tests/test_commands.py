@@ -96,6 +96,9 @@ class TestGlobalCommands:
         assert "--model" in result.output
         assert "--action" in result.output
         assert "--model-group" in result.output
+        assert "--max-turns" in result.output
+        assert "1<=x<=500" in result.output
+        assert "server default: 500" in " ".join(result.output.split())
         assert "tool_use_id" in result.output
         assert "tool_call_id" not in result.output
         assert '"expires_at":1790000000' in result.output
@@ -271,7 +274,7 @@ class TestChat2Commands:
 
     @respx.mock
     def test_chat2_json(self, runner, mock_chat_response):
-        respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
+        route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
@@ -282,6 +285,8 @@ class TestChat2Commands:
         data = json.loads(result.output)
         assert "answer" in data
         assert "id" in data
+        body = json.loads(route.calls.last.request.content)
+        assert "max_turns" not in body
 
     @respx.mock
     def test_chat2_with_model(self, runner, mock_chat_response):
@@ -330,18 +335,30 @@ class TestChat2Commands:
         body = json.loads(route.calls.last.request.content)
         assert body["action"] == "chat"
 
+    @pytest.mark.parametrize("max_turns", [1, 5, 500])
     @respx.mock
-    def test_chat2_with_max_turns(self, runner, mock_chat_response):
+    def test_chat2_with_max_turns(self, runner, mock_chat_response, max_turns):
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat2", "Hello", "--max-turns", "5", "--json"],
+            ["--token", "test-token", "chat2", "Hello", "--max-turns", str(max_turns), "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["max_turns"] == 5
+        assert body["max_turns"] == max_turns
+
+    @pytest.mark.parametrize("max_turns", ["0", "501", "-1", "1.5", "not-a-number"])
+    @respx.mock
+    def test_chat2_invalid_max_turns(self, runner, max_turns):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "chat2", "Hello", "--max-turns", max_turns],
+        )
+        assert result.exit_code == 2
+        assert "--max-turns" in result.output
+        assert not respx.calls
 
     @respx.mock
     def test_chat2_without_question(self, runner, mock_chat_response):
