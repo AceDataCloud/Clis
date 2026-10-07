@@ -64,6 +64,19 @@ aichat chat "Hello" --json | jq '.answer'
 | `--ref` | Reference URL or text (repeatable) |
 | `--json` | Output raw JSON |
 
+## Chat2 Turn Limit
+
+`aichat chat2 --max-turns` accepts integers from 1 to 500 and limits agent
+iterations (model calls), not conversation history. When omitted, the CLI leaves
+`max_turns` out of the request and the server defaults to 500. Each model call is
+billed by actual usage; a higher limit allows longer tool chains.
+
+Set the limit to 1 for a single answer without tool calls:
+
+```bash
+aichat chat2 "Explain quantum computing" --max-turns 1
+```
+
 ## Configuration
 
 | Environment Variable | Description | Default |
