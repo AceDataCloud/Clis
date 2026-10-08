@@ -41,7 +41,7 @@ def aspect_ratios() -> None:
 
 @click.command()
 def resolutions() -> None:
-    """List available output resolutions (nano-banana-pro only).
+    """List available output resolutions (nano-banana-2, 2.1, and pro).
 
     Examples:
 
@@ -49,7 +49,7 @@ def resolutions() -> None:
     """
     from rich.table import Table
 
-    table = Table(title="Available Resolutions (nano-banana-pro only)")
+    table = Table(title="Available Resolutions (nano-banana-2, 2.1, and pro)")
     table.add_column("Resolution", style="bold cyan")
     table.add_column("Description")
 

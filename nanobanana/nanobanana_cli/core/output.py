@@ -14,6 +14,7 @@ NANOBANANA_MODELS = [
     "nano-banana",
     "nano-banana-2-lite",
     "nano-banana-2",
+    "nano-banana-2.1",
     "nano-banana-pro",
     "nano-banana:official",
     "nano-banana-2-lite:official",
@@ -36,7 +37,7 @@ ASPECT_RATIOS = [
 
 DEFAULT_ASPECT_RATIO = "1:1"
 
-# Available resolutions (nano-banana-pro only)
+# Available resolutions (nano-banana-2, 2.1, and pro)
 RESOLUTIONS = [
     "1K",
     "2K",
@@ -157,6 +158,11 @@ def print_models() -> None:
         "nano-banana-2",
         "Improved generation",
         "Better quality, balanced speed",
+    )
+    table.add_row(
+        "nano-banana-2.1",
+        "Latest efficient image model",
+        "1K/2K/4K generation and editing",
     )
     table.add_row(
         "nano-banana-pro",

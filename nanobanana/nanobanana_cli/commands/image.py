@@ -37,7 +37,7 @@ from nanobanana_cli.core.output import (
     "--resolution",
     type=click.Choice(RESOLUTIONS),
     default=None,
-    help="Output resolution (nano-banana-pro only).",
+    help="Output resolution (nano-banana-2, 2.1, and pro).",
 )
 @click.option(
     "-n",
