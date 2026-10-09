@@ -145,6 +145,7 @@ done < prompts.txt
 |-------|--------|-------|
 | `nano-banana` | Gemini 2.5 Flash | Fast, good quality (default) |
 | `nano-banana-2` | Improved | Better quality, balanced speed |
+| `nano-banana-2.1` | Gemini Nano Banana 2.1 | 1K/2K/4K generation and editing |
 | `nano-banana-pro` | Gemini 3 Pro | Best quality, supports resolution control (1K/2K/4K) |
 
 ## Aspect Ratios
