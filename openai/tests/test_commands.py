@@ -508,6 +508,53 @@ class TestImageCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-image-1"
 
+    @pytest.mark.parametrize(
+        ("command", "endpoint", "image_args"),
+        [
+            ("image", "generations", []),
+            ("edit", "edits", ["--image-url", "https://example.com/photo.jpg"]),
+        ],
+    )
+    @respx.mock
+    def test_nano_banana_2_1_json_payload(
+        self, runner, mock_image_response, command, endpoint, image_args
+    ):
+        route = respx.post(f"https://api.acedata.cloud/openai/images/{endpoint}").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                command,
+                "Make it blue",
+                "-m",
+                "nano-banana-2.1",
+                "-n",
+                "2",
+                *image_args,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == "nano-banana-2.1"
+        assert body["n"] == 2
+        if command == "edit":
+            assert body["image"] == "https://example.com/photo.jpg"
+
+    @pytest.mark.parametrize("command", ["image", "edit"])
+    @respx.mock
+    def test_nano_banana_2_1_rejects_official_variant(self, runner, command):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", command, "test", "-m", "nano-banana-2.1:official"],
+        )
+        assert result.exit_code == 2
+        assert "Invalid value for" in result.output
+        assert not respx.calls
+
     def test_image_rejects_count_above_openapi_max(self, runner):
         result = runner.invoke(
             cli,
@@ -649,9 +696,10 @@ class TestImageCommands:
         assert result.exit_code != 0
         assert "at most 16" in result.output
 
+    @pytest.mark.parametrize("model", ["nano-banana-2-lite", "nano-banana-2.1"])
     @respx.mock
-    def test_edit_supports_nano_banana_2_lite_for_image_file(
-        self, runner, tmp_path, mock_image_response
+    def test_edit_supports_nano_banana_for_image_file(
+        self, runner, tmp_path, mock_image_response, model
     ):
         image_file = tmp_path / "base.png"
         image_file.write_bytes(b"fake-image")
@@ -668,14 +716,14 @@ class TestImageCommands:
                 "--image-file",
                 str(image_file),
                 "--model",
-                "nano-banana-2-lite",
+                model,
                 "--json",
             ],
         )
         assert result.exit_code == 0
         content = route.calls.last.request.content.decode()
         assert 'name="model"' in content
-        assert "nano-banana-2-lite" in content
+        assert model in content
 
 
 # ─── Response Commands ─────────────────────────────────────────────────────

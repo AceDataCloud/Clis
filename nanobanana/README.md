@@ -14,7 +14,7 @@ Generate and edit AI images directly from your terminal — no MCP client requir
 
 - **Image Generation** — Generate images from text prompts with multiple models
 - **Image Editing** — Edit, combine, and transform images with AI
-- **Multiple Models** — nano-banana (fast), nano-banana-2 (improved), nano-banana-pro (best, 4K)
+- **Multiple Models** — nano-banana (fast), nano-banana-2 (improved), nano-banana-2.1 (efficient, 1K/2K/4K), nano-banana-pro (best, 4K)
 - **Flexible Output** — Aspect ratios (1:1, 16:9, 9:16, etc.) and resolutions (1K/2K/4K)
 - **Task Management** — Query tasks, batch query, wait with polling
 - **Rich Output** — Beautiful terminal tables and panels via Rich
@@ -64,6 +64,10 @@ nano-banana-pro generate "A cat sitting on a windowsill at sunset, warm lighting
 
 # Generate with specific model and aspect ratio
 nano-banana-pro generate "Product photo of a watch" -m nano-banana-pro -a 16:9 -r 4K
+
+# Generate and edit with Nano Banana 2.1
+nano-banana-pro generate "A blue ceramic vase on a cream background" -m nano-banana-2.1 -r 2K
+nano-banana-pro edit "Make the vase green" -i https://example.com/photo.jpg -m nano-banana-2.1 -r 4K
 
 # Edit an image
 nano-banana-pro edit "Make it look like an oil painting" -i https://example.com/photo.jpg
@@ -147,6 +151,8 @@ done < prompts.txt
 | `nano-banana-2` | Improved | Better quality, balanced speed |
 | `nano-banana-2.1` | Gemini Nano Banana 2.1 | 1K/2K/4K generation and editing |
 | `nano-banana-pro` | Gemini 3 Pro | Best quality, supports resolution control (1K/2K/4K) |
+
+Specify `-m nano-banana-2.1` explicitly; the default remains `nano-banana`. Both generation and editing support `-r 1K`, `-r 2K`, or `-r 4K`. There is no `nano-banana-2.1:official` variant.
 
 ## Aspect Ratios
 

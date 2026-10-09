@@ -89,6 +89,18 @@ openai-cli config
 
 `embed` supports `text-embedding-3-small` (the default) and `text-embedding-3-large`. The legacy `text-embedding-ada-002` model is retired. When migrating an existing index, regenerate its vectors and rebuild the index; do not mix vectors from the old and new models.
 
+## Nano Banana 2.1 images
+
+Use the public `nano-banana-2.1` model ID for generation or editing. There is no `nano-banana-2.1:official` variant; specify the model explicitly to use it instead of the existing default.
+
+```bash
+openai-cli image "A blue ceramic vase on a cream background" -m nano-banana-2.1 -n 2
+openai-cli edit "Make the vase green" --image-url https://example.com/photo.jpg -m nano-banana-2.1
+openai-cli edit "Make the vase green" --image-file photo.png -m nano-banana-2.1
+```
+
+Use `--image-url` for JSON requests or `--image-file` for multipart uploads, not both. For dedicated `1K`/`2K`/`4K` resolution controls, use `nano-banana-pro generate` or `nano-banana-pro edit` from the NanoBanana CLI; the OpenAI-compatible commands use their own request fields.
+
 ## Environment Variables
 
 | Variable | Description | Default |
