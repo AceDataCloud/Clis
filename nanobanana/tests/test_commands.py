@@ -88,6 +88,51 @@ class TestImageCommands:
         )
         assert result.exit_code == 0
 
+    @pytest.mark.parametrize("command", ["generate", "edit"])
+    @pytest.mark.parametrize("resolution", ["1K", "2K", "4K"])
+    @respx.mock
+    def test_nano_banana_2_1_payload(self, runner, mock_image_response, command, resolution):
+        route = respx.post("https://api.acedata.cloud/nano-banana/images").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        image_args = ["-i", "https://example.com/photo.jpg"] if command == "edit" else []
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                command,
+                "Make it blue",
+                "-m",
+                "nano-banana-2.1",
+                "-r",
+                resolution,
+                "-n",
+                "2",
+                *image_args,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        body = json.loads(route.calls.last.request.content)
+        assert body["action"] == command
+        assert body["model"] == "nano-banana-2.1"
+        assert body["resolution"] == resolution
+        assert body["count"] == 2
+        if command == "edit":
+            assert body["image_urls"] == ["https://example.com/photo.jpg"]
+
+    @pytest.mark.parametrize("command", ["generate", "edit"])
+    @respx.mock
+    def test_nano_banana_2_1_rejects_official_variant(self, runner, command):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", command, "test", "-m", "nano-banana-2.1:official"],
+        )
+        assert result.exit_code == 2
+        assert "Invalid value for" in result.output
+        assert not respx.calls
+
     @respx.mock
     def test_generate_with_official_model(self, runner, mock_image_response):
         respx.post("https://api.acedata.cloud/nano-banana/images").mock(
