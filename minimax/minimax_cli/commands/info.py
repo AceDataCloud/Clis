@@ -10,6 +10,9 @@ from minimax_cli.core.output import console, print_models
 def models() -> None:
     """List available MiniMax models."""
     print_models()
+    console.print(
+        "MiniMax-H3-Max: use max-video; 480P/768P, 5–15 seconds. Native utilities: enhance-prompt and regenerate."
+    )
 
 
 @click.command()
