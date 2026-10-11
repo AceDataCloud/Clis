@@ -44,10 +44,7 @@ from maestro_cli.core.output import (
     "--lang",
     "langs",
     multiple=True,
-    help=(
-        "Output language(s) e.g. zh-cn, en. First is primary; each additional adds "
-        "+6 credits. Defaults to zh-cn."
-    ),
+    help="One output language per task, e.g. zh-cn or en. Defaults to zh-cn.",
 )
 @click.option(
     "--aspect",
@@ -117,8 +114,8 @@ def create(
         raise click.UsageError("--ref-task-id is required for remix, edit, and extend actions.")
     if len(file_urls) > 20:
         raise click.UsageError("At most 20 reference media URLs are allowed.")
-    if len(langs) > 4:
-        raise click.UsageError("At most 4 output languages are allowed.")
+    if len(langs) > 1:
+        raise click.UsageError("Only one output language is allowed per task.")
 
     client = get_client(ctx.obj.get("token"))
 

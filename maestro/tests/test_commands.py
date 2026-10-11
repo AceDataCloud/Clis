@@ -34,6 +34,8 @@ class TestGlobalCommands:
         assert "PROMPT" in result.output
         assert "--action" in result.output
         assert "--quality" not in result.output
+        assert "One output language per task" in result.output
+        assert "+6" not in result.output
 
     def test_help_task(self, runner):
         result = runner.invoke(cli, ["task", "--help"])
@@ -54,7 +56,7 @@ class TestCreateCommand:
 
     @respx.mock
     def test_create_json(self, runner, mock_video_response):
-        respx.post("https://api.acedata.cloud/maestro/videos").mock(
+        route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
@@ -64,6 +66,8 @@ class TestCreateCommand:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["task_id"] == "maestro-task-123"
+        sent = json.loads(route.calls[0].request.content)
+        assert "langs" not in sent
 
     @respx.mock
     def test_create_rich_output(self, runner, mock_video_response):
@@ -274,28 +278,19 @@ class TestCreateCommand:
         )
         assert result.exit_code == 0
 
+    @pytest.mark.parametrize("lang", ["zh-cn", "en"])
     @respx.mock
-    def test_create_with_multiple_langs(self, runner, mock_video_response):
+    def test_create_with_one_language(self, runner, mock_video_response, lang):
         route = respx.post("https://api.acedata.cloud/maestro/videos").mock(
             return_value=Response(200, json=mock_video_response)
         )
         result = runner.invoke(
             cli,
-            [
-                "--token",
-                "test-token",
-                "create",
-                "test",
-                "--lang",
-                "zh-cn",
-                "--lang",
-                "en",
-                "--json",
-            ],
+            ["--token", "test-token", "create", "test", "--lang", lang, "--json"],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["langs"] == ["zh-cn", "en"]
+        assert sent["langs"] == [lang]
 
     @respx.mock
     def test_create_with_file_urls(self, runner, mock_video_response):
@@ -366,7 +361,12 @@ class TestCreateCommand:
         assert result.exit_code != 0
         assert "--ref-task-id is required" in result.output
 
-    def test_create_rejects_more_than_four_languages(self, runner):
+    @pytest.mark.parametrize(
+        "langs", [("zh-cn", "en"), ("en", "en"), ("zh-cn", "en", "es", "fr", "de")]
+    )
+    @respx.mock(assert_all_called=False)
+    def test_create_rejects_multiple_languages(self, runner, langs):
+        route = respx.post("https://api.acedata.cloud/maestro/videos")
         result = runner.invoke(
             cli,
             [
@@ -374,20 +374,12 @@ class TestCreateCommand:
                 "test-token",
                 "create",
                 "test",
-                "--lang",
-                "zh-cn",
-                "--lang",
-                "en",
-                "--lang",
-                "es",
-                "--lang",
-                "fr",
-                "--lang",
-                "de",
+                *[option for lang in langs for option in ("--lang", lang)],
             ],
         )
-        assert result.exit_code != 0
-        assert "At most 4 output languages are allowed." in result.output
+        assert result.exit_code == 2
+        assert "Only one output language is allowed per task." in result.output
+        assert not route.called
 
     def test_create_rejects_more_than_twenty_file_urls(self, runner):
         result = runner.invoke(
@@ -397,7 +389,11 @@ class TestCreateCommand:
                 "test-token",
                 "create",
                 "test",
-                *[option for _ in range(21) for option in ("--file-url", "https://example.com/ref")],
+                *[
+                    option
+                    for _ in range(21)
+                    for option in ("--file-url", "https://example.com/ref")
+                ],
             ],
         )
         assert result.exit_code != 0
