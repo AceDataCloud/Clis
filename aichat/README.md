@@ -128,4 +128,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## Links
 
 - [AceDataCloud Platform](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=aichat_cli_readme_platform)
-- [API Documentation](https://docs.acedata.cloud)
+- [API Documentation](https://platform.acedata.cloud/documents?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=aichat_cli_readme_documents)
