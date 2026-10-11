@@ -174,8 +174,15 @@ def print_task_result(data: dict[str, Any]) -> None:
             table.add_column("Field", style="bold cyan", width=15)
             table.add_column("Value")
 
-            for key in ["id", "status", "state", "audio_url", "video_url", "model_name",
-                        "created_at"]:
+            for key in [
+                "id",
+                "status",
+                "state",
+                "audio_url",
+                "video_url",
+                "model_name",
+                "created_at",
+            ]:
                 if task_data.get(key):
                     table.add_row(key.replace("_", " ").title(), str(task_data[key]))
 
@@ -186,8 +193,7 @@ def print_task_result(data: dict[str, Any]) -> None:
         table.add_column("Field", style="bold cyan", width=15)
         table.add_column("Value")
 
-        for key in ["id", "status", "state", "audio_url", "video_url", "model_name",
-                    "created_at"]:
+        for key in ["id", "status", "state", "audio_url", "video_url", "model_name", "created_at"]:
             if tasks.get(key):
                 table.add_row(key.replace("_", " ").title(), str(tasks[key]))
 

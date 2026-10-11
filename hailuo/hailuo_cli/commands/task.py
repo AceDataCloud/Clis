@@ -74,6 +74,7 @@ def tasks_batch(
         print_error(e.message)
         raise SystemExit(1) from e
 
+
 @click.command()
 @click.argument("task_id")
 @click.option(
