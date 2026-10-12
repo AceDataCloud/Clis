@@ -147,9 +147,7 @@ class TestGenerateCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "wan3.0-video"
         assert body["duration"] == 30
-        assert body["media"] == [
-            {"type": "first_frame", "url": "https://example.com/start.png"}
-        ]
+        assert body["media"] == [{"type": "first_frame", "url": "https://example.com/start.png"}]
         assert body["ratio"] == "16:9"
         assert body["seed"] == 123
         assert body["watermark"] is True

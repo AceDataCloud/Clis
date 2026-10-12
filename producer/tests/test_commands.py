@@ -68,9 +68,7 @@ class TestGenerateCommands:
         respx.post("https://api.acedata.cloud/producer/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "generate", "A test prompt"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "generate", "A test prompt"])
         assert result.exit_code == 0
         assert "test-task-123" in result.output
 

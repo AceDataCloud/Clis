@@ -83,9 +83,7 @@ class TestProducerClient:
         )
         client = ProducerClient(api_token="test-token")
         with pytest.raises(ProducerTimeoutError):
-            client.request(
-                "/producer/audios", {"action": "generate", "prompt": "test"}, timeout=1
-            )
+            client.request("/producer/audios", {"action": "generate", "prompt": "test"}, timeout=1)
 
     @respx.mock
     def test_request_removes_none_values(self):

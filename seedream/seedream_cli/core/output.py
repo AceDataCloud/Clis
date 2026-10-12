@@ -98,10 +98,7 @@ def print_image_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
-    if "id" in data:
-        tasks = [data]
-    else:
-        tasks = data.get("items", data.get("data", []))
+    tasks = [data] if "id" in data else data.get("items", data.get("data", []))
 
     if isinstance(tasks, list):
         for task_data in tasks:
