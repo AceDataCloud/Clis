@@ -60,7 +60,7 @@ def _content_options(command):
     command = click.option(
         "--contents",
         required=True,
-        help="Contents as a JSON array.",
+        help="Contents as a JSON array (text, image, video or audio parts).",
     )(command)
     command = click.option(
         "-m",

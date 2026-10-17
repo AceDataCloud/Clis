@@ -62,6 +62,39 @@ gemini models
 > endpoint. Use the native `/v1beta/models/{model}:generateContent` API for
 > image generation.
 
+## Native audio input
+
+`generate-content` and `stream-generate-content` accept audio alongside text,
+images and video through the native `--contents` JSON array. Use `inlineData`
+with `mimeType` and base64-encoded `data`, or `fileData` with `mimeType` and
+`fileUri`.
+
+For a remote recording, replace the example URL with your audio file's directly
+accessible HTTPS URL. It must not require login; any signed URL must remain
+valid throughout processing.
+
+```bash
+GEMINI_REQUEST_TIMEOUT=300 gemini generate-content \
+  --model gemini-2.5-flash \
+  --contents '[{"role":"user","parts":[
+    {"text":"Summarize this recording."},
+    {"fileData":{"mimeType":"audio/mpeg","fileUri":"https://example.com/audio.mp3"}}
+  ]}]' \
+  --json
+```
+
+Non-streaming audio analysis returns only when processing finishes and can take
+more than 90 seconds. Set `GEMINI_REQUEST_TIMEOUT` before starting the CLI to a
+sufficiently long value for the file size and workload; 300 seconds above is an
+example, not a guaranteed processing limit. The default is 30 seconds. This
+setting controls HTTPX network timeouts, not an overall wall-clock deadline.
+For streaming, use `stream-generate-content` with the same contents and
+`--alt sse`.
+
+Audio output, built-in tools and explicit context caching do not have uniformly
+guaranteed availability. Audio input support does not imply those capabilities
+are supported by every model.
+
 ## Available Video Models
 
 | Model | Notes |
