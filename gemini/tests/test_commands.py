@@ -5,8 +5,9 @@ import json
 import pytest
 import respx
 from click.testing import CliRunner
-from httpx import Response
+from httpx import ReadTimeout, Response
 
+from gemini_cli.core.config import Settings, settings
 from gemini_cli.core.output import GEMINI_CHAT_MODELS, GEMINI_NATIVE_MODELS
 from gemini_cli.main import cli
 
@@ -66,6 +67,7 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["generate-content", "--help"])
         assert result.exit_code == 0
         assert "--contents" in result.output
+        assert "audio parts" in result.output
         assert "--generation-config" in result.output
         assert "--cached-content" not in result.output
 
@@ -73,6 +75,7 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["stream-generate-content", "--help"])
         assert result.exit_code == 0
         assert "--contents" in result.output
+        assert "audio parts" in result.output
         assert "--cached-content" not in result.output
 
     def test_chat_model_inventory_includes_current_public_model(self):
@@ -540,6 +543,90 @@ class TestVideoCommand:
 
 class TestContentCommands:
     """Tests for native Gemini content commands."""
+
+    @pytest.mark.parametrize(
+        ("command", "operation"),
+        [
+            ("generate-content", "generateContent"),
+            ("stream-generate-content", "streamGenerateContent"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        "audio_part",
+        [
+            {"inlineData": {"mimeType": "audio/wav", "data": "dGVzdCBhdWRpbw=="}},
+            {
+                "fileData": {
+                    "mimeType": "audio/mpeg",
+                    "fileUri": "https://example.com/audio.mp3?signature=test",
+                }
+            },
+        ],
+    )
+    @respx.mock
+    def test_audio_input_preserves_payload_and_configured_timeout(
+        self, runner, monkeypatch, command, operation, audio_part
+    ):
+        monkeypatch.setenv("GEMINI_REQUEST_TIMEOUT", "300")
+        monkeypatch.setattr(settings, "request_timeout", Settings().request_timeout)
+        route = respx.post(
+            f"https://api.acedata.cloud/v1beta/models/gemini-2.5-flash:{operation}"
+        ).mock(return_value=Response(200, json={}))
+        contents = [{"role": "user", "parts": [{"text": "Summarize this recording."}, audio_part]}]
+
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                command,
+                "--model",
+                "gemini-2.5-flash",
+                "--contents",
+                json.dumps(contents),
+                "--json",
+            ],
+        )
+
+        assert result.exit_code == 0, result.output
+        request = route.calls.last.request
+        assert json.loads(request.content) == {"contents": contents}
+        assert request.extensions["timeout"] == {
+            "connect": 300.0,
+            "read": 300.0,
+            "write": 300.0,
+            "pool": 300.0,
+        }
+
+    @pytest.mark.parametrize(
+        ("command", "operation"),
+        [
+            ("generate-content", "generateContent"),
+            ("stream-generate-content", "streamGenerateContent"),
+        ],
+    )
+    @respx.mock
+    def test_audio_input_reports_timeout(self, runner, monkeypatch, command, operation):
+        monkeypatch.setattr(settings, "request_timeout", 300.0)
+        respx.post(f"https://api.acedata.cloud/v1beta/models/gemini-2.5-flash:{operation}").mock(
+            side_effect=ReadTimeout("Audio analysis timed out")
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                command,
+                "--model",
+                "gemini-2.5-flash",
+                "--contents",
+                '[{"parts":[{"fileData":{"mimeType":"audio/mpeg",'
+                '"fileUri":"https://example.com/audio.mp3"}}]}]',
+            ],
+        )
+
+        assert result.exit_code == 1
+        assert "timed out after 300.0s" in " ".join(result.output.split())
 
     @respx.mock
     def test_generate_content_json(self, runner, mock_chat_response):
