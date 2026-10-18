@@ -49,6 +49,10 @@ class TestGlobalCommands:
         assert "--page-size" in result.output
         assert "--title-language" in result.output
         assert "--sort-by" in result.output
+        help_text = " ".join(result.output.split())
+        assert "across API tokens. Voices remain public." in help_text
+        assert "not supported with --self" in help_text
+        assert "--self supports created_at and task_count" in help_text
 
     def test_help_model(self, runner):
         result = runner.invoke(cli, ["model", "--help"])
@@ -354,6 +358,70 @@ class TestModelCommands:
         result = runner.invoke(cli, ["--token", "test-token", "models", "--self", "--json"])
         assert result.exit_code == 0
         assert "self=true" in str(route.calls[0].request.url)
+
+    @pytest.mark.parametrize("sort_by", ["created_at", "task_count"])
+    @respx.mock
+    def test_models_self_with_filters(self, runner, mock_models_response, sort_by):
+        route = respx.get("https://api.acedata.cloud/fish/model").mock(
+            return_value=Response(200, json={**mock_models_response, "has_more": False})
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "models",
+                "--self",
+                "--author-id",
+                "voice-author",
+                "--sort-by",
+                sort_by,
+                "--page-size",
+                "5",
+                "--page-number",
+                "2",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert dict(route.calls[0].request.url.params) == {
+            "self": "true",
+            "author_id": "voice-author",
+            "sort_by": sort_by,
+            "page_size": "5",
+            "page_number": "2",
+        }
+        assert json.loads(result.output)["has_more"] is False
+
+    @pytest.mark.parametrize(
+        "args,message",
+        [
+            (["--title-language", "en"], "--title-language is not supported with --self"),
+            (["--sort-by", "like_count"], "--self supports --sort-by created_at or task_count"),
+        ],
+    )
+    @respx.mock
+    def test_models_rejects_unsupported_self_filters(self, runner, args, message):
+        result = runner.invoke(cli, ["--token", "test-token", "models", "--self", *args])
+        assert result.exit_code == 2
+        assert message in result.output
+        assert not respx.calls
+
+    @pytest.mark.parametrize("self_only,has_more", [(False, None), (True, False), (True, True)])
+    @respx.mock
+    def test_models_preserves_pagination_metadata(
+        self, runner, mock_models_response, self_only, has_more
+    ):
+        response = {**mock_models_response, "has_more": has_more}
+        respx.get("https://api.acedata.cloud/fish/model").mock(
+            return_value=Response(200, json=response)
+        )
+        args = ["--token", "test-token", "models", "--json"]
+        if self_only:
+            args.append("--self")
+        result = runner.invoke(cli, args)
+        assert result.exit_code == 0
+        assert json.loads(result.output) == response
 
     @respx.mock
     def test_models_with_new_query_params(self, runner, mock_models_response):

@@ -37,7 +37,7 @@ from fish_cli.core.output import print_error, print_json, print_model_detail, pr
     "self_only",
     is_flag=True,
     default=False,
-    help="Only return voice models created by the current account.",
+    help="List voices created and saved through this platform by the current account, across API tokens. Voices remain public.",
 )
 @click.option(
     "--author-id",
@@ -52,12 +52,12 @@ from fish_cli.core.output import print_error, print_json, print_model_detail, pr
 @click.option(
     "--title-language",
     default=None,
-    help="Filter by title language.",
+    help="Filter the public voice library by title language (not supported with --self).",
 )
 @click.option(
     "--sort-by",
     default=None,
-    help="Sort models by a specific field.",
+    help="Sort models by a field; --self supports created_at and task_count.",
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
@@ -82,6 +82,11 @@ def models(
       fish models --self
       fish models --title "my voice" --language en
     """
+    if self_only and title_language is not None:
+        raise click.UsageError("--title-language is not supported with --self.")
+    if self_only and sort_by not in (None, "created_at", "task_count"):
+        raise click.UsageError("--self supports --sort-by created_at or task_count.")
+
     client = get_client(ctx.obj.get("token"))
 
     params: dict[str, object] = {
