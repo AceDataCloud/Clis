@@ -57,12 +57,13 @@ def mock_models_response():
                 "state": "trained",
                 "tags": [],
                 "languages": ["zh", "en"],
-                "visibility": "private",
+                "visibility": "public",
                 "created_at": "2025-05-09T12:34:56.789Z",
                 "updated_at": "2025-05-09T12:34:56.789Z",
             }
         ],
         "total": 1,
+        "has_more": None,
     }
 
 
@@ -78,7 +79,7 @@ def mock_model_response():
         "train_mode": "fast",
         "tags": [],
         "languages": ["zh", "en"],
-        "visibility": "private",
+        "visibility": "public",
         "created_at": "2025-05-09T12:34:56.789Z",
         "updated_at": "2025-05-09T12:34:56.789Z",
         "like_count": 0,
