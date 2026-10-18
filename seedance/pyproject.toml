@@ -1,7 +1,7 @@
 [project]
 name = "seedance-cli"
 version = "0.1.0"
-description = "CLI tool for Seedance AI Video Generation via AceDataCloud API"
+description = "Seedance video generation CLI by Ace Data Cloud"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
@@ -16,10 +16,11 @@ keywords = [
     "seedance",
     "ai",
     "video",
-    "video",
     "generation",
     "acedata",
-    "command-line"
+    "command-line",
+    "acedatacloud",
+    "seedance-api",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

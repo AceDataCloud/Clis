@@ -1,7 +1,7 @@
 [project]
 name = "openai-pro-cli"
 version = "0.1.0"
-description = "CLI tool for OpenAI-compatible APIs via AceDataCloud"
+description = "GPT Image generation and OpenAI-compatible CLI by Ace Data Cloud"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
@@ -20,6 +20,9 @@ keywords = [
     "image-generation",
     "acedata",
     "command-line",
+    "acedatacloud",
+    "gpt-image",
+    "gpt-image-2.5",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

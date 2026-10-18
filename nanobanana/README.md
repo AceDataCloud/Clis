@@ -1,4 +1,26 @@
-# NanoBanana CLI
+# Nano Banana by Ace Data Cloud — CLI
+
+## Install the Ace integration
+
+This integration is maintained by **Ace Data Cloud** and uses your Ace API key. It is not an official client published by the model owner. Check the [PyPI package](https://pypi.org/project/nano-banana-pro-cli/) and its AceDataCloud repository before installing.
+
+```bash
+python -m pip install nano-banana-pro-cli
+nano-banana-pro --help
+nano-banana-pro models
+```
+
+The commands above show local help/reference information and do not submit a generation. Then follow **Get API Token** below: register/sign in, initialize General application if needed, create/copy an application key, and store it in the terminal's `ACEDATACLOUD_API_TOKEN` environment variable. Do not use a platform management token.
+
+Generation follows your account's current service access, balance and pricing. Save the returned task ID and query that **same ID**; do not repeat generation while a task is pending.
+
+```text
+nano-banana-pro task <task-id>
+nano-banana-pro wait <task-id> --interval 5
+```
+
+A successful command or running preview does not prove a completed media result. Check the task's terminal outcome and returned media link. [中文首次使用指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md) · [Service-name package directory](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES.md)
+
 
 [![PyPI version](https://img.shields.io/pypi/v/nano-banana-pro-cli.svg)](https://pypi.org/project/nano-banana-pro-cli/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/nano-banana-pro-cli.svg)](https://pypi.org/project/nano-banana-pro-cli/)

@@ -1,12 +1,29 @@
-# HappyHorse CLI
+# HappyHorse by Ace Data Cloud — source CLI
 
 A command-line tool for AI video generation using HappyHorse through the AceDataCloud platform.
 
-## Installation
+## Installation status
+
+The HappyHorse MCP package is publicly available at [mcp-happyhorse](https://pypi.org/project/mcp-happyhorse/) from [AceDataCloud/HappyHorseMCP](https://github.com/AceDataCloud/HappyHorseMCP). This CLI is maintained in the Clis source repository; a PyPI release named `happyhorse-cli` and a standalone HappyHorseCli mirror were **not published when checked on 2026-10-18**. Use the existing published MCP if you need a registry-distributed integration.
+
+For the source CLI, use the pinned source below in an isolated Python environment; it is a local source installation, not a PyPI release. [中文安装与密钥指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md)
+
+## Source installation
 
 ```bash
-pip install happyhorse-cli
+python -m pip install "git+https://github.com/AceDataCloud/Clis.git@06c580dbfddd59f9b9bb1c80e86776723fc6cfd3#subdirectory=happyhorse"
 ```
+
+## API key and free local checks
+
+Register/sign in at [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=happyhorse_cli_readme_api_key), initialize General application if needed, and copy or create an API Key with HappyHorse generation and task-query access. Check expiration, limits, balance and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=happyhorse_cli_readme_pricing). Store only the raw token in `ACEDATACLOUD_API_TOKEN`, never a prompt or commit. A platform account-management token is different.
+
+```bash
+happyhorse --help
+happyhorse models
+```
+
+These are local reference commands. Generation is charged under your current account terms. Save its task ID; use `happyhorse task <task-id>` or `happyhorse wait <task-id>` for that same task instead of generating again.
 
 ## Usage
 
