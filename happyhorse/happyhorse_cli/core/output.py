@@ -132,9 +132,7 @@ def print_models() -> None:
     table.add_row("happyhorse-1.1-i2v", "Image-to-Video", "Generate video from image")
     table.add_row("happyhorse-1.0-r2v", "Reference-to-Video", "Generate video from reference")
     table.add_row("happyhorse-1.1-r2v", "Reference-to-Video", "Generate video from reference")
-    table.add_row(
-        "happyhorse-1.0-video-edit", "Video Edit", "Edit video with text instructions"
-    )
+    table.add_row("happyhorse-1.0-video-edit", "Video Edit", "Edit video with text instructions")
 
     console.print(table)
     console.print(f"\n[dim]Default model: {DEFAULT_MODEL}[/dim]")

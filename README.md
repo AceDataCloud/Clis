@@ -16,6 +16,12 @@ Monorepo for all AceDataCloud command-line interface tools.
 
 Save the key in the client's credential store or the environment variable shown below. Never put it in a prompt, shared workflow, screenshot, or Git commit. If authentication fails, check the full copied value, application/service access, expiration, usage limit, and balance before creating another key.
 
+## Find a service package
+
+Start with the service name you need: [Suno, Seedance, HappyHorse, GPT Image and Nano Banana](docs/SERVICE_PACKAGES.md). The directory gives the actual Ace-owned package/repository, local checks and published versus source-only state. A package under a similar name may belong to another publisher.
+
+The source ADC CLI also offers an offline `adc packages suno` / `adc packages "gpt image" --json` directory. It becomes available to registry users only after the ADC package containing this change is released. This command does not install tools or submit API requests. [中文](docs/SERVICE_PACKAGES_zh-CN.md)
+
 ## CLIs
 
 | Directory | Standalone Repo | Description |

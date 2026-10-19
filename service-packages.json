@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "evidence_date": "2026-10-19",
+  "publisher": "Ace Data Cloud",
+  "source_repository": "https://github.com/AceDataCloud/Clis",
+  "package_status_is_observed_not_a_release_trigger": true,
+  "services": [
+    {
+      "slug": "suno",
+      "label": "Suno",
+      "brand": "Suno by Ace Data Cloud",
+      "search_terms": [
+        "suno",
+        "suno music",
+        "suno cli"
+      ],
+      "cli_directory": "suno",
+      "cli_package": "suno-cli",
+      "cli_command": "suno",
+      "cli_published": true,
+      "cli_repo": "https://github.com/AceDataCloud/SunoCli",
+      "mcp_package": "mcp-suno",
+      "mcp_repo": "https://github.com/AceDataCloud/SunoMCP",
+      "documentation": "suno-mcp",
+      "safe_command": "suno models",
+      "task_commands": [
+        "suno task <task-id>",
+        "suno wait <task-id> --interval 5"
+      ],
+      "note": "Independent music CLI and MCP packages; no upstream Suno affiliation is implied.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-suno"
+      ]
+    },
+    {
+      "slug": "seedance",
+      "label": "Seedance",
+      "brand": "Seedance by Ace Data Cloud",
+      "search_terms": [
+        "seedance",
+        "seedance video",
+        "seedance cli"
+      ],
+      "cli_directory": "seedance",
+      "cli_package": "seedance-cli",
+      "cli_command": "seedance",
+      "cli_published": true,
+      "cli_repo": "https://github.com/AceDataCloud/SeedanceCli",
+      "mcp_package": "mcp-seedance",
+      "mcp_repo": "https://github.com/AceDataCloud/SeedanceMCP",
+      "documentation": "seedance-mcp",
+      "safe_command": "seedance models",
+      "task_commands": [
+        "seedance task <task-id>",
+        "seedance wait <task-id> --interval 5"
+      ],
+      "note": "Independent video CLI and MCP packages.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-seedance"
+      ]
+    },
+    {
+      "slug": "happyhorse",
+      "label": "HappyHorse",
+      "brand": "HappyHorse by Ace Data Cloud",
+      "search_terms": [
+        "happyhorse",
+        "happy horse",
+        "happyhorse video"
+      ],
+      "cli_directory": "happyhorse",
+      "cli_package": "happyhorse-cli",
+      "cli_command": "happyhorse",
+      "cli_published": false,
+      "cli_repo": null,
+      "mcp_package": "mcp-happyhorse",
+      "mcp_repo": "https://github.com/AceDataCloud/HappyHorseMCP",
+      "documentation": "happyhorse",
+      "safe_command": "happyhorse models",
+      "task_commands": [
+        "happyhorse task <task-id>",
+        "happyhorse wait <task-id> --interval 5"
+      ],
+      "note": "The MCP is published. The CLI is source-only: no happyhorse-cli registry release or HappyHorseCli mirror was verified on the evidence date.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-happyhorse"
+      ]
+    },
+    {
+      "slug": "gpt-image",
+      "label": "GPT Image",
+      "brand": "GPT Image by Ace Data Cloud",
+      "search_terms": [
+        "gpt image",
+        "gpt-image",
+        "gpt-image-2.5"
+      ],
+      "cli_directory": "openai",
+      "cli_package": "openai-pro-cli",
+      "cli_command": "openai-cli",
+      "cli_published": true,
+      "cli_repo": "https://github.com/AceDataCloud/OpenAICli",
+      "mcp_package": "mcp-openai-pro",
+      "mcp_repo": "https://github.com/AceDataCloud/OpenAIMCP",
+      "documentation": "openai",
+      "safe_command": "openai-cli image --help",
+      "task_commands": [
+        "openai-cli tasks retrieve --id <task-id>"
+      ],
+      "note": "The GPT Image-only entry reuses the Ace-owned mcp-openai-pro distribution with --profile gpt-image (version 2026.10.18.2 or newer), exposing five image/task tools. It is a dedicated service profile and Registry entry, not a separate PyPI package. The general OpenAI package is unchanged; do not substitute the generic hosted OpenAI remote.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "--from",
+        "mcp-openai-pro>=2026.10.18.2",
+        "mcp-openai-pro",
+        "--profile",
+        "gpt-image"
+      ],
+      "mcp_profile": "gpt-image",
+      "mcp_min_version": "2026.10.18.2",
+      "mcp_registry_name": "io.github.AceDataCloud/mcp-gpt-image",
+      "mcp_registry_url": "https://registry.modelcontextprotocol.io/?q=io.github.AceDataCloud%2Fmcp-gpt-image",
+      "mcp_guide_url": "https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md"
+    },
+    {
+      "slug": "nano-banana",
+      "label": "Nano Banana",
+      "brand": "Nano Banana by Ace Data Cloud",
+      "search_terms": [
+        "nano banana",
+        "nano-banana",
+        "nanobanana"
+      ],
+      "cli_directory": "nanobanana",
+      "cli_package": "nano-banana-pro-cli",
+      "cli_command": "nano-banana-pro",
+      "cli_published": true,
+      "cli_repo": "https://github.com/AceDataCloud/NanoBananaCli",
+      "mcp_package": "mcp-nanobanana-pro",
+      "mcp_repo": "https://github.com/AceDataCloud/NanoBananaMCP",
+      "documentation": "nano-banana-mcp",
+      "safe_command": "nano-banana-pro models",
+      "task_commands": [
+        "nano-banana-pro task <task-id>",
+        "nano-banana-pro wait <task-id> --interval 5"
+      ],
+      "note": "Independent image CLI and MCP packages.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-nanobanana-pro"
+      ]
+    }
+  ]
+}

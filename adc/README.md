@@ -22,6 +22,16 @@ Save the key in the client's credential store or the environment variable shown 
 pip install acedatacloud-cli
 ```
 
+## Find a service by name
+
+```bash
+adc packages suno
+adc packages "gpt image" --json
+adc packages "nano banana"
+```
+
+This local directory shows Ace-maintained service packages and their observed publication state. It never installs a package or submits a request. HappyHorse's standalone CLI is source-only; use the published MCP entry when you need a registry package. See the [service-name directory](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES.md) for publisher checks and first-use steps.
+
 ## Quick Start
 
 ```bash

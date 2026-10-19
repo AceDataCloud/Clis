@@ -3,10 +3,16 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
+
+try:
+    from .service_packages import bundled, validate
+except ImportError:
+    from service_packages import bundled, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 # Retain the historical source/mirror mapping without advertising it as active.
@@ -46,13 +52,17 @@ def attribution_errors(text: str, entry: str) -> list[str]:
         if any(query.get(key) != [value] for key, value in expected.items()):
             errors.append(f"expected opensource/referral/evergreen attribution: {url}")
         content = query.get("utm_content", [])
-        if len(content) != 1 or not re.fullmatch(r"[a-z0-9][a-z0-9_.-]{0,95}", content[0]):
+        if len(content) != 1 or not re.fullmatch(
+            r"[a-z0-9][a-z0-9_.-]{0,95}", content[0]
+        ):
             errors.append(f"missing or malformed utm_content: {url}")
         elif not content[0].startswith(f"{entry}_readme_"):
             errors.append(f"utm_content belongs to another CLI: {url}")
         if {key for key in query if key.startswith("utm_")} != UTM_KEYS:
             errors.append(f"unexpected or missing UTM fields: {url}")
-        if parts.path == "/console/applications" and content == [f"{entry}_readme_api_key"]:
+        if parts.path == "/console/applications" and content == [
+            f"{entry}_readme_api_key"
+        ]:
             found_api_key = True
     if not found_api_key:
         errors.append("missing the attributed Applications API key entry")
@@ -60,8 +70,14 @@ def attribution_errors(text: str, entry: str) -> list[str]:
 
 
 def main() -> int:
-    mappings = set(re.findall(r"^  ([a-z0-9_-]+):\s*$", (ROOT / "sync.yaml").read_text(), re.MULTILINE))
-    listed = set(re.findall(r"^\| `([^/`]+)/`", (ROOT / "README.md").read_text(), re.MULTILINE))
+    mappings = set(
+        re.findall(
+            r"^  ([a-z0-9_-]+):\s*$", (ROOT / "sync.yaml").read_text(), re.MULTILINE
+        )
+    )
+    listed = set(
+        re.findall(r"^\| `([^/`]+)/`", (ROOT / "README.md").read_text(), re.MULTILINE)
+    )
     missing = sorted(mappings - listed)
     extra = sorted(listed - mappings)
     if missing or extra:
@@ -71,17 +87,32 @@ def main() -> int:
             print(f"README lists unmapped CLIs: {', '.join(extra)}", file=sys.stderr)
         return 1
     readmes = [(ROOT / "README.md", "cli_catalog")]
-    readmes.extend((ROOT / alias / "README.md", alias.replace("-", "_") + "_cli") for alias in sorted(mappings - RETIRED))
+    readmes.extend(
+        (ROOT / alias / "README.md", alias.replace("-", "_") + "_cli")
+        for alias in sorted(mappings - RETIRED)
+    )
     errors = []
+    package_data = json.loads((ROOT / "service-packages.json").read_text())
+    errors.extend(validate(package_data))
+    package_copy = ROOT / "adc/adc_cli/service_packages.json"
+    if not package_copy.is_file() or package_copy.read_text() != bundled(package_data):
+        errors.append(
+            "ADC service directory is stale; run python3 scripts/service_packages.py --write"
+        )
     for path, entry in readmes:
         if not path.is_file():
             errors.append(f"{path.relative_to(ROOT)}: missing README")
             continue
-        errors.extend(f"{path.relative_to(ROOT)}: {error}" for error in attribution_errors(path.read_text(), entry))
+        errors.extend(
+            f"{path.relative_to(ROOT)}: {error}"
+            for error in attribution_errors(path.read_text(), entry)
+        )
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
-    print(f"README inventory matches {len(mappings)} mappings; attribution passes for catalog + {len(mappings - RETIRED)} active CLIs")
+    print(
+        f"README inventory matches {len(mappings)} mappings; attribution passes for catalog + {len(mappings - RETIRED)} active CLIs"
+    )
     return 0
 
 

@@ -1,4 +1,36 @@
-# OpenAI CLI
+# GPT Image and OpenAI APIs by Ace Data Cloud — CLI
+
+## Install the Ace integration
+
+This integration is maintained by **Ace Data Cloud** and uses your Ace API key. It is not an official client published by the model owner. Check the [PyPI package](https://pypi.org/project/openai-pro-cli/) and its AceDataCloud repository before installing.
+
+```bash
+python -m pip install openai-pro-cli
+openai-cli --help
+openai-cli image --help
+```
+
+The commands above show local help/reference information and do not submit a generation. Then follow **Get API Token** below: register/sign in, initialize General application if needed, create/copy an application key, and store it in the terminal's `ACEDATACLOUD_API_TOKEN` environment variable. Do not use a platform management token.
+
+Generation follows your account's current service access, balance and pricing. Save the returned task ID and query that **same ID**; do not repeat generation while a task is pending.
+
+```text
+openai-cli tasks retrieve --id <task-id>
+```
+
+A successful command or running preview does not prove a completed media result. Check the task's terminal outcome and returned media link. [中文首次使用指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md) · [Service-name package directory](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES.md)
+
+
+## GPT Image-only MCP service entry
+
+The [GPT Image service guide](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md) and official Registry entry `io.github.AceDataCloud/mcp-gpt-image` use the existing `mcp-openai-pro` package with `--profile gpt-image`. Install version `2026.10.18.2` or newer and preserve those arguments to expose five image/task tools. This is a dedicated service profile, not a new PyPI package and not the generic hosted OpenAI MCP URL.
+
+```bash
+uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image
+```
+
+Configure the raw application key in this server's environment. The free `gpt_image_list_models` is local reference information; generation still requires an explicit model, current permissions/balance/price and same-task retrieval.
+
 
 A command-line tool for OpenAI-compatible APIs via [AceDataCloud](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=openai_cli_readme_platform).
 

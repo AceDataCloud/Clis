@@ -15,6 +15,7 @@ from adc_cli.commands.auth import auth
 from adc_cli.commands.image import image
 from adc_cli.commands.info import config, services
 from adc_cli.commands.music import music
+from adc_cli.commands.packages import packages
 from adc_cli.commands.search import search
 from adc_cli.commands.task import task, wait_task
 from adc_cli.commands.video import video
@@ -74,6 +75,7 @@ cli.add_command(search)
 cli.add_command(task)
 cli.add_command(wait_task)
 cli.add_command(services)
+cli.add_command(packages)
 cli.add_command(config)
 
 

@@ -1,7 +1,7 @@
 [project]
 name = "nano-banana-pro-cli"
 version = "0.1.0"
-description = "CLI tool for NanoBanana AI Image Generation via AceDataCloud API"
+description = "Nano Banana image generation and editing CLI by Ace Data Cloud"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
@@ -21,6 +21,8 @@ keywords = [
     "gemini",
     "acedata",
     "command-line",
+    "acedatacloud",
+    "nano-banana",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
