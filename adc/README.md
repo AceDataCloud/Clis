@@ -30,7 +30,7 @@ adc packages "gpt image" --json
 adc packages "nano banana"
 ```
 
-This local directory shows Ace-maintained service packages and their observed publication state. It never installs a package or submits a request. HappyHorse's standalone CLI is source-only; use the published MCP entry when you need a registry package. See the [service-name directory](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES.md) for publisher checks and first-use steps.
+This local directory shows Ace-maintained service packages and their observed publication state. It never installs a package or submits a request. HappyHorse's standalone CLI is published; its directory entry carries the exact first-release version/hash/install receipt. The independent MCP entry remains available. See the [service-name directory](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES.md) for publisher checks and first-use steps.
 
 ## Quick Start
 

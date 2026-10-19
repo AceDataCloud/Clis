@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "evidence_date": "2026-10-19",
+  "evidence_date": "2026-10-20",
   "publisher": "Ace Data Cloud",
   "source_repository": "https://github.com/AceDataCloud/Clis",
   "package_status_is_observed_not_a_release_trigger": true,
@@ -73,7 +73,7 @@
       "cli_directory": "happyhorse",
       "cli_package": "happyhorse-cli",
       "cli_command": "happyhorse",
-      "cli_published": false,
+      "cli_published": true,
       "cli_repo": "https://github.com/AceDataCloud/HappyHorseCli",
       "mcp_package": "mcp-happyhorse",
       "mcp_repo": "https://github.com/AceDataCloud/HappyHorseMCP",
@@ -83,11 +83,37 @@
         "happyhorse task <task-id>",
         "happyhorse wait <task-id> --interval 5"
       ],
-      "note": "The MCP is published. The HappyHorseCli mirror contains the canonical source and build workflow; happyhorse-cli has no verified PyPI release as of 2026-10-19. First-project publication waits for the existing publisher allowance on 2026-10-20. Keep this source-only flag until an official package/version/hash and clean installation receipt exists.",
+      "note": "Independent HappyHorse CLI and MCP packages are published. The first CLI release 2026.10.19.4 was verified against official PyPI wheel/sdist hashes, exact source README and a clean installation with free help/models checks. This does not verify a paid generation, final video or bill.",
       "mcp_command": "uvx",
       "mcp_arguments": [
         "mcp-happyhorse"
-      ]
+      ],
+      "cli_min_version": "2026.10.19.4",
+      "publication_receipt": {
+        "verified_at": "2026-10-20T04:39:42.229227+08:00",
+        "version": "2026.10.19.4",
+        "official_url": "https://pypi.org/project/happyhorse-cli/2026.10.19.4/",
+        "official_metadata_url": "https://pypi.org/pypi/happyhorse-cli/2026.10.19.4/json",
+        "workflow_url": "https://github.com/AceDataCloud/HappyHorseCli/actions/runs/39320691210",
+        "source_sha": "87d3e63bcde057c8b8492840e35a662c0b1d63c4",
+        "artifacts": [
+          {
+            "filename": "happyhorse_cli-2026.10.19.4-py3-none-any.whl",
+            "sha256": "0d69518abae3a2e5c9492dabff142ffd3c4911d9ff48a15148ef31a7d93c86fa"
+          },
+          {
+            "filename": "happyhorse_cli-2026.10.19.4.tar.gz",
+            "sha256": "eefab4fd6b3f1410b4f38589ce3005ed7d0eb928f6bcd4cec031b14bf37a2ba8"
+          }
+        ],
+        "readme_matches_source": true,
+        "clean_install_verified": true,
+        "free_commands": [
+          "happyhorse --help",
+          "happyhorse models"
+        ],
+        "generation_verified": false
+      }
     },
     {
       "slug": "gpt-image",

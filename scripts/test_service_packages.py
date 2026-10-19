@@ -20,9 +20,7 @@ class ServicePackageDirectoryTests(unittest.TestCase):
     def test_unpublished_happyhorse_requires_new_receipt(self):
         data = copy.deepcopy(self.data)
         entry = next(item for item in data["services"] if item["slug"] == "happyhorse")
-        entry.update(
-            cli_published=True, cli_repo="https://github.com/AceDataCloud/HappyHorseCli"
-        )
+        entry.pop("publication_receipt", None)
         self.assertTrue(validate(data))
 
     def test_third_party_package_identity_is_not_an_ace_repository(self):
@@ -41,4 +39,20 @@ class ServiceProfileTests(unittest.TestCase):
         data = json.loads((ROOT / "service-packages.json").read_text())
         entry = next(item for item in data["services"] if item["slug"] == "gpt-image")
         entry["mcp_arguments"] = ["mcp-openai-pro"]
+        self.assertTrue(validate(data))
+
+
+class PublicationReceiptTests(unittest.TestCase):
+    def test_happyhorse_requires_both_official_artifact_hashes(self):
+        data = json.loads((ROOT / "service-packages.json").read_text())
+        entry = next(item for item in data["services"] if item["slug"] == "happyhorse")
+        entry["publication_receipt"]["artifacts"][0]["sha256"] = "not-a-valid-hash"
+        self.assertTrue(validate(data))
+
+    def test_receipt_cannot_point_to_an_unrelated_registry_project(self):
+        data = json.loads((ROOT / "service-packages.json").read_text())
+        entry = next(item for item in data["services"] if item["slug"] == "happyhorse")
+        entry["publication_receipt"]["official_metadata_url"] = (
+            "https://pypi.org/pypi/another-package/1/json"
+        )
         self.assertTrue(validate(data))

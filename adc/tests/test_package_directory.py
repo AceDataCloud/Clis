@@ -21,7 +21,15 @@ def test_service_name_aliases_work_without_a_token(monkeypatch):
         assert [item["slug"] for item in json.loads(result.output)["services"]] == [slug]
 
 
-def test_source_only_cli_is_not_an_install_recommendation():
+def test_source_only_cli_is_not_an_install_recommendation(monkeypatch, tmp_path):
+    from importlib import import_module
+
+    directory = import_module("adc_cli.commands.packages")
+    data = json.loads(directory.files("adc_cli").joinpath("service_packages.json").read_text())
+    entry = next(item for item in data["services"] if item["slug"] == "happyhorse")
+    entry["cli_published"] = False
+    (tmp_path / "service_packages.json").write_text(json.dumps(data))
+    monkeypatch.setattr(directory, "files", lambda _name: tmp_path)
     result = CliRunner().invoke(cli, ["packages", "happyhorse"])
     assert result.exit_code == 0
     assert "source only" in result.output
@@ -53,3 +61,16 @@ def test_gpt_image_text_launch_preserves_five_tool_profile():
     assert "mcp-openai-pro>=2026.10.18.2" in result.output
     assert "five image/task tools" in result.output
     assert "not a separate PyPI package" in result.output
+
+
+def test_published_happyhorse_offers_a_verified_install_entry():
+    runner = CliRunner()
+    result = runner.invoke(cli, ["packages", "happyhorse"])
+    assert result.exit_code == 0
+    assert "pip install happyhorse-cli" in result.output
+    assert "source only" not in result.output
+    data = json.loads(runner.invoke(cli, ["packages", "happyhorse", "--json"]).output)
+    entry = data["services"][0]
+    assert entry["cli_published"] is True
+    assert entry["publication_receipt"]["version"] == "2026.10.19.4"
+    assert entry["publication_receipt"]["generation_verified"] is False
