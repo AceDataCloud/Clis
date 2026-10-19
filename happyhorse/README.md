@@ -1,20 +1,20 @@
-# HappyHorse by Ace Data Cloud — source CLI
+# HappyHorse by Ace Data Cloud — CLI
 
 A command-line tool for AI video generation using HappyHorse through the AceDataCloud platform.
 
-## Installation status
+## Install the published Ace integration
 
-The HappyHorse MCP package is publicly available at [mcp-happyhorse](https://pypi.org/project/mcp-happyhorse/) from [AceDataCloud/HappyHorseMCP](https://github.com/AceDataCloud/HappyHorseMCP). This CLI is maintained in the Clis source repository; the [HappyHorseCli mirror](https://github.com/AceDataCloud/HappyHorseCli) now contains this source and its standard build workflow. A PyPI release named `happyhorse-cli` is **not published as of 2026-10-19**. The existing publisher's new-project allowance resumes on 2026-10-20; until the first exact-version receipt, this remains a source installation. Use the existing published MCP if you need a registry-distributed integration.
-
-For the source CLI, use the pinned source below in an isolated Python environment; it is a local source installation, not a PyPI release. [中文安装与密钥指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md)
-
-The [publication checklist](https://github.com/AceDataCloud/Clis/blob/main/happyhorse/PUBLICATION.md) records the concrete mirror/package release steps and the temporary publisher-project allowance gate. The repository is already populated; no new account registration is required.
-
-## Source installation
+This CLI is maintained by **Ace Data Cloud** for HappyHorse. It is not an official client published by the model owner. The first public release, [happyhorse-cli 2026.10.19.4](https://pypi.org/project/happyhorse-cli/2026.10.19.4/), was published and verified on **2026-10-20 Asia/Shanghai**. The version uses the release workflow's UTC date.
 
 ```bash
-python -m pip install "git+https://github.com/AceDataCloud/Clis.git@06c580dbfddd59f9b9bb1c80e86776723fc6cfd3#subdirectory=happyhorse"
+python -m pip install happyhorse-cli
+happyhorse --help
+happyhorse models
 ```
+
+The local help/model-reference commands do not send a generation request or need a key. Check the package's source is [AceDataCloud/HappyHorseCli](https://github.com/AceDataCloud/HappyHorseCli). Canonical source remains [Clis/happyhorse](https://github.com/AceDataCloud/Clis/tree/main/happyhorse); do not edit the mirror directly. The independently published [HappyHorse MCP](https://pypi.org/project/mcp-happyhorse/) is also available for MCP hosts.
+
+[中文安装与密钥指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md) · [Exact first-release receipt and maintenance sequence](https://github.com/AceDataCloud/Clis/blob/main/happyhorse/PUBLICATION.md)
 
 ## API key and free local checks
 
@@ -26,6 +26,12 @@ happyhorse models
 ```
 
 These are local reference commands. Generation is charged under your current account terms. Save its task ID; use `happyhorse task <task-id>` or `happyhorse wait <task-id>` for that same task instead of generating again.
+
+![Copy an application API key or open Manage Keys](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
+
+![Create a dedicated key](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png)
+
+These are existing redacted platform screenshots from the SunoDify source archived on 2026-10-08, reused for the same key flow. The original name “Dify tutorial” is an example. They show only shared key management, not a HappyHorse generation. Original capture time/frontend version is not established.
 
 ## Usage
 

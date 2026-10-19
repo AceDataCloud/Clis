@@ -28,9 +28,36 @@ def validate(data: dict) -> list[str]:
             if value and not value.startswith("https://github.com/AceDataCloud/"):
                 errors.append(f"unexpected publisher in {field}: {slug}")
         if entry["cli_published"] and entry["cli_directory"] == "happyhorse":
-            errors.append(
-                "HappyHorse CLI requires a new registry/repository receipt before promotion"
-            )
+            receipt = entry.get("publication_receipt", {})
+            version = receipt.get("version", "")
+            artifacts = receipt.get("artifacts", [])
+            if (
+                not re.fullmatch(r"[0-9]+(?:\.[0-9]+)+", version)
+                or receipt.get("official_metadata_url")
+                != f"https://pypi.org/pypi/{entry['cli_package']}/{version}/json"
+                or not receipt.get("workflow_url", "").startswith(
+                    "https://github.com/AceDataCloud/HappyHorseCli/actions/runs/"
+                )
+                or not re.fullmatch(r"[0-9a-f]{40}", receipt.get("source_sha", ""))
+                or receipt.get("clean_install_verified") is not True
+                or receipt.get("readme_matches_source") is not True
+                or len(artifacts) != 2
+                or not all(
+                    re.fullmatch(r"[0-9a-f]{64}", artifact.get("sha256", ""))
+                    for artifact in artifacts
+                )
+                or not any(
+                    artifact.get("filename", "").endswith(".whl")
+                    for artifact in artifacts
+                )
+                or not any(
+                    artifact.get("filename", "").endswith(".tar.gz")
+                    for artifact in artifacts
+                )
+            ):
+                errors.append(
+                    "HappyHorse CLI needs its official version/hash/source/install receipt"
+                )
         if entry.get("mcp_command") != "uvx" or not entry.get("mcp_arguments"):
             errors.append(f"missing the exact isolated MCP launch path: {slug}")
         if slug == "gpt-image":

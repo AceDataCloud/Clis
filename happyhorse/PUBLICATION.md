@@ -1,45 +1,28 @@
-# HappyHorse CLI publication handoff
+# HappyHorse CLI first-publication receipt
 
-Checked 2026-10-19. This is an execution checklist, not a package-release receipt.
+Verified **2026-10-20 Asia/Shanghai** using the existing publisher identity. The shared new-project queue released this owner alone after its prior observed quota time; exactly **one** normal `publish=true` dispatch was made. No 429, retry, new account or permission change occurred.
 
-The existing source is `AceDataCloud/Clis/happyhorse`; the live service already
-has an independently distributed `mcp-happyhorse`. Do not duplicate its API
-client into a new codebase or mark this source-only CLI as published.
+- Public package: [happyhorse-cli 2026.10.19.4](https://pypi.org/project/happyhorse-cli/2026.10.19.4/).
+- Official metadata: [version JSON](https://pypi.org/pypi/happyhorse-cli/2026.10.19.4/json).
+- Normal workflow: [run 39320691210](https://github.com/AceDataCloud/HappyHorseCli/actions/runs/39320691210), build and publish successful, source `87d3e63bcde057c8b8492840e35a662c0b1d63c4`.
+- Canonical source: Clis `7135f0673e7b58948969dd1aa296d98b17b7c395`, `happyhorse/`; mirror pyproject matches that source.
+- Uploads: 2026-10-20 04:36:47/48 Asia/Shanghai. The date-based package version uses UTC, so the `2026.10.19` prefix is expected.
 
-## Gate and next executable sequence
+| Artifact | Official SHA-256 |
+|---|---|
+| happyhorse_cli-2026.10.19.4-py3-none-any.whl | 0d69518abae3a2e5c9492dabff142ffd3c4911d9ff48a15148ef31a7d93c86fa |
+| happyhorse_cli-2026.10.19.4.tar.gz | eefab4fd6b3f1410b4f38589ce3005ed7d0eb928f6bcd4cec031b14bf37a2ba8 |
 
-The existing PyPI publisher identity works. The coordinating release queue
-reports the new-project allowance resumes on **2026-10-20**. This is a
-publisher-quota wait, not a request to register a new account or grant access.
+Both downloaded artifacts match those official hashes. The wheel and sdist UTF-8 README match the exact publishing source, including the existing service-specific API-key/current-price CTA with all four UTM fields. The initial version's source-stage installation note is now corrected in this follow-up source PR; immutable release files are not edited or republished.
 
-1. The non-empty `AceDataCloud/HappyHorseCli` mirror was created on 2026-10-19 from the complete canonical source/tests at Clis f4c000c, and its build/publication workflow is reviewed separately. Re-read current Clis main and existing HappyHorse repository/PR inventory.
-   If no mirror has been created, create `AceDataCloud/HappyHorseCli` under the
-   existing bot identity; do not create an empty mirror before its source and
-   workflow are ready. Use the same single-source/mirror convention as SunoCli.
-2. Submit one scoped Clis PR adding the `happyhorse` mapping to `sync.yaml` and
-   the root mirror inventory. Keep the package directory unchanged except for
-   verified release metadata. Retain source-only status until the first PyPI
-   receipt exists; do not prematurely set `cli_published=true` in the catalog.
-3. Configure the mirror's standard build/test/date-version publish workflow,
-   excluding `.github` from source synchronization as in the existing mirrors.
-   Reuse the existing organization publisher access. If an actual authentication
-   error occurs, report its exact job/error and selected-repository secret
-   requirement; do not ask for a new PyPI registration or put tokens in chat.
-4. After the coordinating shared merge and mirror synchronization, run the
-   ordinary package checks and first publish when the project allowance permits.
-   Use a unique date version, not the source scaffold's `0.1.0` as a current
-   registry assertion. Do not create a placeholder PyPI project for reservation.
-5. Read the official PyPI JSON and compare owner/source URLs, package README,
-   permissions/pricing CTA and wheel SHA-256. Install in a new isolated
-   environment and run only `happyhorse --help` and `happyhorse models` first.
-   These steps do not require a key or send a generation request.
-6. Only after those receipts, update `service-packages.json`, its bundled ADC
-   copy and documentation together. Include the exact package/repository/version
-   receipt in that follow-up PR, removing the temporary source-only guard.
+A fresh Python 3.12 venv without system dependencies used a no-cache mirror-backed install of this exact public version. `uv pip check`, `happyhorse --help`, `happyhorse models` and `happyhorse --version` passed. No API credential was present and no search, generation or paid media request ran.
+
+## Publication-state update
+
+`service-packages.json` may now set `cli_published=true` with the versioned official metadata URL, source/run, both artifact hashes and clean-install receipt. Refresh the bundled ADC copy at the same time. The validator must reject promotion without the receipt; don't retain the temporary unconditional source-only guard after the first successful publication.
+
+Canonical source remains `AceDataCloud/Clis/happyhorse`. Its normal mirror synchronization may publish a new date/run version after this guide update. Use that ordinary chain rather than dispatching the already successful first-publication run or overwriting immutable files. Read any later version separately before replacing this frozen first-release receipt.
 
 ## Separate business acceptance
 
-A successful publish or local model table does not prove video generation,
-account access, terminal media, a unique bill or attributed signup/payment.
-Those require their own authorized checks. Preserve the returned task ID and
-query that same task rather than starting a second generation to poll it.
+Package publication, local model-reference output and a clean installation do not prove video generation, actual account/model access, terminal media, a unique bill, normal webpage service-term discovery or attributed signup/payment. Those require their own authorized checks. Save a generation's task ID and query the same task, never create another task merely to poll it.

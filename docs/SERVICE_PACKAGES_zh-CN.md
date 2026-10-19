@@ -2,13 +2,13 @@
 
 [English](SERVICE_PACKAGES.md)
 
-以下是 **Ace Data Cloud 提供的服务集成**，不是模型方官方客户端。包名、源码身份与发布状态核验日为 **2026-10-19**；搜索排名、具体宿主安装和真实生成需分别验证，同名第三方包不能当 Ace 收录。
+以下是 **Ace Data Cloud 提供的服务集成**，不是模型方官方客户端。包名、源码身份与发布状态核验日为 **2026-10-20**；搜索排名、具体宿主安装和真实生成需分别验证，同名第三方包不能当 Ace 收录。
 
 | 服务 | Ace CLI 包 | Ace MCP 包 | 本地免费检查 |
 |---|---|---|---|
 | Suno by Ace Data Cloud | [suno-cli](https://pypi.org/project/suno-cli/) | [mcp-suno](https://pypi.org/project/mcp-suno/) | `suno models` |
 | Seedance by Ace Data Cloud | [seedance-cli](https://pypi.org/project/seedance-cli/) | [mcp-seedance](https://pypi.org/project/mcp-seedance/) | `seedance models` |
-| HappyHorse by Ace Data Cloud | happyhorse-cli — source only / 未发布 | [mcp-happyhorse](https://pypi.org/project/mcp-happyhorse/) | `happyhorse models` |
+| HappyHorse by Ace Data Cloud | [happyhorse-cli](https://pypi.org/project/happyhorse-cli/) | [mcp-happyhorse](https://pypi.org/project/mcp-happyhorse/) | `happyhorse models` |
 | GPT Image by Ace Data Cloud | [openai-pro-cli](https://pypi.org/project/openai-pro-cli/) | [mcp-openai-pro](https://pypi.org/project/mcp-openai-pro/) | `openai-cli image --help` |
 | Nano Banana by Ace Data Cloud | [nano-banana-pro-cli](https://pypi.org/project/nano-banana-pro-cli/) | [mcp-nanobanana-pro](https://pypi.org/project/mcp-nanobanana-pro/) | `nano-banana-pro models` |
 
@@ -24,7 +24,7 @@ suno --help
 suno models
 ```
 
-HappyHorse 已有公开 MCP；[HappyHorseCli镜像](https://github.com/AceDataCloud/HappyHorseCli)与标准构建链已备好，现有publisher新项目额度10-20恢复；首次PyPI回执前仍为源码安装，不能用未发布包的 `pip install happyhorse-cli`。GPT Image CLI 使用现有 `openai-pro-cli`。MCP 已有独立品牌工具入口：官方 Registry 名称 `io.github.AceDataCloud/mcp-gpt-image`，复用 **mcp-openai-pro>=2026.10.18.2** 并保留 **--profile gpt-image**，只展示五个图像/任务工具；这不是新PyPI包。不要用泛OpenAI托管地址代替它，也不要把第三方PyPI同名 `mcp-gpt-image` 当Ace包。按[完整GPT Image指南](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md)配置：
+HappyHorse CLI 已正式公开：[happyhorse-cli 2026.10.19.4](https://pypi.org/project/happyhorse-cli/2026.10.19.4/) 于2026-10-20上海时间发布，使用现有publisher正常流程。官方wheel/sdist哈希、精确源码README和新环境安装/本地help/models已验证；版本日期按UTC。现在可 `python -m pip install happyhorse-cli`，但这不代表真实视频生成或账单已验。独立HappyHorse MCP仍可按需安装。GPT Image CLI 使用现有 `openai-pro-cli`。MCP 已有独立品牌工具入口：官方 Registry 名称 `io.github.AceDataCloud/mcp-gpt-image`，复用 **mcp-openai-pro>=2026.10.18.2** 并保留 **--profile gpt-image**，只展示五个图像/任务工具；这不是新PyPI包。不要用泛OpenAI托管地址代替它，也不要把第三方PyPI同名 `mcp-gpt-image` 当Ace包。按[完整GPT Image指南](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md)配置：
 
 ```bash
 uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image

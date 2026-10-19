@@ -2,13 +2,13 @@
 
 [简体中文](SERVICE_PACKAGES_zh-CN.md)
 
-These are **Ace Data Cloud integrations for the named services**, not official clients from the model owners. The package names, publisher/repository links and observed publication state below were checked on **2026-10-19**. Search ranking and installation in a third-party host are separate checks; a matching name alone is not proof of ownership.
+These are **Ace Data Cloud integrations for the named services**, not official clients from the model owners. The package names, publisher/repository links and observed publication state below were checked on **2026-10-20**. Search ranking and installation in a third-party host are separate checks; a matching name alone is not proof of ownership.
 
 | Service | Ace CLI package | Ace MCP package | Free local check |
 |---|---|---|---|
 | Suno by Ace Data Cloud | [suno-cli](https://pypi.org/project/suno-cli/) | [mcp-suno](https://pypi.org/project/mcp-suno/) | `suno models` |
 | Seedance by Ace Data Cloud | [seedance-cli](https://pypi.org/project/seedance-cli/) | [mcp-seedance](https://pypi.org/project/mcp-seedance/) | `seedance models` |
-| HappyHorse by Ace Data Cloud | happyhorse-cli — source only / 未发布 | [mcp-happyhorse](https://pypi.org/project/mcp-happyhorse/) | `happyhorse models` |
+| HappyHorse by Ace Data Cloud | [happyhorse-cli](https://pypi.org/project/happyhorse-cli/) | [mcp-happyhorse](https://pypi.org/project/mcp-happyhorse/) | `happyhorse models` |
 | GPT Image by Ace Data Cloud | [openai-pro-cli](https://pypi.org/project/openai-pro-cli/) | [mcp-openai-pro](https://pypi.org/project/mcp-openai-pro/) | `openai-cli image --help` |
 | Nano Banana by Ace Data Cloud | [nano-banana-pro-cli](https://pypi.org/project/nano-banana-pro-cli/) | [mcp-nanobanana-pro](https://pypi.org/project/mcp-nanobanana-pro/) | `nano-banana-pro models` |
 
@@ -24,7 +24,7 @@ suno --help
 suno models
 ```
 
-HappyHorse already has a published MCP. Its [HappyHorseCli mirror](https://github.com/AceDataCloud/HappyHorseCli) and standard build workflow are prepared; the first PyPI release waits for the existing publisher project allowance on 2026-10-20. It remains source-only until a real release receipt: [pinned source installation](https://github.com/AceDataCloud/Clis/tree/main/happyhorse). The GPT Image CLI uses the existing `openai-pro-cli`. Its MCP has a separately named service entry, `io.github.AceDataCloud/mcp-gpt-image`, while reusing **mcp-openai-pro>=2026.10.18.2** with **--profile gpt-image**. That profile exposes five image/task tools; it is not a separate PyPI distribution. Preserve the profile arguments instead of substituting the generic OpenAI hosted URL. Do not install the unrelated third-party PyPI package named `mcp-gpt-image`. Follow the [complete service guide](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md):
+The [HappyHorse CLI 2026.10.19.4](https://pypi.org/project/happyhorse-cli/2026.10.19.4/) is now published (2026-10-20 Asia/Shanghai, with a UTC-based version). Its official wheel/sdist hashes, exact-source README and clean install/local help/models were verified through the existing publisher flow. You may use `python -m pip install happyhorse-cli`; this is not proof of a video-generation result or bill. The independently published HappyHorse MCP remains available. The GPT Image CLI uses the existing `openai-pro-cli`. Its MCP has a separately named service entry, `io.github.AceDataCloud/mcp-gpt-image`, while reusing **mcp-openai-pro>=2026.10.18.2** with **--profile gpt-image**. That profile exposes five image/task tools; it is not a separate PyPI distribution. Preserve the profile arguments instead of substituting the generic OpenAI hosted URL. Do not install the unrelated third-party PyPI package named `mcp-gpt-image`. Follow the [complete service guide](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md):
 
 ```bash
 uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image
