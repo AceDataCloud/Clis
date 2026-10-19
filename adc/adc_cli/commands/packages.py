@@ -2,6 +2,7 @@
 
 import json
 import re
+import shlex
 from importlib.resources import files
 
 import click
@@ -50,8 +51,12 @@ def packages(query: str, output_json: bool) -> None:
             click.echo(
                 f"  CLI: source only; {entry['cli_package']} is not a verified published package"
             )
-        click.echo(f"  MCP: https://pypi.org/project/{entry['mcp_package']}/")
-        click.echo(f"  Local check: {entry['safe_command']}")
+        click.echo(f"  MCP package: https://pypi.org/project/{entry['mcp_package']}/")
+        click.echo(f"  MCP launch: {shlex.join([entry['mcp_command'], *entry['mcp_arguments']])}")
+        if entry.get("mcp_registry_url"):
+            click.echo(f"  Service Registry entry: {entry['mcp_registry_url']}")
+        label = "Local check" if entry["cli_published"] else "After source installation only"
+        click.echo(f"  {label}: {entry['safe_command']}")
         click.echo(f"  {entry['note']}")
     if not matches:
         click.echo("No matching service in this package directory.")

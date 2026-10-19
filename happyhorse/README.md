@@ -8,6 +8,8 @@ The HappyHorse MCP package is publicly available at [mcp-happyhorse](https://pyp
 
 For the source CLI, use the pinned source below in an isolated Python environment; it is a local source installation, not a PyPI release. [中文安装与密钥指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md)
 
+The [publication checklist](https://github.com/AceDataCloud/Clis/blob/main/happyhorse/PUBLICATION.md) records the concrete mirror/package release steps and the temporary publisher-project allowance gate. No new account registration is required.
+
 ## Source installation
 
 ```bash

@@ -2,7 +2,7 @@
 
 [English](SERVICE_PACKAGES.md)
 
-以下是 **Ace Data Cloud 提供的服务集成**，不是模型方官方客户端。包名、源码身份与发布状态核验日为 **2026-10-18**；搜索排名、具体宿主安装和真实生成需分别验证，同名第三方包不能当 Ace 收录。
+以下是 **Ace Data Cloud 提供的服务集成**，不是模型方官方客户端。包名、源码身份与发布状态核验日为 **2026-10-19**；搜索排名、具体宿主安装和真实生成需分别验证，同名第三方包不能当 Ace 收录。
 
 | 服务 | Ace CLI 包 | Ace MCP 包 | 本地免费检查 |
 |---|---|---|---|
@@ -24,7 +24,13 @@ suno --help
 suno models
 ```
 
-HappyHorse 已有公开 MCP；CLI 仍为源码安装，不能用未发布包的 `pip install happyhorse-cli`。GPT Image 当前使用 Ace 的 `openai-pro-cli` / `mcp-openai-pro`；不把第三方同名 `mcp-gpt-image` 当成 Ace 独立收录。MCP 包可能共用顶层 Python 模块，请使用宿主的独立 `uvx` 环境，不要把多个包直接混装到同一环境运行。
+HappyHorse 已有公开 MCP；CLI 仍为源码安装，不能用未发布包的 `pip install happyhorse-cli`。GPT Image CLI 使用现有 `openai-pro-cli`。MCP 已有独立品牌工具入口：官方 Registry 名称 `io.github.AceDataCloud/mcp-gpt-image`，复用 **mcp-openai-pro>=2026.10.18.2** 并保留 **--profile gpt-image**，只展示五个图像/任务工具；这不是新PyPI包。不要用泛OpenAI托管地址代替它，也不要把第三方PyPI同名 `mcp-gpt-image` 当Ace包。按[完整GPT Image指南](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md)配置：
+
+```bash
+uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image
+```
+
+把本机自己的应用Key放入宿主该server的 `ACEDATACLOUD_API_TOKEN`，先用免费静态 `gpt_image_list_models`，不发生成。独立Registry收录不代表所有下游客户端GUI安装已验。MCP 包可能共用顶层 Python 模块，请使用宿主的独立 `uvx` 环境，不要把多个包直接混装到同一环境运行。
 
 ## 2. 注册/登录并取得正确的 API Key
 

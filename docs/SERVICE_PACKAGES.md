@@ -2,7 +2,7 @@
 
 [简体中文](SERVICE_PACKAGES_zh-CN.md)
 
-These are **Ace Data Cloud integrations for the named services**, not official clients from the model owners. The package names, publisher/repository links and observed publication state below were checked on **2026-10-18**. Search ranking and installation in a third-party host are separate checks; a matching name alone is not proof of ownership.
+These are **Ace Data Cloud integrations for the named services**, not official clients from the model owners. The package names, publisher/repository links and observed publication state below were checked on **2026-10-19**. Search ranking and installation in a third-party host are separate checks; a matching name alone is not proof of ownership.
 
 | Service | Ace CLI package | Ace MCP package | Free local check |
 |---|---|---|---|
@@ -24,7 +24,13 @@ suno --help
 suno models
 ```
 
-HappyHorse already has a published MCP. Its CLI remains source-only: [pinned source installation](https://github.com/AceDataCloud/Clis/tree/main/happyhorse). GPT Image currently uses the Ace-owned `openai-pro-cli` and `mcp-openai-pro`; we do not claim an independent GPT Image listing or a third-party `mcp-gpt-image` package. Install separate MCP packages in separate environments, such as each host's `uvx` launcher, because they may share top-level Python module names.
+HappyHorse already has a published MCP. Its CLI remains source-only: [pinned source installation](https://github.com/AceDataCloud/Clis/tree/main/happyhorse). The GPT Image CLI uses the existing `openai-pro-cli`. Its MCP has a separately named service entry, `io.github.AceDataCloud/mcp-gpt-image`, while reusing **mcp-openai-pro>=2026.10.18.2** with **--profile gpt-image**. That profile exposes five image/task tools; it is not a separate PyPI distribution. Preserve the profile arguments instead of substituting the generic OpenAI hosted URL. Do not install the unrelated third-party PyPI package named `mcp-gpt-image`. Follow the [complete service guide](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md):
+
+```bash
+uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image
+```
+
+Configure your own application key in this server's `ACEDATACLOUD_API_TOKEN` field, then begin with the free static `gpt_image_list_models`. Do not submit a generation for installation validation. The Registry entry does not prove every downstream client's GUI installation. Install separate MCP packages in separate environments, such as each host's `uvx` launcher, because they may share top-level Python module names.
 
 ## 2. Register/sign in and create the right API key
 

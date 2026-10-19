@@ -34,3 +34,11 @@ class ServicePackageDirectoryTests(unittest.TestCase):
         data = copy.deepcopy(self.data)
         data["services"].append(data["services"][0])
         self.assertTrue(validate(data))
+
+
+class ServiceProfileTests(unittest.TestCase):
+    def test_gpt_image_cannot_silently_become_generic_openai(self):
+        data = json.loads((ROOT / "service-packages.json").read_text())
+        entry = next(item for item in data["services"] if item["slug"] == "gpt-image")
+        entry["mcp_arguments"] = ["mcp-openai-pro"]
+        self.assertTrue(validate(data))

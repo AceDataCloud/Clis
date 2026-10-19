@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "evidence_date": "2026-10-18",
+  "evidence_date": "2026-10-19",
   "publisher": "Ace Data Cloud",
   "source_repository": "https://github.com/AceDataCloud/Clis",
   "package_status_is_observed_not_a_release_trigger": true,
@@ -27,7 +27,11 @@
         "suno task <task-id>",
         "suno wait <task-id> --interval 5"
       ],
-      "note": "Independent music CLI and MCP packages; no upstream Suno affiliation is implied."
+      "note": "Independent music CLI and MCP packages; no upstream Suno affiliation is implied.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-suno"
+      ]
     },
     {
       "slug": "seedance",
@@ -51,7 +55,11 @@
         "seedance task <task-id>",
         "seedance wait <task-id> --interval 5"
       ],
-      "note": "Independent video CLI and MCP packages."
+      "note": "Independent video CLI and MCP packages.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-seedance"
+      ]
     },
     {
       "slug": "happyhorse",
@@ -75,7 +83,11 @@
         "happyhorse task <task-id>",
         "happyhorse wait <task-id> --interval 5"
       ],
-      "note": "The MCP is published. The CLI is source-only: no happyhorse-cli registry release or HappyHorseCli mirror was verified on the evidence date."
+      "note": "The MCP is published. The CLI is source-only: no happyhorse-cli registry release or HappyHorseCli mirror was verified on the evidence date.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-happyhorse"
+      ]
     },
     {
       "slug": "gpt-image",
@@ -98,7 +110,20 @@
       "task_commands": [
         "openai-cli tasks retrieve --id <task-id>"
       ],
-      "note": "GPT Image is provided by the existing Ace-owned OpenAI package. A same-named third-party package is not an Ace listing; no dedicated GPT Image package is claimed."
+      "note": "The GPT Image-only entry reuses the Ace-owned mcp-openai-pro distribution with --profile gpt-image (version 2026.10.18.2 or newer), exposing five image/task tools. It is a dedicated service profile and Registry entry, not a separate PyPI package. The general OpenAI package is unchanged; do not substitute the generic hosted OpenAI remote.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "--from",
+        "mcp-openai-pro>=2026.10.18.2",
+        "mcp-openai-pro",
+        "--profile",
+        "gpt-image"
+      ],
+      "mcp_profile": "gpt-image",
+      "mcp_min_version": "2026.10.18.2",
+      "mcp_registry_name": "io.github.AceDataCloud/mcp-gpt-image",
+      "mcp_registry_url": "https://registry.modelcontextprotocol.io/?q=io.github.AceDataCloud%2Fmcp-gpt-image",
+      "mcp_guide_url": "https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md"
     },
     {
       "slug": "nano-banana",
@@ -122,7 +147,11 @@
         "nano-banana-pro task <task-id>",
         "nano-banana-pro wait <task-id> --interval 5"
       ],
-      "note": "Independent image CLI and MCP packages."
+      "note": "Independent image CLI and MCP packages.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-nanobanana-pro"
+      ]
     }
   ]
 }
