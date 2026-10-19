@@ -89,3 +89,8 @@ mappings:
     exclude:
       - .github
       - .gitbooks
+  happyhorse:
+    repo: AceDataCloud/HappyHorseCli
+    exclude:
+      - .github
+      - .gitbooks

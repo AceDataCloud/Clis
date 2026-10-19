@@ -66,10 +66,10 @@ happyhorse-cli = "happyhorse_cli.main:cli"
 happyhorse = "happyhorse_cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/AceDataCloud/Clis/tree/main/happyhorse"
-Repository = "https://github.com/AceDataCloud/Clis/tree/main/happyhorse"
-Issues = "https://github.com/AceDataCloud/Clis/issues"
-Changelog = "https://github.com/AceDataCloud/Clis/blob/main/happyhorse/CHANGELOG.md"
+Homepage = "https://github.com/AceDataCloud/HappyHorseCli"
+Repository = "https://github.com/AceDataCloud/HappyHorseCli"
+Issues = "https://github.com/AceDataCloud/HappyHorseCli/issues"
+Changelog = "https://github.com/AceDataCloud/HappyHorseCli/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling>=1.21.0,<1.22.0"]
