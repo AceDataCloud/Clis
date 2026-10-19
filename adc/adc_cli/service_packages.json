@@ -74,7 +74,7 @@
       "cli_package": "happyhorse-cli",
       "cli_command": "happyhorse",
       "cli_published": false,
-      "cli_repo": null,
+      "cli_repo": "https://github.com/AceDataCloud/HappyHorseCli",
       "mcp_package": "mcp-happyhorse",
       "mcp_repo": "https://github.com/AceDataCloud/HappyHorseMCP",
       "documentation": "happyhorse",
@@ -83,7 +83,7 @@
         "happyhorse task <task-id>",
         "happyhorse wait <task-id> --interval 5"
       ],
-      "note": "The MCP is published. The CLI is source-only: no happyhorse-cli registry release or HappyHorseCli mirror was verified on the evidence date.",
+      "note": "The MCP is published. The HappyHorseCli mirror contains the canonical source and build workflow; happyhorse-cli has no verified PyPI release as of 2026-10-19. First-project publication waits for the existing publisher allowance on 2026-10-20. Keep this source-only flag until an official package/version/hash and clean installation receipt exists.",
       "mcp_command": "uvx",
       "mcp_arguments": [
         "mcp-happyhorse"

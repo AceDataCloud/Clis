@@ -42,6 +42,7 @@ The source ADC CLI also offers an offline `adc packages suno` / `adc packages "g
 | `hailuo/` | [HailuoCli](https://github.com/AceDataCloud/HailuoCli) | Hailuo video generation CLI |
 | `kling/` | [KlingCli](https://github.com/AceDataCloud/KlingCli) | Kling video generation CLI |
 | `openai/` | [OpenAICli](https://github.com/AceDataCloud/OpenAICli) | OpenAI-compatible API CLI |
+| `happyhorse/` | [HappyHorseCli](https://github.com/AceDataCloud/HappyHorseCli) | HappyHorse video CLI; first PyPI publication pending |
 | `producer/` | [ProducerCli](https://github.com/AceDataCloud/ProducerCli) | Producer music generation CLI |
 | `webextrator/` | [WebExtratorCli](https://github.com/AceDataCloud/WebExtratorCli) | Web extraction and rendering CLI |
 

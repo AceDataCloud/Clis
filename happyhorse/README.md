@@ -4,11 +4,11 @@ A command-line tool for AI video generation using HappyHorse through the AceData
 
 ## Installation status
 
-The HappyHorse MCP package is publicly available at [mcp-happyhorse](https://pypi.org/project/mcp-happyhorse/) from [AceDataCloud/HappyHorseMCP](https://github.com/AceDataCloud/HappyHorseMCP). This CLI is maintained in the Clis source repository; a PyPI release named `happyhorse-cli` and a standalone HappyHorseCli mirror were **not published when checked on 2026-10-18**. Use the existing published MCP if you need a registry-distributed integration.
+The HappyHorse MCP package is publicly available at [mcp-happyhorse](https://pypi.org/project/mcp-happyhorse/) from [AceDataCloud/HappyHorseMCP](https://github.com/AceDataCloud/HappyHorseMCP). This CLI is maintained in the Clis source repository; the [HappyHorseCli mirror](https://github.com/AceDataCloud/HappyHorseCli) now contains this source and its standard build workflow. A PyPI release named `happyhorse-cli` is **not published as of 2026-10-19**. The existing publisher's new-project allowance resumes on 2026-10-20; until the first exact-version receipt, this remains a source installation. Use the existing published MCP if you need a registry-distributed integration.
 
 For the source CLI, use the pinned source below in an isolated Python environment; it is a local source installation, not a PyPI release. [中文安装与密钥指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md)
 
-The [publication checklist](https://github.com/AceDataCloud/Clis/blob/main/happyhorse/PUBLICATION.md) records the concrete mirror/package release steps and the temporary publisher-project allowance gate. No new account registration is required.
+The [publication checklist](https://github.com/AceDataCloud/Clis/blob/main/happyhorse/PUBLICATION.md) records the concrete mirror/package release steps and the temporary publisher-project allowance gate. The repository is already populated; no new account registration is required.
 
 ## Source installation
 

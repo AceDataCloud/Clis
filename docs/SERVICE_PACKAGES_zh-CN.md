@@ -24,7 +24,7 @@ suno --help
 suno models
 ```
 
-HappyHorse 已有公开 MCP；CLI 仍为源码安装，不能用未发布包的 `pip install happyhorse-cli`。GPT Image CLI 使用现有 `openai-pro-cli`。MCP 已有独立品牌工具入口：官方 Registry 名称 `io.github.AceDataCloud/mcp-gpt-image`，复用 **mcp-openai-pro>=2026.10.18.2** 并保留 **--profile gpt-image**，只展示五个图像/任务工具；这不是新PyPI包。不要用泛OpenAI托管地址代替它，也不要把第三方PyPI同名 `mcp-gpt-image` 当Ace包。按[完整GPT Image指南](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md)配置：
+HappyHorse 已有公开 MCP；[HappyHorseCli镜像](https://github.com/AceDataCloud/HappyHorseCli)与标准构建链已备好，现有publisher新项目额度10-20恢复；首次PyPI回执前仍为源码安装，不能用未发布包的 `pip install happyhorse-cli`。GPT Image CLI 使用现有 `openai-pro-cli`。MCP 已有独立品牌工具入口：官方 Registry 名称 `io.github.AceDataCloud/mcp-gpt-image`，复用 **mcp-openai-pro>=2026.10.18.2** 并保留 **--profile gpt-image**，只展示五个图像/任务工具；这不是新PyPI包。不要用泛OpenAI托管地址代替它，也不要把第三方PyPI同名 `mcp-gpt-image` 当Ace包。按[完整GPT Image指南](https://github.com/AceDataCloud/OpenAIMCP/blob/main/GPT_IMAGE.md)配置：
 
 ```bash
 uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image

@@ -12,7 +12,7 @@ The existing PyPI publisher identity works. The coordinating release queue
 reports the new-project allowance resumes on **2026-10-20**. This is a
 publisher-quota wait, not a request to register a new account or grant access.
 
-1. Re-read the current Clis main and existing HappyHorse repository/PR inventory.
+1. The non-empty `AceDataCloud/HappyHorseCli` mirror was created on 2026-10-19 from the complete canonical source/tests at Clis f4c000c, and its build/publication workflow is reviewed separately. Re-read current Clis main and existing HappyHorse repository/PR inventory.
    If no mirror has been created, create `AceDataCloud/HappyHorseCli` under the
    existing bot identity; do not create an empty mirror before its source and
    workflow are ready. Use the same single-source/mirror convention as SunoCli.
