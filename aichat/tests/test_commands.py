@@ -47,6 +47,10 @@ class TestGlobalCommands:
         assert "glm-5.3" in MODELS2
         assert MODELS.count("deepseek-v4-pro") == 1
         assert MODELS2.count("deepseek-v4-pro") == 1
+        assert "deepseek-v4.1-flash" in MODELS
+        assert "deepseek-v4.1-flash" in MODELS2
+        assert {"deepseek-r1", "deepseek-v3", "deepseek-v3.2-exp"}.isdisjoint(MODELS)
+        assert {"deepseek-r1", "deepseek-v3", "deepseek-v3.2-exp"}.isdisjoint(MODELS2)
 
     def test_new_model_families_render_without_misbranding(self):
         assert _get_model_family("gpt-6-sol") == "GPT-6"
