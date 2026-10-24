@@ -41,6 +41,17 @@ class TestGlobalCommands:
         assert "PROMPT" in result.output
         assert "--model" in result.output
 
+    @pytest.mark.parametrize("command", ["generate", "image-to-video"])
+    def test_reference_video_help_explains_billing(self, runner, command):
+        result = runner.invoke(cli, [command, "--help"])
+        assert result.exit_code == 0
+        help_text = " ".join(result.output.split())
+        assert "kling-o1/kling-v3-omni" in help_text
+        assert "Requires generate_audio=false" in help_text
+        assert "base (default) bills rounded output seconds" in help_text
+        assert "feature bills requested duration" in help_text
+        assert "usage.reference_video_seconds" in help_text
+
     def test_help_motion(self, runner):
         result = runner.invoke(cli, ["motion", "--help"])
         assert result.exit_code == 0
@@ -123,6 +134,8 @@ class TestGenerateCommands:
         body = json.loads(route.calls.last.request.content)
         assert "prompt" not in body
         assert body["duration"] == 5
+        assert "video_list" not in body
+        assert "reference_video_seconds" not in body
 
     @respx.mock
     def test_generate_with_decimal_duration(self, runner, mock_video_response):
@@ -373,6 +386,47 @@ class TestGenerateCommands:
         assert body["video_list"] == [
             {"video_url": "https://example.com/ref.mp4", "refer_type": "base"}
         ]
+
+    @pytest.mark.parametrize("command", ["generate", "image-to-video"])
+    @pytest.mark.parametrize("model", ["kling-o1", "kling-v3-omni"])
+    @pytest.mark.parametrize("mode", ["std", "pro"])
+    @pytest.mark.parametrize("refer_type", ["base", "feature"])
+    @respx.mock
+    def test_reference_video_billing_inputs(
+        self, runner, mock_video_response, command, model, mode, refer_type
+    ):
+        route = respx.post("https://api.acedata.cloud/kling/videos").mock(
+            return_value=Response(200, json=mock_video_response)
+        )
+        video_list = [{"video_url": "https://example.com/ref.mp4", "refer_type": refer_type}]
+        options = [
+            "--token",
+            "test-token",
+            command,
+            "Restyle <<<video_1>>>",
+            "--model",
+            model,
+            "--mode",
+            mode,
+            "--duration",
+            "5",
+            "--no-generate-audio",
+            "--video-list",
+            json.dumps(video_list),
+            "--json",
+        ]
+        if command == "image-to-video":
+            options += ["--image-list", '[{"image_url":"https://example.com/photo.jpg"}]']
+        result = runner.invoke(cli, options)
+        assert result.exit_code == 0
+        assert json.loads(result.output) == mock_video_response
+        body = json.loads(route.calls.last.request.content)
+        assert body["model"] == model
+        assert body["mode"] == mode
+        assert body["generate_audio"] is False
+        assert body["duration"] == 5
+        assert body["video_list"] == video_list
+        assert "reference_video_seconds" not in body
 
     def test_generate_with_invalid_video_list(self, runner):
         result = runner.invoke(

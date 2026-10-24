@@ -14,6 +14,8 @@ The commands above show local help/reference information and do not submit a gen
 
 Generation follows your account's current service access, balance and pricing. Save the returned task ID and query that **same ID**; do not repeat generation while a task is pending.
 
+OpenAI image generation/editing catalog entries and their companion guides are hidden in mainland China (`cn`). This is regional catalog visibility, not global retirement of the image APIs. Local CLI help/model references do not establish regional availability; check your account's current catalog and permissions before submitting an image request.
+
 ```text
 openai-cli tasks retrieve --id <task-id>
 ```
