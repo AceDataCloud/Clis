@@ -87,3 +87,24 @@ Use `apparel`, `goods-studio`, `video-commerce` and `virtual-try-on` with `--req
 ## Reference inputs
 
 Use `element_list` and `voice_list` only with already valid platform references and the supported model combinations in the current backend guide. Standalone asset creation and management are not published.
+
+### O1 and Omni reference-video billing
+
+For `generate` or `image-to-video` with `kling-o1` or `kling-v3-omni`, pass at most one reference video through `--video-list` and use `--no-generate-audio`. Reference videos use a separate billing tier: **1.202 Credits per billed second** in `std`, or **1.602 Credits per billed second** in `pro`. Reference images (`--image-list`, start/end frames) alone do not trigger this tier.
+
+For a 5-second `kling-o1` output:
+
+| Mode | Without reference video | With reference video (5 billed seconds) |
+|---|---:|---:|
+| std | 4.005 Credits | 6.010 Credits |
+| pro | 5.340 Credits | 8.010 Credits |
+
+With `refer_type=base` (the default), editing may follow the reference video's length, and billing uses actual output duration rounded to whole seconds (5.708 seconds bills as 6; 5.041 bills as 5). With `refer_type=feature`, billing uses the requested `--duration`. Use `--json` to inspect `usage.reference_video_seconds` for final billed seconds; an estimate at submission can differ from the final charge. Do not submit this response field as a request parameter.
+
+```bash
+kling generate 'Restyle <<<video_1>>> as a watercolor animation' \
+  --model kling-o1 --mode std --no-generate-audio \
+  --video-list '[{"video_url":"https://example.com/ref.mp4","refer_type":"base"}]' --json
+```
+
+Reference videos cannot be combined with audio generation. `base` references also cannot be combined with start/end frames; use `feature` for compatible frame-based requests.

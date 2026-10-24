@@ -97,9 +97,12 @@ def _parse_json_option(value: str | None, param_hint: str) -> Any:
     "--video-list",
     default=None,
     help=(
-        "Reference video(s) as a JSON array string. Each item must have video_url and may "
-        "include refer_type (feature or base) and keep_original_sound (yes/no). "
-        'Example: \'[{"video_url": "https://...", "refer_type": "base"}]\''
+        "Reference video as a JSON array string for kling-o1/kling-v3-omni. "
+        "Each item must have video_url and may include refer_type (feature or base) "
+        "and keep_original_sound (yes/no). Requires generate_audio=false. "
+        "Separate billing tier: base (default) bills rounded output seconds; "
+        "feature bills requested duration. Use --json to inspect final billed seconds "
+        "in usage.reference_video_seconds."
     ),
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
@@ -244,9 +247,12 @@ def generate(
     "--video-list",
     default=None,
     help=(
-        "Reference video(s) as a JSON array string. Each item must have video_url and may "
-        "include refer_type (feature or base) and keep_original_sound (yes/no). "
-        'Example: \'[{"video_url": "https://...", "refer_type": "base"}]\''
+        "Reference video as a JSON array string for kling-o1/kling-v3-omni. "
+        "Each item must have video_url and may include refer_type (feature or base) "
+        "and keep_original_sound (yes/no). Requires generate_audio=false. "
+        "Separate billing tier: base (default) bills rounded output seconds; "
+        "feature bills requested duration. Use --json to inspect final billed seconds "
+        "in usage.reference_video_seconds."
     ),
 )
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
