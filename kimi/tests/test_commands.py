@@ -7,6 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
+from kimi_cli.core.output import DEFAULT_MODEL, KIMI_MODELS
 from kimi_cli.main import cli
 
 
@@ -42,7 +43,7 @@ class TestChatCommand:
 
     @respx.mock
     def test_chat_json(self, runner, mock_chat_response):
-        respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
+        route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
@@ -51,6 +52,10 @@ class TestChatCommand:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["choices"][0]["message"]["content"] == "The capital of France is Paris."
+        sent = json.loads(route.calls.last.request.content)
+        assert sent["model"] == "kimi-k3.1-pro"
+        assert "reasoning_effort" not in sent
+        assert "thinking" not in sent
 
     @respx.mock
     def test_chat_rich_output(self, runner, mock_chat_response):
@@ -61,17 +66,18 @@ class TestChatCommand:
         assert result.exit_code == 0
         assert "Paris" in result.output
 
+    @pytest.mark.parametrize("model", ["kimi-k3.1-pro", "kimi-k3", "kimi-k2.6"])
     @respx.mock
-    def test_chat_with_model(self, runner, mock_chat_response):
+    def test_chat_with_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
-            cli, ["--token", "test-token", "chat", "Hello", "-m", "kimi-k3", "--json"]
+            cli, ["--token", "test-token", "chat", "Hello", "-m", model, "--json"]
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["model"] == "kimi-k3"
+        assert sent["model"] == model
 
     def test_chat_rejects_removed_model(self, runner):
         result = runner.invoke(
@@ -106,24 +112,38 @@ class TestChatCommand:
         assert sent["temperature"] == 0.5
 
     @respx.mock
-    def test_chat_with_reasoning_effort(self, runner, mock_chat_response):
+    def test_chat_with_k3_reasoning_effort(self, runner, mock_chat_response):
         route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "--reasoning-effort", "max", "--json"],
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "-m",
+                "kimi-k3",
+                "--reasoning-effort",
+                "max",
+                "--json",
+            ],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
         assert sent["reasoning_effort"] == "max"
 
-    def test_chat_with_invalid_reasoning_effort(self, runner):
+    @pytest.mark.parametrize("effort", ["none", "standard", "medium"])
+    @respx.mock
+    def test_chat_with_invalid_reasoning_effort(self, runner, effort):
         result = runner.invoke(
             cli,
-            ["chat", "Hello", "--reasoning-effort", "high"],
+            ["--token", "test-token", "chat", "Hello", "--reasoning-effort", effort],
         )
-        assert result.exit_code != 0
+        assert result.exit_code == 2
+        assert "Invalid value for '--reasoning-effort'" in result.output
+        assert not respx.calls
 
     @respx.mock
     def test_chat_with_service_tier(self, runner, mock_chat_response):
@@ -208,18 +228,21 @@ class TestChatCommand:
         sent = json.loads(route.calls[0].request.content)
         assert sent["parallel_tool_calls"] is False
 
+    @pytest.mark.parametrize("effort", ["low", "high", "max"])
     @respx.mock
-    def test_chat_with_reasoning_effort_low(self, runner, mock_chat_response):
+    def test_chat_with_reasoning_effort(self, runner, mock_chat_response, effort):
         route = respx.post("https://api.acedata.cloud/kimi/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "--reasoning-effort", "low", "--json"],
+            ["--token", "test-token", "chat", "Hello", "--reasoning-effort", effort, "--json"],
         )
         assert result.exit_code == 0
         sent = json.loads(route.calls[0].request.content)
-        assert sent["reasoning_effort"] == "low"
+        assert sent["model"] == "kimi-k3.1-pro"
+        assert sent["reasoning_effort"] == effort
+        assert "thinking" not in sent
 
     @respx.mock
     def test_chat_with_store(self, runner, mock_chat_response):
@@ -321,9 +344,18 @@ class TestInfoCommands:
     def test_models(self, runner):
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
-        assert "kimi-k3" in result.output
-        assert "kimi-k2.6" in result.output
-        assert "default" in result.output.lower()
+        assert "kimi-k3.1-pro" in result.output
+        assert "Kimi K3.1 Pro (default, recommended)" in result.output
+        assert "Default model: kimi-k3.1-pro" in result.output
+        assert DEFAULT_MODEL == "kimi-k3.1-pro"
+        assert KIMI_MODELS == [
+            "kimi-k3.1-pro",
+            "kimi-k3",
+            "kimi-k2.6",
+            "kimi-k2-thinking-turbo",
+            "kimi-k2.5",
+            "kimi-k2-thinking",
+        ]
 
     def test_config(self, runner):
         result = runner.invoke(cli, ["config"])

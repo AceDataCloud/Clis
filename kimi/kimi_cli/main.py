@@ -43,7 +43,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
     \b
     Examples:
       kimi chat "What is the capital of France?"
-      kimi chat "Explain quantum computing" -m kimi-k3
+      kimi chat "Explain quantum computing" -m kimi-k3.1-pro
       kimi models
       kimi config
 

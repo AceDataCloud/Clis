@@ -94,7 +94,7 @@ from kimi_cli.core.output import (
     "--reasoning-effort",
     default=None,
     type=click.Choice(REASONING_EFFORTS),
-    help="Reasoning effort level (low/high/max).",
+    help="K3.1 Pro reasoning effort (low/high/max); use max for K3. Both always reason.",
 )
 @click.option(
     "--service-tier",
@@ -139,7 +139,9 @@ from kimi_cli.core.output import (
     default=False,
     help="Whether to store the output of this completion request.",
 )
-@click.option("--stream", is_flag=True, default=False, help="Stream partial chat completion events.")
+@click.option(
+    "--stream", is_flag=True, default=False, help="Stream partial chat completion events."
+)
 @click.option(
     "--response-format",
     default=None,
@@ -158,7 +160,7 @@ from kimi_cli.core.output import (
 @click.option(
     "--stream-options",
     default=None,
-    help='Streaming options as a JSON object (e.g. \'{"include_usage": true}\').',
+    help="Streaming options as a JSON object (e.g. '{\"include_usage\": true}').",
 )
 @click.option("--metadata", default=None, help="Metadata as a JSON object.")
 @click.option("--logit-bias", default=None, help="Logit bias map as a JSON object.")
@@ -211,7 +213,7 @@ def chat(
     \b
     Examples:
       kimi chat "What is the capital of France?"
-      kimi chat "Explain quantum computing" -m kimi-k3
+      kimi chat "Explain quantum computing" -m kimi-k3.1-pro
       kimi chat "Write a poem" --temperature 0.9
       kimi chat "Summarize this" -s "You are a concise summarizer"
     """
@@ -231,9 +233,7 @@ def chat(
         parsed_modalities = parse_json_array(modalities, "--modalities")
         parsed_audio = parse_json_object(audio, "--audio")
         parsed_prediction = parse_json_object(prediction, "--prediction")
-        parsed_web_search_options = parse_json_object(
-            web_search_options, "--web-search-options"
-        )
+        parsed_web_search_options = parse_json_object(web_search_options, "--web-search-options")
         parsed_thinking = parse_json_object(thinking, "--thinking")
     except click.BadParameter as e:
         print_error(e.format_message())

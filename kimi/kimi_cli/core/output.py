@@ -12,6 +12,7 @@ console = Console()
 
 # Available Kimi models from OpenAPI spec
 KIMI_MODELS = [
+    "kimi-k3.1-pro",
     "kimi-k3",
     "kimi-k2.6",
     "kimi-k2-thinking-turbo",
@@ -19,7 +20,7 @@ KIMI_MODELS = [
     "kimi-k2-thinking",
 ]
 
-DEFAULT_MODEL = "kimi-k3"
+DEFAULT_MODEL = "kimi-k3.1-pro"
 
 # Available reasoning efforts
 REASONING_EFFORTS = ["low", "high", "max"]
@@ -93,7 +94,8 @@ def print_models() -> None:
     table.add_column("Notes")
 
     model_notes = {
-        "kimi-k3": "Kimi K3 (default, latest)",
+        "kimi-k3.1-pro": "Kimi K3.1 Pro (default, recommended)",
+        "kimi-k3": "Kimi K3",
         "kimi-k2.6": "Kimi K2.6",
         "kimi-k2-thinking-turbo": "Kimi K2 Thinking Turbo",
         "kimi-k2.5": "Kimi K2.5",

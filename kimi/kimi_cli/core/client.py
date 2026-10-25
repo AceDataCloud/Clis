@@ -25,8 +25,7 @@ class KimiClient:
         """Get request headers with authentication."""
         if not self.api_token:
             raise KimiAuthError(
-                "API token not configured. "
-                "Set ACEDATACLOUD_API_TOKEN or use --token option."
+                "API token not configured. Set ACEDATACLOUD_API_TOKEN or use --token option."
             )
         return {
             "accept": "application/json",
@@ -96,27 +95,26 @@ class KimiClient:
         url = f"{self.base_url}{endpoint}"
 
         try:
-            with httpx.Client() as http_client, http_client.stream(
-                "POST",
-                url,
-                json=payload,
-                headers=self._get_headers(),
-                timeout=self.timeout,
-            ) as response:
+            with (
+                httpx.Client() as http_client,
+                http_client.stream(
+                    "POST",
+                    url,
+                    json=payload,
+                    headers=self._get_headers(),
+                    timeout=self.timeout,
+                ) as response,
+            ):
                 if response.status_code == 401:
                     raise KimiAuthError("Invalid API token")
 
                 if response.status_code == 403:
-                    raise KimiAuthError(
-                        "Access denied. Check your API permissions."
-                    )
+                    raise KimiAuthError("Access denied. Check your API permissions.")
 
                 response.raise_for_status()
                 yield from response.iter_lines()
         except httpx.TimeoutException as e:
-            raise KimiTimeoutError(
-                f"Request to {endpoint} timed out after {self.timeout}s"
-            ) from e
+            raise KimiTimeoutError(f"Request to {endpoint} timed out after {self.timeout}s") from e
         except KimiAuthError:
             raise
         except httpx.HTTPStatusError as e:

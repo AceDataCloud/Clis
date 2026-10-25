@@ -78,6 +78,15 @@ aichat chat "Hello" --json | jq '.answer'
 | `--ref` | Reference URL or text (repeatable) |
 | `--json` | Output raw JSON |
 
+## Kimi in Chat2
+
+Use `kimi-k3.1-pro` through `chat2`; `kimi-k3` and `kimi-k2.6` remain available.
+Run `aichat models2` for the `chat2` model list, which is separate from `chat`.
+
+```bash
+aichat chat2 "Review this code and suggest a fix" -m kimi-k3.1-pro --max-turns 1
+```
+
 ## Chat2 Turn Limit
 
 `aichat chat2 --max-turns` accepts integers from 1 to 500 and limits agent
