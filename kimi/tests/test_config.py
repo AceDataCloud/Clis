@@ -1,6 +1,5 @@
 """Tests for Kimi CLI configuration."""
 
-
 import pytest
 
 from kimi_cli.core.config import Settings

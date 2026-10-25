@@ -18,7 +18,7 @@ export ACEDATACLOUD_API_TOKEN=your_token
 kimi chat "What is the capital of France?"
 
 # Use a specific model
-kimi chat "Explain quantum computing" -m kimi-k3
+kimi chat "Explain quantum computing" -m kimi-k3.1-pro --reasoning-effort low
 
 # List available models
 kimi models
@@ -38,7 +38,7 @@ kimi chat "Your prompt here" [OPTIONS]
 ```
 
 Options:
-- `-m, --model`: Model to use (default: `kimi-k3`)
+- `-m, --model`: Model to use (default: `kimi-k3.1-pro`)
 - `-s, --system`: System prompt
 - `--temperature`: Sampling temperature (0-2)
 - `--max-tokens`: Maximum tokens to generate
@@ -57,6 +57,16 @@ Options:
 - `--parallel-tool-calls`: Enable parallel function calling during tool use
 - `--store`: Store the output of this completion request
 - `--json`: Output raw JSON
+
+K3.1 Pro always enables reasoning. Use `--reasoning-effort low`, `high`, or `max`
+to select its reasoning effort; do not send thinking-disable settings. `kimi-k3`
+remains available and should use `--reasoning-effort max`. For K2.6, use
+`--thinking` with a JSON object instead of `--reasoning-effort`.
+
+```bash
+kimi chat "Review this code and suggest a fix" --reasoning-effort low
+kimi chat "Explain this algorithm" -m kimi-k3 --reasoning-effort max
+```
 
 ### `models`
 
@@ -78,7 +88,8 @@ kimi config
 
 | Model | Notes |
 |-------|-------|
-| `kimi-k3` | Kimi K3 (default, latest) |
+| `kimi-k3.1-pro` | Kimi K3.1 Pro (default, recommended) |
+| `kimi-k3` | Kimi K3 |
 | `kimi-k2.6` | Kimi K2.6 |
 | `kimi-k2-thinking-turbo` | Kimi K2 Thinking Turbo |
 | `kimi-k2.5` | Kimi K2.5 |

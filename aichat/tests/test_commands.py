@@ -28,6 +28,11 @@ class TestGlobalCommands:
         assert "claude-opus-5" in MODELS2
         assert "claude-3-opus-20240229" not in MODELS2
 
+    def test_kimi_k31_pro_is_only_available_in_chat2(self):
+        assert MODELS2.count("kimi-k3.1-pro") == 1
+        assert "kimi-k3" in MODELS2
+        assert "kimi-k3.1-pro" not in MODELS
+
     def test_fast_sol_is_available_in_both_chat_commands(self):
         assert "gpt-5.6-sol-fast" in MODELS
         assert "gpt-5.6-sol-fast" in MODELS2
@@ -255,6 +260,7 @@ class TestInfoCommands:
         assert "claude-opus-5" in result.output
         assert "claude-sonnet-5" in result.output
         assert "gemini-3.1-pro" in result.output
+        assert "kimi-k3.1-pro" in result.output
         assert "kimi-k3" in result.output
         assert "kimi-k2.6" in result.output
         assert "kimi-k2-0711-preview" not in result.output
@@ -417,18 +423,19 @@ class TestChat2Commands:
         )
         assert result.exit_code != 0
 
+    @pytest.mark.parametrize("model", ["kimi-k3.1-pro", "kimi-k3", "kimi-k2.6"])
     @respx.mock
-    def test_chat2_with_kimi_model(self, runner, mock_chat_response):
+    def test_chat2_with_kimi_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat2", "Hello", "-m", "kimi-k2.6", "--json"],
+            ["--token", "test-token", "chat2", "Hello", "-m", model, "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "kimi-k2.6"
+        assert body["model"] == model
 
     @pytest.mark.parametrize(
         "model",
