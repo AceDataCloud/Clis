@@ -345,7 +345,8 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         assert "kimi-k3.1-pro" in result.output
-        assert "Kimi K3.1 Pro (default, recommended)" in result.output
+        assert "Kimi K3.1 Pro (default)" in result.output
+        assert "recommended" not in result.output.lower()
         assert "Default model: kimi-k3.1-pro" in result.output
         assert DEFAULT_MODEL == "kimi-k3.1-pro"
         assert KIMI_MODELS == [
