@@ -88,7 +88,7 @@ kimi config
 
 | Model | Notes |
 |-------|-------|
-| `kimi-k3.1-pro` | Kimi K3.1 Pro (default, recommended) |
+| `kimi-k3.1-pro` | Kimi K3.1 Pro (default) |
 | `kimi-k3` | Kimi K3 |
 | `kimi-k2.6` | Kimi K2.6 |
 | `kimi-k2-thinking-turbo` | Kimi K2 Thinking Turbo |
