@@ -38,6 +38,22 @@ claude config
 - `models` — List models available to Chat Completions and Messages
 - `config` — Show current configuration
 
+## Chat and Messages billing
+
+Accepted compatible-model requests are billed for the selected model's input, output and cache usage, not a fixed fee per request. Switching interface formats does not change this to per-request billing. Check current model prices in the console and the returned `usage.cost` for the charge; billing support alone does not establish model availability or account access.
+
+- Chat Completions `usage.prompt_tokens` includes cached tokens. Reported cache usage is settled at the corresponding cache price; do not add it to the prompt total again.
+- Messages `usage.input_tokens` excludes separately reported cache-read and cache-creation tokens. Those dimensions are settled separately, so input tokens alone do not describe all billed input usage.
+
+Use `--json` to inspect the full returned usage, including cache details and `usage.cost` when present; the default terminal summary is not a billing breakdown. These commands submit billable requests:
+
+```bash
+claude chat "Hello" --model claude-3-5-haiku-20241022 --json | jq '.usage'
+claude messages "Hello" --model claude-3-5-haiku-20241022 --max-tokens 1024 --json | jq '.usage'
+```
+
+`claude-opus-5-5` is recommended through Messages. Use each command's `--help` to check its supported model choices; the model defaults are unchanged.
+
 ## Sol Fast
 
 The public alias `gpt-5.6-sol-fast` is available through both `chat` and `messages`. It is not supported by `count-tokens`; Claude model defaults are unchanged.
