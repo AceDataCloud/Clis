@@ -129,6 +129,19 @@ openai-cli config
 | `models` | List available models (`/openai/models`) |
 | `config` | Show current configuration |
 
+## Chat and Responses billing
+
+Accepted compatible-model requests are billed for the selected model's input, output and cache usage, not a fixed fee per request. Switching between Chat Completions and Responses does not change this to per-request billing. Check current model prices in the console and the returned `usage.cost` for the charge; billing support alone does not establish model availability or account access.
+
+For Chat Completions, `usage.prompt_tokens` includes cached tokens. Responses input totals also include reported cached tokens. Reported cache usage is settled at the corresponding cache price, so do not add cached tokens to these input totals again.
+
+Use `--json` to inspect the full returned usage, including cache details and `usage.cost` when present; the default terminal summary is not a billing breakdown. These commands submit billable requests:
+
+```bash
+openai-cli chat "Hello" -m gpt-4o-mini --json | jq '.usage'
+openai-cli response "Hello" -m gpt-4o-mini --json | jq '.usage'
+```
+
 ## Embedding models
 
 `embed` supports `text-embedding-3-small` (the default) and `text-embedding-3-large`. The legacy `text-embedding-ada-002` model is retired. When migrating an existing index, regenerate its vectors and rebuild the index; do not mix vectors from the old and new models.
