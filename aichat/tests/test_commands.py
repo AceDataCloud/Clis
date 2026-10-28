@@ -57,6 +57,8 @@ class TestGlobalCommands:
         assert _get_model_family("gpt-6-sol") == "GPT-6"
 
     def test_chat2_model_inventory_matches_gemini_models(self):
+        assert MODELS2.count("gemini-4-argon") == 1
+        assert "gemini-4-argon" not in MODELS
         assert "gemini-3.7-flash" in MODELS2
         assert "gemini-3.5-flash-lite" in MODELS2
         assert "gemini-2.5-pro" in MODELS2
@@ -294,18 +296,19 @@ class TestChat2Commands:
         body = json.loads(route.calls.last.request.content)
         assert "max_turns" not in body
 
+    @pytest.mark.parametrize("model", ["deepseek-v4-pro", "gemini-4-argon"])
     @respx.mock
-    def test_chat2_with_model(self, runner, mock_chat_response):
+    def test_chat2_with_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat2", "Hello", "-m", "deepseek-v4-pro", "--json"],
+            ["--token", "test-token", "chat2", "Hello", "-m", model, "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "deepseek-v4-pro"
+        assert body["model"] == model
 
     @respx.mock
     def test_chat2_with_model_group(self, runner, mock_chat_response):

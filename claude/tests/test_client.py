@@ -4,10 +4,10 @@ import json
 
 import pytest
 import respx
-from httpx import Response
+from httpx import ByteStream, ReadTimeout, Response
 
 from claude_cli.core.client import ClaudeClient, get_client
-from claude_cli.core.exceptions import ClaudeAPIError, ClaudeAuthError
+from claude_cli.core.exceptions import ClaudeAPIError, ClaudeAuthError, ClaudeTimeoutError
 
 
 class TestClaudeClient:
@@ -42,6 +42,63 @@ class TestClaudeClient:
         client = ClaudeClient(api_token="test-token")
         result = client.chat_completions(model="claude-3-5-haiku-20241022", messages=[])
         assert result == mock_response
+
+    @respx.mock
+    def test_stream_chat_completions_preserves_events_and_request(self):
+        events = b'data: {"choices":[{"delta":{"content":"Hello"}}]}\n\ndata: [DONE]\n\n'
+        response = Response(
+            200, stream=ByteStream(events), headers={"content-type": "text/event-stream"}
+        )
+        route = respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+            return_value=response
+        )
+        client = ClaudeClient(api_token="test-token")
+        client.timeout = 300
+        result = list(
+            client.stream_chat_completions(
+                model="claude-opus-5-5",
+                messages=[],
+                temperature=None,
+                stream_options={"include_usage": True},
+            )
+        )
+        assert result == events.decode().splitlines()
+        request = route.calls.last.request
+        assert json.loads(request.content) == {
+            "model": "claude-opus-5-5",
+            "messages": [],
+            "stream": True,
+            "stream_options": {"include_usage": True},
+        }
+        assert request.headers["accept"] == "text/event-stream"
+        assert request.headers["authorization"] == "Bearer test-token"
+        assert request.extensions["timeout"]["read"] == 300
+        assert route.calls.last.response.is_closed
+
+    @pytest.mark.parametrize("status", [401, 403, 400, 500])
+    @respx.mock
+    def test_stream_chat_completions_http_errors(self, status):
+        response = Response(status, stream=ByteStream(b"Request failed"))
+        route = respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+            return_value=response
+        )
+        client = ClaudeClient(api_token="test-token")
+        expected = ClaudeAuthError if status in (401, 403) else ClaudeAPIError
+        with pytest.raises(expected) as exc:
+            list(client.stream_chat_completions(model="claude-opus-5-5", messages=[]))
+        if status not in (401, 403):
+            assert exc.value.message == "Request failed"
+            assert exc.value.status_code == status
+        assert route.calls.last.response.is_closed
+
+    @respx.mock
+    def test_stream_chat_completions_timeout(self):
+        respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+            side_effect=ReadTimeout("Timed out")
+        )
+        client = ClaudeClient(api_token="test-token")
+        with pytest.raises(ClaudeTimeoutError):
+            list(client.stream_chat_completions(model="claude-opus-5-5", messages=[]))
 
     @respx.mock
     def test_messages(self):

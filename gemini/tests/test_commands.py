@@ -79,11 +79,13 @@ class TestGlobalCommands:
         assert "--cached-content" not in result.output
 
     def test_chat_model_inventory_includes_current_public_model(self):
+        assert "gemini-4-argon" in GEMINI_CHAT_MODELS
         assert "gemini-3.8-flash" in GEMINI_CHAT_MODELS
         assert len(GEMINI_CHAT_MODELS) == len(set(GEMINI_CHAT_MODELS))
 
     def test_native_model_inventory_matches_api(self):
         assert GEMINI_NATIVE_MODELS == [
+            "gemini-4-argon",
             "gemini-3.7-flash",
             "gemini-3.6-flash",
             "gemini-3.5-flash",
@@ -137,6 +139,7 @@ class TestChatCommand:
     @respx.mock
     def test_chat_with_new_models(self, runner, mock_chat_response):
         for model in [
+            "gemini-4-argon",
             "gemini-2.5-flash-lite",
             "gemini-3.6-flash",
             "gemini-3.7-flash",
@@ -162,9 +165,10 @@ class TestChatCommand:
             )
             assert result.exit_code != 0, f"Model {model} should be rejected"
 
+    @pytest.mark.parametrize("model", ["gemini-3.6-flash", "gemini-4-argon"])
     @respx.mock
-    def test_generate_content_accepts_new_native_models(self, runner, mock_chat_response):
-        respx.post("https://api.acedata.cloud/v1beta/models/gemini-3.6-flash:generateContent").mock(
+    def test_generate_content_accepts_new_native_models(self, runner, mock_chat_response, model):
+        route = respx.post(f"https://api.acedata.cloud/v1beta/models/{model}:generateContent").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
@@ -174,13 +178,19 @@ class TestChatCommand:
                 "test-token",
                 "generate-content",
                 "--model",
-                "gemini-3.6-flash",
+                model,
                 "--contents",
                 '[{"parts":[{"text":"Hello"}]}]',
+                "--generation-config",
+                '{"maxOutputTokens":32768}',
                 "--json",
             ],
         )
         assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content) == {
+            "contents": [{"parts": [{"text": "Hello"}]}],
+            "generationConfig": {"maxOutputTokens": 32768},
+        }
 
     @respx.mock
     def test_chat_with_max_completion_tokens(self, runner, mock_chat_response):
@@ -260,8 +270,9 @@ class TestChatCommand:
         assert result.exit_code != 0
         assert "at most 4 values are allowed" in result.output
 
+    @pytest.mark.parametrize("model", ["gemini-2.5-flash", "gemini-4-argon"])
     @respx.mock
-    def test_chat_streams_server_sent_events(self, runner):
+    def test_chat_streams_server_sent_events(self, runner, model):
         route = respx.post("https://api.acedata.cloud/gemini/chat/completions").mock(
             return_value=Response(
                 200,
@@ -269,11 +280,15 @@ class TestChatCommand:
                 headers={"content-type": "text/event-stream"},
             )
         )
-        result = runner.invoke(cli, ["--token", "test-token", "chat", "Hello", "--stream"])
+        result = runner.invoke(
+            cli, ["--token", "test-token", "chat", "Hello", "-m", model, "--stream"]
+        )
         assert result.exit_code == 0
         assert 'data: {"choices":[{"delta":{"content":"Hello"}}]}' in result.output
         assert "data: [DONE]" in result.output
-        assert json.loads(route.calls.last.request.content)["stream"] is True
+        body = json.loads(route.calls.last.request.content)
+        assert body["stream"] is True
+        assert body["model"] == model
         assert route.calls.last.request.headers["accept"] == "text/event-stream"
 
     @respx.mock
@@ -653,10 +668,11 @@ class TestContentCommands:
         assert request_body["contents"] == [{"parts": [{"text": "Hello"}]}]
         assert request_body["generationConfig"] == {"temperature": 0.5}
 
+    @pytest.mark.parametrize("model", ["gemini-3.1-flash-image", "gemini-4-argon"])
     @respx.mock
-    def test_stream_generate_content_server_sent_events(self, runner):
+    def test_stream_generate_content_server_sent_events(self, runner, model):
         route = respx.post(
-            "https://api.acedata.cloud/v1beta/models/gemini-3.1-flash-image:streamGenerateContent?alt=sse"
+            f"https://api.acedata.cloud/v1beta/models/{model}:streamGenerateContent?alt=sse"
         ).mock(
             return_value=Response(
                 200,
@@ -671,7 +687,7 @@ class TestContentCommands:
                 "test-token",
                 "stream-generate-content",
                 "--model",
-                "gemini-3.1-flash-image",
+                model,
                 "--contents",
                 '[{"parts":[{"text":"Hello"}]}]',
                 "--alt",

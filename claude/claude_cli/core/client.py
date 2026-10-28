@@ -1,5 +1,6 @@
 """HTTP client for Claude AI AceDataCloud API."""
 
+from collections.abc import Iterator
 from typing import Any
 
 import httpx
@@ -20,14 +21,14 @@ class ClaudeClient:
         self.base_url = base_url or settings.api_base_url
         self.timeout = settings.request_timeout
 
-    def _get_headers(self) -> dict[str, str]:
+    def _get_headers(self, accept: str = "application/json") -> dict[str, str]:
         """Get request headers with authentication."""
         if not self.api_token:
             raise ClaudeAuthError(
                 "API token not configured. Set ACEDATACLOUD_API_TOKEN or use --token option."
             )
         return {
-            "accept": "application/json",
+            "accept": accept,
             "authorization": f"Bearer {self.api_token}",
             "content-type": "application/json",
         }
@@ -91,6 +92,47 @@ class ClaudeClient:
     def chat_completions(self, **kwargs: Any) -> dict[str, Any]:
         """Send a chat completion request (OpenAI-compatible endpoint)."""
         return self.request("/v1/chat/completions", kwargs)
+
+    def stream_chat_completions(self, **kwargs: Any) -> Iterator[str]:
+        """Stream chat completion events."""
+        endpoint = "/v1/chat/completions"
+        payload = {k: v for k, v in kwargs.items() if v is not None}
+        payload["stream"] = True
+        try:
+            with (
+                httpx.Client() as http_client,
+                http_client.stream(
+                    "POST",
+                    f"{self.base_url}{endpoint}",
+                    json=payload,
+                    headers=self._get_headers("text/event-stream"),
+                    timeout=self.timeout,
+                ) as response,
+            ):
+                if response.status_code == 401:
+                    raise ClaudeAuthError("Invalid API token")
+                if response.status_code == 403:
+                    raise ClaudeAuthError("Access denied. Check your API permissions.")
+                if response.is_error:
+                    response.read()
+                response.raise_for_status()
+                yield from response.iter_lines()
+        except httpx.TimeoutException as e:
+            raise ClaudeTimeoutError(
+                f"Request to {endpoint} timed out after {self.timeout}s"
+            ) from e
+        except ClaudeAuthError:
+            raise
+        except httpx.HTTPStatusError as e:
+            raise ClaudeAPIError(
+                message=e.response.text,
+                code=f"http_{e.response.status_code}",
+                status_code=e.response.status_code,
+            ) from e
+        except Exception as e:
+            if isinstance(e, ClaudeAPIError | ClaudeTimeoutError):
+                raise
+            raise ClaudeAPIError(message=str(e)) from e
 
     def messages(self, *, anthropic_beta: str | None = None, **kwargs: Any) -> dict[str, Any]:
         """Send a messages request (Claude native API)."""

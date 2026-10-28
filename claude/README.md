@@ -52,7 +52,18 @@ claude chat "Hello" --model claude-3-5-haiku-20241022 --json | jq '.usage'
 claude messages "Hello" --model claude-3-5-haiku-20241022 --max-tokens 1024 --json | jq '.usage'
 ```
 
-`claude-opus-5-5` is recommended through Messages. Use each command's `--help` to check its supported model choices; the model defaults are unchanged.
+### Opus 5.5
+
+`claude-opus-5-5` supports ordinary and streaming Chat Completions, as well as Messages. Chat compatibility does not return native thinking blocks; use Messages for complete thinking blocks, signatures and native tool semantics.
+
+For this model's Chat requests, use only `--count 1`, omit `--temperature` or set it to at least 1, and omit `--top-p` or use its default value of 1. When calling tools, use `--tool-choice auto`, not a forced tool. Leave sufficient output budget for thinking and the final text.
+
+```bash
+claude chat "Review these tradeoffs" --model claude-opus-5-5 --max-tokens 32768
+claude chat "Review these tradeoffs" --model claude-opus-5-5 --max-tokens 32768 --stream
+```
+
+`chat --stream` prints raw SSE lines, including any terminal marker and usage events returned by the server; it does not assemble a single JSON response. Use each command's `--help` to check supported model choices; model defaults are unchanged.
 
 ## Sol Fast
 
