@@ -47,6 +47,7 @@ gemini models
 
 | Model | Notes |
 |-------|-------|
+| `gemini-4-argon` | Deep reasoning; Chat Completions and native Generate Content |
 | `gemini-3.7-flash` | Gemini 3.7 Flash |
 | `gemini-3.6-flash` | Gemini 3.6 Flash |
 | `gemini-3.5-flash` | Gemini 3.5 Flash |
@@ -61,6 +62,23 @@ gemini models
 > Image-generating models (`gemini-*-image`) are not available on the chat
 > endpoint. Use the native `/v1beta/models/{model}:generateContent` API for
 > image generation.
+
+## Gemini 4 Argon
+
+Use `gemini-4-argon` for ordinary or streaming text replies on Chat Completions and native Generate Content. Thinking consumes part of the output budget; Google's guidance recommends at least 32768 output tokens for routine tasks. Adjust the budget and `GEMINI_REQUEST_TIMEOUT` to your workload, and inspect the returned stop reason for incomplete output.
+
+```bash
+GEMINI_REQUEST_TIMEOUT=300 gemini chat "Review this design" \
+  --model gemini-4-argon --max-tokens 32768 --json
+GEMINI_REQUEST_TIMEOUT=300 gemini chat "Review this design" \
+  --model gemini-4-argon --max-tokens 32768 --stream
+GEMINI_REQUEST_TIMEOUT=300 gemini generate-content \
+  --model gemini-4-argon \
+  --contents '[{"role":"user","parts":[{"text":"Review this design"}]}]' \
+  --generation-config '{"maxOutputTokens":32768}' --json
+```
+
+For native streaming, replace `generate-content` with `stream-generate-content` and add `--alt sse`. Streaming commands print raw SSE lines. These endpoints do not provide Google Interactions background long-output jobs or server-side sessions. Argon supports implicit caching only, not explicit cached content; its sampling parameters (`temperature`, `top_p`, `top_k`) are ignored. Model defaults are unchanged.
 
 ## Native audio input
 

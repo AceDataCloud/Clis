@@ -15,6 +15,7 @@ CHAT_MODELS = [
     "gpt-5.6-sol-fast",
     "claude-fable-5-1",
     "claude-fable-5",
+    "claude-opus-5-5",
     "claude-opus-5",
     "claude-opus-4-8",
     "claude-sonnet-5",
@@ -36,7 +37,11 @@ CHAT_MODELS = [
 ]
 
 # Claude Messages API models
-MESSAGES_MODELS = ["claude-opus-5-5", "claude-sonnet-5-5", *CHAT_MODELS]
+MESSAGES_MODELS = [
+    "claude-opus-5-5",
+    "claude-sonnet-5-5",
+    *[model for model in CHAT_MODELS if model != "claude-opus-5-5"],
+]
 COUNT_TOKENS_MODELS = [model for model in MESSAGES_MODELS if model != "gpt-5.6-sol-fast"]
 
 DEFAULT_CHAT_MODEL = "claude-3-5-haiku-20241022"

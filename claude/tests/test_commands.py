@@ -25,8 +25,10 @@ class TestGlobalCommands:
     def test_model_inventory_excludes_retired_opus_3(self):
         assert CHAT_MODELS[1:3] == ["claude-fable-5-1", "claude-fable-5"]
         assert "claude-opus-5" in CHAT_MODELS
-        assert "claude-opus-5-5" not in CHAT_MODELS
+        assert "claude-opus-5-5" in CHAT_MODELS
         assert MESSAGES_MODELS[0] == "claude-opus-5-5"
+        assert len(MESSAGES_MODELS) == len(set(MESSAGES_MODELS))
+        assert "claude-sonnet-5-5" not in CHAT_MODELS
         assert "claude-3-opus-20240229" not in CHAT_MODELS
 
     def test_fast_sol_inventory_is_scoped_to_generation(self):
@@ -36,7 +38,7 @@ class TestGlobalCommands:
         expected_count_tokens_models = [
             "claude-opus-5-5",
             "claude-sonnet-5-5",
-            *CHAT_MODELS[1:],
+            *[model for model in CHAT_MODELS[1:] if model != "claude-opus-5-5"],
         ]
         assert expected_count_tokens_models == COUNT_TOKENS_MODELS
 
@@ -153,8 +155,9 @@ class TestChatCommands:
         assert result.exit_code == 0
         assert "Paris" in result.output
 
+    @pytest.mark.parametrize("model", ["claude-opus-5", "claude-opus-5-5"])
     @respx.mock
-    def test_chat_with_model(self, runner, mock_chat_response):
+    def test_chat_with_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
         )
@@ -166,12 +169,68 @@ class TestChatCommands:
                 "chat",
                 "Hello",
                 "-m",
-                "claude-opus-5",
+                model,
             ],
         )
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
-        assert request_body["model"] == "claude-opus-5"
+        assert request_body["model"] == model
+        assert "temperature" not in request_body
+        assert "top_p" not in request_body
+        assert "n" not in request_body
+        assert "tool_choice" not in request_body
+
+    @pytest.mark.parametrize("model", ["claude-3-5-haiku-20241022", "claude-opus-5-5"])
+    @respx.mock
+    def test_chat_streams_server_sent_events(self, runner, model):
+        events = 'data: {"choices":[{"delta":{"content":"Hello"}}]}\n\ndata: [DONE]\n\n'
+        route = respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+            return_value=Response(
+                200, content=events, headers={"content-type": "text/event-stream"}
+            )
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "-m",
+                model,
+                "--stream",
+                "--stream-options",
+                '{"include_usage":true}',
+                "--max-tokens",
+                "32768",
+                "--count",
+                "1",
+                "--tool-choice",
+                "auto",
+            ],
+        )
+        assert result.exit_code == 0, result.output
+        assert result.output == events
+        request = route.calls.last.request
+        body = json.loads(request.content)
+        assert body["model"] == model
+        assert body["stream"] is True
+        assert body["stream_options"] == {"include_usage": True}
+        assert body["max_tokens"] == 32768
+        assert body["n"] == 1
+        assert body["tool_choice"] == "auto"
+        assert request.headers["accept"] == "text/event-stream"
+
+    @respx.mock
+    def test_chat_stream_reports_api_error(self, runner):
+        respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
+            return_value=Response(400, text="Invalid model parameters")
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "chat", "Hello", "-m", "claude-opus-5-5", "--stream"]
+        )
+        assert result.exit_code == 1
+        assert "Invalid model parameters" in result.output
 
     @respx.mock
     def test_chat_with_system(self, runner, mock_chat_response):
@@ -549,6 +608,8 @@ class TestInfoCommands:
         assert "claude-fable-5" in result.output
         assert "claude-opus-5" in result.output
         assert "claude-opus-5-5" in result.output
+        opus_line = next(line for line in result.output.splitlines() if "claude-opus-5-5" in line)
+        assert "Chat / Messages" in opus_line
         assert "Messages only" in result.output
         sol_fast_line = next(
             line for line in result.output.splitlines() if "gpt-5.6-sol-fast" in line

@@ -87,6 +87,14 @@ Run `aichat models2` for the `chat2` model list, which is separate from `chat`.
 aichat chat2 "Review this code and suggest a fix" -m kimi-k3.1-pro --max-turns 1
 ```
 
+## Gemini 4 Argon in Chat2
+
+`gemini-4-argon` is available through `chat2`, not `chat`. The model defaults are unchanged; `aichat models2` lists the choices for this endpoint.
+
+```bash
+aichat chat2 "Review this design and its tradeoffs" -m gemini-4-argon --max-turns 1
+```
+
 ## Chat2 Turn Limit
 
 `aichat chat2 --max-turns` accepts integers from 1 to 500 and limits agent
