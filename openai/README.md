@@ -146,6 +146,20 @@ openai-cli response "Hello" -m gpt-4o-mini --json | jq '.usage'
 
 `embed` supports `text-embedding-3-small` (the default) and `text-embedding-3-large`. The legacy `text-embedding-ada-002` model is retired. When migrating an existing index, regenerate its vectors and rebuild the index; do not mix vectors from the old and new models.
 
+## GPT Image quality
+
+`image` and `edit` accept `--quality auto`, `low`, `medium` or `high` for GPT Image models. Only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst`, including their `:official` variants, additionally support `xhigh` and `max`. Editing supports these values with either JSON image URLs or multipart image files. `:official` requests are billed on actual token usage; size and quality affect that usage.
+
+These commands submit billable requests:
+
+```bash
+openai-cli image "A blue ceramic vase on a cream background" -m gpt-image-2.5-flare --quality xhigh
+openai-cli edit "Make the vase green" --image-url https://example.com/photo.jpg -m gpt-image-2.5-sunburst --quality max
+openai-cli edit "Make the vase green" --image-file photo.png -m gpt-image-2.5-flare:official --quality max
+```
+
+Legacy DALL-E quality options are unchanged: `dall-e-3` generation accepts `hd` or `standard`, and `dall-e-2` accepts `standard`.
+
 ## Nano Banana 2.1 images
 
 Use the public `nano-banana-2.1` model ID for generation or editing. There is no `nano-banana-2.1:official` variant; specify the model explicitly to use it instead of the existing default.
