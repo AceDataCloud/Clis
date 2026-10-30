@@ -544,6 +544,100 @@ class TestImageCommands:
         if command == "edit":
             assert body["image"] == "https://example.com/photo.jpg"
 
+    @pytest.mark.parametrize("quality", ["xhigh", "max"])
+    @pytest.mark.parametrize(
+        "model",
+        [
+            "gpt-image-2.5-flare",
+            "gpt-image-2.5-sunburst",
+            "gpt-image-2.5-flare:official",
+            "gpt-image-2.5-sunburst:official",
+        ],
+    )
+    @pytest.mark.parametrize("mode", ["generate", "url", "file"])
+    @respx.mock
+    def test_extended_quality_payload(
+        self, runner, tmp_path, mock_image_response, quality, model, mode
+    ):
+        endpoint = "generations" if mode == "generate" else "edits"
+        route = respx.post(f"https://api.acedata.cloud/openai/images/{endpoint}").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        args = ["--token", "test-token", "image" if mode == "generate" else "edit", "A vase"]
+        if mode == "url":
+            args += ["--image-url", "https://example.com/photo.jpg"]
+        elif mode == "file":
+            image_file = tmp_path / "photo.png"
+            image_file.write_bytes(b"test-image")
+            args += ["--image-file", str(image_file)]
+        args += ["--model", model, "--quality", quality, "--json"]
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 0, result.output
+        request = route.calls.last.request
+        if mode == "file":
+            assert "multipart/form-data" in request.headers["content-type"]
+            content = request.content.decode()
+            assert f'name="quality"\r\n\r\n{quality}\r\n' in content
+            assert f'name="model"\r\n\r\n{model}\r\n' in content
+        else:
+            body = json.loads(request.content)
+            assert body["quality"] == quality
+            assert body["model"] == model
+
+    @pytest.mark.parametrize("quality", ["xhigh", "max"])
+    @pytest.mark.parametrize(
+        "model", ["gpt-image-2", "gpt-image-2:official", "nano-banana-2.1", "dall-e-3"]
+    )
+    @pytest.mark.parametrize("command", ["image", "edit"])
+    @respx.mock
+    def test_extended_quality_rejects_other_models(self, runner, quality, model, command):
+        args = ["--token", "test-token", command, "A vase", "--model", model, "--quality", quality]
+        if command == "edit":
+            args += ["--image-url", "https://example.com/photo.jpg"]
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 2
+        assert "Invalid value for --quality" in result.output
+        assert not respx.calls
+
+    @pytest.mark.parametrize(
+        ("command", "model", "quality"),
+        [
+            ("image", "gpt-image-2", "high"),
+            ("edit", "gpt-image-2", "auto"),
+            ("image", "dall-e-3", "hd"),
+            ("image", "dall-e-2", "standard"),
+            ("edit", "dall-e-2", "standard"),
+        ],
+    )
+    @respx.mock
+    def test_existing_quality_options(self, runner, mock_image_response, command, model, quality):
+        endpoint = "generations" if command == "image" else "edits"
+        route = respx.post(f"https://api.acedata.cloud/openai/images/{endpoint}").mock(
+            return_value=Response(200, json=mock_image_response)
+        )
+        args = [
+            "--token",
+            "test-token",
+            command,
+            "A vase",
+            "--model",
+            model,
+            "--quality",
+            quality,
+            "--json",
+        ]
+        if command == "edit":
+            args += ["--image-url", "https://example.com/photo.jpg"]
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(route.calls.last.request.content)["quality"] == quality
+
     @pytest.mark.parametrize("command", ["image", "edit"])
     @respx.mock
     def test_nano_banana_2_1_rejects_official_variant(self, runner, command):

@@ -31,6 +31,18 @@ def _validate_size_format(
     return value
 
 
+def _validate_quality(model: str, quality: str | None) -> None:
+    if quality in {"xhigh", "max"} and model.removesuffix(":official") not in {
+        "gpt-image-2.5-flare",
+        "gpt-image-2.5-sunburst",
+    }:
+        raise click.BadParameter(
+            "xhigh and max require gpt-image-2.5-flare or gpt-image-2.5-sunburst "
+            "(including :official variants).",
+            param_hint="--quality",
+        )
+
+
 @click.command()
 @click.argument("prompt")
 @click.option(
@@ -63,9 +75,12 @@ def _validate_size_format(
 )
 @click.option(
     "--quality",
-    type=click.Choice(["auto", "high", "medium", "low", "hd", "standard"]),
+    type=click.Choice(["auto", "high", "medium", "low", "xhigh", "max", "hd", "standard"]),
     default=None,
-    help="Image quality.",
+    help=(
+        "Image quality; xhigh/max only for gpt-image-2.5-flare and "
+        "gpt-image-2.5-sunburst (including :official)."
+    ),
 )
 @click.option(
     "--style",
@@ -151,6 +166,7 @@ def image(
       openai-cli image "Portrait of a cat" -m gpt-image-1 --quality high
       openai-cli image "Abstract art" --size 1792x1024 --style vivid
     """
+    _validate_quality(model, quality)
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
         "prompt": prompt,
@@ -229,9 +245,12 @@ def image(
 )
 @click.option(
     "--quality",
-    type=click.Choice(["auto", "high", "medium", "low", "standard"]),
+    type=click.Choice(["auto", "high", "medium", "low", "xhigh", "max", "standard"]),
     default=None,
-    help="Image quality.",
+    help=(
+        "Image quality; xhigh/max only for gpt-image-2.5-flare and "
+        "gpt-image-2.5-sunburst (including :official)."
+    ),
 )
 @click.option(
     "--output-format",
@@ -313,6 +332,7 @@ def edit(
       openai-cli edit "Change background to forest" --image-url https://example.com/pic.jpg -m gpt-image-1
       openai-cli edit "Remove background" --image-file photo.png --mask-file mask.png
     """
+    _validate_quality(model, quality)
     if not image_url and not image_file:
         raise click.UsageError("Provide at least one of --image-url or --image-file.")
     if image_url and image_file:
