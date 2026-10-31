@@ -12,6 +12,8 @@ console = Console()
 
 # Available models from OpenAPI spec
 MODELS = [
+    "mimo-v2.6-pro",
+    "mimo-v2.6-flash",
     "gpt-6-astra",
     "gpt-6.1-sol",
     "gpt-6-sol",
@@ -113,6 +115,8 @@ DEFAULT_MODEL = "gpt-4o"
 
 # Available models for /aichat2/conversations endpoint
 MODELS2 = [
+    "mimo-v2.6-pro",
+    "mimo-v2.6-flash",
     "gpt-5.6-sol-fast",
     "gpt-6.1-sol",
     "gpt-6-sol",
@@ -208,7 +212,7 @@ MODELS2 = [
 DEFAULT_MODEL2 = "gpt-4o"
 
 # Available model groups for /aichat2/conversations endpoint
-MODEL_GROUPS = ["chatgpt", "claude", "gemini", "grok", "kimi", "glm", "deepseek"]
+MODEL_GROUPS = ["chatgpt", "claude", "gemini", "grok", "kimi", "glm", "mimo", "deepseek"]
 
 # Available actions for /aichat2/conversations endpoint
 ACTIONS2 = ["chat", "retrieve", "retrieve_batch", "update", "delete"]
@@ -297,6 +301,8 @@ def _get_model_family(model: str) -> str:
         return "DeepSeek"
     elif model.startswith("kimi"):
         return "Kimi"
+    elif model.startswith("mimo"):
+        return "MiMo (pending activation)"
     elif model.startswith("glm"):
         return "GLM"
     else:
