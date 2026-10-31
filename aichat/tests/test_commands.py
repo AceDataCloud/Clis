@@ -7,7 +7,7 @@ import respx
 from click.testing import CliRunner
 from httpx import Response
 
-from aichat_cli.core.output import MODELS, MODELS2, _get_model_family
+from aichat_cli.core.output import MODEL_GROUPS, MODELS, MODELS2, _get_model_family
 from aichat_cli.main import cli, get_version
 
 
@@ -69,6 +69,13 @@ class TestGlobalCommands:
         assert "gemini-3.1-flash-lite-preview" not in MODELS2
         assert "gemini-3.1-pro" not in MODELS2
         assert "gemini-3-pro-preview" not in MODELS2
+
+    def test_mimo_catalog_is_prepared_and_clearly_labeled(self):
+        assert "mimo" in MODEL_GROUPS
+        for model in ("mimo-v2.6-pro", "mimo-v2.6-flash"):
+            assert MODELS.count(model) == 1
+            assert MODELS2.count(model) == 1
+            assert _get_model_family(model) == "MiMo (pending activation)"
 
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
