@@ -33,6 +33,17 @@ class TestGlobalCommands:
         assert "PROMPT" in result.output
         assert "--model" in result.output
 
+    def test_inherited_media_settings_help(self):
+        runner = CliRunner()
+        for command in ["image-to-video", "video-edit"]:
+            result = runner.invoke(cli, [command, "--help"])
+            assert result.exit_code == 0
+            help_text = " ".join(result.output.split())
+            assert f"Ignored for {command}" in help_text
+            assert "aspect ratio follows" in help_text
+            if command == "video-edit":
+                assert "duration follows the source video" in help_text
+
 
 class TestGenerateCommands:
     """Tests for video generation commands."""

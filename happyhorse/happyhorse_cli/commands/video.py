@@ -135,7 +135,7 @@ def generate(
     "--ratio",
     type=click.Choice(RATIO_CHOICES),
     default="16:9",
-    help="Video aspect ratio (default: 16:9).",
+    help="Ignored for image-to-video; aspect ratio follows the source image.",
 )
 @click.option("--duration", type=int, default=5, help="Video duration in seconds (default: 5).")
 @click.option(
@@ -333,9 +333,14 @@ def reference_to_video(
     "--ratio",
     type=click.Choice(RATIO_CHOICES),
     default="16:9",
-    help="Video aspect ratio (default: 16:9).",
+    help="Ignored for video-edit; aspect ratio follows the source video.",
 )
-@click.option("--duration", type=int, default=5, help="Video duration in seconds (default: 5).")
+@click.option(
+    "--duration",
+    type=int,
+    default=5,
+    help="Ignored for video-edit; duration follows the source video.",
+)
 @click.option(
     "--watermark/--no-watermark",
     default=False,

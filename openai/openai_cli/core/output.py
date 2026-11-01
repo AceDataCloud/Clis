@@ -57,6 +57,8 @@ CHAT_MODELS = [
     "o3-mini",
     "o3-pro",
     "o4-mini",
+    "mimo-v2.6-pro",
+    "mimo-v2.6-flash",
 ]
 
 # Embedding models

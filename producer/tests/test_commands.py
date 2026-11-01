@@ -61,7 +61,28 @@ class TestGenerateCommands:
         assert data["task_id"] == "test-task-123"
         body = json.loads(route.calls.last.request.content)
         assert body["prompt"] == "A test music prompt"
-        assert body["lyric"] == ""
+        assert "lyric" not in body
+
+    @pytest.mark.parametrize(
+        "options", [["--custom", "--instrumental"], ["--custom", "--lyric", "[Verse] Hello"]]
+    )
+    @respx.mock
+    def test_custom_without_prompt(self, runner, mock_audio_response, options):
+        route = respx.post("https://api.acedata.cloud/producer/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "generate", *options, "--json"])
+        assert result.exit_code == 0, result.output
+        body = json.loads(route.calls.last.request.content)
+        assert "prompt" not in body
+        assert body["custom"] is True
+
+    @pytest.mark.parametrize("args", [[], ["--custom"], ["--custom", "--lyric", " "]])
+    @respx.mock
+    def test_generate_requires_mode_inputs(self, runner, args):
+        result = runner.invoke(cli, ["--token", "test-token", "generate", *args])
+        assert result.exit_code == 2
+        assert not respx.calls
 
     @respx.mock
     def test_generate_rich_output(self, runner, mock_audio_response):
@@ -159,22 +180,11 @@ class TestGenerateCommands:
         data = json.loads(result.output)
         assert data["success"] is True
         body = json.loads(route.calls.last.request.content)
-        assert body["prompt"] == ""
-        assert body["lyric"] == ""
+        assert "prompt" not in body
+        assert "lyric" not in body
 
     @respx.mock
     def test_extend_json(self, runner, mock_audio_response):
-        respx.post("https://api.acedata.cloud/producer/audios").mock(
-            return_value=Response(200, json=mock_audio_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "extend", "audio-abc-123", "--json"],
-        )
-        assert result.exit_code == 0
-
-    @respx.mock
-    def test_extend_with_continue_at(self, runner, mock_audio_response):
         respx.post("https://api.acedata.cloud/producer/audios").mock(
             return_value=Response(200, json=mock_audio_response)
         )
@@ -186,11 +196,48 @@ class TestGenerateCommands:
                 "extend",
                 "audio-abc-123",
                 "--continue-at",
-                "30.5",
+                "30.792",
+                "--instrumental",
                 "--json",
             ],
         )
         assert result.exit_code == 0
+
+    @respx.mock
+    def test_extend_with_continue_at(self, runner, mock_audio_response):
+        route = respx.post("https://api.acedata.cloud/producer/audios").mock(
+            return_value=Response(200, json=mock_audio_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "extend",
+                "audio-abc-123",
+                "--continue-at",
+                "30.5",
+                "--lyric",
+                "[Verse] New lyrics",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+
+        body = json.loads(route.calls.last.request.content)
+        assert body["continue_at"] == 30.5
+        assert body["lyric"] == "[Verse] New lyrics"
+        assert body["custom"] is True
+        assert body["instrumental"] is False
+
+    @pytest.mark.parametrize(
+        "args", [[], ["--continue-at", "0", "--instrumental"], ["--continue-at", "30"]]
+    )
+    @respx.mock
+    def test_extend_requires_mode_inputs(self, runner, args):
+        result = runner.invoke(cli, ["--token", "test-token", "extend", "audio-123", *args])
+        assert result.exit_code == 2
+        assert not respx.calls
 
     @respx.mock
     def test_variation_json(self, runner, mock_audio_response):
@@ -257,8 +304,8 @@ class TestGenerateCommands:
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["prompt"] == ""
-        assert body["lyric"] == ""
+        assert "prompt" not in body
+        assert "lyric" not in body
 
 
 # ─── Lyrics Commands ────────────────────────────────────────────────────────

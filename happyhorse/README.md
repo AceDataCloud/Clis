@@ -81,6 +81,13 @@ happyhorse config
 | `--async` | `False` | Submit asynchronously |
 | `--json` | `False` | Output raw JSON |
 
+### Inherited dimensions for image/video inputs
+
+`image-to-video` inherits the source image's aspect ratio; `--ratio` has no effect.
+`video-edit` inherits both source video duration and aspect ratio; `--duration`
+and `--ratio` do not override them. Editing is billed for the combined input and
+output video durations. Use `--audio-setting origin` to retain the source audio.
+
 ## Models
 
 | Model | Type |

@@ -91,9 +91,9 @@ from openai_cli.core.output import (
 )
 @click.option(
     "--reasoning-effort",
-    type=click.Choice(["minimal", "low", "medium", "high"]),
+    type=click.Choice(["minimal", "low", "medium", "high", "xhigh", "max"]),
     default=None,
-    help="Reasoning effort for o1/o3/o4/gpt-5 series models.",
+    help="Reasoning effort; supported values depend on the selected model.",
 )
 @click.option(
     "--user",

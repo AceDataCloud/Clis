@@ -38,10 +38,28 @@ digitalhuman wait task_abc123
 - `generate` – Generate a digital human video from a face source and audio/text
 - `clone-voice` – Clone a voice from an audio sample
 - `task` – Query a single task status
-- `tasks` – Query multiple tasks
+- `tasks` – List recent history, or retrieve each supplied task ID individually
 - `wait` – Poll until a task completes
 - `engines` – List available engines
 - `config` – Show current configuration
+
+## Task history and selected IDs
+
+```bash
+digitalhuman tasks --limit 20 --type videos --json
+digitalhuman tasks --created-at-min 1793404800 --created-at-max 1793491200 --json
+digitalhuman tasks task_abc123 task_def456 --json
+```
+
+With no IDs, `tasks` lists the authenticated caller's recent history, newest first.
+`--limit` is 1–100 (server default: 20), `--type` is `videos` or `voices`, and
+creation filters are strict Unix-second boundaries. The API's `retrieve_batch`
+action lists history; it does not look up an array of IDs.
+
+With IDs, the CLI sends one `retrieve` request per ID and collects them into
+`items` and `count`. History filters cannot be combined with selected IDs.
+Detailed task records carry timing/status fields and nest video or voice output
+inside `response`; `--json` preserves the full records, including null timing fields.
 
 ## Notes
 

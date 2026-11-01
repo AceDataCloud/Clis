@@ -67,16 +67,34 @@ claude chat "Review these tradeoffs" --model claude-opus-5-5 --max-tokens 32768 
 
 ## Sol Fast
 
-The public alias `gpt-5.6-sol-fast` is available through both `chat` and `messages`. It is not supported by `count-tokens`; Claude model defaults are unchanged.
+The public alias `gpt-5.6-sol-fast` is available through `chat`, `messages` and `count-tokens`; Claude model defaults are unchanged.
 
 ```bash
 claude chat "Explain the tradeoffs" --model gpt-5.6-sol-fast
 claude messages "Explain the tradeoffs" --model gpt-5.6-sol-fast --max-tokens 1024
 ```
 
+## Messages model selection and structured output
+
+`messages` and `count-tokens` also accept the published GPT-6.1 Sol/Terra,
+GPT-6 Sol/Luna/Astra, GPT-5.6 Sol, GLM-5/5-turbo/5.1/5.2/5.3 and Gemini-3.6
+Flash IDs. Keep the same model for token counting and generation. These additions
+do not change `chat` model choices or defaults, and MiMo is not a Messages model.
+Check current account access and prices before switching models.
+
+Requests and responses retain the Messages format. Supply tools with
+`tools[].input_schema`; `--tool-choice '{"type":"auto","disable_parallel_tool_use":true}'`
+disables parallel tool calls. Structured output uses `output_config.format`, and
+returned text remains in Messages `content` blocks:
+
+```bash
+claude messages "Return an answer" --model gpt-6.1-terra --max-tokens 1024 \
+  --output-config '{"effort":"low","format":{"type":"json_schema","schema":{"type":"object","properties":{"answer":{"type":"string"}},"required":["answer"],"additionalProperties":false}}}' --json
+```
+
 ## Thinking options
 
-`messages` and `count-tokens` pass thinking settings through to the selected model without fixed mode/display enums, a minimum budget, or model-specific combination rules. The model determines which values and combinations it supports; parameter errors are returned rather than silently rewriting the request.
+`messages` and `count-tokens` send thinking settings without fixed mode/display enums, a minimum budget, or model-specific combination rules in the CLI. The platform passes or maps these fields according to the selected generation protocol; support depends on the model, and parameter errors are returned to the caller.
 
 Use `--thinking` for a JSON object, including extension fields. The convenience flags `--thinking-type`, `--thinking-budget-tokens`, and `--thinking-display` override only their corresponding fields if supplied alongside `--thinking`. `messages --output-config` likewise preserves JSON fields and effort values.
 

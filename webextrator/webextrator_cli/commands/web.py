@@ -31,8 +31,36 @@ def _parse_headers(headers: str | None) -> dict[str, str] | None:
     return parsed
 
 
+def _parse_cookies(cookies: str | None) -> list[dict] | None:
+    if cookies is None:
+        return None
+    try:
+        parsed = json.loads(cookies)
+    except json.JSONDecodeError as exc:
+        raise click.BadParameter("--cookies must be a valid JSON array.") from exc
+    if not isinstance(parsed, list) or not all(
+        isinstance(cookie, dict)
+        and all(isinstance(cookie.get(key), str) for key in ("name", "value", "domain"))
+        for cookie in parsed
+    ):
+        raise click.BadParameter(
+            "--cookies must be an array of objects with name, value and domain strings."
+        )
+    return parsed
+
+
 @click.command()
 @click.argument("url")
+@click.option(
+    "--cookies", default=None, help="Cookies as a JSON array with name, value and domain."
+)
+@click.option("--bypass-cache", is_flag=True, default=False, help="Skip cache reads, not writes.")
+@click.option(
+    "--cache-ttl-seconds",
+    type=click.IntRange(min=0),
+    default=None,
+    help="Cache lifetime in integer seconds (default: 3600); 0 disables writes.",
+)
 @click.option(
     "--expected-type",
     type=click.Choice(["product", "article", "general"]),
@@ -49,19 +77,19 @@ def _parse_headers(headers: str | None) -> dict[str, str] | None:
     "--wait-until",
     type=click.Choice(WAIT_UNTIL_OPTIONS),
     default=None,
-    help="Page load wait condition (default: networkidle).",
+    help="Page load wait condition (default: load).",
 )
 @click.option(
     "--timeout",
     default=None,
-    type=float,
-    help="Total timeout in seconds for the extract operation (default: 30).",
+    type=click.IntRange(min=1),
+    help="Navigation timeout in positive integer seconds (default: 30).",
 )
 @click.option(
     "--delay",
     default=None,
-    type=float,
-    help="Extra delay in seconds after the page is loaded, before extraction.",
+    type=click.IntRange(min=0),
+    help="Extra delay in integer seconds after the page is loaded, before extraction.",
 )
 @click.option(
     "--wait-for-selector",
@@ -105,11 +133,14 @@ def _parse_headers(headers: str | None) -> dict[str, str] | None:
 def extract(
     ctx: click.Context,
     url: str,
+    cookies: str | None,
+    bypass_cache: bool,
+    cache_ttl_seconds: int | None,
     expected_type: str | None,
     enable_llm: bool,
     wait_until: str | None,
-    timeout: float | None,
-    delay: float | None,
+    timeout: int | None,
+    delay: int | None,
     wait_for_selector: str | None,
     block_resources: tuple[str, ...],
     headers: str | None,
@@ -132,6 +163,9 @@ def extract(
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
         "url": url,
+        "cookies": _parse_cookies(cookies),
+        "bypass_cache": bypass_cache,
+        "cache_ttl_seconds": cache_ttl_seconds,
         "expected_type": expected_type,
         "enable_llm": enable_llm if enable_llm else None,
         "wait_until": wait_until,
@@ -159,22 +193,32 @@ def extract(
 @click.command()
 @click.argument("url")
 @click.option(
+    "--cookies", default=None, help="Cookies as a JSON array with name, value and domain."
+)
+@click.option("--bypass-cache", is_flag=True, default=False, help="Skip cache reads, not writes.")
+@click.option(
+    "--cache-ttl-seconds",
+    type=click.IntRange(min=0),
+    default=None,
+    help="Cache lifetime in integer seconds (default: 3600); 0 disables writes.",
+)
+@click.option(
     "--wait-until",
     type=click.Choice(WAIT_UNTIL_OPTIONS),
     default=None,
-    help="Page load wait condition (default: networkidle).",
+    help="Page load wait condition (default: load).",
 )
 @click.option(
     "--timeout",
     default=None,
-    type=float,
-    help="Total timeout in seconds for the render operation (default: 30).",
+    type=click.IntRange(min=1),
+    help="Navigation timeout in positive integer seconds (default: 30).",
 )
 @click.option(
     "--delay",
     default=None,
-    type=float,
-    help="Extra delay in seconds after the page is loaded, before HTML is captured.",
+    type=click.IntRange(min=0),
+    help="Extra delay in integer seconds after the page is loaded, before HTML is captured.",
 )
 @click.option(
     "--wait-for-selector",
@@ -218,9 +262,12 @@ def extract(
 def render(
     ctx: click.Context,
     url: str,
+    cookies: str | None,
+    bypass_cache: bool,
+    cache_ttl_seconds: int | None,
     wait_until: str | None,
-    timeout: float | None,
-    delay: float | None,
+    timeout: int | None,
+    delay: int | None,
     wait_for_selector: str | None,
     block_resources: tuple[str, ...],
     headers: str | None,
@@ -243,6 +290,9 @@ def render(
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
         "url": url,
+        "cookies": _parse_cookies(cookies),
+        "bypass_cache": bypass_cache,
+        "cache_ttl_seconds": cache_ttl_seconds,
         "wait_until": wait_until,
         "timeout": timeout,
         "delay": delay,

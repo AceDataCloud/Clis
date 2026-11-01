@@ -242,6 +242,84 @@ class TestRenderCommand:
         assert result.exit_code != 0
 
 
+@pytest.mark.parametrize("command", ["extract", "render"])
+class TestBrowserOptions:
+    @respx.mock
+    def test_cookies_cache_and_integer_options(self, runner, command):
+        route = respx.post(f"https://api.acedata.cloud/webextrator/{command}").mock(
+            return_value=Response(200, json={})
+        )
+        cookies = [
+            {
+                "name": "session",
+                "value": "test",
+                "domain": "example.com",
+                "secure": True,
+                "sameSite": "Lax",
+            }
+        ]
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                command,
+                "https://example.com",
+                "--cookies",
+                json.dumps(cookies),
+                "--bypass-cache",
+                "--cache-ttl-seconds",
+                "0",
+                "--timeout",
+                "10",
+                "--delay",
+                "0",
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0, result.output
+        sent = json.loads(route.calls.last.request.content)
+        assert sent["cookies"] == cookies
+        assert sent["bypass_cache"] is True
+        assert sent["cache_ttl_seconds"] == 0
+        assert sent["timeout"] == 10 and type(sent["timeout"]) is int
+        assert sent["delay"] == 0
+
+    @pytest.mark.parametrize(
+        ("option", "value"),
+        [
+            ("--timeout", "0"),
+            ("--timeout", "1.5"),
+            ("--delay", "-1"),
+            ("--delay", "0.5"),
+            ("--cache-ttl-seconds", "-1"),
+            ("--cookies", "{}"),
+            ("--cookies", "[{}]"),
+            ("--cookies", "invalid"),
+        ],
+    )
+    @respx.mock
+    def test_invalid_options_do_not_send_requests(self, runner, command, option, value):
+        result = runner.invoke(
+            cli, ["--token", "test-token", command, "https://example.com", option, value]
+        )
+        assert result.exit_code == 2
+        assert not respx.calls
+
+    @respx.mock
+    def test_defaults_leave_server_options_unset(self, runner, command):
+        route = respx.post(f"https://api.acedata.cloud/webextrator/{command}").mock(
+            return_value=Response(200, json={})
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", command, "https://example.com", "--json"]
+        )
+        assert result.exit_code == 0
+        sent = json.loads(route.calls.last.request.content)
+        assert not {"cookies", "timeout", "delay", "cache_ttl_seconds", "wait_until"} & sent.keys()
+        assert "default: load" in runner.invoke(cli, [command, "--help"]).output
+
+
 class TestTasksCommands:
     """Tests for tasks management commands."""
 
