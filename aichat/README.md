@@ -146,3 +146,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - [AceDataCloud Platform](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=aichat_cli_readme_platform)
 - [API Documentation](https://platform.acedata.cloud/documents?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=aichat_cli_readme_documents)
+
+## MiMo integration preparation
+
+The model lists include `mimo-v2.6-pro` and `mimo-v2.6-flash` as prepared entries. They are not yet available; verify the live model catalog and your account access before using `chat` or `chat2` with either ID. Initial scope is text, reasoning and function tools. Command-line model discovery does not grant service access or confirm live availability.
