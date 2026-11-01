@@ -44,7 +44,7 @@ producer lyrics "A love song about the ocean at sunset"
 producer cover abc123-def456
 
 # Extend an existing track
-producer extend abc123-def456 --continue-at 30.5
+producer extend abc123-def456 --continue-at 30.5 --lyric "[Verse] New lyrics"
 
 # Generate a variation
 producer variation abc123-def456
@@ -82,6 +82,24 @@ producer models
 # Show configuration
 producer config
 ```
+
+## Generation modes and extension inputs
+
+`generate` requires a prompt in the default inspiration mode. With `--custom`,
+provide `--lyric` for vocals, or use `--instrumental` without inventing lyrics or
+a prompt. `extend` requires a source audio ID and a positive `--continue-at`
+(fractional seconds are preserved), plus `--lyric` unless `--instrumental` is set.
+Vocal extensions select custom lyrics mode.
+
+```bash
+producer generate --custom --instrumental
+producer generate --custom --lyric "[Verse] Hello world"
+producer extend abc123 --continue-at 30.792 --instrumental
+```
+
+Cover, variation, swaps, replacement and stem separation require the source audio
+ID, not unconditional lyrics or prompts. Omitted `lyrics_strength` and
+`sound_strength` use the service defaults of 0.5.
 
 ## Authentication
 

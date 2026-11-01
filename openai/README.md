@@ -112,6 +112,26 @@ openai-cli models
 openai-cli config
 ```
 
+## Recent chat model options
+
+`gpt-6.1-terra` is available in `chat` and `response`. Its reasoning levels are
+`low`, `medium`, `high`, `xhigh` and `max`, not `minimal` or `none`. Start with
+`chat --reasoning-effort low` or `response --reasoning '{"effort":"low"}'`.
+Input above 272,000 tokens uses long-context pricing; check current account
+access, prices and returned usage before switching models.
+
+`chat` also accepts `mimo-v2.6-pro` and `mimo-v2.6-flash` through the compatible
+Chat Completions endpoint, with MiMo service permission. This release covers text
+Chat Completions, not MiMo Responses, Messages, multimedia, built-in search or
+Batch. Function tools use `--tool-choice auto`; executing tools remains the
+application's responsibility. The CLI does not automatically execute tools or
+assemble multi-turn tool continuations.
+
+```bash
+openai-cli chat "Explain rainbows" --model mimo-v2.6-flash --max-completion-tokens 256 --json
+openai-cli chat "Compare these options" --model gpt-6.1-terra --reasoning-effort low --json
+```
+
 ## Commands
 
 | Command | Description |

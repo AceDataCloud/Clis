@@ -42,6 +42,28 @@ webextrator tasks retrieve --id <task-id>
 | `webextrator tasks batch` | Retrieve multiple tasks at once |
 | `webextrator config` | Show current configuration |
 
+## Browser and cache options
+
+Both `extract` and `render` default to the server's `load` wait condition. Use
+`--wait-until networkidle` only when needed. `--timeout` is a positive integer
+navigation timeout in seconds (server default: 30); `--delay` is a nonnegative
+integer number of extra seconds.
+
+`--cookies` accepts a JSON array; every cookie needs string `name`, `value` and
+`domain` fields. Optional fields include `path`, `expires`, `httpOnly`, `secure`
+and `sameSite` (`Strict`, `Lax`, `None`). Use only cookies you are authorized to
+send, and avoid putting sensitive values in shared shell history.
+
+`--bypass-cache` skips cache reads but still allows writes. The default cache
+lifetime is 3600 seconds; `--cache-ttl-seconds 0` disables writes for that result.
+
+```bash
+webextrator render https://example.com --timeout 30 --delay 0 \
+  --bypass-cache --cache-ttl-seconds 0 --json
+webextrator extract https://example.com \
+  --cookies '[{"name":"locale","value":"en","domain":"example.com"}]' --json
+```
+
 ## Global Options
 
 ```

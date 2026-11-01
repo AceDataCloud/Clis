@@ -39,28 +39,46 @@ def task(
 
 
 @click.command("tasks")
-@click.argument("task_ids", nargs=-1, required=True)
+@click.argument("task_ids", nargs=-1)
+@click.option(
+    "--limit", type=click.IntRange(1, 100), default=None, help="History limit (default: 20)."
+)
+@click.option(
+    "--created-at-min", type=int, default=None, help="History strictly after this Unix second."
+)
+@click.option(
+    "--created-at-max", type=int, default=None, help="History strictly before this Unix second."
+)
+@click.option("--type", "task_type", type=click.Choice(["videos", "voices"]), default=None)
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def tasks_batch(
     ctx: click.Context,
     task_ids: tuple[str, ...],
+    limit: int | None,
+    created_at_min: int | None,
+    created_at_max: int | None,
+    task_type: str | None,
     output_json: bool,
 ) -> None:
-    """Query multiple tasks at once.
-
-    TASK_IDS are space-separated task IDs.
-
-    \b
-    Examples:
-      digitalhuman tasks task_abc123 task_def456
-    """
+    """List recent history, or retrieve each supplied TASK_ID individually."""
+    if task_ids and any(
+        value is not None for value in (limit, created_at_min, created_at_max, task_type)
+    ):
+        raise click.UsageError("History filters cannot be combined with task IDs.")
     client = get_client(ctx.obj.get("token"))
     try:
-        result = client.query_task(
-            task_id=task_ids[0],
-            action="retrieve_batch",
-        )
+        if task_ids:
+            items = [client.query_task(task_id=task_id, action="retrieve") for task_id in task_ids]
+            result = {"items": items, "count": len(items)}
+        else:
+            result = client.query_task(
+                action="retrieve_batch",
+                limit=limit,
+                created_at_min=created_at_min,
+                created_at_max=created_at_max,
+                type=task_type,
+            )
         if output_json:
             print_json(result)
         else:

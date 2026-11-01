@@ -58,10 +58,13 @@ class TestGenerateCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "generate",
-                "--video-url", "https://example.com/face.mp4",
-                "--audio-url", "https://example.com/speech.mp3",
+                "--video-url",
+                "https://example.com/face.mp4",
+                "--audio-url",
+                "https://example.com/speech.mp3",
                 "--json",
             ],
         )
@@ -81,10 +84,13 @@ class TestGenerateCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "generate",
-                "--image-url", "https://example.com/portrait.jpg",
-                "--audio-url", "https://example.com/speech.mp3",
+                "--image-url",
+                "https://example.com/portrait.jpg",
+                "--audio-url",
+                "https://example.com/speech.mp3",
                 "--json",
             ],
         )
@@ -100,11 +106,15 @@ class TestGenerateCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "generate",
-                "--video-url", "https://example.com/face.mp4",
-                "--audio-url", "https://example.com/speech.mp3",
-                "--engine", "heygem",
+                "--video-url",
+                "https://example.com/face.mp4",
+                "--audio-url",
+                "https://example.com/speech.mp3",
+                "--engine",
+                "heygem",
                 "--json",
             ],
         )
@@ -120,11 +130,15 @@ class TestGenerateCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "generate",
-                "--video-url", "https://example.com/face.mp4",
-                "--text", "Hello world",
-                "--voice-id", "f754a190e26c",
+                "--video-url",
+                "https://example.com/face.mp4",
+                "--text",
+                "Hello world",
+                "--voice-id",
+                "f754a190e26c",
                 "--json",
             ],
         )
@@ -141,10 +155,13 @@ class TestGenerateCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "generate",
-                "--video-url", "https://example.com/face.mp4",
-                "--audio-url", "https://example.com/speech.mp3",
+                "--video-url",
+                "https://example.com/face.mp4",
+                "--audio-url",
+                "https://example.com/speech.mp3",
                 "--async",
                 "--json",
             ],
@@ -161,11 +178,15 @@ class TestGenerateCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "generate",
-                "--video-url", "https://example.com/face.mp4",
-                "--audio-url", "https://example.com/speech.mp3",
-                "--resolution", "540p",
+                "--video-url",
+                "https://example.com/face.mp4",
+                "--audio-url",
+                "https://example.com/speech.mp3",
+                "--resolution",
+                "540p",
                 "--json",
             ],
         )
@@ -176,25 +197,29 @@ class TestGenerateCommand:
     def test_generate_missing_source(self, runner):
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate",
-             "--audio-url", "https://example.com/speech.mp3"],
+            ["--token", "test-token", "generate", "--audio-url", "https://example.com/speech.mp3"],
         )
         assert result.exit_code != 0
 
     def test_generate_missing_audio(self, runner):
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate",
-             "--video-url", "https://example.com/face.mp4"],
+            ["--token", "test-token", "generate", "--video-url", "https://example.com/face.mp4"],
         )
         assert result.exit_code != 0
 
     def test_generate_text_without_voice_id(self, runner):
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "generate",
-             "--video-url", "https://example.com/face.mp4",
-             "--text", "Hello"],
+            [
+                "--token",
+                "test-token",
+                "generate",
+                "--video-url",
+                "https://example.com/face.mp4",
+                "--text",
+                "Hello",
+            ],
         )
         assert result.exit_code != 0
 
@@ -202,10 +227,13 @@ class TestGenerateCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "",
+                "--token",
+                "",
                 "generate",
-                "--video-url", "https://example.com/face.mp4",
-                "--audio-url", "https://example.com/speech.mp3",
+                "--video-url",
+                "https://example.com/face.mp4",
+                "--audio-url",
+                "https://example.com/speech.mp3",
             ],
         )
         assert result.exit_code != 0
@@ -222,9 +250,11 @@ class TestCloneVoiceCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "clone-voice",
-                "--audio-url", "https://example.com/voice.wav",
+                "--audio-url",
+                "https://example.com/voice.wav",
                 "--json",
             ],
         )
@@ -242,10 +272,13 @@ class TestCloneVoiceCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "clone-voice",
-                "--audio-url", "https://example.com/voice.wav",
-                "--lang", "en",
+                "--audio-url",
+                "https://example.com/voice.wav",
+                "--lang",
+                "en",
                 "--json",
             ],
         )
@@ -261,10 +294,13 @@ class TestCloneVoiceCommand:
         result = runner.invoke(
             cli,
             [
-                "--token", "test-token",
+                "--token",
+                "test-token",
                 "clone-voice",
-                "--audio-url", "https://example.com/voice.wav",
-                "--name", "My Voice",
+                "--audio-url",
+                "https://example.com/voice.wav",
+                "--name",
+                "My Voice",
                 "--json",
             ],
         )
@@ -290,8 +326,7 @@ class TestTaskCommands:
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "task",
-             "task_49af42c410c24f04ad416b28af55d237", "--json"],
+            ["--token", "test-token", "task", "task_49af42c410c24f04ad416b28af55d237", "--json"],
         )
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -313,14 +348,91 @@ class TestTaskCommands:
 
     @respx.mock
     def test_tasks_batch_json(self, runner, mock_task_response):
-        respx.post("https://api.acedata.cloud/digital-human/tasks").mock(
+        route = respx.post("https://api.acedata.cloud/digital-human/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
         result = runner.invoke(
-            cli,
-            ["--token", "test-token", "tasks", "task_abc123", "--json"],
+            cli, ["--token", "test-token", "tasks", "task_abc123", "task_def456", "--json"]
         )
         assert result.exit_code == 0
+        assert [json.loads(call.request.content) for call in route.calls] == [
+            {"task_id": "task_abc123", "action": "retrieve"},
+            {"task_id": "task_def456", "action": "retrieve"},
+        ]
+        assert json.loads(result.output) == {
+            "count": 2,
+            "items": [mock_task_response, mock_task_response],
+        }
+
+    @pytest.mark.parametrize("output_json", [True, False])
+    @respx.mock
+    def test_history(self, runner, mock_task_response, output_json):
+        detailed = {
+            "id": "task_abc123",
+            "status": "succeed",
+            "kind": "videos",
+            "created_at": 10.5,
+            "started_at": None,
+            "finished_at": None,
+            "elapsed": None,
+            "request": {},
+            "response": mock_task_response,
+        }
+        history = {"count": 1, "items": [detailed]}
+        route = respx.post("https://api.acedata.cloud/digital-human/tasks").mock(
+            return_value=Response(200, json=history)
+        )
+        args = [
+            "--token",
+            "test-token",
+            "tasks",
+            "--limit",
+            "5",
+            "--created-at-min",
+            "0",
+            "--created-at-max",
+            "20",
+            "--type",
+            "videos",
+        ]
+        result = runner.invoke(cli, args + (["--json"] if output_json else []))
+        assert result.exit_code == 0, result.output
+        assert json.loads(route.calls.last.request.content) == {
+            "action": "retrieve_batch",
+            "limit": 5,
+            "created_at_min": 0,
+            "created_at_max": 20,
+            "type": "videos",
+        }
+        if output_json:
+            assert json.loads(result.output) == history
+        else:
+            assert "task_abc123" in result.output
+            assert mock_task_response["video_url"] in result.output
+
+    @respx.mock
+    def test_history_defaults(self, runner):
+        route = respx.post("https://api.acedata.cloud/digital-human/tasks").mock(
+            return_value=Response(200, json={"count": 0, "items": []})
+        )
+        result = runner.invoke(cli, ["--token", "test-token", "tasks", "--json"])
+        assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content) == {"action": "retrieve_batch"}
+
+    @pytest.mark.parametrize(
+        "args",
+        [
+            ["--limit", "0"],
+            ["--limit", "101"],
+            ["--type", "invalid"],
+            ["task_abc123", "--limit", "1"],
+        ],
+    )
+    @respx.mock
+    def test_invalid_history_filters(self, runner, args):
+        result = runner.invoke(cli, ["--token", "test-token", "tasks", *args])
+        assert result.exit_code == 2
+        assert not respx.calls
 
 
 class TestInfoCommands:

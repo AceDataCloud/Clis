@@ -38,11 +38,23 @@ CHAT_MODELS = [
 
 # Claude Messages API models
 MESSAGES_MODELS = [
+    "gpt-6.1-sol",
+    "gpt-6.1-terra",
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "gpt-6-astra",
+    "glm-5.3",
+    "glm-5.2",
+    "glm-5.1",
+    "glm-5-turbo",
+    "glm-5",
+    "gpt-5.6-sol",
+    "gemini-3.6-flash",
     "claude-opus-5-5",
     "claude-sonnet-5-5",
     *[model for model in CHAT_MODELS if model != "claude-opus-5-5"],
 ]
-COUNT_TOKENS_MODELS = [model for model in MESSAGES_MODELS if model != "gpt-5.6-sol-fast"]
+COUNT_TOKENS_MODELS = MESSAGES_MODELS.copy()
 
 DEFAULT_CHAT_MODEL = "claude-3-5-haiku-20241022"
 DEFAULT_MESSAGES_MODEL = "claude-3-5-haiku-20241022"

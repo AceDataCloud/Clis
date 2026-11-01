@@ -14,7 +14,7 @@ from producer_cli.core.output import (
 
 
 @click.command()
-@click.argument("prompt")
+@click.argument("prompt", required=False)
 @click.option(
     "-m",
     "--model",
@@ -86,7 +86,7 @@ from producer_cli.core.output import (
 @click.pass_context
 def generate(
     ctx: click.Context,
-    prompt: str,
+    prompt: str | None,
     model: str,
     lyric: str | None,
     title: str | None,
@@ -111,12 +111,16 @@ def generate(
       producer generate "Jazz instrumental" --instrumental
       producer generate "Epic orchestral battle theme" --custom -l "[Verse]\\nHere we stand"
     """
+    if not custom and not (prompt and prompt.strip()):
+        raise click.UsageError("PROMPT is required unless --custom is enabled.")
+    if custom and not instrumental and not (lyric and lyric.strip()):
+        raise click.UsageError("--lyric is required for custom vocal generation.")
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
         "action": "generate",
         "prompt": prompt,
         "model": model,
-        "lyric": lyric or "",
+        "lyric": lyric,
         "title": title,
         "custom": custom if custom else None,
         "instrumental": instrumental if instrumental else None,
@@ -191,8 +195,7 @@ def cover(
         "action": "cover",
         "audio_id": audio_id,
         "model": model,
-        "prompt": prompt or "",
-        "lyric": "",
+        "prompt": prompt,
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }
@@ -223,11 +226,13 @@ def cover(
     default=None,
     help="Style description for the extension.",
 )
+@click.option("-l", "--lyric", default=None, help="Lyrics for a vocal extension.")
+@click.option("--instrumental", is_flag=True, default=False, help="Extend without vocals.")
 @click.option(
     "--continue-at",
-    default=None,
-    type=float,
-    help="Timestamp (in seconds) to continue from.",
+    required=True,
+    type=click.FloatRange(min=0, min_open=True),
+    help="Positive timestamp in seconds to continue from.",
 )
 @click.option(
     "--callback-url",
@@ -248,7 +253,9 @@ def extend(
     audio_id: str,
     model: str,
     prompt: str | None,
-    continue_at: float | None,
+    continue_at: float,
+    lyric: str | None,
+    instrumental: bool,
     callback_url: str | None,
     async_mode: bool,
     output_json: bool,
@@ -259,16 +266,20 @@ def extend(
 
     \b
     Examples:
-      producer extend abc123-def456
-      producer extend abc123 --continue-at 30.5
+      producer extend abc123-def456 --continue-at 30.5 --lyric "[Verse] New lyrics"
+      producer extend abc123 --continue-at 30.5 --instrumental
     """
+    if not instrumental and not (lyric and lyric.strip()):
+        raise click.UsageError("--lyric is required unless --instrumental is enabled.")
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
         "action": "extend",
         "audio_id": audio_id,
         "model": model,
-        "prompt": prompt or "",
-        "lyric": "",
+        "prompt": prompt,
+        "lyric": lyric,
+        "custom": True,
+        "instrumental": instrumental,
         "continue_at": continue_at,
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
@@ -337,8 +348,7 @@ def variation(
         "action": "variation",
         "audio_id": audio_id,
         "model": model,
-        "prompt": prompt or "",
-        "lyric": "",
+        "prompt": prompt,
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }
@@ -395,8 +405,7 @@ def swap_vocals(
     payload: dict[str, object] = {
         "action": "swap_vocals",
         "audio_id": audio_id,
-        "prompt": prompt or "",
-        "lyric": "",
+        "prompt": prompt,
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }
@@ -453,8 +462,7 @@ def swap_instrumentals(
     payload: dict[str, object] = {
         "action": "swap_instrumentals",
         "audio_id": audio_id,
-        "prompt": prompt or "",
-        "lyric": "",
+        "prompt": prompt,
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }
@@ -526,8 +534,7 @@ def replace_section(
     payload: dict[str, object] = {
         "action": "replace_section",
         "audio_id": audio_id,
-        "prompt": prompt or "",
-        "lyric": "",
+        "prompt": prompt,
         "replace_section_start": replace_section_start,
         "replace_section_end": replace_section_end,
         "callback_url": callback_url,
@@ -580,8 +587,6 @@ def stems(
     payload: dict[str, object] = {
         "action": "stems",
         "audio_id": audio_id,
-        "prompt": "",
-        "lyric": "",
         "callback_url": callback_url,
         "async": async_mode if async_mode else None,
     }

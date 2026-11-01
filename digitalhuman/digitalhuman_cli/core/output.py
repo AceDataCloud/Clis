@@ -89,11 +89,32 @@ def print_voice_result(data: dict[str, Any]) -> None:
 
 def print_task_result(data: dict[str, Any]) -> None:
     """Print task query result in a rich format."""
+    if "items" in data:
+        console.print(f"Tasks: {data['count']}")
+        for item in data["items"]:
+            print_task_result(item)
+        return
+    data = {**data.get("response", {}), **data}
     table = Table(show_header=False, box=None, padding=(0, 2))
     table.add_column("Field", style="bold cyan", width=15)
     table.add_column("Value")
 
-    for key in ["task_id", "state", "progress", "video_url", "voice_id", "engine"]:
+    for key in [
+        "id",
+        "task_id",
+        "status",
+        "state",
+        "kind",
+        "progress",
+        "video_url",
+        "voice_id",
+        "engine",
+        "created_at",
+        "started_at",
+        "finished_at",
+        "elapsed",
+        "error",
+    ]:
         if data.get(key) is not None:
             table.add_row(key.replace("_", " ").title(), str(data[key]))
 

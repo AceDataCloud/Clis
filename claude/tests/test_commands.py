@@ -26,21 +26,30 @@ class TestGlobalCommands:
         assert CHAT_MODELS[1:3] == ["claude-fable-5-1", "claude-fable-5"]
         assert "claude-opus-5" in CHAT_MODELS
         assert "claude-opus-5-5" in CHAT_MODELS
-        assert MESSAGES_MODELS[0] == "claude-opus-5-5"
+        assert "claude-opus-5-5" in MESSAGES_MODELS
         assert len(MESSAGES_MODELS) == len(set(MESSAGES_MODELS))
         assert "claude-sonnet-5-5" not in CHAT_MODELS
         assert "claude-3-opus-20240229" not in CHAT_MODELS
 
-    def test_fast_sol_inventory_is_scoped_to_generation(self):
+    def test_messages_and_count_tokens_share_published_models(self):
         assert CHAT_MODELS.count("gpt-5.6-sol-fast") == 1
         assert MESSAGES_MODELS.count("gpt-5.6-sol-fast") == 1
-        assert "gpt-5.6-sol-fast" not in COUNT_TOKENS_MODELS
-        expected_count_tokens_models = [
-            "claude-opus-5-5",
-            "claude-sonnet-5-5",
-            *[model for model in CHAT_MODELS[1:] if model != "claude-opus-5-5"],
-        ]
-        assert expected_count_tokens_models == COUNT_TOKENS_MODELS
+        assert COUNT_TOKENS_MODELS == MESSAGES_MODELS
+        assert {
+            "gpt-6.1-sol",
+            "gpt-6.1-terra",
+            "gpt-6-sol",
+            "gpt-6-luna",
+            "gpt-6-astra",
+            "glm-5.3",
+            "glm-5.2",
+            "glm-5.1",
+            "glm-5-turbo",
+            "glm-5",
+            "gpt-5.6-sol",
+            "gemini-3.6-flash",
+        } <= set(MESSAGES_MODELS)
+        assert "mimo-v2.6-pro" not in MESSAGES_MODELS
 
     @pytest.mark.parametrize(
         ("command", "endpoint"),
@@ -61,18 +70,24 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert json.loads(route.calls.last.request.content)["model"] == "gpt-5.6-sol-fast"
 
+    @pytest.mark.parametrize(
+        "model", ["gpt-5.6-sol-fast", "gpt-6.1-terra", "glm-5.3", "gemini-3.6-flash"]
+    )
+    @pytest.mark.parametrize("command", ["messages", "count-tokens"])
     @respx.mock
-    def test_count_tokens_rejects_fast_sol_without_request(self, runner):
-        help_result = runner.invoke(cli, ["count-tokens", "--help"])
-        assert help_result.exit_code == 0
-        assert "gpt-5.6-sol-fast" not in help_result.output
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "count-tokens", "Hello", "-m", "gpt-5.6-sol-fast"],
+    def test_published_messages_models(
+        self, runner, model, command, mock_messages_response, mock_count_tokens_response
+    ):
+        endpoint = "/v1/messages" if command == "messages" else "/v1/messages/count_tokens"
+        response = mock_messages_response if command == "messages" else mock_count_tokens_response
+        route = respx.post(f"https://api.acedata.cloud{endpoint}").mock(
+            return_value=Response(200, json=response)
         )
-        assert result.exit_code == 2
-        assert "Invalid value for '-m' / '--model'" in result.output
-        assert not respx.calls
+        result = runner.invoke(
+            cli, ["--token", "test-token", command, "Hello", "-m", model, "--json"]
+        )
+        assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content)["model"] == model
 
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
@@ -710,7 +725,19 @@ class TestThinkingPassthrough:
                 "2048",
             ]
             thinking.update(type="adaptive", display="omitted", budget_tokens=2048)
-        output_config = {"effort": "future-effort", "extension": {"enabled": False}}
+        output_config = {
+            "effort": "future-effort",
+            "format": {
+                "type": "json_schema",
+                "schema": {
+                    "type": "object",
+                    "properties": {"answer": {"type": "string"}},
+                    "required": ["answer"],
+                    "additionalProperties": False,
+                },
+            },
+            "extension": {"enabled": False},
+        }
         if command == "messages":
             options += ["--output-config", json.dumps(output_config)]
         result = runner.invoke(cli, ["--token", "test-token", command, "Hello", *options])

@@ -96,6 +96,43 @@ class TestGlobalCommands:
 class TestChatCommands:
     """Tests for the chat command."""
 
+    @pytest.mark.parametrize("model", ["mimo-v2.6-pro", "mimo-v2.6-flash"])
+    @respx.mock
+    def test_mimo_chat_only(self, runner, model, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli, ["--token", "test-token", "chat", "Hello", "-m", model, "--json"]
+        )
+        assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content)["model"] == model
+        result = runner.invoke(cli, ["response", "Hello", "-m", model])
+        assert result.exit_code == 2
+
+    @pytest.mark.parametrize("effort", ["xhigh", "max"])
+    @respx.mock
+    def test_terra_reasoning_effort(self, runner, effort, mock_chat_response):
+        route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
+            return_value=Response(200, json=mock_chat_response)
+        )
+        result = runner.invoke(
+            cli,
+            [
+                "--token",
+                "test-token",
+                "chat",
+                "Hello",
+                "-m",
+                "gpt-6.1-terra",
+                "--reasoning-effort",
+                effort,
+                "--json",
+            ],
+        )
+        assert result.exit_code == 0
+        assert json.loads(route.calls.last.request.content)["reasoning_effort"] == effort
+
     @respx.mock
     def test_chat_json(self, runner, mock_chat_response):
         respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
