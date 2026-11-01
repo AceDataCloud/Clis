@@ -70,12 +70,12 @@ class TestGlobalCommands:
         assert "gemini-3.1-pro" not in MODELS2
         assert "gemini-3-pro-preview" not in MODELS2
 
-    def test_mimo_catalog_is_prepared_and_clearly_labeled(self):
+    def test_mimo_catalog_is_clearly_labeled(self):
         assert "mimo" in MODEL_GROUPS
         for model in ("mimo-v2.6-pro", "mimo-v2.6-flash"):
             assert MODELS.count(model) == 1
             assert MODELS2.count(model) == 1
-            assert _get_model_family(model) == "MiMo (pending activation)"
+            assert _get_model_family(model) == "MiMo"
 
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])

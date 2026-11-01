@@ -304,7 +304,7 @@ def _get_model_family(model: str) -> str:
     elif model.startswith("kimi"):
         return "Kimi"
     elif model.startswith("mimo"):
-        return "MiMo (pending activation)"
+        return "MiMo"
     elif model.startswith("glm"):
         return "GLM"
     else:
