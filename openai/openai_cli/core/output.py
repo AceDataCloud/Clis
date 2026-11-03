@@ -76,6 +76,8 @@ IMAGE_MODELS = [
     "gpt-image-2",
     "gpt-image-2.5-flare",
     "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-flare:reverse",
+    "gpt-image-2.5-sunburst:reverse",
     "gpt-image-2.5-flare:official",
     "gpt-image-2.5-sunburst:official",
     "gpt-image-2:reverse",

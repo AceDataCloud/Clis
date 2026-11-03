@@ -32,13 +32,14 @@ def _validate_size_format(
 
 
 def _validate_quality(model: str, quality: str | None) -> None:
-    if quality in {"xhigh", "max"} and model.removesuffix(":official") not in {
+    base_model = model.removesuffix(":official").removesuffix(":reverse")
+    if quality in {"xhigh", "max"} and base_model not in {
         "gpt-image-2.5-flare",
         "gpt-image-2.5-sunburst",
     }:
         raise click.BadParameter(
             "xhigh and max require gpt-image-2.5-flare or gpt-image-2.5-sunburst "
-            "(including :official variants).",
+            "(including :reverse and :official variants).",
             param_hint="--quality",
         )
 
@@ -79,7 +80,7 @@ def _validate_quality(model: str, quality: str | None) -> None:
     default=None,
     help=(
         "Image quality; xhigh/max only for gpt-image-2.5-flare and "
-        "gpt-image-2.5-sunburst (including :official)."
+        "gpt-image-2.5-sunburst (including :reverse and :official)."
     ),
 )
 @click.option(
@@ -249,7 +250,7 @@ def image(
     default=None,
     help=(
         "Image quality; xhigh/max only for gpt-image-2.5-flare and "
-        "gpt-image-2.5-sunburst (including :official)."
+        "gpt-image-2.5-sunburst (including :reverse and :official)."
     ),
 )
 @click.option(

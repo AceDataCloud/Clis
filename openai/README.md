@@ -168,13 +168,15 @@ openai-cli response "Hello" -m gpt-4o-mini --json | jq '.usage'
 
 ## GPT Image quality
 
-`image` and `edit` accept `--quality auto`, `low`, `medium` or `high` for GPT Image models. Only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst`, including their `:official` variants, additionally support `xhigh` and `max`. Editing supports these values with either JSON image URLs or multipart image files. `:official` requests are billed on actual token usage; size and quality affect that usage.
+`image` and `edit` accept `--quality auto`, `low`, `medium` or `high` for GPT Image models. Only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst`, including their `:reverse` and `:official` variants, additionally support `xhigh` and `max`. Editing supports these values with either JSON image URLs or multipart image files. `:official` requests are billed on actual token usage; size and quality affect that usage.
+
+`gpt-image-2.5-flare:reverse` and `gpt-image-2.5-sunburst:reverse` are explicit aliases of the corresponding unsuffixed models. Pass the full model ID unchanged to `image` or `edit`. GPT Image 2/2.5 unsuffixed models and their `:reverse` aliases are billed per successful image; the base rate is 0.19 Credits per image, with account discounts and final charges determined by current pricing and usage records. Availability recovery may use GPT Image 2.5 Flare without changing the requested model or per-image billing. These models support `-n 1`–`10`; use URL responses for multiple images because `--response-format b64_json` supports only one.
 
 These commands submit billable requests:
 
 ```bash
-openai-cli image "A blue ceramic vase on a cream background" -m gpt-image-2.5-flare --quality xhigh
-openai-cli edit "Make the vase green" --image-url https://example.com/photo.jpg -m gpt-image-2.5-sunburst --quality max
+openai-cli image "A blue ceramic vase on a cream background" -m gpt-image-2.5-flare:reverse --quality xhigh
+openai-cli edit "Make the vase green" --image-url https://example.com/photo.jpg -m gpt-image-2.5-sunburst:reverse --quality max
 openai-cli edit "Make the vase green" --image-file photo.png -m gpt-image-2.5-flare:official --quality max
 ```
 
