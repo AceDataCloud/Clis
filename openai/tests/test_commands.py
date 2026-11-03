@@ -59,6 +59,9 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["image", "--help"])
         assert result.exit_code == 0
         assert "PROMPT" in result.output
+        assert "gpt-image-2.5-flare:reverse" in result.output
+        assert "gpt-image-2.5-sunburst:reverse" in result.output
+        assert "including :reverse and :official" in " ".join(result.output.split())
         assert ":official GPT Image variants use actual-token billing" in " ".join(
             result.output.split()
         )
@@ -68,6 +71,9 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "PROMPT" in result.output
         assert "--image-url" in result.output
+        assert "gpt-image-2.5-flare:reverse" in result.output
+        assert "gpt-image-2.5-sunburst:reverse" in result.output
+        assert "including :reverse and :official" in " ".join(result.output.split())
         assert ":official GPT Image variants use actual-token billing" in " ".join(
             result.output.split()
         )
@@ -587,6 +593,8 @@ class TestImageCommands:
         [
             "gpt-image-2.5-flare",
             "gpt-image-2.5-sunburst",
+            "gpt-image-2.5-flare:reverse",
+            "gpt-image-2.5-sunburst:reverse",
             "gpt-image-2.5-flare:official",
             "gpt-image-2.5-sunburst:official",
         ],
@@ -625,7 +633,14 @@ class TestImageCommands:
 
     @pytest.mark.parametrize("quality", ["xhigh", "max"])
     @pytest.mark.parametrize(
-        "model", ["gpt-image-2", "gpt-image-2:official", "nano-banana-2.1", "dall-e-3"]
+        "model",
+        [
+            "gpt-image-2",
+            "gpt-image-2:reverse",
+            "gpt-image-2:official",
+            "nano-banana-2.1",
+            "dall-e-3",
+        ],
     )
     @pytest.mark.parametrize("command", ["image", "edit"])
     @respx.mock
@@ -645,6 +660,8 @@ class TestImageCommands:
         [
             ("image", "gpt-image-2", "high"),
             ("edit", "gpt-image-2", "auto"),
+            ("image", "gpt-image-2:reverse", "high"),
+            ("edit", "gpt-image-2:reverse", "auto"),
             ("image", "dall-e-3", "hd"),
             ("image", "dall-e-2", "standard"),
             ("edit", "dall-e-2", "standard"),
@@ -1568,6 +1585,8 @@ class TestTasksCommands:
     [
         "gpt-image-2.5-flare",
         "gpt-image-2.5-sunburst",
+        "gpt-image-2.5-flare:reverse",
+        "gpt-image-2.5-sunburst:reverse",
         "gpt-image-2.5-flare:official",
         "gpt-image-2.5-sunburst:official",
     ],
