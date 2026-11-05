@@ -35,10 +35,12 @@ def _validate_quality(model: str, quality: str | None) -> None:
     base_model = model.removesuffix(":official").removesuffix(":reverse")
     if quality in {"xhigh", "max"} and base_model not in {
         "gpt-image-2.5-flare",
+        "gpt-image-2.6-flare",
         "gpt-image-2.5-sunburst",
+        "gpt-image-2.6-sunburst",
     }:
         raise click.BadParameter(
-            "xhigh and max require gpt-image-2.5-flare or gpt-image-2.5-sunburst "
+            "xhigh and max require GPT Image 2.5 or 2.6 Flare/Sunburst "
             "(including :reverse and :official variants).",
             param_hint="--quality",
         )
@@ -69,7 +71,7 @@ def _validate_quality(model: str, quality: str | None) -> None:
     is_eager=False,
     help=(
         "Size of the generated image as WIDTHxHEIGHT or 'auto'. "
-        "GPT Image 2/2.5 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, 655360–8294400 pixels, and aspect ratio up to 3:1. "
+        "GPT Image 2/2.5/2.6 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, 655360–8294400 pixels, and aspect ratio up to 3:1. "
         "dall-e-3: 1024x1024, 1792x1024, 1024x1792. "
         "dall-e-2: 256x256, 512x512, 1024x1024."
     ),
@@ -79,8 +81,8 @@ def _validate_quality(model: str, quality: str | None) -> None:
     type=click.Choice(["auto", "high", "medium", "low", "xhigh", "max", "hd", "standard"]),
     default=None,
     help=(
-        "Image quality; xhigh/max only for gpt-image-2.5-flare and "
-        "gpt-image-2.5-sunburst (including :reverse and :official)."
+        "Image quality; xhigh/max only for GPT Image 2.5/2.6 Flare and "
+        "Sunburst (including :reverse and :official)."
     ),
 )
 @click.option(
@@ -239,7 +241,7 @@ def image(
     is_eager=False,
     help=(
         "Size of the output image as WIDTHxHEIGHT or 'auto'. "
-        "GPT Image 2/2.5 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, 655360–8294400 pixels, and aspect ratio up to 3:1. "
+        "GPT Image 2/2.5/2.6 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, 655360–8294400 pixels, and aspect ratio up to 3:1. "
         "dall-e-3: 1024x1024, 1792x1024, 1024x1792. "
         "dall-e-2: 256x256, 512x512, 1024x1024."
     ),
@@ -249,8 +251,8 @@ def image(
     type=click.Choice(["auto", "high", "medium", "low", "xhigh", "max", "standard"]),
     default=None,
     help=(
-        "Image quality; xhigh/max only for gpt-image-2.5-flare and "
-        "gpt-image-2.5-sunburst (including :reverse and :official)."
+        "Image quality; xhigh/max only for GPT Image 2.5/2.6 Flare and "
+        "Sunburst (including :reverse and :official)."
     ),
 )
 @click.option(
