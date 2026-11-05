@@ -592,11 +592,17 @@ class TestImageCommands:
         "model",
         [
             "gpt-image-2.5-flare",
+            "gpt-image-2.6-flare",
             "gpt-image-2.5-sunburst",
+            "gpt-image-2.6-sunburst",
             "gpt-image-2.5-flare:reverse",
+            "gpt-image-2.6-flare:reverse",
             "gpt-image-2.5-sunburst:reverse",
+            "gpt-image-2.6-sunburst:reverse",
             "gpt-image-2.5-flare:official",
+            "gpt-image-2.6-flare:official",
             "gpt-image-2.5-sunburst:official",
+            "gpt-image-2.6-sunburst:official",
         ],
     )
     @pytest.mark.parametrize("mode", ["generate", "url", "file"])
@@ -1584,11 +1590,17 @@ class TestTasksCommands:
     "model",
     [
         "gpt-image-2.5-flare",
+        "gpt-image-2.6-flare",
         "gpt-image-2.5-sunburst",
+        "gpt-image-2.6-sunburst",
         "gpt-image-2.5-flare:reverse",
+        "gpt-image-2.6-flare:reverse",
         "gpt-image-2.5-sunburst:reverse",
+        "gpt-image-2.6-sunburst:reverse",
         "gpt-image-2.5-flare:official",
+        "gpt-image-2.6-flare:official",
         "gpt-image-2.5-sunburst:official",
+        "gpt-image-2.6-sunburst:official",
     ],
 )
 @respx.mock

@@ -207,3 +207,5 @@ Use `--image-url` for JSON requests or `--image-file` for multipart uploads, not
 ```bash
 docker compose run --rm openai-cli chat "Hello!" -m gpt-4o
 ```
+
+GPT Image 2.6 supports `gpt-image-2.6-flare` and `gpt-image-2.6-sunburst`, including `:reverse` and `:official`. Both generation and URL/file editing accept `xhigh` and `max`. Plain/reverse billing is 0.22 Credits per image; official billing follows the 2.5 token rates. Output formats remain PNG/JPEG/WebP.
