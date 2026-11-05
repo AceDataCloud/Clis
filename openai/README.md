@@ -168,16 +168,20 @@ openai-cli response "Hello" -m gpt-4o-mini --json | jq '.usage'
 
 ## GPT Image quality
 
-`image` and `edit` accept `--quality auto`, `low`, `medium` or `high` for GPT Image models. Only `gpt-image-2.5-flare` and `gpt-image-2.5-sunburst`, including their `:reverse` and `:official` variants, additionally support `xhigh` and `max`. Editing supports these values with either JSON image URLs or multipart image files. `:official` requests are billed on actual token usage; size and quality affect that usage.
+`image` and `edit` accept `--quality auto`, `low`, `medium` or `high` for GPT Image models. GPT Image 2.5 and 2.6 Flare/Sunburst, including their `:reverse` and `:official` variants, additionally support `xhigh` and `max`. Editing supports these values with either JSON image URLs or multipart image files. Use `--output-format png`, `jpeg` or `webp`; SVG/GIF output is not supported.
 
-`gpt-image-2.5-flare:reverse` and `gpt-image-2.5-sunburst:reverse` are explicit aliases of the corresponding unsuffixed models. Pass the full model ID unchanged to `image` or `edit`. GPT Image 2/2.5 unsuffixed models and their `:reverse` aliases are billed per successful image; the base rate is 0.19 Credits per image, with account discounts and final charges determined by current pricing and usage records. Availability recovery may use GPT Image 2.5 Flare without changing the requested model or per-image billing. These models support `-n 1`–`10`; use URL responses for multiple images because `--response-format b64_json` supports only one.
+For GPT Image 2.6, use `gpt-image-2.6-flare` or `gpt-image-2.6-sunburst`, optionally with `:reverse` or `:official`. Pass the full model ID unchanged to `image` or `edit`; `gpt-image-2.6` is not a supported shorthand. For both 2.5 and 2.6 Flare/Sunburst, `:reverse` is an explicit alias of the corresponding unsuffixed model.
+
+GPT Image 2/2.5 unsuffixed models and their `:reverse` aliases have a base rate of 0.19 Credits per successful image; GPT Image 2.6 unsuffixed models and their `:reverse` aliases have a base rate of 0.22 Credits per successful image. Returned token statistics do not change this per-image billing. Account discounts and final charges follow current pricing and usage records. GPT Image 2/2.5 availability recovery may use GPT Image 2.5 Flare without changing the requested model or per-image billing.
+
+`:official` requests are billed on actual token usage, not a fixed per-image charge; 2.6 uses the same token rates as 2.5. Generation meters text input and image output; editing also meters reference-image input. Size and quality affect token usage, and pre-request prices are estimates. These models support `-n 1`–`10`; official usage is aggregated across the response, not multiplied by `n` again. Use URL responses for multiple images because `--response-format b64_json` supports only one.
 
 These commands submit billable requests:
 
 ```bash
-openai-cli image "A blue ceramic vase on a cream background" -m gpt-image-2.5-flare:reverse --quality xhigh
-openai-cli edit "Make the vase green" --image-url https://example.com/photo.jpg -m gpt-image-2.5-sunburst:reverse --quality max
-openai-cli edit "Make the vase green" --image-file photo.png -m gpt-image-2.5-flare:official --quality max
+openai-cli image "A blue ceramic vase on a cream background" -m gpt-image-2.6-flare:reverse --quality xhigh --output-format png
+openai-cli edit "Make the vase green" --image-url https://example.com/photo.jpg -m gpt-image-2.6-sunburst:reverse --quality max --output-format webp
+openai-cli edit "Make the vase green" --image-file photo.png -m gpt-image-2.6-flare:official --quality max --output-format jpeg
 ```
 
 Legacy DALL-E quality options are unchanged: `dall-e-3` generation accepts `hd` or `standard`, and `dall-e-2` accepts `standard`.
@@ -207,5 +211,3 @@ Use `--image-url` for JSON requests or `--image-file` for multipart uploads, not
 ```bash
 docker compose run --rm openai-cli chat "Hello!" -m gpt-4o
 ```
-
-GPT Image 2.6 supports `gpt-image-2.6-flare` and `gpt-image-2.6-sunburst`, including `:reverse` and `:official`. Both generation and URL/file editing accept `xhigh` and `max`. Plain/reverse billing is 0.22 Credits per image; official billing follows the 2.5 token rates. Output formats remain PNG/JPEG/WebP.
