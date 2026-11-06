@@ -46,6 +46,28 @@ def _validate_quality(model: str, quality: str | None) -> None:
         )
 
 
+_GIF_MODELS = {
+    "gpt-image-2.6-flare",
+    "gpt-image-2.6-flare:reverse",
+    "gpt-image-2.6-flare:official",
+    "gpt-image-2.6-sunburst:official",
+}
+
+
+def _validate_gif_options(
+    model: str, output_format: str | None, frame_count: int | None, frame_duration_ms: int | None
+) -> None:
+    if output_format == "gif" and model not in _GIF_MODELS:
+        raise click.BadParameter(
+            "GIF requires GPT Image 2.6 Flare (standard/reverse/official) or Sunburst official.",
+            param_hint="--output-format",
+        )
+    if output_format != "gif" and (frame_count is not None or frame_duration_ms is not None):
+        raise click.BadParameter(
+            "Frame controls require --output-format gif.", param_hint="--output-format"
+        )
+
+
 @click.command()
 @click.argument("prompt")
 @click.option(
@@ -93,9 +115,21 @@ def _validate_quality(model: str, quality: str | None) -> None:
 )
 @click.option(
     "--output-format",
-    type=click.Choice(["png", "jpeg", "webp"]),
+    type=click.Choice(["png", "jpeg", "webp", "gif"]),
     default=None,
-    help="Output format for GPT image models.",
+    help="PNG/JPEG/WebP, or GIF for 2.6 Flare variants and Sunburst official. GIF defaults to a 512 preview; use static formats for 4K.",
+)
+@click.option(
+    "--frame-count",
+    type=click.IntRange(min=1),
+    default=None,
+    help="GIF-only frame count; API default is 9.",
+)
+@click.option(
+    "--frame-duration-ms",
+    type=click.IntRange(min=1),
+    default=None,
+    help="GIF-only frame duration in milliseconds; API default is 200.",
 )
 @click.option(
     "--background",
@@ -150,6 +184,8 @@ def image(
     quality: str | None,
     style: str | None,
     output_format: str | None,
+    frame_count: int | None,
+    frame_duration_ms: int | None,
     background: str | None,
     moderation: str | None,
     output_compression: int | None,
@@ -170,6 +206,7 @@ def image(
       openai-cli image "Abstract art" --size 1792x1024 --style vivid
     """
     _validate_quality(model, quality)
+    _validate_gif_options(model, output_format, frame_count, frame_duration_ms)
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
         "prompt": prompt,
@@ -179,6 +216,8 @@ def image(
         "quality": quality,
         "style": style,
         "output_format": output_format,
+        "frame_count": frame_count,
+        "frame_duration_ms": frame_duration_ms,
         "background": background,
         "moderation": moderation,
         "output_compression": output_compression,
@@ -257,9 +296,21 @@ def image(
 )
 @click.option(
     "--output-format",
-    type=click.Choice(["png", "jpeg", "webp"]),
+    type=click.Choice(["png", "jpeg", "webp", "gif"]),
     default=None,
-    help="Output format for GPT image models.",
+    help="PNG/JPEG/WebP, or GIF for 2.6 Flare variants and Sunburst official. GIF defaults to a 512 preview; use static formats for 4K.",
+)
+@click.option(
+    "--frame-count",
+    type=click.IntRange(min=1),
+    default=None,
+    help="GIF-only frame count; API default is 9.",
+)
+@click.option(
+    "--frame-duration-ms",
+    type=click.IntRange(min=1),
+    default=None,
+    help="GIF-only frame duration in milliseconds; API default is 200.",
 )
 @click.option(
     "--background",
@@ -316,6 +367,8 @@ def edit(
     size: str | None,
     quality: str | None,
     output_format: str | None,
+    frame_count: int | None,
+    frame_duration_ms: int | None,
     background: str | None,
     input_fidelity: str | None,
     output_compression: int | None,
@@ -336,6 +389,7 @@ def edit(
       openai-cli edit "Remove background" --image-file photo.png --mask-file mask.png
     """
     _validate_quality(model, quality)
+    _validate_gif_options(model, output_format, frame_count, frame_duration_ms)
     if not image_url and not image_file:
         raise click.UsageError("Provide at least one of --image-url or --image-file.")
     if image_url and image_file:
@@ -356,6 +410,8 @@ def edit(
             "size": size,
             "quality": quality,
             "output_format": output_format,
+            "frame_count": frame_count,
+            "frame_duration_ms": frame_duration_ms,
             "background": background,
             "input_fidelity": input_fidelity,
             "output_compression": output_compression,
@@ -394,6 +450,8 @@ def edit(
         "size": size,
         "quality": quality,
         "output_format": output_format,
+        "frame_count": frame_count,
+        "frame_duration_ms": frame_duration_ms,
         "background": background,
         "input_fidelity": input_fidelity,
         "output_compression": output_compression,
