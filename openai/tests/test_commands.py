@@ -1658,3 +1658,66 @@ def test_image_commands_reject_unsupported_gpt_image_2_5_and_2_6_aliases(runner,
     assert result.exit_code == 2
     assert "Invalid value for '-m' / '--model'" in result.output
     assert not respx.calls
+
+
+@pytest.mark.parametrize("mode", ["generate", "url", "file"])
+@respx.mock
+def test_gif_parameters_reach_each_image_transport(runner, tmp_path, mock_image_response, mode):
+    endpoint = "generations" if mode == "generate" else "edits"
+    route = respx.post(f"https://api.acedata.cloud/openai/images/{endpoint}").mock(
+        return_value=Response(200, json=mock_image_response)
+    )
+    args = [
+        "--token",
+        "test-token",
+        "image" if mode == "generate" else "edit",
+        "animate",
+        "--model",
+        "gpt-image-2.6-flare",
+        "--output-format",
+        "gif",
+        "--frame-count",
+        "9",
+        "--frame-duration-ms",
+        "200",
+        "--json",
+    ]
+    if mode == "url":
+        args += ["--image-url", "https://example.com/reference.png"]
+    elif mode == "file":
+        image = tmp_path / "reference.png"
+        image.write_bytes(b"fixture")
+        args += ["--image-file", str(image)]
+    result = runner.invoke(cli, args)
+    assert result.exit_code == 0, result.output
+    request = route.calls.last.request
+    if mode == "file":
+        content = request.content.decode()
+        for field, value in [
+            ("output_format", "gif"),
+            ("frame_count", "9"),
+            ("frame_duration_ms", "200"),
+        ]:
+            assert f'name="{field}"\r\n\r\n{value}\r\n' in content
+    else:
+        body = json.loads(request.content)
+        assert body["output_format"] == "gif"
+        assert body["frame_count"] == 9
+        assert body["frame_duration_ms"] == 200
+
+
+@pytest.mark.parametrize(
+    "model", ["gpt-image-2.6-sunburst", "gpt-image-2.6-sunburst:reverse", "gpt-image-2.5-flare"]
+)
+def test_unsupported_gif_model_is_rejected_locally(runner, model):
+    result = runner.invoke(cli, ["image", "animate", "--model", model, "--output-format", "gif"])
+    assert result.exit_code == 2
+    assert "GIF requires" in result.output
+
+
+def test_gif_frame_controls_reject_static_output(runner):
+    result = runner.invoke(
+        cli, ["image", "image", "--model", "gpt-image-2.6-flare", "--frame-count", "9"]
+    )
+    assert result.exit_code == 2
+    assert "Frame controls require" in result.output

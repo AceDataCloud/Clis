@@ -211,3 +211,16 @@ Use `--image-url` for JSON requests or `--image-file` for multipart uploads, not
 ```bash
 docker compose run --rm openai-cli chat "Hello!" -m gpt-4o
 ```
+
+
+### GPT Image 2.6 GIF and 4K
+
+Use `--output-format gif` with `gpt-image-2.6-flare`, its `:reverse`/`:official` variants, or `gpt-image-2.6-sunburst:official`. Generation and both URL/file editing accept `--frame-count` and `--frame-duration-ms`. GIF defaults to a 512x512 preview, 9 frames and 200 ms per frame; actual dimensions may be adjusted by the model. Ordinary/reverse Sunburst GIF is not available.
+
+```bash
+openai-cli image "A red ball moving left and right, seamless loop" \
+  --model gpt-image-2.6-flare --output-format gif --size 512x512 \
+  --frame-count 9 --frame-duration-ms 200 --async
+```
+
+All 2.6 variants retain static PNG/JPEG/WebP 4K generation and editing with `--size 3840x2160` or `--size 2160x3840`. GIF has separate size/frame constraints and does not inherit the static 4K presets.
