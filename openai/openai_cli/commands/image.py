@@ -96,7 +96,7 @@ def _validate_gif_options(
     is_eager=False,
     help=(
         "Size of the generated image as WIDTHxHEIGHT or 'auto'. "
-        "GPT Image 2/2.5/2.6 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, 655360–8294400 pixels, and aspect ratio up to 3:1. "
+        "Static GPT Image 2/2.5/2.6 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, 655360–8294400 pixels, and aspect ratio up to 3:1. GIF uses separate limits; omitted/auto size defaults to 512x512. "
         "dall-e-3: 1024x1024, 1792x1024, 1024x1792. "
         "dall-e-2: 256x256, 512x512, 1024x1024."
     ),
@@ -138,7 +138,7 @@ def _validate_gif_options(
     "--frame-duration-ms",
     type=click.IntRange(min=20, max=655350),
     default=None,
-    help="GIF-only frame duration in milliseconds; API default is 200.",
+    help="GIF-only frame duration in milliseconds, rounded to the nearest 10ms; API default is 200.",
 )
 @click.option(
     "--background",
@@ -306,7 +306,7 @@ def image(
     is_eager=False,
     help=(
         "Size of the output image as WIDTHxHEIGHT or 'auto'. "
-        "GPT Image 2/2.5/2.6 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, 655360–8294400 pixels, and aspect ratio up to 3:1. "
+        "Static GPT Image 2/2.5/2.6 accepts WIDTHxHEIGHT with multiples of 16, max side 3840, 655360–8294400 pixels, and aspect ratio up to 3:1. GIF uses separate limits; omitted/auto size defaults to 512x512. "
         "dall-e-3: 1024x1024, 1792x1024, 1024x1792. "
         "dall-e-2: 256x256, 512x512, 1024x1024."
     ),
@@ -342,7 +342,7 @@ def image(
     "--frame-duration-ms",
     type=click.IntRange(min=20, max=655350),
     default=None,
-    help="GIF-only frame duration in milliseconds; API default is 200.",
+    help="GIF-only frame duration in milliseconds, rounded to the nearest 10ms; API default is 200.",
 )
 @click.option(
     "--background",
@@ -354,7 +354,7 @@ def image(
     "--input-fidelity",
     type=click.Choice(["high", "low"]),
     default=None,
-    help="How strongly to match input style/features (GPT image models only).",
+    help="How strongly to match input style/features (GPT Image 1/1.5 only; omit for GPT Image 2.6).",
 )
 @click.option(
     "--output-compression",

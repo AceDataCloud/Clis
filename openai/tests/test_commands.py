@@ -1660,9 +1660,14 @@ def test_image_commands_reject_unsupported_gpt_image_2_5_and_2_6_aliases(runner,
     assert not respx.calls
 
 
+@pytest.mark.parametrize("variant", ["flare", "sunburst"])
+@pytest.mark.parametrize("suffix", ["", ":reverse", ":official"])
+@pytest.mark.parametrize("frame_count,frame_duration_ms", [(2, 20), (9, 200), (16, 655350)])
 @pytest.mark.parametrize("mode", ["generate", "url", "file"])
 @respx.mock
-def test_gif_parameters_reach_each_image_transport(runner, tmp_path, mock_image_response, mode):
+def test_gif_parameters_reach_each_image_transport(
+    runner, tmp_path, mock_image_response, mode, variant, suffix, frame_count, frame_duration_ms
+):
     endpoint = "generations" if mode == "generate" else "edits"
     route = respx.post(f"https://api.acedata.cloud/openai/images/{endpoint}").mock(
         return_value=Response(200, json=mock_image_response)
@@ -1673,13 +1678,13 @@ def test_gif_parameters_reach_each_image_transport(runner, tmp_path, mock_image_
         "image" if mode == "generate" else "edit",
         "animate",
         "--model",
-        "gpt-image-2.6-flare",
+        f"gpt-image-2.6-{variant}{suffix}",
         "--output-format",
         "gif",
         "--frame-count",
-        "9",
+        str(frame_count),
         "--frame-duration-ms",
-        "200",
+        str(frame_duration_ms),
         "--json",
     ]
     if mode == "url":
@@ -1694,16 +1699,106 @@ def test_gif_parameters_reach_each_image_transport(runner, tmp_path, mock_image_
     if mode == "file":
         content = request.content.decode()
         for field, value in [
+            ("model", f"gpt-image-2.6-{variant}{suffix}"),
             ("output_format", "gif"),
-            ("frame_count", "9"),
-            ("frame_duration_ms", "200"),
+            ("frame_count", str(frame_count)),
+            ("frame_duration_ms", str(frame_duration_ms)),
         ]:
             assert f'name="{field}"\r\n\r\n{value}\r\n' in content
     else:
         body = json.loads(request.content)
+        assert body["model"] == f"gpt-image-2.6-{variant}{suffix}"
         assert body["output_format"] == "gif"
-        assert body["frame_count"] == 9
-        assert body["frame_duration_ms"] == 200
+        assert body["frame_count"] == frame_count
+        assert body["frame_duration_ms"] == frame_duration_ms
+
+
+@pytest.mark.parametrize("mode", ["generate", "url", "file"])
+@pytest.mark.parametrize("size", [None, "auto"])
+@respx.mock
+def test_gif_defaults_are_left_to_backend(runner, tmp_path, mock_image_response, mode, size):
+    endpoint = "generations" if mode == "generate" else "edits"
+    route = respx.post(f"https://api.acedata.cloud/openai/images/{endpoint}").mock(
+        return_value=Response(200, json=mock_image_response)
+    )
+    args = [
+        "--token",
+        "test-token",
+        "image" if mode == "generate" else "edit",
+        "animate",
+        "--model",
+        "gpt-image-2.6-sunburst:official",
+        "--output-format",
+        "gif",
+    ]
+    if size is not None:
+        args += ["--size", size]
+    if mode == "url":
+        args += ["--image-url", "https://example.test/base.png"]
+    elif mode == "file":
+        image = tmp_path / "base.png"
+        image.write_bytes(b"reference-fixture")
+        args += ["--image-file", str(image)]
+    result = runner.invoke(cli, args)
+    assert result.exit_code == 0, result.output
+    content = route.calls.last.request.content
+    if mode == "file":
+        for field in ["frame_count", "frame_duration_ms", "complexity"]:
+            assert f'name="{field}"'.encode() not in content
+        if size is None:
+            assert b'name="size"' not in content
+        else:
+            assert b'name="size"\r\n\r\nauto\r\n' in content
+    else:
+        body = json.loads(content)
+        assert not {"frame_count", "frame_duration_ms", "complexity"} & body.keys()
+        if size is None:
+            assert "size" not in body
+        else:
+            assert body["size"] == "auto"
+
+
+@pytest.mark.parametrize("mode", ["generate", "url", "file"])
+@pytest.mark.parametrize("size", ["3840x2160", "2160x3840"])
+@pytest.mark.parametrize("complexity", ["low", "medium", "high"])
+@respx.mock
+def test_static_4k_and_complexity_reach_each_transport(
+    runner, tmp_path, mock_image_response, mode, size, complexity
+):
+    endpoint = "generations" if mode == "generate" else "edits"
+    route = respx.post(f"https://api.acedata.cloud/openai/images/{endpoint}").mock(
+        return_value=Response(200, json=mock_image_response)
+    )
+    args = [
+        "--token",
+        "test-token",
+        "image" if mode == "generate" else "edit",
+        "a landscape",
+        "--model",
+        "gpt-image-2.6-sunburst:reverse",
+        "--size",
+        size,
+        "--output-format",
+        "png",
+        "--complexity",
+        complexity,
+    ]
+    if mode == "url":
+        args += ["--image-url", "https://example.test/base.png"]
+    elif mode == "file":
+        image = tmp_path / "base.png"
+        image.write_bytes(b"reference-fixture")
+        args += ["--image-file", str(image)]
+    result = runner.invoke(cli, args)
+    assert result.exit_code == 0, result.output
+    content = route.calls.last.request.content
+    if mode == "file":
+        assert f'name="size"\r\n\r\n{size}\r\n'.encode() in content
+        assert f'name="complexity"\r\n\r\n{complexity}\r\n'.encode() in content
+    else:
+        body = json.loads(content)
+        assert body["size"] == size
+        assert body["complexity"] == complexity
 
 
 @pytest.mark.parametrize("model", ["gpt-image-2", "gpt-image-2.5-sunburst", "gpt-image-2.5-flare"])
@@ -1726,16 +1821,19 @@ def test_gif_frame_controls_reject_static_output(runner):
     [
         ("--frame-count", "1"),
         ("--frame-count", "17"),
+        ("--frame-count", "2.5"),
         ("--frame-duration-ms", "19"),
         ("--frame-duration-ms", "655351"),
+        ("--frame-duration-ms", "20.5"),
     ],
 )
+@pytest.mark.parametrize("command", ["image", "edit"])
 @respx.mock
-def test_invalid_gif_boundaries_do_not_make_requests(runner, flag, value):
+def test_invalid_gif_boundaries_do_not_make_requests(runner, flag, value, command):
     result = runner.invoke(
         cli,
         [
-            "image",
+            command,
             "animate",
             "--model",
             "gpt-image-2.6-sunburst",
@@ -1749,9 +1847,75 @@ def test_invalid_gif_boundaries_do_not_make_requests(runner, flag, value):
     assert not respx.calls
 
 
-@pytest.mark.parametrize("mode", ["url", "file"])
+@pytest.mark.parametrize("command", ["image", "edit"])
+@pytest.mark.parametrize("option", ["--output-compression", "--partial-images"])
 @respx.mock
-def test_complexity_and_markup_reach_edit_transport(runner, tmp_path, mock_image_response, mode):
+def test_gif_incompatible_options_rejected_locally(runner, command, option):
+    result = runner.invoke(
+        cli,
+        [
+            command,
+            "animate",
+            "--model",
+            "gpt-image-2.6-flare",
+            "--output-format",
+            "gif",
+            option,
+            "1",
+        ],
+    )
+    assert result.exit_code == 2
+    assert "GIF does not support" in result.output
+    assert not respx.calls
+
+
+@pytest.mark.parametrize(
+    "options,message",
+    [
+        (["--model", "gpt-image-2.5-flare", "--complexity", "high"], "requires GPT Image 2.6"),
+        (
+            ["--model", "gpt-image-2.5-flare", "--markup-url", "https://example.test/markup.png"],
+            "Markup requires",
+        ),
+        (
+            ["--output-format", "gif", "--markup-url", "https://example.test/markup.png"],
+            "Markup requires",
+        ),
+        (["--markup-url", "https://example.test/markup.png", "--mask-file"], "Markup requires"),
+        (["--output-format", "gif", "--mask-file"], "GIF does not support masks"),
+        (["--markup-url", "https://example.test/markup.png", "--markup-file"], "not both"),
+    ],
+)
+@respx.mock
+def test_invalid_annotation_combinations_do_not_make_requests(runner, tmp_path, options, message):
+    if options[-1] in {"--mask-file", "--markup-file"}:
+        image = tmp_path / "annotation.png"
+        image.write_bytes(b"annotation-fixture")
+        options = [*options, str(image)]
+    result = runner.invoke(
+        cli,
+        [
+            "edit",
+            "recolor",
+            "--model",
+            "gpt-image-2.6-flare",
+            "--image-url",
+            "https://example.test/base.png",
+            *options,
+        ],
+    )
+    assert result.exit_code == 2
+    assert message in result.output
+    assert not respx.calls
+
+
+@pytest.mark.parametrize("mode", ["url", "file"])
+@pytest.mark.parametrize("markup_source", ["url", "file"])
+@pytest.mark.parametrize("complexity", ["low", "medium", "high"])
+@respx.mock
+def test_complexity_and_markup_reach_edit_transport(
+    runner, tmp_path, mock_image_response, mode, markup_source, complexity
+):
     route = respx.post("https://api.acedata.cloud/openai/images/edits").mock(
         return_value=Response(200, json=mock_image_response)
     )
@@ -1763,32 +1927,36 @@ def test_complexity_and_markup_reach_edit_transport(runner, tmp_path, mock_image
         "--model",
         "gpt-image-2.6-flare",
         "--complexity",
-        "low",
+        complexity,
         "--json",
     ]
     if mode == "url":
-        args += [
-            "--image-url",
-            "https://example.test/base.png",
-            "--markup-url",
-            "https://example.test/markup.png",
-        ]
+        args += ["--image-url", "https://example.test/base.png"]
     else:
         image = tmp_path / "base.png"
         image.write_bytes(b"reference-fixture")
+        args += ["--image-file", str(image)]
+    if markup_source == "url":
+        args += ["--markup-url", "https://example.test/markup.png"]
+    else:
         markup = tmp_path / "markup.png"
         markup.write_bytes(b"annotation-fixture")
-        args += ["--image-file", str(image), "--markup-file", str(markup)]
+        args += ["--markup-file", str(markup)]
     result = runner.invoke(cli, args)
     assert result.exit_code == 0, result.output
     content = route.calls.last.request.content
     if mode == "url":
         body = json.loads(content)
-        assert body["complexity"] == "low"
-        assert body["markup"] == "https://example.test/markup.png"
+        assert body["complexity"] == complexity
+        if markup_source == "url":
+            assert body["markup"] == "https://example.test/markup.png"
+        else:
+            assert body["markup"] == "data:image/png;base64,YW5ub3RhdGlvbi1maXh0dXJl"
     else:
-        assert (
-            b'name="complexity"' in content
-            and b'name="markup"' in content
-            and b"annotation-fixture" in content
-        )
+        assert f'name="complexity"\r\n\r\n{complexity}\r\n'.encode() in content
+        if markup_source == "url":
+            assert b'name="markup"\r\n\r\nhttps://example.test/markup.png\r\n' in content
+        else:
+            assert b'name="markup"; filename="markup.png"' in content
+            assert b"Content-Type: image/png" in content
+            assert b"annotation-fixture" in content

@@ -168,7 +168,7 @@ openai-cli response "Hello" -m gpt-4o-mini --json | jq '.usage'
 
 ## GPT Image quality
 
-`image` and `edit` accept `--quality auto`, `low`, `medium` or `high` for GPT Image models. GPT Image 2.5 and 2.6 Flare/Sunburst, including their `:reverse` and `:official` variants, additionally support `xhigh` and `max`. Editing supports these values with either JSON image URLs or multipart image files. Use `--output-format png`, `jpeg` or `webp`; SVG/GIF output is not supported.
+`image` and `edit` accept `--quality auto`, `low`, `medium` or `high` for GPT Image models. GPT Image 2.5 and 2.6 Flare/Sunburst, including their `:reverse` and `:official` variants, additionally support `xhigh` and `max`. Editing supports these values with either JSON image URLs or multipart image files. Use `--output-format png`, `jpeg` or `webp` for static images; GPT Image 2.6 variants also support native `gif` animation (see **GPT Image 2.6 GIF and 4K** below). SVG output is not supported.
 
 For GPT Image 2.6, use `gpt-image-2.6-flare` or `gpt-image-2.6-sunburst`, optionally with `:reverse` or `:official`. Pass the full model ID unchanged to `image` or `edit`; `gpt-image-2.6` is not a supported shorthand. For both 2.5 and 2.6 Flare/Sunburst, `:reverse` is an explicit alias of the corresponding unsuffixed model.
 
@@ -223,9 +223,11 @@ openai-cli image "A red ball moving left and right, seamless loop" \
   --frame-count 9 --frame-duration-ms 200 --async
 ```
 
-All 2.6 variants retain static PNG/JPEG/WebP 4K generation and editing with `--size 3840x2160` or `--size 2160x3840`. GIF has separate size/frame constraints and does not inherit the static 4K presets.
+All 2.6 variants retain static PNG/JPEG/WebP 4K generation and editing with `--size 3840x2160` or `--size 2160x3840`. Use concrete pixels, not `--size 4K`; `4096x4096` exceeds the static pixel budget. GIF has separate size/frame constraints and does not inherit the static 4K presets. `--count` counts returned GIF files, not frames.
 
-GPT Image 2.6 supports `complexity="low"|"medium"|"high"` (omitted: model default high). Static edits accept `markup`: a PNG with transparent pixels, matching the first reference after orientation, up to 16,777,216 pixels per image and 40MB for the annotation. JSON accepts an HTTPS URL, PNG data URL or an object containing only `image_url`; multipart accepts an annotation file. Do not combine markup with mask, GIF or prompt_rewriter. GIF frame count is 2–16; frame duration is 20–655350ms, rounded to 10ms. GIF rejects masks, custom compression and partial streaming. Pricing is unchanged.
+GPT Image 2.6 supports `--complexity low`, `medium` or `high` (omitted: model default high). Planning complexity is independent of rendering `--quality` and has no separate surcharge; `:official` still bills actual token usage. Omit `--input-fidelity` for GPT Image 2.6.
+
+Static edits accept `--markup-url` for an HTTPS PNG annotation URL or `--markup-file` for a local PNG. The annotation must contain transparent pixels and match the first reference after orientation, up to 16,777,216 pixels per image and 40MB for the annotation. With `--image-url`, a local annotation is encoded as a PNG data URL in JSON; with `--image-file`, it is uploaded as a multipart file (an annotation HTTPS URL is also accepted). Markup does not support `file_id` and cannot be combined with mask, GIF or prompt rewriting. GIF frame count is 2–16; frame duration is 20–655350ms, rounded to the nearest 10ms. GIF rejects masks, annotations, custom compression, prompt rewriting and partial streaming. Pricing is unchanged: unsuffixed/`:reverse` models bill per successful file, `:official` bills actual tokens.
 
 ```bash
 openai-cli edit "Recolor the annotated area" --model gpt-image-2.6-flare \
