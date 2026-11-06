@@ -215,7 +215,7 @@ docker compose run --rm openai-cli chat "Hello!" -m gpt-4o
 
 ### GPT Image 2.6 GIF and 4K
 
-Use `--output-format gif` with `gpt-image-2.6-flare`, its `:reverse`/`:official` variants, or `gpt-image-2.6-sunburst:official`. Generation and both URL/file editing accept `--frame-count` and `--frame-duration-ms`. GIF defaults to a 512x512 preview, 9 frames and 200 ms per frame; actual dimensions may be adjusted by the model. Ordinary/reverse Sunburst GIF is not available.
+Use `--output-format gif` with `gpt-image-2.6-flare`, its `:reverse`/`:official` variants, or any `gpt-image-2.6-sunburst` variant. Generation and both URL/file editing accept `--frame-count` and `--frame-duration-ms`. GIF defaults to a 512x512 preview, 9 frames and 200 ms per frame; actual dimensions may be adjusted by the model.
 
 ```bash
 openai-cli image "A red ball moving left and right, seamless loop" \
@@ -224,3 +224,10 @@ openai-cli image "A red ball moving left and right, seamless loop" \
 ```
 
 All 2.6 variants retain static PNG/JPEG/WebP 4K generation and editing with `--size 3840x2160` or `--size 2160x3840`. GIF has separate size/frame constraints and does not inherit the static 4K presets.
+
+GPT Image 2.6 supports `complexity="low"|"medium"|"high"` (omitted: model default high). Static edits accept `markup`: a PNG with transparent pixels, matching the first reference after orientation, up to 16,777,216 pixels per image and 40MB for the annotation. JSON accepts an HTTPS URL, PNG data URL or an object containing only `image_url`; multipart accepts an annotation file. Do not combine markup with mask, GIF or prompt_rewriter. GIF frame count is 2–16; frame duration is 20–655350ms, rounded to 10ms. GIF rejects masks, custom compression and partial streaming. Pricing is unchanged.
+
+```bash
+openai-cli edit "Recolor the annotated area" --model gpt-image-2.6-flare \
+  --image-file reference.png --markup-file annotation.png --complexity low --async
+```

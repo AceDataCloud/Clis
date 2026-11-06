@@ -1,5 +1,6 @@
 """Image generation and editing commands."""
 
+import base64
 import re
 from pathlib import Path
 
@@ -50,6 +51,8 @@ _GIF_MODELS = {
     "gpt-image-2.6-flare",
     "gpt-image-2.6-flare:reverse",
     "gpt-image-2.6-flare:official",
+    "gpt-image-2.6-sunburst",
+    "gpt-image-2.6-sunburst:reverse",
     "gpt-image-2.6-sunburst:official",
 }
 
@@ -59,7 +62,7 @@ def _validate_gif_options(
 ) -> None:
     if output_format == "gif" and model not in _GIF_MODELS:
         raise click.BadParameter(
-            "GIF requires GPT Image 2.6 Flare (standard/reverse/official) or Sunburst official.",
+            "GIF requires GPT Image 2.6 Flare/Sunburst (standard/reverse/official).",
             param_hint="--output-format",
         )
     if output_format != "gif" and (frame_count is not None or frame_duration_ms is not None):
@@ -99,6 +102,12 @@ def _validate_gif_options(
     ),
 )
 @click.option(
+    "--complexity",
+    type=click.Choice(["low", "medium", "high"]),
+    default=None,
+    help="GPT Image 2.6 planning complexity; model default high.",
+)
+@click.option(
     "--quality",
     type=click.Choice(["auto", "high", "medium", "low", "xhigh", "max", "hd", "standard"]),
     default=None,
@@ -117,17 +126,17 @@ def _validate_gif_options(
     "--output-format",
     type=click.Choice(["png", "jpeg", "webp", "gif"]),
     default=None,
-    help="PNG/JPEG/WebP, or GIF for 2.6 Flare variants and Sunburst official. GIF defaults to a 512 preview; use static formats for 4K.",
+    help="PNG/JPEG/WebP, or GIF for all GPT Image 2.6 variants. GIF defaults to a 512 preview; use static formats for 4K.",
 )
 @click.option(
     "--frame-count",
-    type=click.IntRange(min=1),
+    type=click.IntRange(min=2, max=16),
     default=None,
     help="GIF-only frame count; API default is 9.",
 )
 @click.option(
     "--frame-duration-ms",
-    type=click.IntRange(min=1),
+    type=click.IntRange(min=20, max=655350),
     default=None,
     help="GIF-only frame duration in milliseconds; API default is 200.",
 )
@@ -182,6 +191,7 @@ def image(
     count: int | None,
     size: str | None,
     quality: str | None,
+    complexity: str | None,
     style: str | None,
     output_format: str | None,
     frame_count: int | None,
@@ -206,6 +216,10 @@ def image(
       openai-cli image "Abstract art" --size 1792x1024 --style vivid
     """
     _validate_quality(model, quality)
+    if complexity is not None and model not in _GIF_MODELS:
+        raise click.BadParameter("complexity requires GPT Image 2.6.", param_hint="--complexity")
+    if output_format == "gif" and (output_compression is not None or partial_images):
+        raise click.UsageError("GIF does not support compression or partial images.")
     _validate_gif_options(model, output_format, frame_count, frame_duration_ms)
     client = get_client(ctx.obj.get("token"))
     payload: dict[str, object] = {
@@ -214,6 +228,7 @@ def image(
         "n": count,
         "size": size,
         "quality": quality,
+        "complexity": complexity,
         "style": style,
         "output_format": output_format,
         "frame_count": frame_count,
@@ -252,6 +267,17 @@ def image(
     help="Reference image file to upload for editing (repeat up to 16 times).",
 )
 @click.option(
+    "--markup-url",
+    default=None,
+    help="Transparent PNG annotation URL for GPT Image 2.6 static edits.",
+)
+@click.option(
+    "--markup-file",
+    type=click.Path(exists=True, dir_okay=False),
+    default=None,
+    help="Transparent PNG annotation matching the first reference image.",
+)
+@click.option(
     "--mask-file",
     type=click.Path(exists=True, dir_okay=False),
     default=None,
@@ -286,6 +312,12 @@ def image(
     ),
 )
 @click.option(
+    "--complexity",
+    type=click.Choice(["low", "medium", "high"]),
+    default=None,
+    help="GPT Image 2.6 planning complexity; model default high.",
+)
+@click.option(
     "--quality",
     type=click.Choice(["auto", "high", "medium", "low", "xhigh", "max", "standard"]),
     default=None,
@@ -298,17 +330,17 @@ def image(
     "--output-format",
     type=click.Choice(["png", "jpeg", "webp", "gif"]),
     default=None,
-    help="PNG/JPEG/WebP, or GIF for 2.6 Flare variants and Sunburst official. GIF defaults to a 512 preview; use static formats for 4K.",
+    help="PNG/JPEG/WebP, or GIF for all GPT Image 2.6 variants. GIF defaults to a 512 preview; use static formats for 4K.",
 )
 @click.option(
     "--frame-count",
-    type=click.IntRange(min=1),
+    type=click.IntRange(min=2, max=16),
     default=None,
     help="GIF-only frame count; API default is 9.",
 )
 @click.option(
     "--frame-duration-ms",
-    type=click.IntRange(min=1),
+    type=click.IntRange(min=20, max=655350),
     default=None,
     help="GIF-only frame duration in milliseconds; API default is 200.",
 )
@@ -362,10 +394,13 @@ def edit(
     image_url: tuple[str, ...],
     image_file: tuple[str, ...],
     mask_file: str | None,
+    markup_url: str | None,
+    markup_file: str | None,
     model: str,
     count: int | None,
     size: str | None,
     quality: str | None,
+    complexity: str | None,
     output_format: str | None,
     frame_count: int | None,
     frame_duration_ms: int | None,
@@ -389,7 +424,19 @@ def edit(
       openai-cli edit "Remove background" --image-file photo.png --mask-file mask.png
     """
     _validate_quality(model, quality)
+    if complexity is not None and model not in _GIF_MODELS:
+        raise click.BadParameter("complexity requires GPT Image 2.6.", param_hint="--complexity")
+    if output_format == "gif" and (output_compression is not None or partial_images):
+        raise click.UsageError("GIF does not support compression or partial images.")
     _validate_gif_options(model, output_format, frame_count, frame_duration_ms)
+    if markup_url and markup_file:
+        raise click.UsageError("Use either --markup-url or --markup-file, not both.")
+    if (markup_url or markup_file) and (
+        model not in _GIF_MODELS or output_format == "gif" or mask_file
+    ):
+        raise click.UsageError("Markup requires a GPT Image 2.6 static edit without a mask.")
+    if output_format == "gif" and mask_file:
+        raise click.UsageError("GIF does not support masks.")
     if not image_url and not image_file:
         raise click.UsageError("Provide at least one of --image-url or --image-file.")
     if image_url and image_file:
@@ -409,6 +456,7 @@ def edit(
             "n": count,
             "size": size,
             "quality": quality,
+            "complexity": complexity,
             "output_format": output_format,
             "frame_count": frame_count,
             "frame_duration_ms": frame_duration_ms,
@@ -424,6 +472,11 @@ def edit(
             ("image", (Path(path).name, Path(path).read_bytes(), "application/octet-stream"))
             for path in image_file
         ]
+        if markup_url:
+            fields["markup"] = markup_url
+        if markup_file:
+            annotation = Path(markup_file)
+            files.append(("markup", (annotation.name, annotation.read_bytes(), "image/png")))
         if mask_file:
             mask_path = Path(mask_file)
             files.append(
@@ -449,6 +502,7 @@ def edit(
         "n": count,
         "size": size,
         "quality": quality,
+        "complexity": complexity,
         "output_format": output_format,
         "frame_count": frame_count,
         "frame_duration_ms": frame_duration_ms,
@@ -460,6 +514,12 @@ def edit(
         "async": async_mode,
     }
 
+    if markup_url:
+        payload["markup"] = markup_url
+    if markup_file:
+        payload["markup"] = (
+            "data:image/png;base64," + base64.b64encode(Path(markup_file).read_bytes()).decode()
+        )
     try:
         result = client.image_edits(**payload)  # type: ignore[arg-type]
         if output_json:
