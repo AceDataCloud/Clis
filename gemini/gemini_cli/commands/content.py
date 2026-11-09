@@ -50,7 +50,11 @@ def _content_options(command):
     command = click.option(
         "--generation-config",
         default=None,
-        help="Generation config as a JSON object.",
+        help=(
+            "Generation config as a JSON object. Set thinkingConfig.includeThoughts to true "
+            "to request thought summaries (API default: false); this does not enable or "
+            "disable internal thinking."
+        ),
     )(command)
     command = click.option(
         "--system-instruction",

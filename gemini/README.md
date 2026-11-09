@@ -80,6 +80,32 @@ GEMINI_REQUEST_TIMEOUT=300 gemini generate-content \
 
 For native streaming, replace `generate-content` with `stream-generate-content` and add `--alt sse`. Streaming commands print raw SSE lines. These endpoints do not provide Google Interactions background long-output jobs or server-side sessions. Argon supports implicit caching only, not explicit cached content; its sampling parameters (`temperature`, `top_p`, `top_k`) are ignored. Model defaults are unchanged.
 
+## Native thought summaries
+
+For `generate-content` and `stream-generate-content`, the API defaults
+`generationConfig.thinkingConfig.includeThoughts` to `false`. Omit it or set it
+to `false` to hide thought-summary text in JSON and SSE responses. To request
+summaries, explicitly pass the JSON boolean `true`:
+
+```bash
+gemini generate-content --model gemini-2.5-flash \
+  --contents '[{"role":"user","parts":[{"text":"Explain quantum entanglement"}]}]' \
+  --generation-config '{"thinkingConfig":{"includeThoughts":true}}' --json
+```
+
+For streaming, use the same options with `stream-generate-content --alt sse`.
+Summaries are not guaranteed even when requested. This setting does not enable
+or disable internal thinking: `thinkingBudget` or `thinkingLevel` controls its
+budget or depth where supported by the model. The CLI passes your generation
+config unchanged and leaves API defaults to the server.
+
+Hiding summaries does not guarantee lower thinking token usage or cost;
+`usageMetadata`, `usage` and `thoughtsTokenCount` still reflect actual usage.
+`thoughtSignature` is encrypted state for later turns, not summary text. When
+manually reusing native history, preserve Part order and signature placement,
+including empty-text or signature-only Parts. Use `--json` for the full
+non-streaming response; streaming commands print raw SSE lines.
+
 ## Native audio input
 
 `generate-content` and `stream-generate-content` accept audio alongside text,
