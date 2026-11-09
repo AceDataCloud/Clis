@@ -68,6 +68,9 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "--contents" in result.output
         assert "audio parts" in result.output
+        help_text = " ".join(result.output.split())
+        assert "thinkingConfig.includeThoughts to true" in help_text
+        assert "API default: false" in help_text
         assert "--generation-config" in result.output
         assert "--cached-content" not in result.output
 
@@ -76,6 +79,9 @@ class TestGlobalCommands:
         assert result.exit_code == 0
         assert "--contents" in result.output
         assert "audio parts" in result.output
+        help_text = " ".join(result.output.split())
+        assert "thinkingConfig.includeThoughts to true" in help_text
+        assert "API default: false" in help_text
         assert "--cached-content" not in result.output
 
     def test_chat_model_inventory_includes_current_public_model(self):
@@ -558,6 +564,57 @@ class TestVideoCommand:
 
 class TestContentCommands:
     """Tests for native Gemini content commands."""
+
+    @pytest.mark.parametrize(
+        ("command", "operation"),
+        [
+            ("generate-content", "generateContent"),
+            ("stream-generate-content", "streamGenerateContent"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("model", "generation_config"),
+        [
+            ("gemini-2.5-flash", None),
+            ("gemini-2.5-flash-image", None),
+            ("gemini-2.5-flash", {"thinkingConfig": {"thinkingBudget": 2048}}),
+            (
+                "gemini-2.5-flash",
+                {"thinkingConfig": {"includeThoughts": True, "thinkingBudget": 2048}},
+            ),
+            (
+                "gemini-3-flash-preview",
+                {"thinkingConfig": {"includeThoughts": False, "thinkingLevel": "low"}},
+            ),
+        ],
+    )
+    @respx.mock
+    def test_thinking_config_passthrough(
+        self, runner, command, operation, model, generation_config
+    ):
+        route = respx.post(f"https://api.acedata.cloud/v1beta/models/{model}:{operation}").mock(
+            return_value=Response(200, json={})
+        )
+        contents = [{"parts": [{"text": "Hello"}]}]
+        args = [
+            "--token",
+            "test-token",
+            command,
+            "--model",
+            model,
+            "--contents",
+            json.dumps(contents),
+            "--json",
+        ]
+        expected_payload = {"contents": contents}
+        if generation_config is not None:
+            args.extend(["--generation-config", json.dumps(generation_config)])
+            expected_payload["generationConfig"] = generation_config
+
+        result = runner.invoke(cli, args)
+
+        assert result.exit_code == 0, result.output
+        assert json.loads(route.calls.last.request.content) == expected_payload
 
     @pytest.mark.parametrize(
         ("command", "operation"),
