@@ -47,7 +47,7 @@ from midjourney_cli.core.output import (
     "--version",
     type=click.Choice(IMAGINE_VERSIONS),
     default=None,
-    help="Midjourney version to use.",
+    help="Select the Midjourney version (not model); omit to use the API default.",
 )
 @click.option("--hd/--no-hd", default=False, help="Enable HD generation.")
 @click.option("--quality", default=None, help="Quality setting.")

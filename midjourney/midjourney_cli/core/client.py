@@ -8,6 +8,7 @@ from midjourney_cli.core.config import settings
 from midjourney_cli.core.exceptions import (
     MidjourneyAPIError,
     MidjourneyAuthError,
+    MidjourneyError,
     MidjourneyTimeoutError,
 )
 
@@ -46,6 +47,12 @@ class MidjourneyClient:
         Returns:
             API response as dictionary
         """
+        if endpoint == "/midjourney/imagine" and "model" in payload:
+            raise MidjourneyError(
+                "Midjourney Imagine does not support 'model'; use 'version' instead.",
+                code="bad_request",
+            )
+
         url = f"{self.base_url}{endpoint}"
         request_timeout = timeout or self.timeout
         accept = payload.pop("accept", "application/json")

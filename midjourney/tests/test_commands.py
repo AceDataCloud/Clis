@@ -43,6 +43,9 @@ class TestGlobalCommands:
         result = runner.invoke(cli, ["imagine", "--help"])
         assert result.exit_code == 0
         assert "--mode" in result.output
+        assert "--version" in result.output
+        assert "not model" in result.output
+        assert "--model" not in result.output
 
     def test_help_edits(self, runner):
         result = runner.invoke(cli, ["edits", "--help"])
@@ -106,16 +109,17 @@ class TestImagineCommand:
 
     @respx.mock
     def test_imagine_json(self, runner, mock_imagine_response):
-        respx.post("https://api.acedata.cloud/midjourney/imagine").mock(
+        route = respx.post("https://api.acedata.cloud/midjourney/imagine").mock(
             return_value=Response(200, json=mock_imagine_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "imagine", "A test prompt", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "imagine", "A test prompt", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["success"] is True
         assert data["task_id"] == "test-task-123"
+        body = json.loads(route.calls.last.request.content)
+        assert "version" not in body
+        assert "model" not in body
 
     @respx.mock
     def test_imagine_rich_output(self, runner, mock_imagine_response):
@@ -173,18 +177,37 @@ class TestImagineCommand:
         body = json.loads(route.calls.last.request.content)
         assert body["callback_url"] == "https://example.com/callback"
 
+    @pytest.mark.parametrize("async_mode", [False, True])
     @respx.mock
-    def test_imagine_with_version(self, runner, mock_imagine_response):
+    def test_imagine_with_version(self, runner, mock_imagine_response, async_mode):
         route = respx.post("https://api.acedata.cloud/midjourney/imagine").mock(
             return_value=Response(200, json=mock_imagine_response)
         )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "imagine", "test", "--version", "8.2", "--json"],
-        )
+        args = ["--token", "test-token", "imagine", "test", "--version", "8.2", "--json"]
+        if async_mode:
+            args.append("--async")
+        result = runner.invoke(cli, args)
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["version"] == "8.2"
+        assert "model" not in body
+        if async_mode:
+            assert body["async"] is True
+        else:
+            assert "async" not in body
+
+    @pytest.mark.parametrize("model", ["8.2", "", "null"])
+    @pytest.mark.parametrize("async_mode", [False, True])
+    @respx.mock
+    def test_imagine_rejects_model_option(self, runner, model, async_mode):
+        args = ["--token", "test-token", "imagine", "test", "--model", model]
+        if async_mode:
+            args.append("--async")
+        result = runner.invoke(cli, args)
+        assert result.exit_code == 2
+        assert "No such option" in result.output
+        assert "--model" in result.output
+        assert not respx.calls
 
     def test_imagine_rejects_unsupported_version(self, runner):
         result = runner.invoke(cli, ["imagine", "test", "--version", "invalid"])
@@ -445,9 +468,7 @@ class TestTaskCommands:
         respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "task", "abc123-def456", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "task", "abc123-def456", "--json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["success"] is True
@@ -479,9 +500,7 @@ class TestTaskCommands:
         route = respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "task", "abc123-def456", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "task", "abc123-def456", "--json"])
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
         assert body["id"] == "abc123-def456"
@@ -552,9 +571,7 @@ class TestTaskCommands:
         respx.post("https://api.acedata.cloud/midjourney/tasks").mock(
             return_value=Response(200, json=mock_task_response)
         )
-        result = runner.invoke(
-            cli, ["--token", "test-token", "wait", "abc123-def456", "--json"]
-        )
+        result = runner.invoke(cli, ["--token", "test-token", "wait", "abc123-def456", "--json"])
         assert result.exit_code == 0
 
     @respx.mock
