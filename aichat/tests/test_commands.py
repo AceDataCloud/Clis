@@ -23,6 +23,7 @@ class TestGlobalCommands:
     """Tests for global CLI options."""
 
     def test_model_inventory_excludes_retired_opus_3(self):
+        assert MODELS2.count("claude-fable-5-2") == 1
         assert "claude-fable-5-1" in MODELS2
         assert MODELS2.count("claude-fable-5-1") == 1
         assert "claude-opus-5" in MODELS2
@@ -267,6 +268,7 @@ class TestInfoCommands:
     def test_models2(self, runner):
         result = runner.invoke(cli, ["models2"])
         assert result.exit_code == 0
+        assert "claude-fable-5-2" in result.output
         assert "claude-fable-5-1" in result.output
         assert "claude-fable-5" in result.output
         assert "claude-opus-5" in result.output

@@ -13,6 +13,7 @@ console = Console()
 # Claude chat completion models (OpenAI-compatible endpoint)
 CHAT_MODELS = [
     "gpt-5.6-sol-fast",
+    "claude-fable-5-2",
     "claude-fable-5-1",
     "claude-fable-5",
     "claude-opus-5-5",
@@ -54,7 +55,7 @@ MESSAGES_MODELS = [
     "claude-sonnet-5-5",
     *[model for model in CHAT_MODELS if model != "claude-opus-5-5"],
 ]
-COUNT_TOKENS_MODELS = MESSAGES_MODELS.copy()
+COUNT_TOKENS_MODELS = [model for model in MESSAGES_MODELS if model != "claude-fable-5-2"]
 
 DEFAULT_CHAT_MODEL = "claude-3-5-haiku-20241022"
 DEFAULT_MESSAGES_MODEL = "claude-3-5-haiku-20241022"
