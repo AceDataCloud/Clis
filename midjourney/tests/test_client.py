@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from midjourney_cli.core.client import MidjourneyClient
-from midjourney_cli.core.exceptions import MidjourneyAuthError
+from midjourney_cli.core.exceptions import MidjourneyAuthError, MidjourneyError
 
 
 @pytest.fixture
@@ -33,6 +33,63 @@ class TestMidjourneyClient:
         client = MidjourneyClient(api_token="", base_url="https://api.test.local")
         with pytest.raises(MidjourneyAuthError, match="not configured"):
             client._get_headers()
+
+    @pytest.mark.parametrize("model", ["8.2", "", None])
+    @pytest.mark.parametrize("async_mode", [False, True])
+    @pytest.mark.parametrize("entry_point", ["imagine", "request"])
+    def test_imagine_rejects_model_before_request(self, client, model, async_mode, entry_point):
+        payload = {
+            "prompt": "test",
+            "version": "8.2",
+            "model": model,
+            "async": async_mode,
+            "accept": "application/json",
+        }
+        original_payload = payload.copy()
+
+        with patch("httpx.Client") as mock_http:
+            with pytest.raises(MidjourneyError, match="use 'version' instead") as error:
+                if entry_point == "imagine":
+                    client.imagine(**payload)
+                else:
+                    client.request("/midjourney/imagine", payload)
+
+            assert error.value.code == "bad_request"
+            mock_http.assert_not_called()
+        assert payload == original_payload
+
+    @pytest.mark.parametrize("version", [None, "8.2"])
+    @pytest.mark.parametrize("async_mode", [False, True])
+    def test_imagine_version_payload(self, client, mock_imagine_response, version, async_mode):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = mock_imagine_response
+        payload = {"prompt": "test", "version": version, "async": async_mode}
+
+        with patch("httpx.Client") as mock_http:
+            mock_instance = mock_http.return_value.__enter__.return_value
+            mock_instance.post.return_value = mock_response
+
+            assert client.imagine(**payload) == mock_imagine_response
+            body = mock_instance.post.call_args.kwargs["json"]
+            assert "model" not in body
+            assert body["async"] is async_mode
+            if version is None:
+                assert "version" not in body
+            else:
+                assert body["version"] == version
+
+    def test_model_guard_is_scoped_to_imagine(self, client, mock_task_response):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = mock_task_response
+
+        with patch("httpx.Client") as mock_http:
+            mock_instance = mock_http.return_value.__enter__.return_value
+            mock_instance.post.return_value = mock_response
+
+            assert client.query_task(id="test-task-123", model=None) == mock_task_response
+            assert mock_instance.post.call_args.kwargs["json"] == {"id": "test-task-123"}
 
     def test_request_uses_accept_header_override(self, client):
         """Test accept is sent as a header and not as a JSON body field."""

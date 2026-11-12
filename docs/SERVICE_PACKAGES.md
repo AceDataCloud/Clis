@@ -55,7 +55,7 @@ Only after checking current access, balance and price should you submit a genera
 | 401/403 | Check the full raw token, application/service permissions, expiration and Allowed APIs; do not post the key for support. |
 | 400 | Use the exact command/model parameters in that service's current README; services are not interchangeable. |
 | Pending / no final URL | Retrieve the same task ID. Do not resubmit generation to poll. |
-| 429 | Reduce concurrency and wait; do not silently add paid retries. |
+| 429 `too_many_requests` | Reduce concurrency and wait. Accounts without a successful paid recharge or an administrator's manual credit addition share one billable-request slot across all keys and services. Wait for the existing request's final result; free task polling remains available. Do not silently add paid retries. |
 | 5xx / timeout | Inspect the existing task/trace before deciding on another billable attempt. |
 
 ## For integration maintainers

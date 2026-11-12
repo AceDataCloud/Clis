@@ -16,6 +16,23 @@ Monorepo for all AceDataCloud command-line interface tools.
 
 Save the key in the client's credential store or the environment variable shown below. Never put it in a prompt, shared workflow, screenshot, or Git commit. If authentication fails, check the full copied value, application/service access, expiration, usage limit, and balance before creating another key.
 
+## Trial account concurrency
+
+Accounts that have never completed a paid recharge or received an administrator's
+manual credit addition can run only one billable request at a time across all API
+keys and services. Rewards, redemption cards and transferred credits do not remove
+this limit. The read-only user flag `has_recharged` records eligibility; it is not
+a CLI option. Eligible accounts still follow normal balance and key usage checks.
+
+An overlapping request returns HTTP 429 `too_many_requests`. Free task queries
+remain available: poll the original task until its final result before submitting
+another generation. Asynchronous acceptance, a disconnected client or a proxy
+timeout does not mean the task has finished. If it remains without a terminal
+result, retain its `trace_id` and contact support rather than blindly resubmitting.
+Realtime connection authentication does not occupy this ordinary-request slot.
+This limit does not change trial access or billing; charges still settle after the
+request ends based on actual usage.
+
 ## Find a service package
 
 Start with the service name you need: [Suno, Seedance, HappyHorse, GPT Image and Nano Banana](docs/SERVICE_PACKAGES.md). The directory gives the actual Ace-owned package/repository, local checks and published versus source-only state. A package under a similar name may belong to another publisher.

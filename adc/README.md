@@ -57,6 +57,24 @@ adc task abc123 -s flux
 adc wait abc123 -s flux
 ```
 
+## Trial accounts and overlapping requests
+
+If your account has never completed a paid recharge or received an administrator's
+manual credit addition, run only one billable request at a time across all API keys
+and services. Rewards, redemption cards and transferred credits do not remove this
+account-wide limit. The read-only user flag `has_recharged` is managed by the
+platform, not a CLI setting; eligible accounts still follow normal balance and key
+usage checks.
+
+HTTP 429 `too_many_requests` can mean another request is still running. The CLI
+reports the API error and exits nonzero without automatically retrying. Asynchronous
+acceptance does not release the slot: save the original `task_id` and use
+`adc task TASK_ID --service SERVICE` or `adc wait TASK_ID --service SERVICE` until
+its final result before starting another generation. Free task polling remains
+available. A disconnect or proxy timeout does not cancel the task; if it has no
+terminal result for an extended period, retain its `trace_id` and contact support
+instead of blindly resubmitting. Trial access and usage-based billing are unchanged.
+
 ## Configuration
 
 Get your API token at [platform.acedata.cloud](https://platform.acedata.cloud?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=adc_cli_readme_platform).

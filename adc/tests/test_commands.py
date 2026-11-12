@@ -63,6 +63,35 @@ class TestImageCommands:
         data = json.loads(result.output)
         assert data["task_id"] == "test-task-123"
 
+    @pytest.mark.parametrize("output_json", [False, True])
+    @respx.mock
+    def test_image_429_exits_without_retry(self, runner, output_json):
+        route = respx.post("https://api.acedata.cloud/flux/images").mock(
+            return_value=Response(
+                429,
+                json={
+                    "error": {
+                        "code": "too_many_requests",
+                        "message": "You have exceeded the rate limit.",
+                    },
+                    "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab",
+                },
+            )
+        )
+        args = ["--token", "test-token", "image", "A sunset"]
+        if output_json:
+            args.append("--json")
+        result = runner.invoke(cli, args)
+
+        output = result.output.replace("\n", "")
+        assert result.exit_code == 1
+        assert "too_many_requests" in output
+        assert "You have exceeded the rate limit." in output
+        assert "2efa9340-b21b-4e26-9e14-4aac95f343ab" in output
+        assert route.call_count == 1
+        assert len(respx.calls) == 1
+        assert json.loads(route.calls.last.request.content)["async"] is True
+
     @respx.mock
     def test_image_rich_output(self, runner, mock_image_response):
         respx.post("https://api.acedata.cloud/flux/images").mock(
