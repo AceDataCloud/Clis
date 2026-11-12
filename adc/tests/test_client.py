@@ -90,6 +90,36 @@ class TestAdcClient:
             client.request("/flux/images", {"prompt": "test"})
         assert exc_info.value.status_code == 500
 
+    @pytest.mark.parametrize("async_mode", [False, True])
+    @respx.mock
+    def test_request_429_preserves_error_without_retry(self, mock_task_response, async_mode):
+        error_body = {
+            "error": {
+                "code": "too_many_requests",
+                "message": "You have exceeded the rate limit.",
+            },
+            "trace_id": "2efa9340-b21b-4e26-9e14-4aac95f343ab",
+        }
+        response = Response(429, json=error_body)
+        generation = respx.post("https://api.acedata.cloud/flux/images").mock(return_value=response)
+        task = respx.post("https://api.acedata.cloud/flux/tasks").mock(
+            return_value=Response(200, json=mock_task_response)
+        )
+        client = AdcClient(api_token="test-token")
+
+        with pytest.raises(AdcAPIError) as exc_info:
+            client.request("/flux/images", {"prompt": "test", "async": async_mode})
+
+        assert exc_info.value.status_code == 429
+        assert exc_info.value.code == "http_429"
+        assert exc_info.value.message == response.text
+        assert generation.call_count == 1
+        assert (
+            client.query_task("flux", id="test-task-123", action="retrieve") == mock_task_response
+        )
+        assert task.call_count == 1
+        assert generation.call_count == 1
+
     @respx.mock
     def test_request_timeout(self):
         import httpx
