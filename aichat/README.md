@@ -95,6 +95,16 @@ aichat chat2 "Review this code and suggest a fix" -m kimi-k3.1-pro --max-turns 1
 aichat chat2 "Review this design and its tradeoffs" -m gemini-4-argon --max-turns 1
 ```
 
+## Claude Fable 5.2 in Chat2
+
+Use the full model ID `claude-fable-5-2` through `chat2`, not `chat`. Fable 5.1 and Fable 5 remain separate choices; defaults are unchanged. `aichat models2` lists the models for this endpoint. Check current model pricing and account access before submitting:
+
+```bash
+aichat chat2 "Review this design and its tradeoffs" -m claude-fable-5-2 --max-turns 1 --json
+```
+
+For native Claude thinking blocks and tool controls, use the Claude CLI's Messages command instead; Chat2 uses its own conversation format.
+
 ## Chat2 Turn Limit
 
 `aichat chat2 --max-turns` accepts integers from 1 to 500 and limits agent

@@ -52,6 +52,20 @@ claude chat "Hello" --model claude-3-5-haiku-20241022 --json | jq '.usage'
 claude messages "Hello" --model claude-3-5-haiku-20241022 --max-tokens 1024 --json | jq '.usage'
 ```
 
+### Fable 5.2
+
+Use the full model ID `claude-fable-5-2` with `chat` or `messages`; Fable 5.1 and Fable 5 remain separate choices and defaults are unchanged. Fable 5.2 currently has no Responses or Count Tokens support. Inspect generation `usage` rather than substituting another model's token count.
+
+Adaptive thinking is always on for this model. Omit `--temperature`, `--top-p` and `--top-k`; do not try to disable thinking or force a tool call. Use Chat's `--tool-choice auto` or Messages' `--tool-choice '{"type":"auto"}'`. Prefer Messages for native thinking blocks and tool semantics, and adjust effort with `--output-config`. The output budget covers both thinking and final text:
+
+```bash
+claude messages "Review this design and its tradeoffs" --model claude-fable-5-2 \
+  --max-tokens 32768 --output-config '{"effort":"high"}' --json
+claude chat "Review this design and its tradeoffs" --model claude-fable-5-2 --max-tokens 32768 --json
+```
+
+At the current largest package's purchase cost (142,800 Credits / $13,584), input and output cost $3.20 and $16 per million tokens; cache reads cost $0.08 and 5-minute / 1-hour cache writes cost $4 / $6.40 per million tokens. These are 40% of official standard API prices, not a guarantee for every package or special pricing mode. Check current model pricing and your actual bill for account discounts.
+
 ### Opus 5.5
 
 `claude-opus-5-5` supports ordinary and streaming Chat Completions, as well as Messages. Chat compatibility does not return native thinking blocks; use Messages for complete thinking blocks, signatures and native tool semantics.

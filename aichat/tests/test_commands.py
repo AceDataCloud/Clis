@@ -24,6 +24,7 @@ class TestGlobalCommands:
 
     def test_model_inventory_excludes_retired_opus_3(self):
         assert MODELS2.count("claude-fable-5-2") == 1
+        assert "claude-fable-5-2" not in MODELS
         assert "claude-fable-5-1" in MODELS2
         assert MODELS2.count("claude-fable-5-1") == 1
         assert "claude-opus-5" in MODELS2
@@ -308,7 +309,7 @@ class TestChat2Commands:
         body = json.loads(route.calls.last.request.content)
         assert "max_turns" not in body
 
-    @pytest.mark.parametrize("model", ["deepseek-v4-pro", "gemini-4-argon"])
+    @pytest.mark.parametrize("model", ["deepseek-v4-pro", "gemini-4-argon", "claude-fable-5-2"])
     @respx.mock
     def test_chat2_with_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(

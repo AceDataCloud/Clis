@@ -173,7 +173,7 @@ class TestChatCommands:
         assert result.exit_code == 0
         assert "Paris" in result.output
 
-    @pytest.mark.parametrize("model", ["claude-opus-5", "claude-opus-5-5"])
+    @pytest.mark.parametrize("model", ["claude-opus-5", "claude-opus-5-5", "claude-fable-5-2"])
     @respx.mock
     def test_chat_with_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/v1/chat/completions").mock(
@@ -431,18 +431,24 @@ class TestMessagesCommands:
         request_body = json.loads(route.calls[0].request.content)
         assert request_body["system"] == "You are a helpful assistant."
 
+    @pytest.mark.parametrize("model", ["claude-opus-5", "claude-fable-5-2"])
     @respx.mock
-    def test_messages_with_model(self, runner, mock_messages_response):
+    def test_messages_with_model(self, runner, mock_messages_response, model):
         route = respx.post("https://api.acedata.cloud/v1/messages").mock(
             return_value=Response(200, json=mock_messages_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "messages", "Hello", "-m", "claude-opus-5"],
+            ["--token", "test-token", "messages", "Hello", "-m", model],
         )
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
-        assert request_body["model"] == "claude-opus-5"
+        assert request_body["model"] == model
+        assert "temperature" not in request_body
+        assert "top_p" not in request_body
+        assert "top_k" not in request_body
+        assert "thinking" not in request_body
+        assert "tool_choice" not in request_body
 
     @respx.mock
     def test_messages_with_extended_openapi_options(self, runner, mock_messages_response):
@@ -567,6 +573,15 @@ class TestCountTokensCommands:
         assert result.exit_code == 0
         request_body = json.loads(route.calls[0].request.content)
         assert request_body["model"] == "claude-3-5-sonnet-20241022"
+
+    @respx.mock
+    def test_count_tokens_rejects_fable_52_without_request(self, runner):
+        result = runner.invoke(
+            cli,
+            ["--token", "test-token", "count-tokens", "Hello", "--model", "claude-fable-5-2"],
+        )
+        assert result.exit_code == 2
+        assert not respx.calls
 
     @respx.mock
     def test_count_tokens_with_system(self, runner, mock_count_tokens_response):
