@@ -23,7 +23,9 @@ class TestGlobalCommands:
     """Tests for global CLI options."""
 
     def test_model_inventory_excludes_retired_opus_3(self):
-        assert CHAT_MODELS[1:3] == ["claude-fable-5-1", "claude-fable-5"]
+        assert CHAT_MODELS[1:4] == ["claude-fable-5-2", "claude-fable-5-1", "claude-fable-5"]
+        assert "claude-fable-5-2" in MESSAGES_MODELS
+        assert "claude-fable-5-2" not in COUNT_TOKENS_MODELS
         assert "claude-opus-5" in CHAT_MODELS
         assert "claude-opus-5-5" in CHAT_MODELS
         assert "claude-opus-5-5" in MESSAGES_MODELS
@@ -31,10 +33,11 @@ class TestGlobalCommands:
         assert "claude-sonnet-5-5" not in CHAT_MODELS
         assert "claude-3-opus-20240229" not in CHAT_MODELS
 
-    def test_messages_and_count_tokens_share_published_models(self):
+    def test_count_tokens_only_lists_models_with_count_support(self):
         assert CHAT_MODELS.count("gpt-5.6-sol-fast") == 1
         assert MESSAGES_MODELS.count("gpt-5.6-sol-fast") == 1
-        assert COUNT_TOKENS_MODELS == MESSAGES_MODELS
+        assert set(MESSAGES_MODELS) - set(COUNT_TOKENS_MODELS) == {"claude-fable-5-2"}
+        assert set(COUNT_TOKENS_MODELS) <= set(MESSAGES_MODELS)
         assert {
             "gpt-6.1-sol",
             "gpt-6.1-terra",
@@ -619,6 +622,7 @@ class TestInfoCommands:
         result = runner.invoke(cli, ["models"])
         assert result.exit_code == 0
         assert "claude" in result.output.lower()
+        assert "claude-fable-5-2" in result.output
         assert "claude-fable-5-1" in result.output
         assert "claude-fable-5" in result.output
         assert "claude-opus-5" in result.output
