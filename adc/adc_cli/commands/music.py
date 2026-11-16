@@ -9,16 +9,20 @@ from adc_cli.core.output import print_error, print_json, print_result
 
 @click.command()
 @click.argument("prompt")
+@click.option(
+    "--service", type=click.Choice(["suno", "acemusic"]), default="suno", show_default=True
+)
 @click.option("--instrumental", is_flag=True, default=False, help="Generate instrumental only.")
 @click.option("--json", "output_json", is_flag=True, help="Output raw JSON.")
 @click.pass_context
 def music(
     ctx: click.Context,
     prompt: str,
+    service: str,
     instrumental: bool,
     output_json: bool,
 ) -> None:
-    """Generate music using Suno AI.
+    """Generate music using Suno or ACE Music.
 
     PROMPT describes the music to generate.
 
@@ -27,6 +31,8 @@ def music(
       adc music "An upbeat electronic dance track"
       adc music "Calm piano jazz" --instrumental
     """
+    if service == "acemusic" and instrumental:
+        raise click.UsageError("ACE Music does not expose a pure-instrumental control.")
     client = get_client(ctx.obj.get("token"))
     try:
         payload: dict[str, object] = {
@@ -35,7 +41,12 @@ def music(
             "instrumental": instrumental,
         }
 
-        result = client.suno_music(**payload)  # type: ignore[arg-type]
+        if service == "acemusic":
+            payload.pop("instrumental")
+            payload.update(custom=False, model="acemusic-v1.1", **{"async": True})
+            result = client.request("/acemusic/audios", payload)
+        else:
+            result = client.suno_music(**payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:
