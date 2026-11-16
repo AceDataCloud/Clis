@@ -56,7 +56,9 @@ def generate(
         lyric = lyric_file.read_text(encoding="utf-8")
         if not lyric.strip():
             raise click.UsageError("The lyrics file is empty.")
-        payload.update(lyric=lyric, style=style, title=title)
+        payload.update(lyric=lyric, style=style)
+        if title:
+            payload["title"] = title
     else:
         if not prompt or style or title:
             raise click.UsageError(
@@ -82,6 +84,10 @@ def lyrics(ctx: click.Context, prompt: str, style: str, output_json: bool) -> No
     """Generate lyrics and a title as a separately priced request."""
     del output_json
     try:
-        print_json(get_client(ctx.obj.get("token")).generate_lyrics(prompt=prompt, style=style))
+        print_json(
+            get_client(ctx.obj.get("token")).generate_lyrics(
+                prompt=prompt, **({"style": style} if style else {})
+            )
+        )
     except AceMusicError as error:
         raise click.ClickException(error.message) from error
