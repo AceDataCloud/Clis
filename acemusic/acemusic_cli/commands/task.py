@@ -76,7 +76,7 @@ def tasks_batch(ctx: click.Context, task_ids: tuple[str, ...], output_json: bool
 @click.pass_context
 def history(ctx: click.Context, page: int, page_size: int) -> None:
     """List your task history."""
-    print_json(query(ctx, action="list", page=page, page_size=page_size))
+    print_json(query(ctx, action="list", limit=page_size, offset=(page - 1) * page_size))
 
 
 @click.command()
