@@ -113,11 +113,18 @@ jobs:
             fi
           done < "$GITHUB_WORKSPACE/sync.yaml"
 
+          # Existing standalone workflows stay independent. The new ACE Music
+          # repository is source-owned here and needs its initial publisher too.
+          WORKFLOW_EXCLUDE="--exclude=.github"
+          if [ "$DIR" = "acemusic" ]; then
+            WORKFLOW_EXCLUDE=""
+          fi
+
           # Sync files: monorepo subdir -> target repo root
           # Delete files in target that don't exist in source (except .git, .github, .gitbooks)
           rsync -av --delete \
             --exclude='.git' \
-            --exclude='.github' \
+            $WORKFLOW_EXCLUDE \
             --exclude='.gitbooks' \
             "$GITHUB_WORKSPACE/${DIR}/" /tmp/target/
 

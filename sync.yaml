@@ -97,5 +97,4 @@ mappings:
   acemusic:
     repo: AceDataCloud/AceMusicCli
     exclude:
-      - .github
       - .gitbooks
