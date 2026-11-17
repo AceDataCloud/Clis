@@ -15,7 +15,7 @@ from adc_cli.core.output import print_error, print_json, print_success, print_ta
     "-s",
     "--service",
     type=click.Choice(
-        ["flux", "suno", "luma", "sora", "veo", "seedance", "seedream", "nanobanana"]
+        ["acemusic", "flux", "suno", "luma", "sora", "veo", "seedance", "seedream", "nanobanana"]
     ),
     default="flux",
     help="Service the task belongs to.",
@@ -56,7 +56,7 @@ def task(
     "-s",
     "--service",
     type=click.Choice(
-        ["flux", "suno", "luma", "sora", "veo", "seedance", "seedream", "nanobanana"]
+        ["acemusic", "flux", "suno", "luma", "sora", "veo", "seedance", "seedream", "nanobanana"]
     ),
     default="flux",
     help="Service the task belongs to.",
@@ -88,6 +88,24 @@ def wait_task(
     try:
         while elapsed < max_timeout:
             result = client.query_task(service, id=task_id, action="retrieve")
+            if service == "acemusic":
+                from adc_cli.core.task_state import acemusic_task_state
+
+                ace_state = acemusic_task_state(result)
+                if ace_state in {
+                    "succeeded",
+                    "complete",
+                    "completed",
+                    "partial_failed",
+                    "failed",
+                    "error",
+                    "cancelled",
+                    "canceled",
+                }:
+                    print_json(result)
+                    if ace_state not in {"succeeded", "complete", "completed"}:
+                        raise SystemExit(1)
+                    return
             data = result.get("data", {})
 
             if isinstance(data, list) and data:

@@ -178,6 +178,34 @@
       "mcp_arguments": [
         "mcp-nanobanana-pro"
       ]
+    },
+    {
+      "slug": "acemusic",
+      "label": "ACE Music",
+      "brand": "ACE Music by Ace Data Cloud",
+      "search_terms": [
+        "ace music",
+        "acemusic",
+        "ace music cli"
+      ],
+      "cli_directory": "acemusic",
+      "cli_package": "acemusic-cli",
+      "cli_command": "acemusic",
+      "cli_published": false,
+      "cli_repo": "https://github.com/AceDataCloud/AceMusicCli",
+      "mcp_package": "mcp-acemusic",
+      "mcp_repo": "https://github.com/AceDataCloud/AceMusicMCP",
+      "documentation": "acemusic",
+      "safe_command": "acemusic models",
+      "task_commands": [
+        "acemusic task <task-id>",
+        "acemusic wait <task-id> --interval 10"
+      ],
+      "note": "New service source prepared for release; verify package and hosted API availability before use.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-acemusic"
+      ]
     }
   ]
 }
