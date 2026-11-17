@@ -66,7 +66,7 @@ The source ADC CLI also offers an offline `adc packages suno` / `adc packages "g
 
 ## How It Works
 
-This is the source-of-truth monorepo. Changes pushed to `main` are automatically synced to the standalone repos via GitHub Actions.
+This is the source-of-truth monorepo. After acquiring the sync lock, GitHub Actions reconciles every mapping from one current `main` snapshot. Unchanged repositories receive no commit. `sync.yaml.exclude` controls downstream-owned files, including `.github`; there are no service-name exceptions. Manual dispatch performs the same catch-up.
 
 The mapping between subdirectories and standalone repos is defined in [`sync.yaml`](sync.yaml).
 
