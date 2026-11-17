@@ -24,7 +24,7 @@ from acemusic_cli.core.output import print_json
     help="UTF-8 custom lyrics file.",
 )
 @click.option("--style", help="Required with custom lyrics.")
-@click.option("--title", default="")
+@click.option("--title", default="", help="Required with custom lyrics.")
 @click.option("--callback-url", help="A real webhook you control.")
 @click.option("--json", "output_json", is_flag=True, help="Print JSON (the default).")
 @click.pass_context
@@ -40,7 +40,7 @@ def generate(
 ) -> None:
     """Submit ONE paid task targeting two song candidates, then save task_id.
 
-    Pass PROMPT for idea mode, or --lyric-file and --style for custom mode.
+    Pass PROMPT for idea mode, or --lyric-file, --style and --title for custom mode.
     No automatic retry is made if submission times out.
     """
     del output_json
@@ -51,14 +51,14 @@ def generate(
         "async": True,
     }
     if lyric_file:
-        if prompt or not style:
-            raise click.UsageError("Custom mode requires --lyric-file and --style, without PROMPT.")
+        if prompt or not style or not style.strip() or not title.strip():
+            raise click.UsageError(
+                "Custom mode requires --lyric-file, --style and --title, without PROMPT."
+            )
         lyric = lyric_file.read_text(encoding="utf-8")
         if not lyric.strip():
             raise click.UsageError("The lyrics file is empty.")
-        payload.update(lyric=lyric, style=style)
-        if title:
-            payload["title"] = title
+        payload.update(lyric=lyric, style=style, title=title)
     else:
         if not prompt or style or title:
             raise click.UsageError(
