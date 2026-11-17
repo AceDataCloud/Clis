@@ -74,3 +74,16 @@ def test_wait_partial_failure_terminates_without_generation():
 def test_models_is_free():
     result = CliRunner().invoke(cli, ["models"])
     assert result.exit_code == 0 and "acemusic-v1.1" in result.output
+
+
+@pytest.mark.parametrize("title_args", [[], ["--title", ""], ["--title", "   "]])
+def test_custom_requires_title_before_contacting_api(tmp_path, title_args):
+    lyric_file = tmp_path / "lyrics.txt"
+    lyric_file.write_text("[Verse] Home")
+    with patch("acemusic_cli.commands.music.get_client") as get_client:
+        result = CliRunner().invoke(
+            cli, ["generate", "--lyric-file", str(lyric_file), "--style", "folk", *title_args]
+        )
+    assert result.exit_code == 2
+    assert "--title" in result.output
+    get_client.assert_not_called()
