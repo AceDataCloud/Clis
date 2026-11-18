@@ -39,6 +39,8 @@ CHAT_MODELS = [
 
 # Claude Messages API models
 MESSAGES_MODELS = [
+    "gpt-6.2-astra",
+    "gpt-6.2-sol",
     "gpt-6.1-sol",
     "gpt-6.1-terra",
     "gpt-6-sol",

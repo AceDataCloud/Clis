@@ -12,6 +12,8 @@ console = Console()
 
 # Chat completion models
 CHAT_MODELS = [
+    "gpt-6.2-astra",
+    "gpt-6.2-sol",
     "gpt-6.1-sol",
     "gpt-6.1-terra",
     "gpt-6-sol",
@@ -97,6 +99,8 @@ IMAGE_MODELS = [
 
 # Response API models
 RESPONSE_MODELS = [
+    "gpt-6.2-astra",
+    "gpt-6.2-sol",
     "gpt-6.1-sol",
     "gpt-6.1-terra",
     "gpt-6-sol",

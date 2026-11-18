@@ -153,18 +153,19 @@ class TestChatCommands:
         assert result.exit_code == 0
         assert "highly intelligent" in result.output
 
+    @pytest.mark.parametrize("model", ["deepseek-v4-pro", "gpt-6.2-astra", "gpt-6.2-sol"])
     @respx.mock
-    def test_chat_with_model(self, runner, mock_chat_response):
+    def test_chat_with_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/aichat/conversations").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "-m", "deepseek-v4-pro", "--json"],
+            ["--token", "test-token", "chat", "Hello", "-m", model, "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "deepseek-v4-pro"
+        assert body["model"] == model
 
     @respx.mock
     def test_chat_with_conversation_id(self, runner, mock_chat_response):
@@ -309,7 +310,10 @@ class TestChat2Commands:
         body = json.loads(route.calls.last.request.content)
         assert "max_turns" not in body
 
-    @pytest.mark.parametrize("model", ["deepseek-v4-pro", "gemini-4-argon", "claude-fable-5-2"])
+    @pytest.mark.parametrize(
+        "model",
+        ["deepseek-v4-pro", "gemini-4-argon", "claude-fable-5-2", "gpt-6.2-astra", "gpt-6.2-sol"],
+    )
     @respx.mock
     def test_chat2_with_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/aichat2/conversations").mock(

@@ -74,7 +74,15 @@ class TestGlobalCommands:
         assert json.loads(route.calls.last.request.content)["model"] == "gpt-5.6-sol-fast"
 
     @pytest.mark.parametrize(
-        "model", ["gpt-5.6-sol-fast", "gpt-6.1-terra", "glm-5.3", "gemini-3.6-flash"]
+        "model",
+        [
+            "gpt-5.6-sol-fast",
+            "gpt-6.1-terra",
+            "glm-5.3",
+            "gemini-3.6-flash",
+            "gpt-6.2-astra",
+            "gpt-6.2-sol",
+        ],
     )
     @pytest.mark.parametrize("command", ["messages", "count-tokens"])
     @respx.mock
