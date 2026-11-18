@@ -354,18 +354,19 @@ class TestChatCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-5.4-pro"
 
+    @pytest.mark.parametrize("model", ["gpt-6-astra", "gpt-6.2-astra", "gpt-6.2-sol"])
     @respx.mock
-    def test_chat_gpt6_astra_model(self, runner, mock_chat_response):
+    def test_chat_gpt6_model(self, runner, mock_chat_response, model):
         route = respx.post("https://api.acedata.cloud/openai/chat/completions").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "chat", "Hello", "-m", "gpt-6-astra", "--json"],
+            ["--token", "test-token", "chat", "Hello", "-m", model, "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "gpt-6-astra"
+        assert body["model"] == model
 
     @respx.mock
     def test_chat_free_model(self, runner, mock_chat_response):
@@ -936,18 +937,19 @@ class TestResponseCommands:
         body = json.loads(route.calls.last.request.content)
         assert body["model"] == "gpt-5.4-nano"
 
+    @pytest.mark.parametrize("model", ["gpt-6-astra", "gpt-6.2-astra", "gpt-6.2-sol"])
     @respx.mock
-    def test_response_gpt6_astra_model(self, runner, mock_response_api_response):
+    def test_response_gpt6_model(self, runner, mock_response_api_response, model):
         route = respx.post("https://api.acedata.cloud/openai/responses").mock(
             return_value=Response(200, json=mock_response_api_response)
         )
         result = runner.invoke(
             cli,
-            ["--token", "test-token", "response", "Hello", "-m", "gpt-6-astra", "--json"],
+            ["--token", "test-token", "response", "Hello", "-m", model, "--json"],
         )
         assert result.exit_code == 0
         body = json.loads(route.calls.last.request.content)
-        assert body["model"] == "gpt-6-astra"
+        assert body["model"] == model
 
     @respx.mock
     def test_response_with_count(self, runner, mock_response_api_response):

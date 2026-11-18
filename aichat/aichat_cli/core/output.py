@@ -12,6 +12,8 @@ console = Console()
 
 # Available models from OpenAPI spec
 MODELS = [
+    "gpt-6.2-astra",
+    "gpt-6.2-sol",
     "mimo-v2.6-pro",
     "mimo-v2.6-flash",
     "gpt-6-astra",
@@ -116,6 +118,8 @@ DEFAULT_MODEL = "gpt-4o"
 
 # Available models for /aichat2/conversations endpoint
 MODELS2 = [
+    "gpt-6.2-astra",
+    "gpt-6.2-sol",
     "mimo-v2.6-pro",
     "mimo-v2.6-flash",
     "gpt-5.6-sol-fast",
