@@ -121,7 +121,7 @@ def upload_audio(
 
     parsed = urlsplit(audio_url)
     if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
-        raise click.UsageError("A public HTTPS audio URL without credentials is required.")
+        raise click.UsageError("A public HTTPS MP3 URL without credentials is required.")
     payload: dict[str, Any] = {"action": "upload", "audio_url": audio_url, "async": True}
     for key, value in (("name", name), ("audio_id", audio_id), ("callback_url", callback_url)):
         if value:
