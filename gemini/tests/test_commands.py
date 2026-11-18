@@ -91,7 +91,10 @@ class TestGlobalCommands:
 
     def test_native_model_inventory_matches_api(self):
         assert GEMINI_NATIVE_MODELS == [
+            "gemini-3.8-flash",
+            "gemini-4-carbon",
             "gemini-4-argon",
+            "gemini-4-hydrogen",
             "gemini-3.7-flash",
             "gemini-3.6-flash",
             "gemini-3.5-flash",
@@ -145,7 +148,9 @@ class TestChatCommand:
     @respx.mock
     def test_chat_with_new_models(self, runner, mock_chat_response):
         for model in [
+            "gemini-4-carbon",
             "gemini-4-argon",
+            "gemini-4-hydrogen",
             "gemini-2.5-flash-lite",
             "gemini-3.6-flash",
             "gemini-3.7-flash",
