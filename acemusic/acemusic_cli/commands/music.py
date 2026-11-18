@@ -1,5 +1,6 @@
 """Paid music and lyrics submissions."""
 
+from math import isfinite
 from pathlib import Path
 from typing import Any
 
@@ -155,6 +156,8 @@ def _reference_payload(
     audio_influence: float,
     callback_url: str | None,
 ) -> dict[str, Any]:
+    if not isfinite(audio_influence) or not 1 <= audio_influence <= 100:
+        raise click.UsageError("Audio influence must be a finite number from 1 to 100.")
     lyric = lyric_file.read_text(encoding="utf-8")
     if not lyric.strip() or not style.strip():
         raise click.UsageError("Nonempty lyrics and style are required.")
