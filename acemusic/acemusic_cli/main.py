@@ -4,7 +4,7 @@ from importlib import metadata
 
 import click
 
-from acemusic_cli.commands.music import generate, lyrics
+from acemusic_cli.commands.music import cover_audio, generate, lyrics, mashup_audio, upload_audio
 from acemusic_cli.commands.task import download, history, task, tasks_batch, wait
 
 
@@ -31,7 +31,18 @@ def models() -> None:
     click.echo("acemusic-v1.1 (default)\nacemusic-v1")
 
 
-for command in (generate, lyrics, task, tasks_batch, history, wait, download):
+for command in (
+    generate,
+    lyrics,
+    upload_audio,
+    cover_audio,
+    mashup_audio,
+    task,
+    tasks_batch,
+    history,
+    wait,
+    download,
+):
     cli.add_command(command)
 
 
