@@ -47,8 +47,8 @@ gemini models
 
 | Model | Notes |
 |-------|-------|
-| `gemini-4-carbon` | Advanced reasoning; Chat Completions and native Generate Content |
-| `gemini-4-hydrogen` | Fast reasoning; Chat Completions and native Generate Content |
+| `gemini-4-carbon` | Advanced reasoning; Chat Completions available, native Generate Content temporarily unavailable |
+| `gemini-4-hydrogen` | Fast reasoning; Chat Completions available, native Generate Content temporarily unavailable |
 | `gemini-4-argon` | Deep reasoning; Chat Completions and native Generate Content |
 | `gemini-3.7-flash` | Gemini 3.7 Flash |
 | `gemini-3.6-flash` | Gemini 3.6 Flash |
