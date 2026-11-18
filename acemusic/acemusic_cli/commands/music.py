@@ -1,5 +1,6 @@
 """Paid music and lyrics submissions."""
 
+from math import isfinite
 from pathlib import Path
 from typing import Any
 
@@ -91,3 +92,125 @@ def lyrics(ctx: click.Context, prompt: str, style: str, output_json: bool) -> No
         )
     except AceMusicError as error:
         raise click.ClickException(error.message) from error
+
+
+def _submit_reference(ctx: click.Context, payload: dict[str, Any]) -> None:
+    try:
+        print_json(get_client(ctx.obj.get("token")).generate_audio(**payload))
+    except AceMusicError as error:
+        raise click.ClickException(
+            error.message + " Preserve the original request; do not automatically submit again."
+        ) from error
+
+
+@click.command("upload")
+@click.argument("audio_url")
+@click.option("--name", help="Display name for this separate priced import.")
+@click.option("--audio-id", help="Optional caller-owned platform audio ID anchor.")
+@click.option("--callback-url", help="A real webhook you control.")
+@click.pass_context
+def upload_audio(
+    ctx: click.Context,
+    audio_url: str,
+    name: str | None,
+    audio_id: str | None,
+    callback_url: str | None,
+) -> None:
+    """Import ONE owned audio URL; do not create a cover automatically."""
+    from urllib.parse import urlsplit
+
+    parsed = urlsplit(audio_url)
+    if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+        raise click.UsageError("A public HTTPS MP3 URL without credentials is required.")
+    payload: dict[str, Any] = {"action": "upload", "audio_url": audio_url, "async": True}
+    for key, value in (("name", name), ("audio_id", audio_id), ("callback_url", callback_url)):
+        if value:
+            payload[key] = value
+    _submit_reference(ctx, payload)
+
+
+def _reference_options(function: Any) -> Any:
+    options = [
+        click.option(
+            "--lyric-file",
+            type=click.Path(exists=True, dir_okay=False, path_type=Path),
+            required=True,
+        ),
+        click.option("--style", required=True),
+        click.option("--title", help="Optional title for the new songs."),
+        click.option(
+            "--audio-influence", type=click.FloatRange(1, 100), default=60, show_default=True
+        ),
+        click.option("--callback-url", help="A real webhook you control."),
+    ]
+    for option in reversed(options):
+        function = option(function)
+    return function
+
+
+def _reference_payload(
+    action: str,
+    lyric_file: Path,
+    style: str,
+    title: str | None,
+    audio_influence: float,
+    callback_url: str | None,
+) -> dict[str, Any]:
+    if not isfinite(audio_influence) or not 1 <= audio_influence <= 100:
+        raise click.UsageError("Audio influence must be a finite number from 1 to 100.")
+    lyric = lyric_file.read_text(encoding="utf-8")
+    if not lyric.strip() or not style.strip():
+        raise click.UsageError("Nonempty lyrics and style are required.")
+    payload: dict[str, Any] = {
+        "action": action,
+        "model": "acemusic-v1.1",
+        "lyric": lyric,
+        "style": style,
+        "audio_influence": audio_influence,
+        "async": True,
+    }
+    if title:
+        payload["title"] = title
+    if callback_url:
+        payload["callback_url"] = callback_url
+    return payload
+
+
+@click.command("cover")
+@click.argument("audio_id")
+@_reference_options
+@click.pass_context
+def cover_audio(
+    ctx: click.Context,
+    audio_id: str,
+    lyric_file: Path,
+    style: str,
+    title: str | None,
+    audio_influence: float,
+    callback_url: str | None,
+) -> None:
+    """Submit ONE paid cover from a successful caller-owned platform audio ID."""
+    payload = _reference_payload("cover", lyric_file, style, title, audio_influence, callback_url)
+    payload["audio_id"] = audio_id
+    _submit_reference(ctx, payload)
+
+
+@click.command("mashup")
+@click.argument("audio_ids", nargs=2)
+@_reference_options
+@click.pass_context
+def mashup_audio(
+    ctx: click.Context,
+    audio_ids: tuple[str, str],
+    lyric_file: Path,
+    style: str,
+    title: str | None,
+    audio_influence: float,
+    callback_url: str | None,
+) -> None:
+    """Submit ONE paid mashup from two compatible owned platform audio IDs."""
+    if len(set(audio_ids)) != 2:
+        raise click.UsageError("Two distinct platform audio IDs are required.")
+    payload = _reference_payload("mashup", lyric_file, style, title, audio_influence, callback_url)
+    payload["mashup_audio_ids"] = list(audio_ids)
+    _submit_reference(ctx, payload)

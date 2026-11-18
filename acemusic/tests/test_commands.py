@@ -87,3 +87,70 @@ def test_custom_requires_title_before_contacting_api(tmp_path, title_args):
     assert result.exit_code == 2
     assert "--title" in result.output
     get_client.assert_not_called()
+
+
+def test_reference_commands_send_once_with_public_ids(tmp_path):
+    lyric_file = tmp_path / "lyrics.txt"
+    lyric_file.write_text("[Verse] Original home")
+    client = Mock()
+    client.generate_audio.return_value = {"task_id": "one"}
+    runner = CliRunner()
+    with patch("acemusic_cli.commands.music.get_client", return_value=client):
+        result = runner.invoke(
+            cli, ["upload", "https://example.com/owned.mp3", "--audio-id", "anchor"]
+        )
+        assert result.exit_code == 0, result.output
+        assert client.generate_audio.call_args.kwargs == {
+            "action": "upload",
+            "audio_url": "https://example.com/owned.mp3",
+            "audio_id": "anchor",
+            "async": True,
+        }
+        result = runner.invoke(
+            cli, ["cover", "audio-a", "--lyric-file", str(lyric_file), "--style", "folk"]
+        )
+        assert result.exit_code == 0, result.output
+        payload = client.generate_audio.call_args.kwargs
+        assert payload["action"] == "cover" and payload["audio_id"] == "audio-a"
+        assert payload["audio_influence"] == 60 and payload["model"] == "acemusic-v1.1"
+        assert "title" not in payload and "custom" not in payload
+        result = runner.invoke(
+            cli,
+            ["mashup", "audio-a", "audio-b", "--lyric-file", str(lyric_file), "--style", "folk"],
+        )
+        assert result.exit_code == 0, result.output
+        assert client.generate_audio.call_args.kwargs["mashup_audio_ids"] == ["audio-a", "audio-b"]
+        assert client.generate_audio.call_count == 3
+
+
+def test_invalid_reference_commands_never_contact_api(tmp_path):
+    lyric_file = tmp_path / "lyrics.txt"
+    lyric_file.write_text("[Verse] Original home")
+    with patch("acemusic_cli.commands.music.get_client") as get_client:
+        runner = CliRunner()
+        for args in [
+            ["upload", "http://example.com/owned.mp3"],
+            [
+                "cover",
+                "a",
+                "--lyric-file",
+                str(lyric_file),
+                "--style",
+                "folk",
+                "--audio-influence",
+                "nan",
+            ],
+            [
+                "cover",
+                "a",
+                "--lyric-file",
+                str(lyric_file),
+                "--style",
+                "folk",
+                "--audio-influence",
+                "101",
+            ],
+            ["mashup", "a", "a", "--lyric-file", str(lyric_file), "--style", "folk"],
+        ]:
+            assert runner.invoke(cli, args).exit_code == 2
+        get_client.assert_not_called()
