@@ -55,8 +55,17 @@ class TestGlobalCommands:
         assert "claude-opus-5-5" not in MODELS2
         assert {"glm-5.3", "glm-4.5", "glm-4.5v"} <= set(MODELS)
         assert "glm-5.3" in MODELS2
-        assert MODELS.count("deepseek-v4-pro") == 1
-        assert MODELS2.count("deepseek-v4-pro") == 1
+
+    def test_deepseek_models_match_in_both_model_lists(self):
+        expected = [
+            "deepseek-v4.1-flash",
+            "deepseek-v4-flash",
+            "deepseek-flash",
+            "deepseek-v4-pro",
+            "deepseek-v3.2",
+        ]
+        for models in (MODELS, MODELS2):
+            assert [m for m in models if m.startswith("deepseek-")] == expected
 
     def test_new_model_families_render_without_misbranding(self):
         assert _get_model_family("gpt-6-sol") == "GPT-6"
