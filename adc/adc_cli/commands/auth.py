@@ -22,7 +22,7 @@ def auth() -> None:
 def login(token: str) -> None:
     """Save your API token for future use.
 
-    Get your token at https://platform.acedata.cloud
+    Get your token at https://platform.acedata.cloud?utm_source=cli&utm_medium=referral&utm_campaign=evergreen
 
     Examples:
 

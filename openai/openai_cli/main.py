@@ -46,7 +46,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
     Chat with GPT models, generate embeddings, create and edit images,
     synthesize speech, and inspect realtime connection details.
 
-    Get your API token at https://platform.acedata.cloud
+    Get your API token at https://platform.acedata.cloud?utm_source=cli&utm_medium=referral&utm_campaign=evergreen
 
     \b
     Quick start:

@@ -2,7 +2,7 @@
 name = "acemusic-cli"
 version = "2026.11.17.0"
 description = "CLI tool for ACE Music AI Music Generation via AceDataCloud API"
-readme = "README.md"
+readme = "README.pypi.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 authors = [
@@ -84,6 +84,7 @@ include = [
     "acemusic_cli/",
     "tests/",
     "README.md",
+    "README.pypi.md",
     "LICENSE",
     "CHANGELOG.md",
     ".env.example",

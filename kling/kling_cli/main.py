@@ -48,7 +48,7 @@ def cli(ctx: click.Context, token: str | None) -> None:
 
     Generate AI videos from the command line using Kling models.
 
-    Get your API token at https://platform.acedata.cloud
+    Get your API token at https://platform.acedata.cloud?utm_source=cli&utm_medium=referral&utm_campaign=evergreen
 
     \b
     Examples:
