@@ -45,6 +45,7 @@ class TestGlobalCommands:
 
     def test_model_inventory_includes_latest_glm_model(self):
         assert GLM_MODELS[0] == "glm-5.3"
+        assert {"glm-4.5", "glm-4.5v"} <= set(GLM_MODELS)
 
 
 class TestChatCommand:

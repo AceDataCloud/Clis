@@ -59,6 +59,8 @@ glm models
 | `glm-5.1` | Earlier GLM-5 release |
 | `glm-4.7` | GLM-4 series (default) |
 | `glm-4.6` | GLM-4 series |
+| `glm-4.5` | GLM-4 series |
+| `glm-4.5v` | Vision-capable GLM-4 model |
 | `glm-3-turbo` | GLM-3 Turbo |
 
 ## Configuration
