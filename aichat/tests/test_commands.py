@@ -63,7 +63,6 @@ class TestGlobalCommands:
             "deepseek-v4-flash",
             "deepseek-flash",
             "deepseek-v4-pro",
-            "deepseek-v4-pro-0813",
             "deepseek-v3.2",
         ]
         for models in (MODELS, MODELS2):
