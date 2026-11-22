@@ -18,7 +18,7 @@ The local help/model-reference commands do not send a generation request or need
 
 ## API key and free local checks
 
-Register/sign in at [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=happyhorse_cli_readme_api_key), initialize General application if needed, and copy or create an API Key with HappyHorse generation and task-query access. Check expiration, limits, balance and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=happyhorse_cli_readme_pricing). Store only the raw token in `ACEDATACLOUD_API_TOKEN`, never a prompt or commit. A platform account-management token is different.
+Register/sign in at [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen), initialize General application if needed, and copy or create an API Key with HappyHorse generation and task-query access. Check expiration, limits, balance and [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Store only the raw token in `ACEDATACLOUD_API_TOKEN`, never a prompt or commit. A platform account-management token is different.
 
 ```bash
 happyhorse --help

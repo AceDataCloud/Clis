@@ -17,11 +17,11 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 # Retain the historical source/mirror mapping without advertising it as active.
 RETIRED = {"sora"}
-UTM_KEYS = {"utm_source", "utm_medium", "utm_campaign", "utm_content"}
+UTM_KEYS = {"utm_source", "utm_medium", "utm_campaign"}
 PLATFORM_URL = re.compile(r"https://(?:platform|studio)\.acedata\.cloud[^\s)<\"']*")
 
 
-def attribution_errors(text: str, entry: str) -> list[str]:
+def attribution_errors(text: str) -> list[str]:
     """Check clickable prose links while preserving API/configuration examples."""
     errors = []
     urls = []
@@ -51,18 +51,9 @@ def attribution_errors(text: str, entry: str) -> list[str]:
         }
         if any(query.get(key) != [value] for key, value in expected.items()):
             errors.append(f"expected opensource/referral/evergreen attribution: {url}")
-        content = query.get("utm_content", [])
-        if len(content) != 1 or not re.fullmatch(
-            r"[a-z0-9][a-z0-9_.-]{0,95}", content[0]
-        ):
-            errors.append(f"missing or malformed utm_content: {url}")
-        elif not content[0].startswith(f"{entry}_readme_"):
-            errors.append(f"utm_content belongs to another CLI: {url}")
         if {key for key in query if key.startswith("utm_")} != UTM_KEYS:
             errors.append(f"unexpected or missing UTM fields: {url}")
-        if parts.path == "/console/applications" and content == [
-            f"{entry}_readme_api_key"
-        ]:
+        if parts.path == "/console/applications":
             found_api_key = True
     if not found_api_key:
         errors.append("missing the attributed Applications API key entry")
@@ -86,9 +77,9 @@ def main() -> int:
         if extra:
             print(f"README lists unmapped CLIs: {', '.join(extra)}", file=sys.stderr)
         return 1
-    readmes = [(ROOT / "README.md", "cli_catalog")]
+    readmes = [ROOT / "README.md"]
     readmes.extend(
-        (ROOT / alias / "README.md", alias.replace("-", "_") + "_cli")
+        ROOT / alias / "README.md"
         for alias in sorted(mappings - RETIRED)
     )
     errors = []
@@ -99,13 +90,13 @@ def main() -> int:
         errors.append(
             "ADC service directory is stale; run python3 scripts/service_packages.py --write"
         )
-    for path, entry in readmes:
+    for path in readmes:
         if not path.is_file():
             errors.append(f"{path.relative_to(ROOT)}: missing README")
             continue
         errors.extend(
             f"{path.relative_to(ROOT)}: {error}"
-            for error in attribution_errors(path.read_text(), entry)
+            for error in attribution_errors(path.read_text())
         )
     if errors:
         print("\n".join(errors), file=sys.stderr)
