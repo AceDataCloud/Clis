@@ -2,6 +2,15 @@
 
 A command-line tool for AI Dialogue via the [AceDataCloud](https://platform.acedata.cloud?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen) platform.
 
+## Unified Chat Completions
+
+```bash
+aichat completions "Hello" --model kimi-k2.7-code
+aichat completions "Explain this" --model gemini-4-argon --json
+```
+
+`completions` calls `/v1/chat/completions` with an explicit model ID and Bearer authentication. It does not restrict you to the legacy `chat` or `chat2` command's per-API model suggestions. No model or token limit is silently selected: `--max-completion-tokens` is optional and only sent when provided. Use `messages` below for a model that only publishes a Messages endpoint. The commands do not fall back to another protocol.
+
 ## Native Messages models
 
 Install the existing published package with `pip install -U aichat-pro-cli`. Models such as `claude-sonnet-5-5` require the native Messages protocol:
