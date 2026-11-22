@@ -53,7 +53,7 @@ class TestGlobalCommands:
             "gemini-3.8-flash",
         } <= set(MODELS2)
         assert "claude-opus-5-5" not in MODELS2
-        assert "glm-5.3" in MODELS
+        assert {"glm-5.3", "glm-4.5", "glm-4.5v"} <= set(MODELS)
         assert "glm-5.3" in MODELS2
         assert MODELS.count("deepseek-v4-pro") == 1
         assert MODELS2.count("deepseek-v4-pro") == 1

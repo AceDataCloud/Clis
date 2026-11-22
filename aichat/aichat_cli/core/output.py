@@ -111,6 +111,8 @@ MODELS = [
     "glm-5.1",
     "glm-4.7",
     "glm-4.6",
+    "glm-4.5",
+    "glm-4.5v",
     "glm-3-turbo",
 ]
 
