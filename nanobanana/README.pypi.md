@@ -1,0 +1,332 @@
+# Nano Banana by Ace Data Cloud — CLI
+
+## Install the Ace integration
+
+This integration is maintained by **Ace Data Cloud** and uses your Ace API key. It is not an official client published by the model owner. Check the [PyPI package](https://pypi.org/project/nano-banana-pro-cli/) and its AceDataCloud repository before installing.
+
+```bash
+python -m pip install nano-banana-pro-cli
+nano-banana-pro --help
+nano-banana-pro models
+```
+
+The commands above show local help/reference information and do not submit a generation. Then follow **Get API Token** below: register/sign in, initialize General application if needed, create/copy an application key, and store it in the terminal's `ACEDATACLOUD_API_TOKEN` environment variable. Do not use a platform management token.
+
+Generation follows your account's current service access, balance and pricing. Save the returned task ID and query that **same ID**; do not repeat generation while a task is pending.
+
+```text
+nano-banana-pro task <task-id>
+nano-banana-pro wait <task-id> --interval 5
+```
+
+A successful command or running preview does not prove a completed media result. Check the task's terminal outcome and returned media link. [中文首次使用指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md) · [Service-name package directory](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES.md)
+
+
+[![PyPI version](https://img.shields.io/pypi/v/nano-banana-pro-cli.svg)](https://pypi.org/project/nano-banana-pro-cli/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/nano-banana-pro-cli.svg)](https://pypi.org/project/nano-banana-pro-cli/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/AceDataCloud/NanoBananaCli/actions/workflows/ci.yaml/badge.svg)](https://github.com/AceDataCloud/NanoBananaCli/actions/workflows/ci.yaml)
+
+A command-line tool for AI image generation and editing using [NanoBanana](https://platform.acedata.cloud/?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen) (Gemini-powered) through the [AceDataCloud API](https://platform.acedata.cloud/?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen).
+
+Generate and edit AI images directly from your terminal — no MCP client required.
+
+## Features
+
+- **Image Generation** — Generate images from text prompts with multiple models
+- **Image Editing** — Edit, combine, and transform images with AI
+- **Multiple Models** — nano-banana (fast), nano-banana-2 (improved), nano-banana-2.1 (efficient, 1K/2K/4K), nano-banana-pro (best, 4K)
+- **Flexible Output** — Aspect ratios (1:1, 16:9, 9:16, etc.) and resolutions (1K/2K/4K)
+- **Task Management** — Query tasks, batch query, wait with polling
+- **Rich Output** — Beautiful terminal tables and panels via Rich
+- **JSON Mode** — Machine-readable output with `--json` for piping
+
+## Quick Start
+
+### 1. Get API Token
+
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen). Sign in, or register an account first.
+2. Find **General application**. If it has not been created, choose **Initialize General Application**. A general key can use the services available to your account; a dedicated application's key is limited to its service. Check the required service/model access and [current pricing](https://platform.acedata.cloud/models?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen).
+3. Copy the **API Key** from the application card, or open **Keys / Manage Keys → Create** to create a separate key for this integration. Give it a recognizable name so you can revoke or rotate it independently.
+4. When creating a key, review **Expiration Time**, **Set Usage Limitation**, and **Allowed APIs**. Enable only the restrictions you need, allow the operations you will call, then click **Create** and copy the token from the key list. Task lookup does not grant permission to submit a generation. Confirm the application's balance can cover your first request; any trial allowance is whatever your account currently displays.
+5. Copy only the token value, without quotation marks, spaces, or `Bearer `. An API Key / API Token field expects this raw value; only a manually configured HTTP `Authorization` header needs the `Bearer ` prefix. A `platform-...` account-management token cannot replace a generation API key.
+
+![Copy an application API key or open Manage Keys](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+
+![Create a separately named key with optional restrictions](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/create-api-key-en.png)
+
+Save the key in the client's credential store or the environment variable shown below. Never put it in a prompt, shared workflow, screenshot, or Git commit. If authentication fails, check the full copied value, application/service access, expiration, usage limit, and balance before creating another key.
+
+### 2. Install
+
+```bash
+# Install with pip
+pip install nano-banana-pro-cli
+
+# Or with uv (recommended)
+uv pip install nano-banana-pro-cli
+
+# Or from source
+git clone https://github.com/AceDataCloud/NanoBananaCli.git
+cd NanoBananaCli
+pip install -e .
+```
+
+### 3. Configure
+
+```bash
+# Set your API token
+export ACEDATACLOUD_API_TOKEN=your_token_here
+
+# Or use .env file
+cp .env.example .env
+# Edit .env with your token
+```
+
+### 4. Use
+
+```bash
+# Generate an image from a prompt
+nano-banana-pro generate "A cat sitting on a windowsill at sunset, warm lighting"
+
+# Generate with specific model and aspect ratio
+nano-banana-pro generate "Product photo of a watch" -m nano-banana-pro -a 16:9 -r 4K
+
+# Generate and edit with Nano Banana 2.1
+nano-banana-pro generate "A blue ceramic vase on a cream background" -m nano-banana-2.1 -r 2K
+nano-banana-pro edit "Make the vase green" -i https://example.com/photo.jpg -m nano-banana-2.1 -r 4K
+
+# Edit an image
+nano-banana-pro edit "Make it look like an oil painting" -i https://example.com/photo.jpg
+
+# Virtual try-on (combine person + clothing)
+nano-banana-pro edit "Let this person wear this T-shirt" -i person.jpg -i shirt.jpg
+
+# Check task status
+nano-banana-pro task <task-id>
+
+# Wait for completion with polling
+nano-banana-pro wait <task-id> --interval 5
+
+# List available models
+nano-banana-pro models
+```
+
+## Commands
+
+### Image Generation & Editing
+
+| Command | Description |
+|---------|-------------|
+| `nano-banana-pro generate <prompt>` | Generate an image from a text prompt |
+| `nano-banana-pro edit <prompt> -i <url>...` | Edit or combine images using AI |
+
+### Task Management
+
+| Command | Description |
+|---------|-------------|
+| `nano-banana-pro task <task_id>` | Query a single task status |
+| `nano-banana-pro tasks <id1> <id2>...` | Query multiple tasks at once |
+| `nano-banana-pro wait <task_id>` | Wait for task completion with polling |
+
+### Utilities
+
+| Command | Description |
+|---------|-------------|
+| `nano-banana-pro models` | List available NanoBanana models |
+| `nano-banana-pro aspect-ratios` | List available aspect ratios |
+| `nano-banana-pro resolutions` | List available output resolutions |
+| `nano-banana-pro config` | Show current configuration |
+
+## Global Options
+
+```
+--token TEXT    API token (or set ACEDATACLOUD_API_TOKEN env var)
+--version       Show version
+--help          Show help message
+```
+
+Most commands support:
+
+```
+--json          Output raw JSON (for piping/scripting)
+--model TEXT    NanoBanana model version (default: nano-banana)
+```
+
+## Scripting & Piping
+
+The `--json` flag outputs machine-readable JSON suitable for piping:
+
+```bash
+# Generate and extract task ID
+TASK_ID=$(nano-banana-pro generate "a red circle" --json | jq -r '.task_id')
+
+# Wait for completion and get image URL
+nano-banana-pro wait $TASK_ID --json | jq -r '.data[0].image_url'
+
+# Batch generate from a file of prompts
+while IFS= read -r prompt; do
+  nano-banana-pro generate "$prompt" --json >> results.jsonl
+done < prompts.txt
+```
+
+## Available Models
+
+| Model | Engine | Notes |
+|-------|--------|-------|
+| `nano-banana` | Gemini 2.5 Flash | Fast, good quality (default) |
+| `nano-banana-2` | Improved | Better quality, balanced speed |
+| `nano-banana-2.1` | Gemini Nano Banana 2.1 | 1K/2K/4K generation and editing |
+| `nano-banana-pro` | Gemini 3 Pro | Best quality, supports resolution control (1K/2K/4K) |
+
+Specify `-m nano-banana-2.1` explicitly; the default remains `nano-banana`. Both generation and editing support `-r 1K`, `-r 2K`, or `-r 4K`. There is no `nano-banana-2.1:official` variant.
+
+## Aspect Ratios
+
+| Ratio | Orientation |
+|-------|-------------|
+| `1:1` | Square (default) |
+| `3:2` / `2:3` | Classic photo |
+| `16:9` / `9:16` | Widescreen / Portrait |
+| `4:3` / `3:4` | Standard |
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ACEDATACLOUD_API_TOKEN` | API token from AceDataCloud | *Required* |
+| `ACEDATACLOUD_API_BASE_URL` | API base URL | `https://api.acedata.cloud` |
+| `NANOBANANA_DEFAULT_MODEL` | Default model | `nano-banana` |
+| `NANOBANANA_REQUEST_TIMEOUT` | Timeout in seconds | `1800` |
+
+## Development
+
+### Setup Development Environment
+
+```bash
+# Clone repository
+git clone https://github.com/AceDataCloud/NanoBananaCli.git
+cd NanoBananaCli
+
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # or `.venv\Scripts\activate` on Windows
+
+# Install with dev dependencies
+pip install -e ".[dev,test]"
+```
+
+### Run Tests
+
+```bash
+# Run unit tests
+pytest
+
+# Run with coverage
+pytest --cov=nanobanana_cli
+
+# Run integration tests (requires API token)
+pytest tests/test_integration.py -m integration
+```
+
+### Code Quality
+
+```bash
+# Format code
+ruff format .
+
+# Lint code
+ruff check .
+
+# Type check
+mypy nanobanana_cli
+```
+
+### Build & Publish
+
+```bash
+# Install build dependencies
+pip install -e ".[release]"
+
+# Build package
+python -m build
+
+# Upload to PyPI
+twine upload dist/*
+```
+
+## Docker
+
+```bash
+# Pull the image
+docker pull ghcr.io/acedatacloud/nano-banana-pro-cli:latest
+
+# Run a command
+docker run --rm -e ACEDATACLOUD_API_TOKEN=your_token \
+  ghcr.io/acedatacloud/nano-banana-pro-cli generate "A beautiful sunset"
+
+# Or use docker-compose
+docker compose run --rm nano-banana-pro-cli generate "A beautiful sunset"
+```
+
+## Project Structure
+
+```
+NanoBananaCli/
+├── nanobanana_cli/            # Main package
+│   ├── __init__.py
+│   ├── __main__.py            # python -m nanobanana_cli entry point
+│   ├── main.py                # CLI entry point
+│   ├── core/                  # Core modules
+│   │   ├── client.py          # HTTP client for NanoBanana API
+│   │   ├── config.py          # Configuration management
+│   │   ├── exceptions.py      # Custom exceptions
+│   │   └── output.py          # Rich terminal formatting
+│   └── commands/              # CLI command groups
+│       ├── image.py           # Image generation & editing commands
+│       ├── task.py            # Task management commands
+│       └── info.py            # Info & utility commands
+├── tests/                     # Test suite
+├── .github/workflows/         # CI/CD (lint, test, publish to PyPI)
+├── Dockerfile                 # Container image
+├── deploy/                    # Kubernetes deployment configs
+├── .env.example               # Environment template
+├── pyproject.toml             # Project configuration
+└── README.md
+```
+
+## NanoBanana CLI vs MCP NanoBanana
+
+| Feature | NanoBanana CLI | MCP NanoBanana |
+|---------|----------------|----------------|
+| Interface | Terminal commands | MCP protocol |
+| Usage | Direct shell, scripts, CI/CD | Claude, VS Code, MCP clients |
+| Output | Rich tables / JSON | Structured MCP responses |
+| Automation | Shell scripts, piping | AI agent workflows |
+| Install | `pip install nano-banana-pro-cli` | `pip install mcp-nanobanana-pro` |
+
+Both tools use the same AceDataCloud API and share the same API token.
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing`)
+5. Open a Pull Request
+
+### Development Requirements
+
+- Python 3.10+
+- Dependencies: `pip install -e ".[all]"`
+- Lint: `ruff check . && ruff format --check .`
+- Test: `pytest`
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

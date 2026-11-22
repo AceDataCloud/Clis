@@ -2,7 +2,7 @@
 name = "seedance-cli"
 version = "0.1.0"
 description = "Seedance video generation CLI by Ace Data Cloud"
-readme = "README.md"
+readme = "README.pypi.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 authors = [
@@ -85,6 +85,7 @@ include = [
     "seedance_cli/",
     "tests/",
     "README.md",
+    "README.pypi.md",
     "LICENSE",
     "CHANGELOG.md",
     ".env.example",

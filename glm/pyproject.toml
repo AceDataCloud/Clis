@@ -2,7 +2,7 @@
 name = "glm-pro-cli"
 version = "0.1.0"
 description = "CLI tool for GLM Chat Completions via AceDataCloud"
-readme = "README.md"
+readme = "README.pypi.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
 authors = [
@@ -81,6 +81,7 @@ include = [
     "glm_cli/",
     "tests/",
     "README.md",
+    "README.pypi.md",
     "LICENSE",
     "CHANGELOG.md",
     ".env.example",

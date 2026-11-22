@@ -1,0 +1,272 @@
+# Seedance by Ace Data Cloud — CLI
+
+## Install the Ace integration
+
+This integration is maintained by **Ace Data Cloud** and uses your Ace API key. It is not an official client published by the model owner. Check the [PyPI package](https://pypi.org/project/seedance-cli/) and its AceDataCloud repository before installing.
+
+```bash
+python -m pip install seedance-cli
+seedance --help
+seedance models
+```
+
+The commands above show local help/reference information and do not submit a generation. Then follow **Get API Token** below: register/sign in, initialize General application if needed, create/copy an application key, and store it in the terminal's `ACEDATACLOUD_API_TOKEN` environment variable. Do not use a platform management token.
+
+Generation follows your account's current service access, balance and pricing. Save the returned task ID and query that **same ID**; do not repeat generation while a task is pending.
+
+```text
+seedance task <task-id>
+seedance wait <task-id> --interval 5
+```
+
+A successful command or running preview does not prove a completed media result. Check the task's terminal outcome and returned media link. [中文首次使用指南](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES_zh-CN.md) · [Service-name package directory](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES.md)
+
+
+[![PyPI version](https://img.shields.io/pypi/v/seedance-cli.svg)](https://pypi.org/project/seedance-cli/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/seedance-cli.svg)](https://pypi.org/project/seedance-cli/)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/AceDataCloud/SeedanceCli/actions/workflows/ci.yaml/badge.svg)](https://github.com/AceDataCloud/SeedanceCli/actions/workflows/ci.yaml)
+
+A command-line tool for AI video generation using [Seedance](https://platform.acedata.cloud/?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen) through the [AceDataCloud API](https://platform.acedata.cloud/?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen).
+
+Generate AI videos directly from your terminal — no MCP client required.
+
+## Features
+
+- **Video Generation** — Generate videos from text prompts with multiple models
+- **Image-to-Video** — Create videos from reference images
+- **Multiple Models** — Seedance 2.5 plus the Seedance 2.0 series ( doubao-seedance-2-0-fast-260128, doubao-seedance-2-0-mini-260615) plus doubao-seedance-1-5-pro-251215, doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-pro-fast-251015, doubao-seedance-1-0-lite-t2v-250428, doubao-seedance-1-0-lite-i2v-250428
+- **Task Management** — Query tasks, batch query, wait with polling
+- **Rich Output** — Beautiful terminal tables and panels via Rich
+- **JSON Mode** — Machine-readable output with `--json` for piping
+
+## Quick Start
+
+### 1. Get API Token
+
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen). Sign in, or register an account first.
+2. Find **General application**. If it has not been created, choose **Initialize General Application**. A general key can use the services available to your account; a dedicated application's key is limited to its service. Check the required service/model access and [current pricing](https://platform.acedata.cloud/models?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen).
+3. Copy the **API Key** from the application card, or open **Keys / Manage Keys → Create** to create a separate key for this integration. Give it a recognizable name so you can revoke or rotate it independently.
+4. When creating a key, review **Expiration Time**, **Set Usage Limitation**, and **Allowed APIs**. Enable only the restrictions you need, allow the operations you will call, then click **Create** and copy the token from the key list. Task lookup does not grant permission to submit a generation. Confirm the application's balance can cover your first request; any trial allowance is whatever your account currently displays.
+5. Copy only the token value, without quotation marks, spaces, or `Bearer `. An API Key / API Token field expects this raw value; only a manually configured HTTP `Authorization` header needs the `Bearer ` prefix. A `platform-...` account-management token cannot replace a generation API key.
+
+![Copy an application API key or open Manage Keys](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+
+![Create a separately named key with optional restrictions](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/create-api-key-en.png)
+
+Save the key in the client's credential store or the environment variable shown below. Never put it in a prompt, shared workflow, screenshot, or Git commit. If authentication fails, check the full copied value, application/service access, expiration, usage limit, and balance before creating another key.
+
+### 2. Install
+
+```bash
+# Install with pip
+pip install seedance-cli
+
+# Or with uv (recommended)
+uv pip install seedance-cli
+
+# Or from source
+git clone https://github.com/AceDataCloud/SeedanceCli.git
+cd SeedanceCli
+pip install -e .
+```
+
+### 3. Configure
+
+```bash
+# Set your API token
+export ACEDATACLOUD_API_TOKEN=your_token_here
+
+# Or use .env file
+cp .env.example .env
+# Edit .env with your token
+```
+
+### 4. Use
+
+```bash
+# Generate a video
+seedance generate "A test video"
+
+# Generate from reference image
+seedance image-to-video "Animate this scene" -i https://example.com/photo.jpg
+
+# Check task status
+seedance task <task-id>
+
+# Wait for completion
+seedance wait <task-id> --interval 5
+
+# List available models
+seedance models
+```
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `seedance generate <prompt>` | Generate a video from a text prompt |
+| `seedance image-to-video <prompt> -i <url>` | Generate a video from reference image(s) |
+| `seedance task <task_id>` | Query a single task status |
+| `seedance tasks <id1> <id2>...` | Query multiple tasks at once |
+| `seedance wait <task_id>` | Wait for task completion with polling |
+| `seedance models` | List available Seedance models |
+| `seedance config` | Show current configuration |
+| `seedance aspect-ratios` | List available aspect ratios |
+| `seedance resolutions` | List available output resolutions |
+
+
+## Global Options
+
+```
+--token TEXT    API token (or set ACEDATACLOUD_API_TOKEN env var)
+--version       Show version
+--help          Show help message
+```
+
+Most commands support:
+
+```
+--json                       Output raw JSON (for piping/scripting)
+--model TEXT                 Seedance model version (default: doubao-seedance-2-0-260128)
+--aspect-ratio TEXT          Aspect ratio (16:9, 9:16, 1:1, 4:3, 3:4, 21:9, adaptive)
+--resolution TEXT            Output resolution (480p, 720p, 1080p, 4k)
+--duration INT               Duration in seconds (-1 for auto, up to 15 for 2.0 or 30 for 2.5). Mutually exclusive with --frames.
+--frames INT                 Frame count (29–289, must satisfy 25+4n). Mutually exclusive with --duration.
+--seed INT                   Random seed for reproducible generation (-1 for random).
+--camerafixed BOOL           Fix the camera position (true/false).
+--watermark BOOL             Add a watermark to the output (true/false).
+--generate-audio BOOL        Generate audio (true/false). Supported by doubao-seedance-1-5-pro-251215 and Seedance 2.x.
+--return-last-frame BOOL     Return the last frame of the video (true/false).
+--tool-json TEXT             Seedance 2.5 web_search tool object as JSON (one maximum).
+--priority INT               Seedance 2.5 task priority (0–9).
+--safety-identifier TEXT     Stable anonymous end-user identifier (maximum 64 characters).
+--execution-expires-after INT  Task timeout in seconds (3600–259200).
+--callback-url TEXT          Webhook callback URL.
+--first-frame-url TEXT       Reference image URL for the first frame.
+--last-frame-url TEXT        Reference image URL for the last frame.
+--reference-image-url TEXT   Additional reference image URL(s) (repeatable).
+--audio-url TEXT             Reference audio URL.
+--video-url TEXT             Reference video URL.
+```
+
+## Available Models
+
+| Model | Version | Notes |
+|-------|---------|-------|
+| `doubao-seedance-1-5-pro-251215` | V1.5 Pro | Newest 1.x, supports audio generation |
+| `doubao-seedance-1-0-pro-250528` | V1.0 Pro | Standard quality |
+| `doubao-seedance-1-0-pro-fast-251015` | V1.0 Fast | Faster generation |
+| `doubao-seedance-1-0-lite-t2v-250428` | V1.0 Lite T2V | Lightweight text-to-video |
+| `doubao-seedance-1-0-lite-i2v-250428` | V1.0 Lite I2V | Lightweight image-to-video |
+| `doubao-seedance-2-5-260628` | V2.5 | Latest flagship, up to 30s, edit/extend |
+| `doubao-seedance-2-0-fast-260128` | V2.0 Fast | Faster next-generation generation |
+| `doubao-seedance-2-0-mini-260615` | V2.0 Mini | Compact next-generation model |
+
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ACEDATACLOUD_API_TOKEN` | API token from AceDataCloud | *Required* |
+| `ACEDATACLOUD_API_BASE_URL` | API base URL | `https://api.acedata.cloud` |
+| `SEEDANCE_DEFAULT_MODEL` | Default model | `doubao-seedance-2-0-260128` |
+| `SEEDANCE_REQUEST_TIMEOUT` | Timeout in seconds | `1800` |
+
+## Development
+
+### Setup Development Environment
+
+```bash
+git clone https://github.com/AceDataCloud/SeedanceCli.git
+cd SeedanceCli
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev,test]"
+```
+
+### Run Tests
+
+```bash
+pytest
+pytest --cov=seedance_cli
+pytest tests/test_integration.py -m integration
+```
+
+### Code Quality
+
+```bash
+ruff format .
+ruff check .
+mypy seedance_cli
+```
+
+## Docker
+
+```bash
+docker pull ghcr.io/acedatacloud/seedance-cli:latest
+docker run --rm -e ACEDATACLOUD_API_TOKEN=your_token \
+  ghcr.io/acedatacloud/seedance-cli generate "A test video"
+```
+
+## Project Structure
+
+```
+SeedanceCli/
+├── seedance_cli/                # Main package
+│   ├── __init__.py
+│   ├── __main__.py            # python -m seedance_cli entry point
+│   ├── main.py                # CLI entry point
+│   ├── core/                  # Core modules
+│   │   ├── client.py          # HTTP client for Seedance API
+│   │   ├── config.py          # Configuration management
+│   │   ├── exceptions.py      # Custom exceptions
+│   │   └── output.py          # Rich terminal formatting
+│   └── commands/              # CLI command groups
+│       ├── video.py           # Video generation commands
+│       ├── task.py            # Task management commands
+│       └── info.py            # Info & utility commands
+├── tests/                     # Test suite
+├── .github/workflows/         # CI/CD (lint, test, publish to PyPI)
+├── Dockerfile                 # Container image
+├── deploy/                    # Kubernetes deployment configs
+├── .env.example               # Environment template
+├── pyproject.toml             # Project configuration
+└── README.md
+```
+
+## Seedance CLI vs MCP Seedance
+
+| Feature | Seedance CLI | MCP Seedance |
+|---------|-----------|-----------|
+| Interface | Terminal commands | MCP protocol |
+| Usage | Direct shell, scripts, CI/CD | Claude, VS Code, MCP clients |
+| Output | Rich tables / JSON | Structured MCP responses |
+| Automation | Shell scripts, piping | AI agent workflows |
+| Install | `pip install seedance-cli` | `pip install mcp-seedance` |
+
+Both tools use the same AceDataCloud API and share the same API token.
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing`)
+5. Open a Pull Request
+
+### Development Requirements
+
+- Python 3.10+
+- Dependencies: `pip install -e ".[all]"`
+- Lint: `ruff check . && ruff format --check .`
+- Test: `pytest`
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
