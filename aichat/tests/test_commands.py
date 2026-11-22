@@ -58,6 +58,7 @@ class TestGlobalCommands:
 
     def test_deepseek_models_match_in_both_model_lists(self):
         expected = [
+            "deepseek-v4.1-flash-1017",
             "deepseek-v4.1-flash",
             "deepseek-v4-flash",
             "deepseek-flash",
