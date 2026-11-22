@@ -81,6 +81,14 @@ class AichatClient:
                     raise
                 raise AichatAPIError(message=str(e)) from e
 
+    def completions(self, **kwargs: Any) -> dict[str, Any]:
+        """Send an explicit model to the unified Chat Completions endpoint."""
+        return self.request("/v1/chat/completions", kwargs)
+
+    def messages(self, **kwargs: Any) -> dict[str, Any]:
+        """Send a native Messages request without changing its model or protocol."""
+        return self.request("/v1/messages", kwargs)
+
     def converse(self, **kwargs: Any) -> dict[str, Any]:
         """Send a conversation request to the AI."""
         return self.request("/aichat/conversations", kwargs)

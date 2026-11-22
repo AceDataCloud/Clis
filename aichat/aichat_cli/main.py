@@ -12,7 +12,9 @@ import click
 from dotenv import load_dotenv
 
 from aichat_cli.commands.chat import chat, chat2
+from aichat_cli.commands.completions import completions
 from aichat_cli.commands.info import config, models, models2
+from aichat_cli.commands.messages import messages
 
 load_dotenv()
 
@@ -57,6 +59,8 @@ def cli(ctx: click.Context, token: str | None) -> None:
 # Register commands
 cli.add_command(chat)
 cli.add_command(chat2)
+cli.add_command(messages)
+cli.add_command(completions)
 cli.add_command(models)
 cli.add_command(models2)
 cli.add_command(config)

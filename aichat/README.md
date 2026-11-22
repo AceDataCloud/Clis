@@ -2,6 +2,26 @@
 
 A command-line tool for AI Dialogue via the [AceDataCloud](https://platform.acedata.cloud?utm_source=github&utm_medium=referral&utm_campaign=evergreen) platform.
 
+## Unified Chat Completions
+
+```bash
+aichat completions "Hello" --model kimi-k2.7-code
+aichat completions "Explain this" --model gemini-4-argon --json
+```
+
+`completions` calls `/v1/chat/completions` with an explicit model ID and Bearer authentication. It does not restrict you to the legacy `chat` or `chat2` command's per-API model suggestions. No model or token limit is silently selected: `--max-completion-tokens` is optional and only sent when provided. Use `messages` below for a model that only publishes a Messages endpoint. The commands do not fall back to another protocol.
+
+## Native Messages models
+
+Install the existing published package with `pip install -U aichat-pro-cli`. Models such as `claude-sonnet-5-5` require the native Messages protocol:
+
+```bash
+aichat messages "Hello" --model claude-sonnet-5-5 --max-tokens 128
+aichat messages "Summarize this" --model claude-opus-5-5 --max-tokens 128 --json
+```
+
+The command makes one non-streaming request to `/v1/messages` with your configured Bearer token. A model ID is required and passed through unchanged; no old client-side allowlist prevents newly published Messages models, and no alternate model or protocol is tried. Check the model's published protocol and current pricing before use. `--system` sets a system prompt and `--json` preserves the full native response, including tool or usage fields. The existing `chat`, `chat2`, `models`, and `models2` commands retain their behavior; their per-API model lists are not the complete cross-protocol catalog.
+
 ## Get your Ace Data Cloud API key
 
 1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=github&utm_medium=referral&utm_campaign=evergreen). Sign in, or register an account first.
