@@ -6,7 +6,7 @@ Do not install this CLI for a new workflow. The old commands, model list and con
 
 ## Migrate an existing workflow
 
-Review the current video services and their pricing in the [Ace Data Cloud catalog](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=sora_cli_retirement). Available alternatives have separate CLI packages and API contracts:
+Review the current video services and their pricing in the [Ace Data Cloud catalog](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Available alternatives have separate CLI packages and API contracts:
 
 - [Seedance CLI](https://github.com/AceDataCloud/SeedanceCli)
 - [Kling CLI](https://github.com/AceDataCloud/KlingCli)

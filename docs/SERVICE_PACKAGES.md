@@ -34,8 +34,8 @@ Configure your own application key in this server's `ACEDATACLOUD_API_TOKEN` fie
 
 ## 2. Register/sign in and create the right API key
 
-1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=cli_catalog_readme_api_key). Register/sign in. If General application does not exist, choose **Initialize General Application**.
-2. Copy the application API Key or use **Manage Keys → Create** to create one named for this integration. Check service/model access, expiration, usage limits and account balance against [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen&utm_content=cli_catalog_readme_pricing).
+1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Register/sign in. If General application does not exist, choose **Initialize General Application**.
+2. Copy the application API Key or use **Manage Keys → Create** to create one named for this integration. Check service/model access, expiration, usage limits and account balance against [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 3. If **Allowed APIs** is enabled, allow both the generation and task-query operations needed by the service. A query permission alone does not allow generation. Do not substitute a `platform-...` account-management token or a Discord proxy credential.
 
 ![Copy an application API key](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
