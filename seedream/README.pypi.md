@@ -71,7 +71,7 @@ seedream generate "A test image"
 seedream edit "Make it look like a painting" -i https://example.com/photo.jpg
 
 # Decompose a poster into editable layers
-seedream decompose https://example.com/poster.png --resolution 1.5K --json
+seedream decompose https://example.com/poster.png --model doubao-seedream-5-5-261028 --max-images 12 --text-recognition --json
 
 # Stream Lite image events as NDJSON
 seedream generate "A four-panel storyboard" --sequential-image-generation auto \
@@ -121,6 +121,8 @@ Most commands support:
 
 | Model | Version | Notes |
 |-------|---------|-------|
+| `doubao-seedream-5-5-261028` | V5.5 | Native transparent generation, editing, and up to 99 layers with OCR |
+| `doubao-seedream-5-0-flash-260915` | V5.0 Flash | Fast single images, reference edits, and up to 16 layers |
 | `doubao-seedream-5-0-pro-260628` | V5.0 Pro | Single image, 1K/1.5K/2K, transparent background, layer decomposition |
 | `doubao-seedream-5-0-lite-260128` | V5.0 Lite | Sequential images, streaming, web search (default) |
 | `doubao-seedream-4-5-251128` | V4.5 | Flagship model, best quality |

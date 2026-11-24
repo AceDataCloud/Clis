@@ -11,6 +11,8 @@ console = Console()
 
 # Available models
 SEEDREAM_MODELS = [
+    "doubao-seedream-5-5-261028",
+    "doubao-seedream-5-0-flash-260915",
     "doubao-seedream-5-0-pro-260628",
     "doubao-seedream-5-0-lite-260128",
     "doubao-seedream-4-5-251128",
@@ -90,6 +92,9 @@ def print_image_result(data: dict[str, Any]) -> None:
                 table.add_row("Description", str(item["description"]))
             if item.get("bounding_box"):
                 table.add_row("Bounding box", json.dumps(item["bounding_box"], ensure_ascii=False))
+            ocr_text = (item.get("text_recognition") or {}).get("text")
+            if ocr_text:
+                table.add_row("OCR", ocr_text)
             if item.get("error"):
                 table.add_row("Error", json.dumps(item["error"], ensure_ascii=False))
             console.print(table)
