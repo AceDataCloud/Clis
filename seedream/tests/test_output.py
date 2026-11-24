@@ -17,7 +17,9 @@ class TestConstants:
     """Tests for output constants."""
 
     def test_models_count(self):
-        assert len(SEEDREAM_MODELS) == 4
+        assert len(SEEDREAM_MODELS) == 6
+        assert "doubao-seedream-5-5-261028" in SEEDREAM_MODELS
+        assert "doubao-seedream-5-0-flash-260915" in SEEDREAM_MODELS
 
     def test_default_model_in_models(self):
         assert DEFAULT_MODEL in SEEDREAM_MODELS

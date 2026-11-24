@@ -63,6 +63,7 @@ def _common_result(result: dict, output_json: bool) -> None:
 @click.option("--response-format", type=click.Choice(["url", "b64_json"]), default=None)
 @click.option("--watermark/--no-watermark", default=None)
 @click.option("--output-format", type=click.Choice(["jpeg", "png"]), default=None)
+@click.option("--background", type=click.Choice(["auto", "transparent", "opaque"]), default=None)
 @click.option("--optimize-prompt-mode", type=click.Choice(["standard", "fast"]), default=None)
 @click.option(
     "--web-search", is_flag=True, default=False, help="Enable web search on Seedream 5.0 Lite."
@@ -88,6 +89,7 @@ def generate(
     response_format: str | None,
     watermark: bool | None,
     output_format: str | None,
+    background: str | None,
     optimize_prompt_mode: str | None,
     web_search: bool,
     callback_url: str | None,
@@ -114,6 +116,8 @@ def generate(
         "callback_url": callback_url,
         "async": async_mode,
     }
+    if background is not None:
+        payload["background"] = background
     try:
         if stream:
             payload["stream"] = True
@@ -140,9 +144,9 @@ def generate(
 @click.option("--output-format", type=click.Choice(["jpeg", "png"]), default=None)
 @click.option(
     "--background",
-    type=click.Choice(["transparent", "opaque"]),
+    type=click.Choice(["auto", "transparent", "opaque"]),
     default=None,
-    help="Seedream 5.0 Pro background mode.",
+    help="Background mode for Seedream 5.5 or 5.0 Pro/Flash.",
 )
 @click.option("--optimize-prompt-mode", type=click.Choice(["standard", "fast"]), default=None)
 @click.option("--callback-url", default=None)
@@ -191,6 +195,27 @@ def edit(
 @click.command()
 @click.argument("image_url")
 @click.option(
+    "-m",
+    "--model",
+    type=click.Choice(
+        [
+            "doubao-seedream-5-5-261028",
+            "doubao-seedream-5-0-pro-260628",
+            "doubao-seedream-5-0-flash-260915",
+        ]
+    ),
+    default="doubao-seedream-5-0-pro-260628",
+)
+@click.option(
+    "--max-images",
+    type=click.IntRange(2, 100),
+    default=None,
+    help="5.5 output limit, including the base image.",
+)
+@click.option(
+    "--text-recognition", is_flag=True, help="Return styled OCR for Seedream 5.5 text layers."
+)
+@click.option(
     "--prompt",
     default=None,
     help="Elements to split; omit for automatic decomposition. Supports <bbox>.",
@@ -210,6 +235,9 @@ def edit(
 def decompose(
     ctx: click.Context,
     image_url: str,
+    model: str,
+    max_images: int | None,
+    text_recognition: bool,
     prompt: str | None,
     resolution: str,
     output_format: str,
@@ -219,10 +247,22 @@ def decompose(
     output_json: bool,
 ) -> None:
     """Split IMAGE_URL into a base image and editable transparent layers."""
+    layer_options = {}
+    if max_images is not None or text_recognition:
+        if model != "doubao-seedream-5-5-261028":
+            raise click.UsageError("--max-images and --text-recognition require Seedream 5.5")
+        layer_options["layer_decomposition_options"] = {
+            key: value
+            for key, value in {
+                "max_images": max_images,
+                "text_recognition": True if text_recognition else None,
+            }.items()
+            if value is not None
+        }
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.edit_image(
-            model="doubao-seedream-5-0-pro-260628",
+            model=model,
             image=image_url,
             prompt=prompt,
             size=resolution,
@@ -230,6 +270,7 @@ def decompose(
             watermark=watermark,
             layer_decomposition=True,
             callback_url=callback_url,
+            **layer_options,
             **({"async": True} if async_mode else {}),
         )
         _common_result(result, output_json)
