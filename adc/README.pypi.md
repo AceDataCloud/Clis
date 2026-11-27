@@ -22,7 +22,7 @@ Save the key in the client's credential store or the environment variable shown 
 pip install acedatacloud-cli
 ```
 
-Use `adc services` to list the built-in routes. For Nano Banana, both `--service nano-banana` and `--service nanobanana` work for images and task lookups. Sora generation is retired. For new videos, select Seedance, Veo, or Luma.
+Use `adc services` to list the built-in routes. For Nano Banana, both `--service nano-banana` and `--service nanobanana` work for images and task lookups. Sora generation is retired. For new videos, select Seedance, Veo, Luma, or Kling.
 
 ## Find a service by name
 
@@ -33,6 +33,24 @@ adc packages "nano banana"
 ```
 
 This local directory shows Ace-maintained service packages and their observed publication state. It never installs a package or submits a request. HappyHorse's standalone CLI is published; its directory entry carries the exact first-release version/hash/install receipt. The independent MCP entry remains available. See the [service-name directory](https://github.com/AceDataCloud/Clis/blob/main/docs/SERVICE_PACKAGES.md) for publisher checks and first-use steps.
+
+## GPT Image and Kling
+
+Choose the GPT Image model explicitly. The default request waits for the images. Its result includes `data[].url` or `data[].b64_json`. Pass `--async` to request a task ID for later lookup, and `--json` to preserve the entire response. An image URL selects the edit operation.
+
+```bash
+adc image "A red fox in the snow" --service gpt-image --model gpt-image-2 --size 1024x1024
+adc image "Add a blue scarf" --service gpt-image --model gpt-image-2 --image-url https://example.com/fox.png --async --json
+adc task TASK_ID --service gpt-image --json
+```
+
+Kling returns a task ID for video generation. Use `--image-url` for an opening reference frame, or omit it for text-to-video. Model, mode, duration and aspect ratio are passed through to the Kling API.
+
+```bash
+adc video "A heron lands by the lake" --service kling --model kling-v3 --mode pro --duration 5 --aspect-ratio 16:9
+adc video "Slow pan toward the horizon" --service kling --image-url https://example.com/landscape.jpg
+adc wait TASK_ID --service kling --json
+```
 
 ## Quick Start
 

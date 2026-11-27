@@ -113,8 +113,15 @@ class AdcClient:
 
     def query_task(self, service: str, **kwargs: Any) -> dict[str, Any]:
         """Query task status."""
-        service_path = "nano-banana" if service == "nanobanana" else service
-        return self.request(f"/{service_path}/tasks", kwargs)
+        service_path = {"nanobanana": "nano-banana", "gpt-image": "openai"}.get(service, service)
+        result = self.request(f"/{service_path}/tasks", kwargs)
+        if (
+            service_path in {"openai", "kling"}
+            and kwargs.get("action") == "retrieve"
+            and result.get("id") != kwargs.get("id")
+        ):
+            raise AdcAPIError(message="No matching task was returned for the requested ID.")
+        return result
 
 
 def get_client(token: str | None = None) -> AdcClient:

@@ -16,6 +16,9 @@ from adc_cli.core.output import print_error, print_json, print_success, print_ta
     "--service",
     type=click.Choice(
         [
+            "gpt-image",
+            "openai",
+            "kling",
             "acemusic",
             "flux",
             "suno",
@@ -52,7 +55,7 @@ def task(
     client = get_client(ctx.obj.get("token"))
     try:
         result = client.query_task(service, id=task_id, action="retrieve")
-        if output_json:
+        if output_json or service in {"gpt-image", "openai", "kling"}:
             print_json(result)
         else:
             print_task_result(result)
@@ -68,6 +71,9 @@ def task(
     "--service",
     type=click.Choice(
         [
+            "gpt-image",
+            "openai",
+            "kling",
             "acemusic",
             "flux",
             "suno",
@@ -110,44 +116,55 @@ def wait_task(
     try:
         while elapsed < max_timeout:
             result = client.query_task(service, id=task_id, action="retrieve")
-            if service == "acemusic":
-                from adc_cli.core.task_state import acemusic_task_state
+            if service in {"gpt-image", "openai", "kling"}:
+                from adc_cli.core.task_state import media_task_state
 
-                ace_state = acemusic_task_state(result)
-                if ace_state in {
-                    "succeeded",
-                    "complete",
-                    "completed",
-                    "partial_failed",
-                    "failed",
-                    "error",
-                    "cancelled",
-                    "canceled",
-                }:
+                state = media_task_state(result)
+                if state != "pending":
                     print_json(result)
-                    if ace_state not in {"succeeded", "complete", "completed"}:
+                    if state != "completed":
+                        click.echo(f"Task {task_id}: {state}", err=True)
                         raise SystemExit(1)
                     return
-            data = result.get("data", {})
-
-            if isinstance(data, list) and data:
-                item = data[0]
-            elif isinstance(data, dict):
-                item = data
             else:
-                item = {}
+                if service == "acemusic":
+                    from adc_cli.core.task_state import acemusic_task_state
 
-            state = item.get("state", item.get("status", ""))
-            if state in ("succeeded", "completed", "complete", "failed", "error"):
-                if output_json:
-                    print_json(result)
+                    ace_state = acemusic_task_state(result)
+                    if ace_state in {
+                        "succeeded",
+                        "complete",
+                        "completed",
+                        "partial_failed",
+                        "failed",
+                        "error",
+                        "cancelled",
+                        "canceled",
+                    }:
+                        print_json(result)
+                        if ace_state not in {"succeeded", "complete", "completed"}:
+                            raise SystemExit(1)
+                        return
+                data = result.get("data", {})
+
+                if isinstance(data, list) and data:
+                    item = data[0]
+                elif isinstance(data, dict):
+                    item = data
                 else:
-                    if state in ("failed", "error"):
-                        print_error(f"Task {task_id} failed.")
+                    item = {}
+
+                state = item.get("state", item.get("status", ""))
+                if state in ("succeeded", "completed", "complete", "failed", "error"):
+                    if output_json:
+                        print_json(result)
                     else:
-                        print_success(f"Task {task_id} completed!")
-                    print_task_result(result)
-                return
+                        if state in ("failed", "error"):
+                            print_error(f"Task {task_id} failed.")
+                        else:
+                            print_success(f"Task {task_id} completed!")
+                        print_task_result(result)
+                    return
 
             if not output_json:
                 click.echo(f"Status: {state or 'pending'} (waited {elapsed}s)...", err=True)
