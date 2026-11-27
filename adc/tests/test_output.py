@@ -22,7 +22,8 @@ class TestConstants:
         assert "flux" in SERVICES
         assert "suno" in SERVICES
         assert "luma" in SERVICES
-        assert "sora" in SERVICES
+        assert "sora" not in SERVICES
+        assert "acemusic" in SERVICES
         assert "serp" in SERVICES
 
     def test_service_structure(self):

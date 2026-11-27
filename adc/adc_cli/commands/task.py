@@ -15,7 +15,18 @@ from adc_cli.core.output import print_error, print_json, print_success, print_ta
     "-s",
     "--service",
     type=click.Choice(
-        ["acemusic", "flux", "suno", "luma", "sora", "veo", "seedance", "seedream", "nanobanana"]
+        [
+            "acemusic",
+            "flux",
+            "suno",
+            "luma",
+            "sora",
+            "veo",
+            "seedance",
+            "seedream",
+            "nano-banana",
+            "nanobanana",
+        ]
     ),
     default="flux",
     help="Service the task belongs to.",
@@ -56,7 +67,18 @@ def task(
     "-s",
     "--service",
     type=click.Choice(
-        ["acemusic", "flux", "suno", "luma", "sora", "veo", "seedance", "seedream", "nanobanana"]
+        [
+            "acemusic",
+            "flux",
+            "suno",
+            "luma",
+            "sora",
+            "veo",
+            "seedance",
+            "seedream",
+            "nano-banana",
+            "nanobanana",
+        ]
     ),
     default="flux",
     help="Service the task belongs to.",

@@ -123,6 +123,36 @@ class TestImageCommands:
         assert body["action"] == "edit"
         assert body["model"] == "flux-kontext-pro"
 
+    @pytest.mark.parametrize("alias", ["nano-banana", "nanobanana"])
+    @respx.mock
+    def test_nano_banana_image_and_task_paths(self, runner, alias):
+        image = respx.post("https://api.acedata.cloud/nano-banana/images").mock(
+            return_value=Response(200, json={"task_id": "example"})
+        )
+        task = respx.post("https://api.acedata.cloud/nano-banana/tasks").mock(
+            return_value=Response(200, json={"status": "succeeded"})
+        )
+        source = "https://example.com/image.jpg"
+        args = ["--service", alias, "--image-url", source, "--size", "16:9", "--count", "2"]
+        assert runner.invoke(cli, ["--token", "test-token", "image", "Edit", *args]).exit_code == 0
+        body = json.loads(image.calls.last.request.content)
+        assert body == {
+            "action": "edit",
+            "prompt": "Edit",
+            "count": 2,
+            "image_urls": [source],
+            "aspect_ratio": "16:9",
+            "async": True,
+        }
+        assert (
+            runner.invoke(cli, ["--token", "test-token", "task", "example", "-s", alias]).exit_code
+            == 0
+        )
+        assert json.loads(task.calls.last.request.content) == {
+            "action": "retrieve",
+            "id": "example",
+        }
+
     @respx.mock
     def test_image_seedream(self, runner, mock_image_response):
         route = respx.post("https://api.acedata.cloud/seedream/images").mock(
@@ -156,17 +186,10 @@ class TestVideoCommands:
         data = json.loads(result.output)
         assert data["task_id"] == "test-task-789"
 
-    @respx.mock
-    def test_video_sora(self, runner, mock_video_response):
-        route = respx.post("https://api.acedata.cloud/sora/videos").mock(
-            return_value=Response(200, json=mock_video_response)
-        )
-        result = runner.invoke(
-            cli,
-            ["--token", "test-token", "video", "A rocket", "--service", "sora", "--json"],
-        )
-        assert result.exit_code == 0
-        assert route.called
+    def test_retired_sora_cannot_start_a_new_video(self, runner):
+        result = runner.invoke(cli, ["video", "A rocket", "--service", "sora"])
+        assert result.exit_code == 2
+        assert "Invalid value" in result.output
 
     @respx.mock
     def test_video_veo(self, runner, mock_video_response):
