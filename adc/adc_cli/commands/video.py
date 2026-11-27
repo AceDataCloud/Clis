@@ -11,7 +11,7 @@ from adc_cli.core.output import print_error, print_json, print_result
 @click.argument("prompt")
 @click.option(
     "--service",
-    type=click.Choice(["luma", "sora", "veo", "seedance"]),
+    type=click.Choice(["luma", "veo", "seedance"]),
     default="luma",
     help="Video generation service to use.",
 )
@@ -35,7 +35,7 @@ def video(
     Examples:
       adc video "A cinematic sunset over the ocean"
       adc video "Cat playing with yarn" --service luma --loop
-      adc video "A rocket launching" --service sora
+      adc video "A rocket launching" --service seedance
     """
     client = get_client(ctx.obj.get("token"))
     try:
@@ -48,8 +48,6 @@ def video(
 
         if service == "luma":
             result = client.luma_video(**payload)  # type: ignore[arg-type]
-        elif service == "sora":
-            result = client.sora_video(**payload)  # type: ignore[arg-type]
         else:
             result = client.request(
                 f"/{service}/videos",

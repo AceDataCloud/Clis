@@ -113,7 +113,8 @@ class AdcClient:
 
     def query_task(self, service: str, **kwargs: Any) -> dict[str, Any]:
         """Query task status."""
-        return self.request(f"/{service}/tasks", kwargs)
+        service_path = "nano-banana" if service == "nanobanana" else service
+        return self.request(f"/{service_path}/tasks", kwargs)
 
 
 def get_client(token: str | None = None) -> AdcClient:

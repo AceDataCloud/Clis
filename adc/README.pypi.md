@@ -22,6 +22,8 @@ Save the key in the client's credential store or the environment variable shown 
 pip install acedatacloud-cli
 ```
 
+Use `adc services` to list the built-in routes. For Nano Banana, both `--service nano-banana` and `--service nanobanana` work for images and task lookups. Sora generation is retired. For new videos, select Seedance, Veo, or Luma.
+
 ## Find a service by name
 
 ```bash
@@ -105,7 +107,6 @@ adc image "A landscape" -m flux-pro-1.1-ultra -s 16:9     # Custom model & size
 
 ```bash
 adc video "A cinematic sunset"                              # Luma (default)
-adc video "A rocket launching" --service sora               # Sora
 adc video "Clouds moving" --service veo                     # Veo
 adc video "Dance scene" --service seedance                  # Seedance
 adc video "Cat playing" --loop -a 16:9                      # Loop + aspect ratio
@@ -162,7 +163,6 @@ adc search "test query" --json | jq '.organic[].title'
 | NanoBanana   | Image  | `adc image --service nanobanana` |
 | Suno         | Music  | `adc music`                |
 | Luma         | Video  | `adc video --service luma` |
-| Sora         | Video  | `adc video --service sora` |
 | Veo          | Video  | `adc video --service veo`  |
 | Seedance     | Video  | `adc video --service seedance` |
 | SERP         | Search | `adc search`               |

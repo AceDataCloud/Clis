@@ -11,7 +11,7 @@ from adc_cli.core.output import print_error, print_json, print_result
 @click.argument("prompt")
 @click.option(
     "--service",
-    type=click.Choice(["flux", "seedream", "nanobanana"]),
+    type=click.Choice(["flux", "seedream", "nano-banana", "nanobanana"]),
     default="flux",
     help="Image generation service to use.",
 )
@@ -54,18 +54,26 @@ def image(
                 "image_url": image_url,
             }
             result = client.flux_image(**payload)  # type: ignore[arg-type]
-        else:
-            # seedream, nanobanana — generic image endpoint
+        elif service in {"nano-banana", "nanobanana"}:
             payload = {
-                "action": "generate",
+                "action": "edit" if image_url else "generate",
+                "prompt": prompt,
+                "model": model,
+                "count": count,
+                "image_urls": [image_url] if image_url else None,
+            }
+            if size:
+                payload["aspect_ratio" if ":" in size else "resolution"] = size
+            result = client.request("/nano-banana/images", client._with_async_callback(payload))
+        else:
+            payload = {
+                "action": "edit" if image_url else "generate",
                 "prompt": prompt,
                 "model": model,
                 "size": size,
+                "image": [image_url] if image_url else None,
             }
-            result = client.request(
-                f"/{service}/images",
-                client._with_async_callback(payload),  # noqa: SLF001
-            )
+            result = client.request("/seedream/images", client._with_async_callback(payload))
 
         if output_json:
             print_json(result)
