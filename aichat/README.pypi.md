@@ -109,7 +109,7 @@ aichat chat2 "Review this code and suggest a fix" -m kimi-k3.1-pro --max-turns 1
 
 ## Gemini 4 Argon in Chat2
 
-`gemini-4-argon`, `gemini-4-carbon` and `gemini-4-hydrogen` are available through `chat2`, not `chat`. The model defaults are unchanged; `aichat models2` lists the choices for this endpoint.
+`gemini-4-argon`, `gemini-4-carbon`, `gemini-4-neon` and `gemini-4-hydrogen` are available through `chat2`, not `chat`. The model defaults are unchanged; `aichat models2` lists the choices for this endpoint.
 
 ```bash
 aichat chat2 "Review this design and its tradeoffs" -m gemini-4-argon --max-turns 1

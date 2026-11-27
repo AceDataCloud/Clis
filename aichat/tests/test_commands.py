@@ -74,6 +74,7 @@ class TestGlobalCommands:
     def test_chat2_model_inventory_matches_gemini_models(self):
         assert MODELS2.count("gemini-4-argon") == 1
         assert MODELS2.count("gemini-4-carbon") == 1
+        assert MODELS2.count("gemini-4-neon") == 1
         assert MODELS2.count("gemini-4-hydrogen") == 1
         assert "gemini-4-argon" not in MODELS
         assert "gemini-3.7-flash" in MODELS2
