@@ -219,7 +219,7 @@
       "cli_directory": "tripo",
       "cli_package": "tripo-cli",
       "cli_command": "tripo",
-      "cli_published": false,
+      "cli_published": true,
       "cli_repo": "https://github.com/AceDataCloud/TripoCli",
       "mcp_package": "mcp-tripo",
       "mcp_repo": "https://github.com/AceDataCloud/TripoMCP",
@@ -232,7 +232,14 @@
       "mcp_command": "uvx",
       "mcp_arguments": [
         "mcp-tripo"
-      ]
+      ],
+      "publication_receipt": {
+        "version": "2026.11.27.1",
+        "official_metadata_url": "https://pypi.org/pypi/tripo-cli/2026.11.27.1/json",
+        "workflow_url": "https://github.com/AceDataCloud/TripoCli/actions/runs/45963875860",
+        "wheel_sha256": "109a16898531d605cb6f2a00d72c336cfa2806743e0592eb1977bdda586649f4",
+        "public_task_lookup_verified": true
+      }
     }
   ]
 }
