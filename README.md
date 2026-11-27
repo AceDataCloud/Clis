@@ -43,6 +43,7 @@ The source ADC CLI also offers an offline `adc packages suno` / `adc packages "g
 
 | Directory | Standalone Repo | Description |
 |---|---|---|
+| `tripo/` | [TripoCli](https://github.com/AceDataCloud/TripoCli) | 3D generation, model processing, animation and task retrieval |
 | `acemusic/` | [AceMusicCli](https://github.com/AceDataCloud/AceMusicCli) | ACE Music songs, lyrics and authenticated task CLI |
 | `luma/` | [LumaCli](https://github.com/AceDataCloud/LumaCli) | Luma video generation CLI |
 | `suno/` | [SunoCli](https://github.com/AceDataCloud/SunoCli) | Suno music generation CLI |

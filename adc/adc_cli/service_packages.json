@@ -206,6 +206,33 @@
       "mcp_arguments": [
         "mcp-acemusic"
       ]
+    },
+    {
+      "slug": "tripo",
+      "label": "Tripo",
+      "brand": "Tripo by Ace Data Cloud",
+      "search_terms": [
+        "tripo",
+        "3d",
+        "tripo cli"
+      ],
+      "cli_directory": "tripo",
+      "cli_package": "tripo-cli",
+      "cli_command": "tripo",
+      "cli_published": false,
+      "cli_repo": "https://github.com/AceDataCloud/TripoCli",
+      "mcp_package": "mcp-tripo",
+      "mcp_repo": "https://github.com/AceDataCloud/TripoMCP",
+      "documentation": "tripo",
+      "safe_command": "tripo --help",
+      "task_commands": [
+        "tripo tasks <task-id>"
+      ],
+      "note": "3D model generation, processing and animation with your Ace application token.",
+      "mcp_command": "uvx",
+      "mcp_arguments": [
+        "mcp-tripo"
+      ]
     }
   ]
 }
