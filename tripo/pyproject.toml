@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tripo-cli"
+version = "2026.11.27.0"
+description = "Tripo 3D generation and model tools for the Ace Data Cloud API"
+readme = "README.pypi.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [{name = "Ace Data Cloud", email = "support@acedata.cloud"}]
+dependencies = ["click>=8.1", "httpx>=0.27"]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.4"]
+test = ["pytest>=8", "pytest-cov"]
+
+[project.scripts]
+tripo = "tripo_cli.main:cli"
+
+[project.urls]
+Source = "https://github.com/AceDataCloud/TripoCli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["tripo_cli"]

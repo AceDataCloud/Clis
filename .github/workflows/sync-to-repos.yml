@@ -116,7 +116,7 @@ jobs:
           # Existing standalone workflows stay independent. The new ACE Music
           # repository is source-owned here and needs its initial publisher too.
           WORKFLOW_EXCLUDE="--exclude=.github"
-          if [ "$DIR" = "acemusic" ]; then
+          if [ "$DIR" = "acemusic" ] || [ "$DIR" = "tripo" ]; then
             WORKFLOW_EXCLUDE=""
           fi
 

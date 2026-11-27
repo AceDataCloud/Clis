@@ -94,6 +94,8 @@ mappings:
     exclude:
       - .github
       - .gitbooks
+  tripo:
+    repo: AceDataCloud/TripoCli
   acemusic:
     repo: AceDataCloud/AceMusicCli
     exclude:
