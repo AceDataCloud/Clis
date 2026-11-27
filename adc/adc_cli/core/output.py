@@ -12,6 +12,11 @@ console = Console()
 
 # Service catalog
 SERVICES = {
+    "gpt-image": {
+        "type": "Image",
+        "description": "GPT Image generation and reference-image editing",
+    },
+    "kling": {"type": "Video", "description": "Kling text-to-video and image-to-video"},
     "flux": {"type": "Image", "description": "Flux AI image generation & editing"},
     "seedream": {"type": "Image", "description": "Seedream image generation"},
     "nanobanana": {"type": "Image", "description": "NanoBanana image generation & editing"},
@@ -66,6 +71,14 @@ def print_result(data: dict[str, Any], result_type: str = "Result") -> None:
             console.print()
     else:
         console.print("[yellow]No data available yet. Use 'adc task' to check status.[/yellow]")
+
+
+def print_media_response(data: dict[str, Any]) -> None:
+    """Keep synchronous URLs and inline base64 data intact, and identify queued requests."""
+    if set(data) == {"task_id"} and data["task_id"]:
+        click.echo(f"Task ID: {data['task_id']}")
+    else:
+        print_json(data)
 
 
 def print_task_result(data: dict[str, Any]) -> None:
@@ -152,7 +165,8 @@ def print_services() -> None:
     table.add_column("CLI")
 
     for name, info in SERVICES.items():
-        table.add_row(name, info["type"], info["description"], f"adc {name.split('-')[0]}")
+        command = "adc search" if name == "serp" else f"adc {info['type'].lower()} --service {name}"
+        table.add_row(name, info["type"], info["description"], command)
 
     console.print(table)
-    console.print("\n[dim]Use 'adc <service> --help' for service-specific commands.[/dim]")
+    console.print("\n[dim]Use 'adc <command> --help' for options.[/dim]")
