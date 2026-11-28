@@ -4,6 +4,7 @@ from importlib import metadata
 
 import click
 
+from acemusic_cli.commands.assets import assets
 from acemusic_cli.commands.music import cover_audio, generate, lyrics, mashup_audio, upload_audio
 from acemusic_cli.commands.task import download, history, task, tasks_batch, wait
 
@@ -33,6 +34,7 @@ def models() -> None:
 
 for command in (
     generate,
+    assets,
     lyrics,
     upload_audio,
     cover_audio,

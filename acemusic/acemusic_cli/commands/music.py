@@ -26,6 +26,13 @@ from acemusic_cli.core.output import print_json
 )
 @click.option("--style", help="Required with custom lyrics.")
 @click.option("--title", default="", help="Required with custom lyrics.")
+@click.option("--asset-id", help="Available platform asset ID for idea generation.")
+@click.option(
+    "--asset-type",
+    type=click.Choice(["midi", "image", "video"]),
+    help="Type of the selected asset.",
+)
+@click.option("--idempotency-key", help="Stable key for this generation.")
 @click.option("--callback-url", help="A real webhook you control.")
 @click.option("--json", "output_json", is_flag=True, help="Print JSON (the default).")
 @click.pass_context
@@ -36,6 +43,9 @@ def generate(
     lyric_file: Path | None,
     style: str | None,
     title: str,
+    asset_id: str | None,
+    asset_type: str | None,
+    idempotency_key: str | None,
     callback_url: str | None,
     output_json: bool,
 ) -> None:
@@ -51,6 +61,12 @@ def generate(
         "custom": lyric_file is not None,
         "async": True,
     }
+    if (asset_id is None) != (asset_type is None):
+        raise click.UsageError("Provide --asset-id and --asset-type together.")
+    if asset_id is not None:
+        if not asset_id.strip() or lyric_file or model != "acemusic-v1.1":
+            raise click.UsageError("Reference assets require an asset ID and v1.1 idea mode.")
+        payload.update(asset_id=asset_id, asset_type=asset_type)
     if lyric_file:
         if prompt or not style or not style.strip() or not title.strip():
             raise click.UsageError(
@@ -66,6 +82,8 @@ def generate(
                 "Idea mode requires PROMPT; custom style/title require --lyric-file."
             )
         payload["prompt"] = prompt
+    if idempotency_key is not None:
+        payload["idempotency_key"] = idempotency_key
     if callback_url:
         payload["callback_url"] = callback_url
     try:

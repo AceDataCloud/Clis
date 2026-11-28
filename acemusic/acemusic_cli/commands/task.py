@@ -27,11 +27,15 @@ FAILURE = {"partial_failed", "failed", "error", "cancelled", "canceled"}
 
 def task_state(result: dict[str, Any]) -> str:
     state = str(result.get("state") or result.get("status") or "").lower()
+    if state == "submission_unknown":
+        return state
     if state in TERMINAL:
         return state
     response = result.get("response") or {}
     if isinstance(response, dict):
         response_state = str(response.get("state") or response.get("status") or "").lower()
+        if response_state == "submission_unknown":
+            return response_state
         if response_state in TERMINAL:
             return response_state
         if response.get("success") is False:
@@ -96,6 +100,9 @@ def wait(
     while True:
         result = query(ctx, action="retrieve", id=task_id)
         state = task_state(result)
+        if state == "submission_unknown":
+            print_json(result)
+            raise click.ClickException("Keep the original task and trace IDs for reconciliation.")
         if state in TERMINAL:
             print_json(result)
             if state in FAILURE:

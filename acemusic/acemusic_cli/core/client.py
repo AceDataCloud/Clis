@@ -35,6 +35,8 @@ class AceMusicClient:
         endpoint: str,
         payload: dict[str, Any],
         timeout: float | None = None,
+        *,
+        idempotency_key: str | None = None,
     ) -> dict[str, Any]:
         """Make a POST request to the AceMusic API.
 
@@ -52,12 +54,16 @@ class AceMusicClient:
         # Remove None values from payload
         payload = {k: v for k, v in payload.items() if v is not None}
 
+        headers = self._get_headers()
+        if idempotency_key is not None:
+            headers["Idempotency-Key"] = idempotency_key
+
         with httpx.Client() as http_client:
             try:
                 response = http_client.post(
                     url,
                     json=payload,
-                    headers=self._get_headers(),
+                    headers=headers,
                     timeout=request_timeout,
                 )
 
@@ -91,10 +97,12 @@ class AceMusicClient:
                 raise AceMusicAPIError(message=str(e)) from e
 
     # Convenience methods
-    def generate_audio(self, **kwargs: Any) -> dict[str, Any]:
+    def generate_audio(
+        self, *, idempotency_key: str | None = None, **kwargs: Any
+    ) -> dict[str, Any]:
         """Generate audio using the audios endpoint."""
         kwargs.setdefault("async", True)
-        return self.request("/acemusic/audios", kwargs)
+        return self.request("/acemusic/audios", kwargs, idempotency_key=idempotency_key)
 
     def generate_lyrics(self, **kwargs: Any) -> dict[str, Any]:
         """Generate lyrics using the lyrics endpoint."""
