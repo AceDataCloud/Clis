@@ -32,17 +32,13 @@ uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image
 
 Configure your own application key in this server's `ACEDATACLOUD_API_TOKEN` field, then begin with the free static `gpt_image_list_models`. Do not submit a generation for installation validation. The Registry entry does not prove every downstream client's GUI installation. Install separate MCP packages in separate environments, such as each host's `uvx` launcher, because they may share top-level Python module names.
 
-## 2. Register/sign in and create the right API key
+## 2. Copy your application API key
 
-1. Open [Ace Data Cloud → Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen). Register/sign in. If General application does not exist, choose **Initialize General Application**.
-2. Copy the application API Key or use **Manage Keys → Create** to create one named for this integration. Check service/model access, expiration, usage limits and account balance against [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
+1. Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. On your first visit, select **Initialize General Application** if prompted.
+2. Click the copy button beside **API KEY**, marked **1** in the screenshot. Store the copied key privately in the `ACEDATACLOUD_API_TOKEN` environment variable on the machine that runs the CLI. Check service/model access, expiration, usage limits and account balance against [current pricing](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen).
 3. If **Allowed APIs** is enabled, allow both the generation and task-query operations needed by the service. A query permission alone does not allow generation. Do not substitute a `platform-...` account-management token or a Discord proxy credential.
 
-![Copy an application API key](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
-
-![Create a dedicated key](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png)
-
-These are existing, redacted platform screenshots archived in the Suno Dify tutorial (source commit `8d3d0357`). They show only shared key steps, not CLI installation or a new run. The original key-name field says “Dify tutorial”; choose a CLI-specific name yourself.
+![Copy button beside API KEY in General Application, marked 1](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
 
 ## 3. Configure this terminal, then use the service
 
