@@ -1,6 +1,10 @@
 # Tripo CLI by Ace Data Cloud
 
-Generate 3D models from text or reference views, import or convert models, and check, rig or retarget an animation. Get an application token in [API Keys](https://platform.acedata.cloud/console/applications?utm_source=github&utm_medium=referral&utm_campaign=evergreen) for the application with Tripo access. Set `ACEDATACLOUD_API_TOKEN` to that token.
+Generate 3D models from text or reference views, import or convert models, and check, rig or retarget an animation.
+
+Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=github&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. Copy the key shown in **API KEY**, check that the application has Tripo access, and set `ACEDATACLOUD_API_TOKEN` to the copied value.
+
+![General Application API KEY field and copy button](https://cdn.acedata.cloud/dvc3cg.jpg)
 
 ```bash
 tripo generate --json '{"prompt":"A wooden chair","texture":"none"}' --idempotency-key chair-example-01

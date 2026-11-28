@@ -34,7 +34,7 @@ uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image
 
 ## 2. 注册/登录并取得正确的 API Key
 
-1. 打开 [Ace Data Cloud → Applications / 我的应用](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)，注册或登录；没有通用应用时点击 **Initialize General Application / 初始化通用应用**。
+1. 打开 [Ace Data Cloud → Applications / 我的应用](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)，登录后打开**通用应用**。
 2. 复制应用 API Key，或进 **Manage Keys / 管理密钥 → Create / 创建**，给本次集成命名。检查服务和模型权限、有效期、用量限制及余额，再核对[当前价格](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)。
 3. 如果启用 **Allowed APIs / 允许的接口**，同时允许该服务所需生成和任务查询接口；查询权限不等于生成权限。不要用平台管理 Token 或 Discord 代理凭据代替生成 Key。
 

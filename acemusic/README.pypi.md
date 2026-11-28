@@ -7,7 +7,9 @@ Create songs from an idea or custom lyrics, write lyrics, and retrieve the origi
 
 This new package is prepared for release alongside the ACE Music API. Verify package/API publication before use. Source development: `pip install -e ".[dev,test]"`.
 
-Get an application API key at [Applications](https://platform.acedata.cloud/console/applications?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen). Check service access, allowed APIs, expiration and balance, then set the raw key privately:
+Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen). Open **General Application** and copy the key shown in **API KEY**. Check service access, allowed APIs, expiration and balance, then set the raw key privately:
+
+![General Application API KEY field and copy button](https://cdn.acedata.cloud/dvc3cg.jpg)
 
 ```bash
 export ACEDATACLOUD_API_TOKEN="your-api-key"

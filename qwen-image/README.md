@@ -24,11 +24,9 @@ Generate and edit AI images directly from your terminal — no MCP client requir
 
 ### 1. Get API Token
 
-Get your API token from [AceDataCloud Platform](https://platform.acedata.cloud/):
+Sign in to [Applications](https://platform.acedata.cloud/console/applications) and open **General Application**. Copy the key shown in **API KEY** and use it for `ACEDATACLOUD_API_TOKEN` below.
 
-1. Sign up or log in
-2. Navigate to the QwenImage API page
-3. Click "Acquire" to get your token
+![General Application API KEY field and copy button](https://cdn.acedata.cloud/dvc3cg.jpg)
 
 ### 2. Install
 
