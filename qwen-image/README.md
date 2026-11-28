@@ -24,7 +24,7 @@ Generate and edit AI images directly from your terminal — no MCP client requir
 
 ### 1. Get API Token
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications) and open **General Application**. Initialize it on your first visit if prompted. Copy the key shown in **API KEY** and use it for `ACEDATACLOUD_API_TOKEN` below.
+Sign in to [Applications](https://platform.acedata.cloud/console/applications) and open **General Application**. Copy the key shown in **API KEY** and use it for `ACEDATACLOUD_API_TOKEN` below.
 
 ![General Application API KEY field and copy button](https://cdn.acedata.cloud/dvc3cg.jpg)
 

@@ -2,7 +2,7 @@
 
 Generate 3D models from text or reference views, import or convert models, and check, rig or retarget an animation.
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen), open **General Application**, and initialize it on your first visit if prompted. Copy the key shown in **API KEY**, check that the application has Tripo access, and set `ACEDATACLOUD_API_TOKEN` to the copied value.
+Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=pypi&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. Copy the key shown in **API KEY**, check that the application has Tripo access, and set `ACEDATACLOUD_API_TOKEN` to the copied value.
 
 ![General Application API KEY field and copy button](https://cdn.acedata.cloud/dvc3cg.jpg)
 
