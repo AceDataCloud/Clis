@@ -181,7 +181,7 @@ class TestChatCommand:
     @pytest.mark.parametrize("model", ["gemini-3.6-flash", "gemini-4-argon"])
     @respx.mock
     def test_generate_content_accepts_new_native_models(self, runner, mock_chat_response, model):
-        route = respx.post(f"https://api.acedata.cloud/v1beta/models/{model}:generateContent").mock(
+        route = respx.post(f"https://api.acedata.cloud/v1/models/{model}:generateContent").mock(
             return_value=Response(200, json=mock_chat_response)
         )
         result = runner.invoke(
@@ -599,7 +599,7 @@ class TestContentCommands:
     def test_thinking_config_passthrough(
         self, runner, command, operation, model, generation_config
     ):
-        route = respx.post(f"https://api.acedata.cloud/v1beta/models/{model}:{operation}").mock(
+        route = respx.post(f"https://api.acedata.cloud/v1/models/{model}:{operation}").mock(
             return_value=Response(200, json={})
         )
         contents = [{"parts": [{"text": "Hello"}]}]
@@ -649,7 +649,7 @@ class TestContentCommands:
         monkeypatch.setenv("GEMINI_REQUEST_TIMEOUT", "300")
         monkeypatch.setattr(settings, "request_timeout", Settings().request_timeout)
         route = respx.post(
-            f"https://api.acedata.cloud/v1beta/models/gemini-2.5-flash:{operation}"
+            f"https://api.acedata.cloud/v1/models/gemini-2.5-flash:{operation}"
         ).mock(return_value=Response(200, json={}))
         contents = [{"role": "user", "parts": [{"text": "Summarize this recording."}, audio_part]}]
 
@@ -687,7 +687,7 @@ class TestContentCommands:
     @respx.mock
     def test_audio_input_reports_timeout(self, runner, monkeypatch, command, operation):
         monkeypatch.setattr(settings, "request_timeout", 300.0)
-        respx.post(f"https://api.acedata.cloud/v1beta/models/gemini-2.5-flash:{operation}").mock(
+        respx.post(f"https://api.acedata.cloud/v1/models/gemini-2.5-flash:{operation}").mock(
             side_effect=ReadTimeout("Audio analysis timed out")
         )
         result = runner.invoke(
@@ -707,10 +707,11 @@ class TestContentCommands:
         assert result.exit_code == 1
         assert "timed out after 300.0s" in " ".join(result.output.split())
 
+    @pytest.mark.parametrize("version", [None, "v1beta"])
     @respx.mock
-    def test_generate_content_json(self, runner, mock_chat_response):
+    def test_generate_content_json(self, runner, mock_chat_response, version):
         route = respx.post(
-            "https://api.acedata.cloud/v1beta/models/gemini-2.5-flash:generateContent"
+            f"https://api.acedata.cloud/{version or 'v1'}/models/gemini-2.5-flash:generateContent"
         ).mock(return_value=Response(200, json=mock_chat_response))
         result = runner.invoke(
             cli,
@@ -718,6 +719,7 @@ class TestContentCommands:
                 "--token",
                 "test-token",
                 "generate-content",
+                *(["--api-version", version] if version else []),
                 "--model",
                 "gemini-2.5-flash",
                 "--contents",
@@ -733,10 +735,11 @@ class TestContentCommands:
         assert request_body["generationConfig"] == {"temperature": 0.5}
 
     @pytest.mark.parametrize("model", ["gemini-3.1-flash-image", "gemini-4-argon"])
+    @pytest.mark.parametrize("version", [None, "v1beta"])
     @respx.mock
-    def test_stream_generate_content_server_sent_events(self, runner, model):
+    def test_stream_generate_content_server_sent_events(self, runner, model, version):
         route = respx.post(
-            f"https://api.acedata.cloud/v1beta/models/{model}:streamGenerateContent?alt=sse"
+            f"https://api.acedata.cloud/{version or 'v1'}/models/{model}:streamGenerateContent?alt=sse"
         ).mock(
             return_value=Response(
                 200,
@@ -750,6 +753,7 @@ class TestContentCommands:
                 "--token",
                 "test-token",
                 "stream-generate-content",
+                *(["--api-version", version] if version else []),
                 "--model",
                 model,
                 "--contents",

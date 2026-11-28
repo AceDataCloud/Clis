@@ -63,8 +63,11 @@ gemini models
 | `gemini-2.5-flash-lite` | Gemini 2.5 Flash Lite |
 
 > Image-generating models (`gemini-*-image`) are not available on the chat
-> endpoint. Use the native `/v1beta/models/{model}:generateContent` API for
+> endpoint. Use the native `/v1/models/{model}:generateContent` API for
 > image generation.
+
+The native `generate-content` and `stream-generate-content` commands default to the stable
+`v1` API. Add `--api-version v1beta` to either command to use the beta endpoint.
 
 ## Gemini 4 Argon
 

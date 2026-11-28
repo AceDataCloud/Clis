@@ -12,6 +12,14 @@ from gemini_cli.core.exceptions import (
     GeminiTimeoutError,
 )
 
+NATIVE_API_VERSIONS = ("v1", "v1beta")
+
+
+def _generation_path(model: str, action: str, api_version: str) -> str:
+    if api_version not in NATIVE_API_VERSIONS:
+        raise ValueError(f"Unknown Gemini generation API version: {api_version}")
+    return f"/{api_version}/models/{model}:{action}"
+
 
 class GeminiClient:
     """HTTP client for AceDataCloud Gemini API."""
@@ -132,15 +140,17 @@ class GeminiClient:
                 raise
             raise GeminiAPIError(message=str(e)) from e
 
-    def generate_content(self, model: str, **kwargs: Any) -> dict[str, Any]:
+    def generate_content(
+        self, model: str, *, api_version: str = "v1", **kwargs: Any
+    ) -> dict[str, Any]:
         """Generate content using the native Gemini API."""
-        return self.request(f"/v1beta/models/{model}:generateContent", kwargs)
+        return self.request(_generation_path(model, "generateContent", api_version), kwargs)
 
     def stream_generate_content(
-        self, model: str, alt: str | None = None, **kwargs: Any
+        self, model: str, alt: str | None = None, *, api_version: str = "v1", **kwargs: Any
     ) -> Iterator[str]:
         """Generate streamed content using the native Gemini API."""
-        endpoint = f"/v1beta/models/{model}:streamGenerateContent"
+        endpoint = _generation_path(model, "streamGenerateContent", api_version)
         if alt is not None:
             endpoint = f"{endpoint}?alt={alt}"
         url = f"{self.base_url}{endpoint}"
