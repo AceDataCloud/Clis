@@ -154,3 +154,72 @@ def test_invalid_reference_commands_never_contact_api(tmp_path):
         ]:
             assert runner.invoke(cli, args).exit_code == 2
         get_client.assert_not_called()
+
+
+@respx.mock
+def test_assets_and_reference_generation():
+    url = "https://example.com/owned.mid"
+    route = respx.post("https://api.acedata.cloud/acemusic/assets").mock(
+        side_effect=[
+            httpx.Response(202, json={"task_id": "job"}),
+            httpx.Response(200, json={"success": True, "data": {"id": "asset", "type": "midi"}}),
+            httpx.Response(200, json={"items": [], "count": 0}),
+        ]
+    )
+    song = respx.post("https://api.acedata.cloud/acemusic/audios").mock(
+        return_value=httpx.Response(202, json={"task_id": "song"})
+    )
+    runner = CliRunner()
+    for args in [
+        ["assets", "upload", url, "--type", "midi", "--idempotency-key", "upload"],
+        ["assets", "get", "asset"],
+        ["assets", "list", "--type", "image", "--page", "2"],
+        [
+            "generate",
+            "folk",
+            "--asset-id",
+            "asset",
+            "--asset-type",
+            "midi",
+            "--idempotency-key",
+            "song",
+        ],
+    ]:
+        result = runner.invoke(cli, ["--token", "offline", *args])
+        assert result.exit_code == 0, (result.output, result.exception)
+    assert [json.loads(c.request.content) for c in route.calls] == [
+        {"action": "upload", "type": "midi", "url": url, "async": True},
+        {"action": "retrieve", "id": "asset"},
+        {"action": "retrieve", "page": 2, "page_size": 20, "type": "image"},
+    ]
+    assert route.calls[0].request.headers["Idempotency-Key"] == "upload"
+    assert song.calls[0].request.headers["Idempotency-Key"] == "song"
+    assert json.loads(song.calls[0].request.content)["asset_id"] == "asset"
+    assert runner.invoke(cli, ["generate", "folk", "--asset-id", "asset"]).exit_code == 2
+    assert (
+        runner.invoke(
+            cli,
+            [
+                "generate",
+                "folk",
+                "--asset-id",
+                "asset",
+                "--asset-type",
+                "midi",
+                "--model",
+                "acemusic-v1",
+            ],
+        ).exit_code
+        == 2
+    )
+    assert song.call_count == 1
+
+
+def test_wait_stops_on_unknown_asset_import():
+    client = Mock()
+    client.query_task.return_value = {"id": "job", "state": "submission_unknown"}
+    with patch("acemusic_cli.commands.task.get_client", return_value=client):
+        result = CliRunner().invoke(cli, ["wait", "job"])
+    assert result.exit_code == 1
+    assert "reconciliation" in result.output
+    client.query_task.assert_called_once_with(action="retrieve", id="job")
