@@ -3,7 +3,7 @@
 import click
 
 from gemini_cli.commands._json import parse_json_array, parse_json_object
-from gemini_cli.core.client import get_client
+from gemini_cli.core.client import NATIVE_API_VERSIONS, get_client
 from gemini_cli.core.exceptions import GeminiError
 from gemini_cli.core.output import GEMINI_NATIVE_MODELS, print_chat_result, print_error, print_json
 
@@ -38,6 +38,13 @@ def _build_payload(
 
 
 def _content_options(command):
+    command = click.option(
+        "--api-version",
+        type=click.Choice(NATIVE_API_VERSIONS),
+        default="v1",
+        show_default=True,
+        help="Gemini API version for this request.",
+    )(command)
     command = click.option(
         "--safety-settings", default=None, help="Safety settings as a JSON array."
     )(command)
@@ -82,6 +89,7 @@ def _content_options(command):
 @click.pass_context
 def generate_content(
     ctx: click.Context,
+    api_version: str,
     output_json: bool,
     model: str,
     contents: str,
@@ -103,7 +111,7 @@ def generate_content(
     )
 
     try:
-        result = client.generate_content(model, **payload)  # type: ignore[arg-type]
+        result = client.generate_content(model, api_version=api_version, **payload)  # type: ignore[arg-type]
         if output_json:
             print_json(result)
         else:
@@ -119,6 +127,7 @@ def generate_content(
 @click.pass_context
 def stream_generate_content(
     ctx: click.Context,
+    api_version: str,
     alt: str | None,
     output_json: bool,
     model: str,
@@ -142,7 +151,9 @@ def stream_generate_content(
     )
 
     try:
-        for event in client.stream_generate_content(model, alt=alt, **payload):  # type: ignore[arg-type]
+        for event in client.stream_generate_content(
+            model, alt=alt, api_version=api_version, **payload
+        ):  # type: ignore[arg-type]
             click.echo(event)
     except GeminiError as e:
         print_error(e.message)
