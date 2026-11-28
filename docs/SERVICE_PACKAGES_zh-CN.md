@@ -34,11 +34,15 @@ uvx --from 'mcp-openai-pro>=2026.10.18.2' mcp-openai-pro --profile gpt-image
 
 ## 2. 注册/登录并取得正确的 API Key
 
-1. 登录[应用列表](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)，打开**通用应用**。首次使用时先初始化通用应用。
-2. 点击 **API KEY** 旁的复制按钮（图中标注 **1**）。将 Key 保存在运行 CLI 的环境中，供下文 `ACEDATACLOUD_API_TOKEN` 使用。检查服务和模型权限、有效期、用量限制及余额，再核对[当前价格](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)。
+1. 打开 [Ace Data Cloud → Applications / 我的应用](https://platform.acedata.cloud/console/applications?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)，注册或登录；没有通用应用时点击 **Initialize General Application / 初始化通用应用**。
+2. 复制应用 API Key，或进 **Manage Keys / 管理密钥 → Create / 创建**，给本次集成命名。检查服务和模型权限、有效期、用量限制及余额，再核对[当前价格](https://platform.acedata.cloud/models?utm_source=opensource&utm_medium=referral&utm_campaign=evergreen)。
 3. 如果启用 **Allowed APIs / 允许的接口**，同时允许该服务所需生成和任务查询接口；查询权限不等于生成权限。不要用平台管理 Token 或 Discord 代理凭据代替生成 Key。
 
-![通用应用中 API KEY 旁标注 1 的复制按钮](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![Copy an application API key](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/get-api-key-en.png)
+
+![Create a dedicated key](https://raw.githubusercontent.com/AceDataCloud/SunoDify/8d3d03570e73324220f111f7fe343da0792a8071/_assets/tutorial/create-api-key-en.png)
+
+原图来自 Suno Dify 教程固定提交 `8d3d0357`，真实敏感值已遮挡；仅展示通用密钥步骤，不证明 CLI 安装或新调用。原图名称是 Dify tutorial，实际请填写自己的 CLI 名称。
 
 ## 3. 配置当前终端，再使用服务
 

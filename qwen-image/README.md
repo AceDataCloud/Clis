@@ -24,9 +24,9 @@ Generate and edit AI images directly from your terminal — no MCP client requir
 
 ### 1. Get API Token
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=github&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. On your first visit, select **Initialize General Application** if prompted. Click the copy button beside **API KEY**, marked **1** in the screenshot. Store the copied key privately in the `ACEDATACLOUD_API_TOKEN` environment variable on the machine that runs the CLI.
+Sign in to [Applications](https://platform.acedata.cloud/console/applications) and open **General Application**. Initialize it on your first visit if prompted. Copy the key shown in **API KEY** and use it for `ACEDATACLOUD_API_TOKEN` below.
 
-![Copy button beside API KEY in General Application, marked 1](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![General Application API KEY field and copy button](https://cdn.acedata.cloud/dvc3cg.jpg)
 
 ### 2. Install
 
