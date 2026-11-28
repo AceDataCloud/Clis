@@ -5,7 +5,7 @@ A command-line tool for Gemini AI via [AceDataCloud](https://platform.acedata.cl
 ## Installation
 
 ```bash
-pip install gemini-cli
+python -m pip install "git+https://github.com/AceDataCloud/Clis.git@main#subdirectory=gemini"
 ```
 
 ## Quick Start
